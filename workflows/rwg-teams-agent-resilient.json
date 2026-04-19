@@ -1,0 +1,1138 @@
+{
+  "name": "RWG Teams Agent - Resilient",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## RWG Teams Agent\nRobuster Teams 1:1 Agent mit schneller Erstreaktion, Mehrsprachigkeit, Attachment-Kontext, RAG, Jira-Lookup, Memory und Fallback.",
+        "height": 180,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -920,
+        -360
+      ],
+      "id": "8c4a018e-661b-4dc7-8e7a-0b0bd5e93401",
+      "name": "Note - Purpose"
+    },
+    {
+      "parameters": {
+        "content": "## Nach dem Import\n1. Credentials in n8n zuweisen.\n2. Im Node `Normalize Request` die `ownUserIds` setzen.\n3. In einem Teams 1:1 Chat testen.\n4. Danach aktivieren.",
+        "height": 220,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -920,
+        -120
+      ],
+      "id": "070e96a3-f195-4194-8a98-76c26b951ff8",
+      "name": "Note - Import"
+    },
+    {
+      "parameters": {
+        "content": "## Attachment-Strategie\nTeams-Dateien kommen als Attachments, Links oder Hosted Contents. Der Workflow uebergibt lesbare Inline-Texte, URLs, Dateiarten und Bild-/Dokumenthinweise an den Agenten. Nicht lesbare binaere Inhalte werden transparent benannt.",
+        "height": 220,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -360
+      ],
+      "id": "9ea86f30-e3c7-479c-a96e-dad8dbf1f868",
+      "name": "Note - Files"
+    },
+    {
+      "parameters": {
+        "event": "newChatMessage",
+        "watchAllChats": true
+      },
+      "type": "n8n-nodes-base.microsoftTeamsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        240
+      ],
+      "id": "86df05dc-20e1-42dd-9d80-597cbe932028",
+      "name": "Microsoft Teams Trigger",
+      "webhookId": "replace-after-import"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json || {};\nconst odataId = raw['@odata.id'] || '';\nconst messageId = raw.id || raw.messageId || '';\nlet chatId = raw.chatId || raw.chat?.id || raw.channelData?.chatId || raw.conversationId || raw.conversation?.id || '';\nif (!chatId && odataId) {\n  const direct = odataId.match(/\\/chats\\/([^\\/]+)\\/messages\\/[^\\/]+$/i);\n  const quoted = odataId.match(/chats\\('([^']+)'\\)/i);\n  chatId = direct?.[1] || quoted?.[1] || '';\n}\nconst graphBase = 'https://graph.microsoft.com/v1.0';\nreturn [{\n  json: {\n    receivedAt: new Date().toISOString(),\n    trigger: raw,\n    chatId,\n    messageId,\n    canLoadMessage: Boolean(chatId && messageId),\n    urls: {\n      chat: chatId ? `${graphBase}/chats/${encodeURIComponent(chatId)}` : '',\n      message: chatId && messageId ? `${graphBase}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}` : '',\n      hostedContents: chatId && messageId ? `${graphBase}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}/hostedContents` : ''\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        240
+      ],
+      "id": "2d223cdf-6963-48bb-9ca1-6774cb154453",
+      "name": "Extract Graph IDs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "has-message-url",
+              "leftValue": "={{ $json.canLoadMessage }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        240
+      ],
+      "id": "d8079234-29b1-4e6c-a607-cefe2a0e30c5",
+      "name": "Can Load Message?"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls.chat }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftTeamsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        20,
+        40
+      ],
+      "id": "0f4ae1bc-b3f0-4068-9c48-425cf946aaec",
+      "name": "Load Chat Details",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json || {};\nreturn [{ json: { chatMeta: { id: item.id || '', chatType: item.chatType || '', topic: item.topic || '', webUrl: item.webUrl || '' }, chatLoadError: item.error || null } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        40
+      ],
+      "id": "4b8a431a-3b35-42c6-8b51-d243476f1649",
+      "name": "Prepare Chat Details"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls.message }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftTeamsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        20,
+        240
+      ],
+      "id": "691a0382-afb3-455c-9df9-d84cd0d26694",
+      "name": "Load Full Teams Message",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json || {};\nreturn [{ json: { messageMeta: { id: item.id || '', chatId: item.chatId || '', createdDateTime: item.createdDateTime || '', lastModifiedDateTime: item.lastModifiedDateTime || '', from: item.from || {}, body: item.body || {}, attachments: item.attachments || [], mentions: item.mentions || [], raw: item }, messageLoadError: item.error || null } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        240
+      ],
+      "id": "00ee5418-4cc7-49c2-9a35-aa3d7fec8b49",
+      "name": "Prepare Full Message"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls.hostedContents }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftTeamsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        20,
+        440
+      ],
+      "id": "48043fb9-e8e4-40e3-92df-65844149c356",
+      "name": "Load Hosted Contents",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json || {};\nconst values = Array.isArray(item.value) ? item.value : [];\nconst hostedContents = values.map((entry, index) => {\n  const contentType = entry.contentType || '';\n  const contentBytes = entry.contentBytes || '';\n  let textPreview = '';\n  if (contentBytes && /^(text\\/|application\\/(json|xml))/i.test(contentType)) {\n    try { textPreview = Buffer.from(contentBytes, 'base64').toString('utf8').slice(0, 4000); } catch (error) { textPreview = ''; }\n  }\n  return { index, id: entry.id || '', contentType, isImage: /^image\\//i.test(contentType), isTextLike: Boolean(textPreview), textPreview };\n});\nreturn [{ json: { hostedContents, hostedContentLoadError: item.error || null } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        440
+      ],
+      "id": "2e614737-c20f-45bc-930f-21c9b639ee1d",
+      "name": "Prepare Hosted Contents"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        540,
+        140
+      ],
+      "id": "8cb0d178-24ff-41f2-9834-a33953b02f1c",
+      "name": "Merge Chat + Message"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        820,
+        240
+      ],
+      "id": "13e21992-90f9-4df5-8b8a-63d853411efb",
+      "name": "Merge Context + Hosted"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json || {};\n\nconst ownUserIds = [\n  // TODO after import: add bot/service user ids, for example '00000000-0000-0000-0000-000000000000'\n];\nconst agentDisplayNameHints = ['rwg assistent', 'rwg agent'];\n\nfunction htmlToText(html) {\n  return String(html || '')\n    .replace(/<at[^>]*>.*?<\\/at>/gi, ' ')\n    .replace(/<attachment[^>]*><\\/attachment>/gi, ' ')\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    .replace(/<\\/(div|p|li)>/gi, '\\n')\n    .replace(/<[^>]+>/g, ' ')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/[ \\t]+/g, ' ')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n}\n\nfunction detectLanguage(text) {\n  const lower = String(text || '').toLowerCase();\n  const scores = {\n    de: ['hallo', 'guten', 'bitte', 'danke', 'fehler', 'hilfe', 'kannst', 'was', 'wie', 'warum', 'ticket'],\n    en: ['hello', 'please', 'thanks', 'error', 'help', 'can you', 'what', 'how', 'why', 'ticket'],\n    nl: ['hallo', 'goedemorgen', 'alsjeblieft', 'dank', 'fout', 'hulp', 'waarom', 'hoe'],\n    fr: ['bonjour', 'merci', 'erreur', 'aide', 'comment', 'pourquoi', 'pouvez'],\n    es: ['hola', 'gracias', 'error', 'ayuda', 'como', 'por que', 'puedes'],\n    it: ['ciao', 'grazie', 'errore', 'aiuto', 'come', 'perche', 'puoi']\n  };\n  let best = { code: 'de', score: 0 };\n  for (const [code, words] of Object.entries(scores)) {\n    const score = words.reduce((sum, word) => sum + (lower.includes(word) ? 1 : 0), 0);\n    if (score > best.score) best = { code, score };\n  }\n  const labels = { de: 'Deutsch', en: 'English', nl: 'Nederlands', fr: 'Francais', es: 'Espanol', it: 'Italiano' };\n  return { code: best.code, label: labels[best.code] || 'Deutsch', confidence: best.score > 0 ? 'heuristic' : 'default' };\n}\n\nfunction firstName(displayName) {\n  const parts = String(displayName || '').trim().split(/\\s+/).filter(Boolean);\n  if (!parts.length) return '';\n  return parts.length === 1 ? parts[0] : parts[parts.length - 1];\n}\n\nfunction salutation(language, name) {\n  const prefix = { de: 'Hallo', en: 'Hello', nl: 'Hallo', fr: 'Bonjour', es: 'Hola', it: 'Ciao' }[language] || 'Hallo';\n  return name ? `${prefix} ${name}` : prefix;\n}\n\nfunction quickAck(language) {\n  return {\n    de: 'Ich schaue mir das kurz an und melde mich gleich mit einer Antwort.',\n    en: 'I am checking this and will come back with an answer shortly.',\n    nl: 'Ik kijk er kort naar en kom zo met een antwoord terug.',\n    fr: 'Je regarde cela et je reviens rapidement avec une reponse.',\n    es: 'Lo reviso y vuelvo enseguida con una respuesta.',\n    it: 'Controllo subito e torno a breve con una risposta.'\n  }[language] || 'Ich schaue mir das kurz an und melde mich gleich mit einer Antwort.';\n}\n\nfunction fallback(language) {\n  return {\n    de: 'Ich konnte die Anfrage gerade nicht vollstaendig verarbeiten. Bitte versuche es gleich erneut oder formuliere die Frage etwas konkreter.',\n    en: 'I could not process the request completely right now. Please try again shortly or make the question a bit more specific.',\n    nl: 'Ik kon de vraag nu niet volledig verwerken. Probeer het zo opnieuw of formuleer de vraag iets specifieker.',\n    fr: 'Je n ai pas pu traiter completement la demande pour le moment. Merci de reessayer ou de preciser la question.',\n    es: 'No pude procesar la solicitud completamente ahora. Intentalo de nuevo o formula la pregunta con mas detalle.',\n    it: 'Non sono riuscito a elaborare completamente la richiesta. Riprova tra poco o formula la domanda in modo piu preciso.'\n  }[language] || 'Ich konnte die Anfrage gerade nicht vollstaendig verarbeiten. Bitte versuche es gleich erneut oder formuliere die Frage etwas konkreter.';\n}\n\nconst chatMeta = item.chatMeta || {};\nconst messageMeta = item.messageMeta || {};\nconst rawBody = messageMeta.body || {};\nconst text = htmlToText(rawBody.content || '');\nconst language = detectLanguage(text);\nconst fromUser = messageMeta.from?.user?.displayName || messageMeta.from?.application?.displayName || '';\nconst fromUserId = messageMeta.from?.user?.id || messageMeta.from?.application?.id || '';\nconst fromType = messageMeta.from?.user ? 'user' : messageMeta.from?.application ? 'application' : 'unknown';\nconst chatId = messageMeta.chatId || chatMeta.id || item.chatId || '';\nconst messageId = messageMeta.id || item.messageId || '';\nconst lower = text.toLowerCase();\nconst isGreeting = /^(hallo|hi|hey|moin|servus|guten morgen|guten tag|guten abend|hello|good morning|bonjour|hola|ciao)\\b/i.test(text) && text.length <= 40;\nconst intent = isGreeting ? 'greeting' : text.includes('?') ? 'question' : /fehler|error|problem|hilfe|help|störung|issue|bug/i.test(text) ? 'problem' : 'request';\nconst attachments = (messageMeta.attachments || []).map((a, index) => {\n  const contentType = a.contentType || '';\n  const contentUrl = a.contentUrl || '';\n  const name = a.name || a.id || `attachment-${index + 1}`;\n  return {\n    index,\n    id: a.id || '',\n    name,\n    contentType,\n    contentUrl,\n    hasUrl: Boolean(contentUrl),\n    isImage: /^image\\//i.test(contentType) || /\\.(png|jpg|jpeg|gif|webp)$/i.test(name),\n    isDocument: /pdf|word|excel|powerpoint|officedocument|msword|spreadsheet|presentation/i.test(contentType) || /\\.(pdf|docx?|xlsx?|pptx?)$/i.test(name),\n    rawContentPreview: typeof a.content === 'string' ? a.content.slice(0, 2000) : ''\n  };\n});\nconst links = Array.from(new Set((text.match(/https?:\\/\\/\\S+/gi) || []).map(url => url.replace(/[).,;]+$/, ''))));\nconst hostedContents = Array.isArray(item.hostedContents) ? item.hostedContents : [];\nconst hasReadableAttachmentContext = attachments.some(a => a.rawContentPreview) || hostedContents.some(h => h.textPreview);\nconst isOwnMessage = ownUserIds.includes(fromUserId) || agentDisplayNameHints.some(name => fromUser.toLowerCase().includes(name));\nconst isOneOnOneChat = (chatMeta.chatType || '') === 'oneOnOne';\nconst shouldProcess = Boolean(isOneOnOneChat && fromType === 'user' && !isOwnMessage && chatId && messageId && (text || attachments.length || hostedContents.length));\n\nreturn [{ json: {\n  receivedAt: item.receivedAt || new Date().toISOString(),\n  chat: { id: chatId, type: chatMeta.chatType || '', topic: chatMeta.topic || '', webUrl: chatMeta.webUrl || '', isOneOnOneChat },\n  teams: { chatId, messageId, fromUser, fromUserId, fromType, firstName: firstName(fromUser), salutation: salutation(language.code, firstName(fromUser)), createdDateTime: messageMeta.createdDateTime || '' },\n  body: { contentType: rawBody.contentType || '', rawHtml: rawBody.content || '', text, textLower: lower },\n  language,\n  attachments,\n  hostedContents,\n  links,\n  control: { shouldProcess, isOwnMessage, isGreeting, intent, needsQuickAck: shouldProcess && !isGreeting },\n  reliability: { chatLoadError: item.chatLoadError || null, messageLoadError: item.messageLoadError || null, hostedContentLoadError: item.hostedContentLoadError || null, hasReadableAttachmentContext },\n  replies: { quickAck: quickAck(language.code), fallback: fallback(language.code) }\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        240
+      ],
+      "id": "7bebcdea-7b57-4606-b8fe-c3dad1023979",
+      "name": "Normalize Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "should-process",
+              "leftValue": "={{ $json.control.shouldProcess }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1320,
+        240
+      ],
+      "id": "1c7eb764-45ee-44d7-98a7-9c533f9fd157",
+      "name": "Should Process?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "needs-quick-ack",
+              "leftValue": "={{ $json.control.needsQuickAck }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1560,
+        160
+      ],
+      "id": "3afd1128-a6f4-4aa3-9f1e-f786f4bd6b53",
+      "name": "Needs Quick Ack?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.microsoft.com/v1.0/chats/{{$json.teams.chatId}}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftTeamsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { body: { contentType: 'html', content: '<p>' + $json.replies.quickAck.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' } } }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1800,
+        40
+      ],
+      "id": "0cfa6c6b-eeef-4c2c-a293-798dbe747fbc",
+      "name": "Send Quick Ack",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 750,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $('Normalize Request').first().json }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2040,
+        40
+      ],
+      "id": "3beea8ad-2c38-456a-a6f7-b9056a2fc9a9",
+      "name": "Restore Context After Ack"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst canLookupProfile = Boolean(item.teams?.fromUserId && item.teams?.fromType === 'user');\nreturn [{ json: { ...item, senderLookup: { userId: item.teams?.fromUserId || '', displayName: item.teams?.fromUser || '', canLookupProfile } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2280,
+        160
+      ],
+      "id": "a35acb9a-4c90-44c4-9311-8e86cc9d0af1",
+      "name": "Prepare Sender Lookup"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "can-profile",
+              "leftValue": "={{ $json.senderLookup.canLookupProfile }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2520,
+        160
+      ],
+      "id": "43aa1316-4f32-4260-a725-db26fd6edcbb",
+      "name": "Can Lookup Profile?"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/users/{{$json.senderLookup.userId}}?$select=id,displayName,givenName,surname,jobTitle,department,officeLocation,mail,userPrincipalName",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftTeamsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2760,
+        40
+      ],
+      "id": "d4d549fd-9111-45ea-bb62-0067bc397d6c",
+      "name": "Load Sender Profile",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 750,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const original = $('Prepare Sender Lookup').first().json;\nconst p = $input.first().json || {};\nreturn [{ json: { ...original, senderProfile: { id: p.id || original.senderLookup.userId || '', displayName: p.displayName || original.senderLookup.displayName || '', givenName: p.givenName || '', surname: p.surname || '', jobTitle: p.jobTitle || '', department: p.department || '', officeLocation: p.officeLocation || '', mail: p.mail || '', userPrincipalName: p.userPrincipalName || '' }, senderProfileFallback: Boolean(p.error) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3000,
+        40
+      ],
+      "id": "e7c0f2c4-b6f7-4afc-adc3-1471bf5ec5cf",
+      "name": "Attach Sender Profile"
+    },
+    {
+      "parameters": {
+        "jsCode": "const original = $('Prepare Sender Lookup').first().json;\nreturn [{ json: { ...original, senderProfile: { id: original.senderLookup?.userId || '', displayName: original.senderLookup?.displayName || original.teams?.fromUser || '', givenName: '', surname: '', jobTitle: '', department: '', officeLocation: '', mail: '', userPrincipalName: '' }, senderProfileFallback: true } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2760,
+        280
+      ],
+      "id": "6f9f639f-7099-4f03-9a48-b3943ad7188b",
+      "name": "Fallback Sender Profile"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3240,
+        160
+      ],
+      "id": "f0d234cf-5fa4-4f94-9901-cb7feee9d8cc",
+      "name": "Merge Sender Paths"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst attachmentLines = (item.attachments || []).map(a => `- ${a.name || a.id}: type=${a.contentType || 'unknown'}, url=${a.contentUrl || 'none'}, image=${a.isImage}, document=${a.isDocument}, preview=${a.rawContentPreview || 'none'}`).join('\\n') || '- none';\nconst hostedLines = (item.hostedContents || []).map(h => `- id=${h.id || h.index}, type=${h.contentType || 'unknown'}, image=${h.isImage}, textPreview=${h.textPreview || 'none'}`).join('\\n') || '- none';\nconst linkLines = (item.links || []).map(url => `- ${url}`).join('\\n') || '- none';\nconst profile = item.senderProfile || {};\nconst systemMessage = `Du bist der RWG Assistent, ein interner Microsoft Teams AI-Agent fuer IT-, Prozess-, Jira- und Wissensfragen.\\n\\nAntworte in der Sprache des Nutzers: ${item.language?.label || 'Deutsch'}.\\nNutze zuerst interne Wissensquellen fuer interne Fachfragen. Nutze Jira nur bei konkreten Ticket-Keys. Nutze oeffentliche Webseiten nur fuer oeffentliche Informationen.\\nErfinde nichts. Wenn Informationen fehlen, sage kurz was fehlt. Wenn die Anfrage unklar ist, stelle genau eine kurze Rueckfrage.\\nWenn Attachments, Bilder, Dokumente oder Links im Kontext vorhanden sind, beruecksichtige sie sichtbar. Wenn Dateiinhalt nicht lesbar vorliegt, sage das transparent.\\nWenn gefragt wird, wer dich erstellt hat: Der Schoepfer des Agents ist Sebastian Linges.\\nGib kein HTML aus. Schreibe kurz, direkt, freundlich und natuerlich.`;\nconst agentPrompt = `Absender:\\n- Name: ${item.teams?.fromUser || ''}\\n- Anrede: ${item.teams?.salutation || 'Hallo'}\\n- Jobtitel: ${profile.jobTitle || ''}\\n- Abteilung: ${profile.department || ''}\\n- Standort: ${profile.officeLocation || ''}\\n\\nChat:\\n- Chat-ID: ${item.teams?.chatId || ''}\\n- Nachricht-ID: ${item.teams?.messageId || ''}\\n- Intent: ${item.control?.intent || 'request'}\\n- Sprache: ${item.language?.label || 'Deutsch'}\\n\\nNutzernachricht:\\n${item.body?.text || '(keine Textnachricht)'}\\n\\nAttachments:\\n${attachmentLines}\\n\\nHosted Contents:\\n${hostedLines}\\n\\nLinks:\\n${linkLines}\\n\\nAufgabe:\\nBeantworte die aktuelle Nutzernachricht. Nutze Tools und Memory nur, wenn sie helfen. Liefere Text sowie relevante Bild-, Dokument- oder Linkinformationen, wenn etwas bereitsteht.`;\nreturn [{ json: { ...item, systemMessage, agentPrompt } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3480,
+        160
+      ],
+      "id": "d5a0d005-cb3f-458f-b0f1-c244b3ffd407",
+      "name": "Build Agent Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.agentPrompt }}",
+        "options": {
+          "systemMessage": "={{ $json.systemMessage }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3800,
+        160
+      ],
+      "id": "e9d7615d-f0fc-41b3-8b2c-1b69b5276293",
+      "name": "AI Agent",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3580,
+        500
+      ],
+      "id": "b7e529f5-60e1-4278-a549-114b45ae7157",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Normalize Request').item.json.teams.chatId }}",
+        "contextWindowLength": 12
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3740,
+        500
+      ],
+      "id": "e7c7fb19-c8c9-4338-bbc5-908b87d07f33",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "toolDescription": "RWG-Website fuer oeffentliche Informationen wie Standorte, Kontakt und Oeffnungszeiten. Nicht fuer interne Fachprozesse oder Tickets verwenden.",
+        "url": "https://www.rwg-r.de/",
+        "options": {},
+        "optimizeResponse": true,
+        "responseType": "text"
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        3900,
+        500
+      ],
+      "id": "63972129-3765-44bc-9aac-468827ecadab",
+      "name": "Tool - RWG Website"
+    },
+    {
+      "parameters": {
+        "toolDescription": "GWS Business Central / GeVIS Dokumentation fuer Fragen zu BC-Versionen, GeVIS-Funktionen und GWS-spezifischen Prozessen.",
+        "url": "https://docs.gws.ms/de-DE/gevis-r/versionen/index.html",
+        "options": {},
+        "optimizeResponse": true,
+        "responseType": "text"
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        4060,
+        500
+      ],
+      "id": "726557b4-69b4-4200-a98b-febbc3582605",
+      "name": "Tool - GWS BC Docs"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        4220,
+        500
+      ],
+      "id": "8d1ac36b-3177-4257-9ce8-e0debc77ef0e",
+      "name": "Tool - Calculator"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "jira_tickets",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticket_key",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('ticket_key', 'Exakter Jira Ticket Key, z. B. SSD-6350. Nur verwenden, wenn ein konkreter Ticket-Key gemeint ist.', 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        4380,
+        500
+      ],
+      "id": "60d0a883-37ad-46d6-ab45-5ba5ea097a44",
+      "name": "Tool - Jira Ticket by Key"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Interne Wissenssuche fuer IT-Fragen, Prozesse, Jira-Kontext, Fehlerbilder, Kommentare, Beschreibungen, Anhaenge und interne Anleitungen. Bei internen Fachfragen zuerst verwenden.",
+        "tableName": {
+          "__rl": true,
+          "value": "document_chunks",
+          "mode": "list",
+          "cachedResultName": "document_chunks"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        4560,
+        500
+      ],
+      "id": "3238a82d-adb0-42ef-9bb3-78b6ae5f374e",
+      "name": "Tool - Search Knowledge Chunks"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        4560,
+        720
+      ],
+      "id": "50854e8d-48cc-4e9d-923c-2240d848b691",
+      "name": "Embeddings OpenAI"
+    },
+    {
+      "parameters": {
+        "jsCode": "const original = $('Build Agent Prompt').first().json;\nconst agent = $input.first().json || {};\nlet raw = agent.output ?? agent.text ?? agent.reply ?? agent.answer ?? agent.message ?? '';\nif (agent.error || !String(raw || '').trim()) raw = original.replies?.fallback || 'Ich konnte die Anfrage gerade nicht vollstaendig verarbeiten.';\nfunction stripMarkdown(text) {\n  return String(text || '')\n    .replace(/\\*\\*(.*?)\\*\\*/g, '$1')\n    .replace(/__(.*?)__/g, '$1')\n    .replace(/`([^`]+)`/g, '$1')\n    .replace(/^#{1,6}\\s*/gm, '')\n    .replace(/^\\d+\\.\\s+/gm, '- ')\n    .trim();\n}\nfunction escapeHtml(text) {\n  return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;');\n}\nfunction toTeamsHtml(text) {\n  const lines = stripMarkdown(text).replace(/\\r\\n/g, '\\n').replace(/\\r/g, '\\n').replace(/\\n{3,}/g, '\\n\\n').split('\\n');\n  const html = [];\n  let listOpen = false;\n  let paragraph = [];\n  const flushParagraph = () => { if (paragraph.length) { html.push(`<p>${paragraph.map(escapeHtml).join('<br>')}</p>`); paragraph = []; } };\n  const closeList = () => { if (listOpen) { html.push('</ul>'); listOpen = false; } };\n  for (const rawLine of lines) {\n    const line = rawLine.trim();\n    if (!line) { flushParagraph(); closeList(); continue; }\n    if (/^-\\s+/.test(line)) { flushParagraph(); if (!listOpen) { html.push('<ul>'); listOpen = true; } html.push(`<li>${escapeHtml(line.replace(/^-\\s+/, ''))}</li>`); continue; }\n    closeList();\n    paragraph.push(line);\n  }\n  flushParagraph();\n  closeList();\n  return `<div>${html.join('')}</div>`;\n}\nreturn [{ json: { chatId: original.teams.chatId, rawReply: String(raw).trim(), reply: toTeamsHtml(raw), usedFallback: Boolean(agent.error || !String(agent.output || agent.text || '').trim()) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4300,
+        160
+      ],
+      "id": "3c92d3fd-72d7-4e45-95ac-b90d35d1db86",
+      "name": "Format Final Reply"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.microsoft.com/v1.0/chats/{{$json.chatId}}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftTeamsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { body: { contentType: 'html', content: $json.reply } } }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4560,
+        160
+      ],
+      "id": "ae0ce280-c7f7-4e39-9292-68e00d219f56",
+      "name": "Send Final Reply",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Microsoft Teams Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Graph IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Graph IDs": {
+      "main": [
+        [
+          {
+            "node": "Can Load Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Can Load Message?": {
+      "main": [
+        [
+          {
+            "node": "Load Chat Details",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Load Full Teams Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Load Hosted Contents",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Load Chat Details": {
+      "main": [
+        [
+          {
+            "node": "Prepare Chat Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Chat Details": {
+      "main": [
+        [
+          {
+            "node": "Merge Chat + Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Full Teams Message": {
+      "main": [
+        [
+          {
+            "node": "Prepare Full Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Full Message": {
+      "main": [
+        [
+          {
+            "node": "Merge Chat + Message",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Load Hosted Contents": {
+      "main": [
+        [
+          {
+            "node": "Prepare Hosted Contents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Chat + Message": {
+      "main": [
+        [
+          {
+            "node": "Merge Context + Hosted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Hosted Contents": {
+      "main": [
+        [
+          {
+            "node": "Merge Context + Hosted",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Context + Hosted": {
+      "main": [
+        [
+          {
+            "node": "Normalize Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Request": {
+      "main": [
+        [
+          {
+            "node": "Should Process?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Process?": {
+      "main": [
+        [
+          {
+            "node": "Needs Quick Ack?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Needs Quick Ack?": {
+      "main": [
+        [
+          {
+            "node": "Send Quick Ack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Sender Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Quick Ack": {
+      "main": [
+        [
+          {
+            "node": "Restore Context After Ack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Context After Ack": {
+      "main": [
+        [
+          {
+            "node": "Prepare Sender Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sender Lookup": {
+      "main": [
+        [
+          {
+            "node": "Can Lookup Profile?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Can Lookup Profile?": {
+      "main": [
+        [
+          {
+            "node": "Load Sender Profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback Sender Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Sender Profile": {
+      "main": [
+        [
+          {
+            "node": "Attach Sender Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach Sender Profile": {
+      "main": [
+        [
+          {
+            "node": "Merge Sender Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fallback Sender Profile": {
+      "main": [
+        [
+          {
+            "node": "Merge Sender Paths",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Sender Paths": {
+      "main": [
+        [
+          {
+            "node": "Build Agent Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Final Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool - RWG Website": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool - GWS BC Docs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool - Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool - Jira Ticket by Key": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool - Search Knowledge Chunks": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Tool - Search Knowledge Chunks",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Reply": {
+      "main": [
+        [
+          {
+            "node": "Send Final Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "timezone": "Europe/Berlin"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-19T00:00:00.000Z",
+  "versionId": "local-rwg-teams-agent-resilient"
+}

@@ -1,5 +1,7 @@
 node_modules/
 .env
+.env.*
+!.env.example
 *.log
 dist/
 .vscode/settings.json
@@ -7,11 +9,23 @@ dist/
 # Credentials & Secrets
 *credentials*
 *secret*
+credentials/
+secrets/
 *.key
 *.pem
+*.p12
+*.pfx
+*.kdbx
 
 # n8n lokale Daten
 .n8n/
+n8n-export-with-credentials*.json
+*_with_credentials.json
+
+# Lokale Agent-/Claude-Artefakte
+.agents/
+.claude/
+skills-lock.json
 
 # Betriebssystem
 .DS_Store

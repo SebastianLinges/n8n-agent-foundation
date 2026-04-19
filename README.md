@@ -1,40 +1,34 @@
-# n8n Agent Foundation
+# RWG Teams Agent fuer n8n
 
-Wiederverwendbare Basis für n8n-Workflows mit Fokus auf AI-Agenten, Wissensablage (RAG) und Microsoft Teams Integration.
+Dieses Repository enthaelt den importierbaren n8n Workflow fuer einen robusten Microsoft Teams AI-Agenten.
 
-## Projektziel
+## Hauptworkflow
 
-Dieses Repository dient als strukturierte Grundlage für den Aufbau intelligenter AI-Agenten in n8n. Der erste Kernbaustein ist die Wissensablage (RAG), mit der Agenten kontextbezogen auf internes Wissen zugreifen können.
+Importdatei:
 
-## Fokus: Wissensablage (RAG)
+`workflows/rwg-teams-agent-resilient.json`
 
-- Wissen wird als Markdown, PDF oder strukturierte Daten gepflegt
-- Retrieval erfolgt über einen Vector Store direkt im n8n-Agenten
-- Klare Trennung von Wissensbasis und Workflow-Logik
+Der Workflow verarbeitet Teams-Nachrichten, erkennt Sprache und Kontext, beruecksichtigt Datei-/Linkinformationen, nutzt interne Wissensquellen und sendet schnell eine erste Rueckmeldung in Teams.
 
-## Struktur
+## Dokumentation
 
-| Ordner | Inhalt |
+| Datei | Inhalt |
 |---|---|
-| `workflows/` | Hauptworkflows (n8n JSON) |
-| `subworkflows/` | Wiederverwendbare Bausteine |
-| `prompts/` | System- und User-Prompts für AI-Agenten |
-| `docs/` | Architektur, Konventionen, Strategie |
-| `examples/` | Beispiel-Inputs und Testdaten |
-| `knowledge-base/` | Wissensdateien (Markdown, strukturierte Daten) |
-| `.vscode/` | VS Code Konfiguration |
+| `docs/import-and-security.md` | Import, Credential-Zuordnung und Sicherheitsregeln |
+| `docs/workflow-overview.md` | Ablauf, Funktionen, Grenzen |
+| `docs/project-foundation.md` | Urspruengliche Projektbasis und Ordnerstruktur |
+| `prompts/rwg-teams-agent-system.md` | System-Prompt des Agents |
 
-## Bibliotheken & Erweiterungen
+## Sicherheit
 
-Externe Bibliotheken werden **nur bei Bedarf** ergänzt. Das Projekt startet bewusst schlank und wird schrittweise erweitert.
+Dieses Repo enthaelt keine Zugangsdaten. Nach dem Import muessen Microsoft Teams, OpenAI, Supabase und Postgres Credentials direkt in n8n zugewiesen werden.
 
-## Workflow Import/Export
+Credential-Exports, `.env` Dateien und lokale n8n-Daten sind per `.gitignore` ausgeschlossen.
 
-Workflows werden als JSON gespeichert und in n8n importiert bzw. exportiert. Keine Credentials im Repository.
+## Naechste Schritte
 
-## Nächste Schritte
-
-1. Ersten RAG-Workflow in n8n aufbauen
-2. Vector Store anbinden (z. B. Supabase pgvector oder Pinecone)
-3. Teams-Trigger konfigurieren
-4. System-Prompt verfeinern
+1. Workflow in n8n importieren.
+2. Credentials in n8n zuweisen.
+3. `ownUserIds` im Code-Node `Normalize Request` setzen.
+4. Test in einem Teams 1:1 Chat ausfuehren.
+5. Workflow aktivieren.
