@@ -1,0 +1,18 @@
+node_modules/
+.env
+*.log
+dist/
+.vscode/settings.json
+
+# Credentials & Secrets
+*credentials*
+*secret*
+*.key
+*.pem
+
+# n8n lokale Daten
+.n8n/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db

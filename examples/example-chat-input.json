@@ -1,0 +1,39 @@
+{
+  "trigger": "teams_webhook",
+  "timestamp": "2026-04-19T09:30:00Z",
+  "user": {
+    "id": "user-12345",
+    "displayName": "Max Mustermann",
+    "email": "max.mustermann@example.com",
+    "department": "IT"
+  },
+  "channel": {
+    "id": "channel-abc-001",
+    "name": "IT-Support",
+    "type": "channel"
+  },
+  "message": {
+    "id": "msg-67890",
+    "text": "Wie beantrage ich Urlaub? Welche Schritte muss ich befolgen?",
+    "replyToId": null,
+    "conversationHistory": [
+      {
+        "role": "user",
+        "content": "Hallo, ich brauche Hilfe mit dem Urlaubsantrag."
+      },
+      {
+        "role": "assistant",
+        "content": "Hallo! Gerne helfe ich dir. Was möchtest du genau wissen?"
+      },
+      {
+        "role": "user",
+        "content": "Wie beantrage ich Urlaub? Welche Schritte muss ich befolgen?"
+      }
+    ]
+  },
+  "context": {
+    "source": "teams",
+    "locale": "de-DE",
+    "expectedResponseFormat": "markdown"
+  }
+}
