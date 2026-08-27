@@ -1,20 +1,22 @@
-# Bereinigte Code-Nodes zum Einfügen
+# Code-Node zum Einfügen
 
-Diese Dateien enthalten den Code der gleichnamigen Nodes mit bereinigten Kommentaren:
-Änderungshistorie und Versionsbezüge sind entfernt, die fachliche Begründung bleibt.
+`Internen Kommentar erzeugen.js` enthält den Code des gleichnamigen Nodes mit bereinigtem
+Kopfkommentar — Versionsbezüge und Änderungshistorie entfernt, die fachlichen Regeln bleiben.
 
-**Der ausführbare Code ist unverändert** — geprüft durch Vergleich beider Fassungen
-ohne Kommentarzeilen, dazu `node --check` je Datei.
+**Der ausführbare Code ist unverändert** — geprüft durch Vergleich beider Fassungen ohne
+Kommentarzeilen, dazu `node --check`.
 
-Sie liegen hier, weil die n8n-MCP-Schnittstelle Werte über rund 2.400 Zeichen nicht
-annimmt. Einfügen also von Hand: Node in n8n öffnen, Inhalt der Datei komplett
-ersetzen, speichern, veröffentlichen.
+## Warum von Hand
 
-Nach dem Einfügen wird die Datei hier entfernt — sie ist dann im Workflow-Export
-enthalten.
+Der Node umfasst 16.793 Zeichen mit 42 Template-Literalen, 20 Backslashes und mehreren
+Regex-Ausdrücken — darunter die E-Mail-Maskierung `EMAIL_REGEX` und `.replace(/\u0000/g, '')`.
+Über die MCP-Schnittstelle müsste dieser Code als JSON-String übergeben werden; ein einzelner
+falsch maskierter Backslash würde die PII-Maskierung still beschädigen. Das Risiko steht in
+keinem Verhältnis zum Nutzen eines aufgeräumten Kommentars.
 
-| Datei | Zeichen |
-|---|---|
-| `Internen Kommentar erzeugen.js` | 16.793 |
-| `Evidenzschranke.js` | 4.335 |
-| `Interne Zusatznotizen.js` | 3.049 |
+Copy-Paste aus dieser Datei in den Node ist dagegen gefahrlos.
+
+## Einfügen
+
+Node in n8n öffnen, Inhalt vollständig ersetzen, speichern, veröffentlichen. Danach diese
+Datei löschen — der Stand steckt dann im Workflow-Export.

@@ -1,18 +1,23 @@
 # Jira-Agent — Stand und offene Punkte
 
-Workflow `RWG_Jira-Agent` (`QXCWIsTzDEmfwPwK`), aktiv, 74 Nodes, Jira-Trigger auf `Project = SSD`, Ereignis `jira:issue_created`.
+Workflow `RWG_Jira-Agent` (`QXCWIsTzDEmfwPwK`), aktiv, 75 Nodes, Jira-Trigger auf `Project = SSD`, Ereignis `jira:issue_created`.
 
 ## Absicherung der Policy-Ausgabe
 
-Die Policy entscheidet über Routing und Betriebssignale und liefert dafür ein JSON mit zwölf Feldern und zwei verschachtelten Objektarrays — aus einem Regelwerk von rund 10.000 Zeichen. Diese Ausgabe ist der empfindlichste Punkt des Workflows und deshalb doppelt abgesichert:
+Die Policy entscheidet über Routing und Betriebssignale und liefert dafür ein JSON mit zwölf Feldern und zwei verschachtelten Objektarrays — aus einem Regelwerk von rund 10.000 Zeichen. Diese Ausgabe ist der empfindlichste Punkt des Workflows und deshalb dreifach abgesichert.
 
-**Die API erzwingt gültiges JSON.** `Policy-Modell` läuft über die Responses-API mit `textFormat.type = json_object`. Damit ist ungültiges JSON auf API-Ebene ausgeschlossen — genau der Fehler, an dem die Policy zuvor abbrach.
+**1. Die API erzwingt gültiges JSON.** `Policy-Modell` läuft über die Responses-API mit `textFormat.type = json_object`. Damit ist ungültiges JSON auf API-Ebene ausgeschlossen — genau der Fehler, an dem die Policy zuvor abbrach.
 
-> `json_schema` mit `strict: true` wäre stärker, weil es auch die Felder erzwingt. Der Weg dorthin ist aber versperrt: das Feld `options.textFormat.textOptions.schema` muss als **JSON-String** übergeben werden, nicht als Objekt — als Objekt meldet der Node zur Laufzeit `Failed to parse schema`, und die Policy wird gar nicht erst befragt. Die MCP-Schnittstelle nimmt den nötigen String in voller Länge nicht an, deshalb bleibt es bei `json_object`. Über die Oberfläche ist der Wechsel jederzeit möglich; das vollständige Schema liegt in `policy-schema.json`.
+> `json_schema` mit `strict: true` wäre stärker, weil es zusätzlich die Felder erzwingt. Das Feld `options.textFormat.textOptions.schema` muss dafür als **JSON-String** übergeben werden, nicht als Objekt — als Objekt meldet der Node zur Laufzeit `Failed to parse schema`, und die Policy wird gar nicht erst befragt. Der Wechsel ist erst sinnvoll, wenn `json_object` an echten Läufen bestätigt ist; das vollständige Schema liegt in `policy-schema.json`.
 
-**Der Parser repariert.** `Policy-Schema` prüft dieselbe Struktur mit `autoFix`. Weicht die Ausgabe wider Erwarten ab, wird das Modell mit der Fehlermeldung erneut befragt, statt den Lauf zu beenden. Der Parser prüft Form und Typen ohne die Wertelisten; die zulässigen Werte stehen im Prompt und in `policy-schema.json`.
+**2. Der Parser repariert.** `Policy-Schema` prüft die Struktur mit `autoFix`. Weicht die Ausgabe ab, wird das Modell mit der Fehlermeldung erneut befragt, statt den Lauf zu beenden. Der Parser prüft Form und Typen ohne die Wertelisten; die zulässigen Werte stehen im Prompt und in `policy-schema.json`.
 
-**Scheitert die Policy dennoch**, führt ihr Fehlerausgang auf `Lauf als fehlgeschlagen vermerken`. Der Vorgang wird in `jira_agent_events` auf `failed` gesetzt und trägt den Fehlertext:
+**3. Ausfälle werden sichtbar.** Zwei Wege führen auf `Lauf als fehlgeschlagen vermerken`:
+
+- Der Fehlerausgang von `Policy und Routing bestimmen` (`onError: continueErrorOutput`) fängt Fehler im Chain-Node selbst.
+- `Policy geliefert?` fängt Fehler in den **Sub-Nodes** ab. Scheitert Modell oder Parser, reicht die Chain die Eingangsdaten ohne `output`-Feld durch; der Lauf gilt dann als erfolgreich, obwohl nichts entschieden wurde. Der IF prüft auf `$json.output?.nextAction` und zweigt ab, wenn das Feld fehlt.
+
+Der zweite Weg ist der wichtigere: Der einzige beobachtete Ausfall (Lauf `108721`) kam aus einem Sub-Node, und der Fehlerausgang allein hat ihn nicht erfasst.
 
 ```sql
 UPDATE public.jira_agent_events
@@ -21,7 +26,7 @@ WHERE event_key = $1
 RETURNING event_key, status, attempt_count;
 ```
 
-Damit greift die `status = 'failed'`-Bedingung der Claim-Query, und der Vorgang ist erneut beanspruchbar. Ohne diesen Ausgang bliebe er auf `processing` stehen: die Zeitbedingung der Claim-Query greift nur bei einem erneuten Ereignis, und `issue_created` kommt genau einmal.
+Damit greift die `status = 'failed'`-Bedingung der Claim-Query, und der Vorgang ist erneut beanspruchbar. Ohne diesen Weg bliebe er auf `processing` stehen: die Zeitbedingung der Claim-Query greift nur bei einem erneuten Ereignis, und `issue_created` kommt genau einmal.
 
 ## Laufzeit
 
@@ -35,13 +40,10 @@ Der Atlassian-MCP-Node (`@n8n/mcp-registry.atlassian`) ist als `ai_tool` deklari
 
 ## Offen
 
-**Wirkung messen.** Vor dem Umbau brachen 9 von 60 Läufen am Policy-Schema ab, Quote 15 %, jeweils mit `Invalid JSON in model output`. Der Umbau wurde am 27.08. um 14:30 veröffentlicht; seither steht die Messung aus. Ziel ist eine Quote nahe null, gemessen über mindestens 60 Läufe.
+**Wirkung messen.** Vor dem Umbau brachen 9 von 60 Läufen am Policy-Schema ab, Quote 15 %, jeweils mit `Invalid JSON in model output`. Seither gab es **keinen sauberen Lauf**: der einzige Lauf nach dem ersten Publish lief in einen Konfigurationsfehler, der inzwischen behoben ist. Die Messung beginnt mit dem nächsten neuen SSD-Ticket. Ziel ist eine Quote nahe null über mindestens 60 Läufe.
 
-**Aufräumen (eigene Etappe).** Noch nicht angefasst:
+**Kommentarkopf in `Internen Kommentar erzeugen`.** Trägt weiterhin `V6.1`, `AENDERUNGEN GEGENUEBER V6` und `[FIX 1]`–`[FIX 6]`. Die bereinigte Fassung liegt in `code/` und muss von Hand eingefügt werden — Begründung dort.
 
-- Versionsspuren in den Code-Kommentaren — `V6.1`, `AENDERUNGEN GEGENUEBER V6`, `FIX 08/2026`, `Beleg: Lauf 102972`. Kommentare sollen beschreiben, was der Node heute tut.
-- Sticky Notes tragen technische Namen (`Sticky Note 6dc891e0`) statt sprechender. Die Inhalte sind gut und tragen die Gliederung 1–6.
-- Canvas spannt über 12.100 px; `Analysierbar?` verbindet über 9.400 px direkt auf `Event abschliessen`.
-- 2.079 Code-Zeilen in 11 Code-Nodes, größter Einzelnode 17.237 Zeichen.
+**Canvas.** Der Graph spannt über 12.100 px; `Analysierbar?` verbindet über 9.400 px direkt auf `Event abschliessen`. Das ist kein Layoutproblem, sondern strukturell: `Event abschliessen` ist gemeinsamer Endpunkt für sieben Pfade, darunter der früheste Ausstieg. Auflösen ließe es sich nur durch einen zweiten Abschluss-Node nahe dem frühen Ausstieg — das dupliziert Logik und ist eine offene Entscheidung.
 
-**Credential am neuen Node.** `Lauf als fehlgeschlagen vermerken` wurde `Postgres account: Linges` zugewiesen. Über die MCP-Schnittstelle ist das nicht verifizierbar — sie redigiert Credentials grundsätzlich. Prüfung nur in der Oberfläche möglich.
+**Credential am neuen Node.** `Lauf als fehlgeschlagen vermerken` wurde `Postgres account: Linges` zugewiesen. Über die MCP-Schnittstelle ist das nicht verifizierbar — sie redigiert Credentials grundsätzlich. Prüfung nur in der Oberfläche möglich. Solange das offen ist, greift die Absicherung aus Punkt 3 nicht.
