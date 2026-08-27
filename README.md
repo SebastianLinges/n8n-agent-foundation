@@ -1,74 +1,30 @@
-# RWG Teams Agent fuer n8n
+# n8n Arbeitsablage
 
-Produktionsnaher n8n Workflow fuer einen internen Microsoft Teams AI-Agenten. Der Agent beantwortet Teams-Nachrichten schnell, nutzt interne Wissensquellen, erkennt Sprache und Kontext, beruecksichtigt Datei-/Linkinformationen und liefert robuste Fallback-Antworten.
+Arbeitsordner für die laufende Optimierung der n8n-Instanz. **Die n8n-Instanz ist die Quelle der Wahrheit** — Workflows werden dort direkt über den n8n-MCP-Zugriff gelesen, gebaut und getestet, nicht hier versioniert.
 
-## Aktueller Hauptworkflow
+Hier liegt nur, was in n8n selbst keinen Platz hat: Befunde, Optimierungsvorschläge und isoliert testbare Logik für Code-Nodes.
 
-| Datei | Zweck |
-|---|---|
-| `workflows/rwg-teams-agent-resilient.json` | Importierbarer n8n Hauptworkflow fuer Microsoft Teams |
-
-Der Workflow ist als n8n JSON exportiert und kann direkt in n8n importiert werden. Zugangsdaten sind bewusst nicht enthalten und muessen nach dem Import in n8n neu zugewiesen werden.
-
-## Was der Workflow leistet
-
-- Reagiert auf neue Microsoft Teams Chatnachrichten.
-- Laedt die vollstaendige Teams-Nachricht ueber Microsoft Graph.
-- Sendet bei laengeren Anfragen schnell eine erste Rueckmeldung.
-- Erkennt Deutsch, Englisch, Niederlaendisch, Franzoesisch, Spanisch und Italienisch heuristisch.
-- Normalisiert Text, Links, Attachments und Hosted Contents.
-- Nutzt OpenAI Chat Model, Postgres Chat Memory, Supabase Knowledge Search und Jira Lookup.
-- Gibt Textantworten sowie relevante Bild-, Dokument- und Linkhinweise zurueck.
-- Antwortet mit einem sprachabhaengigen Fallback, wenn der Agent keine belastbare Antwort erzeugt.
-- Vermeidet das Committen von Zugangsdaten und lokalen n8n Exporten mit Credentials.
-
-## Projektstruktur
+## Struktur
 
 | Pfad | Inhalt |
 |---|---|
-| `workflows/` | Importierbare n8n Workflow-Dateien |
-| `docs/` | Import, Sicherheit, Architektur und Workflow-Erklaerung |
-| `prompts/` | System-Prompts und Agent-Anweisungen |
-| `examples/` | Beispielnachrichten und Testdaten |
-| `knowledge-base/` | Beispielhafte Wissensdateien fuer spaetere RAG-Inhalte |
-| `subworkflows/` | Platz fuer wiederverwendbare n8n Teilworkflows |
+| `proposals/` | Analysen und Vorab-Artefakte je Optimierungsthema. Testbarer Code, bevor er als Code-Node in n8n landet. |
+| `.agents/skills/` | n8n-Skills (Expression-Syntax, Code-Nodes, Node-Konfiguration, Validierung, Patterns). Quelle: `czlonkowski/n8n-skills`, Stand in `skills-lock.json`. |
+| `.claude/skills/` | Verzeichnis-Junctions auf `.agents/skills/`, damit Claude Code die Skills sieht. Nicht versioniert. |
 
-## Schnellstart
+## Arbeitsweise
 
-1. In n8n einen neuen Workflow importieren.
-2. `workflows/rwg-teams-agent-resilient.json` auswaehlen.
-3. In n8n die benoetigten Credentials zuweisen:
-   Microsoft Teams OAuth2 API, OpenAI API, Supabase API und Postgres.
-4. Im Code-Node `Normalize Request` die `ownUserIds` des Bot-/Service-Users setzen.
-5. Eine Testnachricht in einem Teams 1:1 Chat senden.
-6. Erst nach erfolgreichem Test aktivieren.
+1. Thema kommt rein, Ist-Stand direkt aus n8n lesen (`search_workflows`, `get_workflow_details`, `search_executions`).
+2. Befund und Vorschlag unter `proposals/<thema>.md` festhalten.
+3. Nicht-triviale Logik als `.mjs` mit Test danebenlegen und lokal prüfen, bevor sie in einen Code-Node wandert.
+4. Änderung in n8n anwenden (`update_workflow`), mit `validate_workflow` bzw. `test_workflow` absichern, erst dann publizieren.
 
-## Wichtige Dokumente
-
-| Datei | Wann lesen |
-|---|---|
-| `docs/import-and-security.md` | Vor dem Import und vor jedem Push |
-| `docs/workflow-overview.md` | Wenn der Ablauf oder die Fehlerstrategie unklar ist |
-| `docs/architecture.md` | Fuer die technische Gesamtstruktur |
-| `docs/knowledge-strategy.md` | Fuer RAG- und Wissensablage-Themen |
-| `prompts/rwg-teams-agent-system.md` | Fuer Anpassungen an Verhalten, Sprache und Stil |
+Bevorzugt werden native n8n-Nodes. Code-Nodes nur für das, was Nodes nicht abdecken.
 
 ## Sicherheit
 
-Dieses Repository darf keine produktiven Zugangsdaten enthalten. Nicht committen:
+Keine produktiven Zugangsdaten im Repository — keine Credential-Exports, `.env`-Dateien, Tokens, API-Keys oder Zertifikate. Credentials leben ausschließlich im n8n Credential Store. Die `.gitignore` ist entsprechend gesetzt.
 
-- n8n Credential-Exports mit Secrets
-- `.env` Dateien
-- Tokens, API Keys, Client Secrets
-- lokale `.n8n` Daten
-- private Zertifikate oder Schluessel
+## Historie
 
-Die `.gitignore` ist entsprechend vorbereitet. Nach dem Import werden Credentials ausschliesslich in n8n zugewiesen.
-
-## GitHub-Ziel
-
-Dieses Projekt gehoert zu:
-
-`https://github.com/SebastianLinges/rwg-teams-agent`
-
-Das Repository `SebastianLinges/n8n-agent-foundation` dient nur als Grundlage/Master-Vorlage und soll nicht mit projektspezifischen Aenderungen beschrieben werden.
+Dieser Ordner war bis April 2026 eine Vorlage für den RWG Teams Agent (`workflows/`, `docs/`, `prompts/`). Diese Artefakte sind durch die Live-Instanz überholt und wurden entfernt; sie liegen weiterhin in der Git-Historie bis Commit `9636379`.
