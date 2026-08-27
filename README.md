@@ -1,30 +1,35 @@
-# n8n Arbeitsablage
+# n8n Agent Foundation
 
-Arbeitsordner für die laufende Optimierung der n8n-Instanz. **Die n8n-Instanz ist die Quelle der Wahrheit** — Workflows werden dort direkt über den n8n-MCP-Zugriff gelesen, gebaut und getestet, nicht hier versioniert.
-
-Hier liegt nur, was in n8n selbst keinen Platz hat: Befunde, Optimierungsvorschläge und isoliert testbare Logik für Code-Nodes.
+Ablage für die n8n-Instanz: je Flow ein Ordner unter `flows/`, darin alles, was zu diesem Flow gehört — Dokumentation, Schemata, Hilfsdateien und der Workflow-Export.
 
 ## Struktur
 
-| Pfad | Inhalt |
-|---|---|
-| `proposals/` | Analysen und Vorab-Artefakte je Optimierungsthema. Testbarer Code, bevor er als Code-Node in n8n landet. |
-| `.agents/skills/` | n8n-Skills (Expression-Syntax, Code-Nodes, Node-Konfiguration, Validierung, Patterns). Quelle: `czlonkowski/n8n-skills`, Stand in `skills-lock.json`. |
-| `.claude/skills/` | Verzeichnis-Junctions auf `.agents/skills/`, damit Claude Code die Skills sieht. Nicht versioniert. |
+```
+flows/<flow-name>/
+  README.md        Was der Flow tut, wie er gebaut ist, was offen ist
+  workflow.json    Export aus n8n
+  *.json / *.sql   Schemata, Abfragen, Hilfsdateien des Flows
+```
+
+| Flow | Ordner | n8n-ID |
+|---|---|---|
+| RWG Jira-Agent | `flows/rwg-jira-agent/` | `QXCWIsTzDEmfwPwK` |
 
 ## Arbeitsweise
 
-1. Thema kommt rein, Ist-Stand direkt aus n8n lesen (`search_workflows`, `get_workflow_details`, `search_executions`).
-2. Befund und Vorschlag unter `proposals/<thema>.md` festhalten.
-3. Nicht-triviale Logik als `.mjs` mit Test danebenlegen und lokal prüfen, bevor sie in einen Code-Node wandert.
-4. Änderung in n8n anwenden (`update_workflow`), mit `validate_workflow` bzw. `test_workflow` absichern, erst dann publizieren.
+1. Ist-Stand direkt aus n8n lesen (`search_workflows`, `get_workflow_details`, `search_executions`).
+2. Befund und Vorgehen im `README.md` des Flow-Ordners festhalten.
+3. Änderung in n8n anwenden, mit `validate_node_config` bzw. `test_workflow` absichern, dann veröffentlichen.
+4. Nach dem Publish den Export erneuern und committen.
 
-Bevorzugt werden native n8n-Nodes. Code-Nodes nur für das, was Nodes nicht abdecken.
+Native n8n-Nodes gehen vor Code-Nodes. Die Dokumentation beschreibt immer den aktuellen Stand — keine Versionsangaben, keine Änderungshistorie, keine abgelösten Passagen.
+
+## Zum Workflow-Export
+
+`workflow.json` enthält Nodes, Verbindungen und Einstellungen und dient der Nachvollziehbarkeit und dem Vergleich zwischen Ständen.
+
+**Es ist kein vollständiges Backup.** Die n8n-Schnittstelle redigiert Credentials grundsätzlich, deshalb enthält der Export **keine Credential-Referenzen**. Nach einem Import müssen alle Credentials in n8n neu zugewiesen werden. Die produktive Wahrheit steht in der Instanz, nicht hier.
 
 ## Sicherheit
 
-Keine produktiven Zugangsdaten im Repository — keine Credential-Exports, `.env`-Dateien, Tokens, API-Keys oder Zertifikate. Credentials leben ausschließlich im n8n Credential Store. Die `.gitignore` ist entsprechend gesetzt.
-
-## Historie
-
-Dieser Ordner war bis April 2026 eine Vorlage für den RWG Teams Agent (`workflows/`, `docs/`, `prompts/`). Diese Artefakte sind durch die Live-Instanz überholt und wurden entfernt; sie liegen weiterhin in der Git-Historie bis Commit `9636379`.
+Keine Zugangsdaten im Repository — keine Credential-Exports, `.env`-Dateien, Tokens, API-Keys oder Zertifikate. Credentials leben ausschließlich im n8n Credential Store.
