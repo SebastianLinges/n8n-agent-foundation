@@ -6,9 +6,11 @@ Workflow `RWG_Jira-Agent` (`QXCWIsTzDEmfwPwK`), aktiv, 74 Nodes, Jira-Trigger au
 
 Die Policy entscheidet über Routing und Betriebssignale und liefert dafür ein JSON mit zwölf Feldern und zwei verschachtelten Objektarrays — aus einem Regelwerk von rund 10.000 Zeichen. Diese Ausgabe ist der empfindlichste Punkt des Workflows und deshalb doppelt abgesichert:
 
-**Die API erzwingt das Format.** `Policy-Modell` läuft über die Responses-API mit `json_schema` und `strict: true`. Das Schema liegt in `jira-agent-policy-schema.json`; jedes Objekt ist geschlossen, `required` deckt alle Felder. Ungültiges JSON ist damit auf API-Ebene ausgeschlossen.
+**Die API erzwingt gültiges JSON.** `Policy-Modell` läuft über die Responses-API mit `textFormat.type = json_object`. Damit ist ungültiges JSON auf API-Ebene ausgeschlossen — genau der Fehler, an dem die Policy zuvor abbrach.
 
-**Der Parser repariert.** `Policy-Schema` prüft dieselbe Struktur mit `autoFix`. Weicht die Ausgabe wider Erwarten ab, wird das Modell mit der Fehlermeldung erneut befragt, statt den Lauf zu beenden. Der Parser prüft Form und Typen ohne die Wertelisten — die Enums erzwingt bereits die API, und doppelt gepflegte Wertelisten wären eine Fehlerquelle.
+> `json_schema` mit `strict: true` wäre stärker, weil es auch die Felder erzwingt. Der Weg dorthin ist aber versperrt: das Feld `options.textFormat.textOptions.schema` muss als **JSON-String** übergeben werden, nicht als Objekt — als Objekt meldet der Node zur Laufzeit `Failed to parse schema`, und die Policy wird gar nicht erst befragt. Die MCP-Schnittstelle nimmt den nötigen String in voller Länge nicht an, deshalb bleibt es bei `json_object`. Über die Oberfläche ist der Wechsel jederzeit möglich; das vollständige Schema liegt in `policy-schema.json`.
+
+**Der Parser repariert.** `Policy-Schema` prüft dieselbe Struktur mit `autoFix`. Weicht die Ausgabe wider Erwarten ab, wird das Modell mit der Fehlermeldung erneut befragt, statt den Lauf zu beenden. Der Parser prüft Form und Typen ohne die Wertelisten; die zulässigen Werte stehen im Prompt und in `policy-schema.json`.
 
 **Scheitert die Policy dennoch**, führt ihr Fehlerausgang auf `Lauf als fehlgeschlagen vermerken`. Der Vorgang wird in `jira_agent_events` auf `failed` gesetzt und trägt den Fehlertext:
 
