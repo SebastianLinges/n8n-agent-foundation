@@ -59,6 +59,30 @@ Jede fett ausgezeichnete Node-Referenz in den Notizen wird gegen die tatsächlic
 
 Mehr ruft der Agent nicht. Die übrigen `RWG Sub -`-Workflows in der Instanz stammen aus der früheren Router-Architektur, haben keine Ausführungen und sind Kandidaten für die Löschung.
 
+## Abgelöste Subflows der früheren Architektur
+
+Vor dem heutigen Aufbau lief das Routing über einen eigenen Agenten-Subflow. Acht Workflows stammen aus dieser Zeit. Sie sind alle auf `active: true`, haben null Ausführungen und werden von **keinem** produktiven Flow mehr aufgerufen.
+
+Sie hängen in zwei Gruppen zusammen:
+
+- **Router-Gruppe:** `RWG Sub - Main Router Agent` (`gHwBx2q73WOCsyHW`) ruft `RAG Retrieve` (`VFTpbtQ9V51f05Zj`), `Jira Query (Count/Filter)` (`PFdhyj2vorEFInUP`) und `My Tickets Lookup` (`d1iTRIJRYOH98Q91`). Fällt der Router weg, fallen alle vier weg.
+- **Bild-Gruppe:** `KB Image Resolve & Send` (`ye5IXGMkidEWIEyg`) ruft `Teams Image Send` (`mYdSt2SLjazK8zSk`).
+- **Einzeln:** `Guardrail Classify` (`21Ak3KiXtnFPZi7S`) und `Jira Issue Create` (`SnD6H4tQfX2sGSZgTaJfs`).
+
+Die Notiz im Router behauptet, er werde vom Teams-Agenten über einen Node `Call Router Agent` gerufen. **Diesen Node gibt es dort nicht** — der Agent arbeitet heute mit einem eigenen `AI Agent` und vier Werkzeugen.
+
+### Belege und ihre Grenzen
+
+Ein Verweis-Scan über 28 Workflows — alle produktiven RWG- und KAPA-Flows — findet keinen einzigen Aufruf von außerhalb dieser acht. Nicht geprüft sind die acht Workflows im Ordner `00_Idias`, die als Ideenablage gelten, sowie `RWG_Reporter_BC`, an dem der MCP-Zugriff abgeschaltet ist.
+
+Das Kriterium „null Ausführungen" allein trägt nicht: Bei `RWG Monitor` und `RAG-Confluence-Ingest` steht `saveDataSuccessExecution: none`, dort werden erfolgreiche Läufe gar nicht erst gespeichert. Belastbar ist erst der Verweis-Scan.
+
+**`Jira Issue Create` ist gesondert zu betrachten.** Er ist der Baustein für die Ticketanlage aus Teams, ausführlich dokumentiert und nie verdrahtet. Ob er wegfällt, ist eine fachliche und keine Aufräumfrage.
+
+### Zum Deaktivieren
+
+Das `active`-Flag steuert nur eigene Trigger. Ein Subflow, der über *Execute Sub-workflow* gerufen wird, läuft auch inaktiv. Deaktivieren blendet also aus, sichert aber nichts ab — dafür wäre Archivieren der passende Schritt.
+
 ## Entschieden: Reranking über Cohere bleibt vorerst unangetastet
 
 Der Subflow `RWG Sub - Wissenssuche` schickt im Node `Kandidaten reranken` die Trefferinhalte an `api.cohere.com` — Titel plus bis zu 2.000 Zeichen je Kandidat, bis zu 24 Kandidaten je Anfrage. Bei IT-Anfragen sind darunter `it_internal`-Inhalte; in Ticket-Chunks stecken Signaturblöcke mit Namen, Anschriften und Telefonnummern.
