@@ -1,5 +1,871 @@
 {
+  "id": "QXCWIsTzDEmfwPwK",
   "name": "RWG_Jira-Agent",
+  "active": true,
+  "isArchived": false,
+  "versionId": "37cf56d7-983d-4724-bdeb-c17c3046eb0d",
+  "activeVersionId": "37cf56d7-983d-4724-bdeb-c17c3046eb0d",
+  "triggerCount": 1,
+  "createdAt": "2026-07-19T13:13:30.872Z",
+  "updatedAt": "2026-08-27T16:04:21.236Z",
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 900,
+    "timeSavedPerExecution": 15
+  },
+  "connections": {
+    "Jira Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Event Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Event Context": {
+      "main": [
+        [
+          {
+            "node": "Nur Neuanlage-Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nur Neuanlage-Events": {
+      "main": [
+        [
+          {
+            "node": "Claim Jira Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Jira Event": {
+      "main": [
+        [
+          {
+            "node": "Event beansprucht?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event beansprucht?": {
+      "main": [
+        [
+          {
+            "node": "Warten auf Jira-Konsistenz",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Warten auf Jira-Konsistenz": {
+      "main": [
+        [
+          {
+            "node": "Get Issue Fresh",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Issue Fresh": {
+      "main": [
+        [
+          {
+            "node": "Maschinen- oder Fachticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Maschinen- oder Fachticket": {
+      "main": [
+        [
+          {
+            "node": "Maschinenticket uebersprungen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Issue Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Issue Comments": {
+      "main": [
+        [
+          {
+            "node": "Ticketkontext aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticketkontext aufbereiten": {
+      "main": [
+        [
+          {
+            "node": "Analysierbar?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analysierbar?": {
+      "main": [
+        [
+          {
+            "node": "Bildanhaenge vorhanden?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Event abschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bildanhaenge vorhanden?": {
+      "main": [
+        [
+          {
+            "node": "Bildanhaenge aufteilen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Kein Bildbefund",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bildanhaenge aufteilen": {
+      "main": [
+        [
+          {
+            "node": "Jira-Bild laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira-Bild laden": {
+      "main": [
+        [
+          {
+            "node": "Bild analysieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bild analysieren": {
+      "main": [
+        [
+          {
+            "node": "Bildbefunde buendeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bildbefunde buendeln": {
+      "main": [
+        [
+          {
+            "node": "Bildbefund setzen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bildbefund setzen": {
+      "main": [
+        [
+          {
+            "node": "Supportfall zusammenstellen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supportfall zusammenstellen": {
+      "main": [
+        [
+          {
+            "node": "Interner Support-Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kein Bildbefund": {
+      "main": [
+        [
+          {
+            "node": "Supportfall zusammenstellen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interner Support-Analyst": {
+      "main": [
+        [
+          {
+            "node": "Analyseergebnis normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyse-Modell": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Interner Support-Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Semantische Wissenssuche": {
+      "ai_tool": [
+        [
+          {
+            "node": "Interner Support-Analyst",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wissens-Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Semantische Wissenssuche",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wissens-Reranker": {
+      "ai_reranker": [
+        [
+          {
+            "node": "Semantische Wissenssuche",
+            "type": "ai_reranker",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Volltextsuche Wissensbasis": {
+      "ai_tool": [
+        [
+          {
+            "node": "Interner Support-Analyst",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira-Altfall lesen": {
+      "ai_tool": [
+        [
+          {
+            "node": "Interner Support-Analyst",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Denkschritt": {
+      "ai_tool": [
+        [
+          {
+            "node": "Interner Support-Analyst",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyse-Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Interner Support-Analyst",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyseergebnis normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Externe Recherche freigeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Public Search Embedding": {
+      "main": [
+        [
+          {
+            "node": "Public Wissen hybrid abrufen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Public Wissen hybrid abrufen": {
+      "main": [
+        [
+          {
+            "node": "Public Kandidaten vorhanden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Public Kandidaten vorhanden?": {
+      "main": [
+        [
+          {
+            "node": "Public Kandidaten reranken",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Keine Public Evidenz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Public Kandidaten reranken": {
+      "main": [
+        [
+          {
+            "node": "Evidenzschranke",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evidenzschranke": {
+      "main": [
+        [
+          {
+            "node": "Policy und Routing bestimmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy-Modell": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Policy und Routing bestimmen",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Policy-Schema",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy-Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Policy und Routing bestimmen",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keine Public Evidenz": {
+      "main": [
+        [
+          {
+            "node": "Policy und Routing bestimmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Entscheidung routen": {
+      "main": [
+        [
+          {
+            "node": "Anwenderloesung formulieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Anwenderrueckfrage formulieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Internen Kommentar erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Internen Kommentar erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anwenderloesung formulieren": {
+      "main": [
+        [
+          {
+            "node": "Sicherheitspruefung Anwendernachricht",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anwender-Schreibmodell": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Anwenderloesung formulieren",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Anwenderrueckfrage formulieren",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sicherheitspruefung Anwendernachricht": {
+      "main": [
+        [
+          {
+            "node": "Anwendernachricht sicher?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anwenderrueckfrage formulieren": {
+      "main": [
+        [
+          {
+            "node": "Sicherheitspruefung Anwendernachricht",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anwendernachricht sicher?": {
+      "main": [
+        [
+          {
+            "node": "Oeffentlicher Schreibzugriff erlaubt?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Internen Kommentar erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Oeffentlicher Schreibzugriff erlaubt?": {
+      "main": [
+        [
+          {
+            "node": "Anwendernachricht senden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anwendernachricht senden?": {
+      "main": [
+        [
+          {
+            "node": "Anwendernachricht senden",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Event abschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anwendernachricht senden": {
+      "main": [
+        [
+          {
+            "node": "Status In Arbeit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Statuswarnung erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status In Arbeit": {
+      "main": [
+        [
+          {
+            "node": "Set Waiting on Employee",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Statuswarnung erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interner Schreibzugriff erlaubt?": {
+      "main": [
+        [
+          {
+            "node": "Internen Kommentar schreiben?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Internen Kommentar schreiben?": {
+      "main": [
+        [
+          {
+            "node": "Internen JSM-Kommentar anlegen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Event abschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Internen JSM-Kommentar anlegen": {
+      "main": [
+        [
+          {
+            "node": "Event abschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Statuswarnung erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Waiting on Employee": {
+      "main": [
+        [
+          {
+            "node": "Event abschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Statuswarnung erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Externe Recherche freigeben": {
+      "main": [
+        [
+          {
+            "node": "Externe Recherche erforderlich?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Externe Recherche erforderlich?": {
+      "main": [
+        [
+          {
+            "node": "Externe Herstellerrecherche ausfuehren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Interne Quellen verifizieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Externe Herstellerrecherche ausfuehren": {
+      "main": [
+        [
+          {
+            "node": "Externe Recherche uebernehmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Externe Recherche uebernehmen": {
+      "main": [
+        [
+          {
+            "node": "Interne Quellen verifizieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interne Quellen verifizieren": {
+      "main": [
+        [
+          {
+            "node": "Analyse und Identifikatoren absichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyse und Identifikatoren absichern": {
+      "main": [
+        [
+          {
+            "node": "Public Search Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy und Routing bestimmen": {
+      "main": [
+        [
+          {
+            "node": "Policy geliefert?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lauf als fehlgeschlagen vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feldpflege aufrufen": {
+      "main": [
+        [
+          {
+            "node": "Routing und Prioritaet ableiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Routing und Prioritaet ableiten": {
+      "main": [
+        [
+          {
+            "node": "Entscheidung routen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Internen Kommentar erzeugen": {
+      "main": [
+        [
+          {
+            "node": "Interne Zusatznotizen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interne Zusatznotizen": {
+      "main": [
+        [
+          {
+            "node": "Interner Schreibzugriff erlaubt?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Statuswarnung erzeugen": {
+      "main": [
+        [
+          {
+            "node": "Event mit Statuswarnung abschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event mit Statuswarnung abschliessen": {
+      "main": [
+        [
+          {
+            "node": "Fehler an n8n melden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy geliefert?": {
+      "main": [
+        [
+          {
+            "node": "Feldpflege aufrufen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lauf als fehlgeschlagen vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "nodes": [
     {
       "parameters": {
@@ -978,7 +1844,7 @@
           "value": "gpt-5.4-mini",
           "cachedResultName": "gpt-5.4-mini"
         },
-        "builtInTools": {},
+        "responsesApiEnabled": true,
         "options": {
           "textFormat": {
             "textOptions": {
@@ -986,12 +1852,10 @@
               "verbosity": "low"
             }
           },
-          "temperature": 0,
           "reasoningEffort": "low",
           "timeout": 120000,
           "maxRetries": 2
-        },
-        "responsesApiEnabled": true
+        }
       },
       "id": "101a4a20-6251-4b27-b869-6639c29d4c5f",
       "name": "Policy-Modell",
@@ -1945,864 +2809,33 @@
       "notes": "Faengt Ausfaelle der Policy-Sub-Nodes ab. Bei einem Fehler in Modell oder Parser reicht die Chain die Eingangsdaten durch, ohne output-Feld - dann fehlt nextAction und der Lauf wird als fehlgeschlagen vermerkt statt still als Erfolg zu enden."
     }
   ],
-  "connections": {
-    "Jira Trigger": {
-      "main": [
-        [
-          {
-            "node": "Set Event Context",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Set Event Context": {
-      "main": [
-        [
-          {
-            "node": "Nur Neuanlage-Events",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Nur Neuanlage-Events": {
-      "main": [
-        [
-          {
-            "node": "Claim Jira Event",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Claim Jira Event": {
-      "main": [
-        [
-          {
-            "node": "Event beansprucht?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Event beansprucht?": {
-      "main": [
-        [
-          {
-            "node": "Warten auf Jira-Konsistenz",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        []
-      ]
-    },
-    "Warten auf Jira-Konsistenz": {
-      "main": [
-        [
-          {
-            "node": "Get Issue Fresh",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Issue Fresh": {
-      "main": [
-        [
-          {
-            "node": "Maschinen- oder Fachticket",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Maschinen- oder Fachticket": {
-      "main": [
-        [
-          {
-            "node": "Maschinenticket uebersprungen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get Issue Comments",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Issue Comments": {
-      "main": [
-        [
-          {
-            "node": "Ticketkontext aufbereiten",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ticketkontext aufbereiten": {
-      "main": [
-        [
-          {
-            "node": "Analysierbar?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analysierbar?": {
-      "main": [
-        [
-          {
-            "node": "Bildanhaenge vorhanden?",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Event abschliessen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Bildanhaenge vorhanden?": {
-      "main": [
-        [
-          {
-            "node": "Bildanhaenge aufteilen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Kein Bildbefund",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Bildanhaenge aufteilen": {
-      "main": [
-        [
-          {
-            "node": "Jira-Bild laden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Jira-Bild laden": {
-      "main": [
-        [
-          {
-            "node": "Bild analysieren",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Bild analysieren": {
-      "main": [
-        [
-          {
-            "node": "Bildbefunde buendeln",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Bildbefunde buendeln": {
-      "main": [
-        [
-          {
-            "node": "Bildbefund setzen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Bildbefund setzen": {
-      "main": [
-        [
-          {
-            "node": "Supportfall zusammenstellen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Supportfall zusammenstellen": {
-      "main": [
-        [
-          {
-            "node": "Interner Support-Analyst",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Kein Bildbefund": {
-      "main": [
-        [
-          {
-            "node": "Supportfall zusammenstellen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Interner Support-Analyst": {
-      "main": [
-        [
-          {
-            "node": "Analyseergebnis normalisieren",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analyse-Modell": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Interner Support-Analyst",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Semantische Wissenssuche": {
-      "ai_tool": [
-        [
-          {
-            "node": "Interner Support-Analyst",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wissens-Embeddings": {
-      "ai_embedding": [
-        [
-          {
-            "node": "Semantische Wissenssuche",
-            "type": "ai_embedding",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wissens-Reranker": {
-      "ai_reranker": [
-        [
-          {
-            "node": "Semantische Wissenssuche",
-            "type": "ai_reranker",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Volltextsuche Wissensbasis": {
-      "ai_tool": [
-        [
-          {
-            "node": "Interner Support-Analyst",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Jira-Altfall lesen": {
-      "ai_tool": [
-        [
-          {
-            "node": "Interner Support-Analyst",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Denkschritt": {
-      "ai_tool": [
-        [
-          {
-            "node": "Interner Support-Analyst",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analyse-Schema": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "Interner Support-Analyst",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analyseergebnis normalisieren": {
-      "main": [
-        [
-          {
-            "node": "Externe Recherche freigeben",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Public Search Embedding": {
-      "main": [
-        [
-          {
-            "node": "Public Wissen hybrid abrufen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Public Wissen hybrid abrufen": {
-      "main": [
-        [
-          {
-            "node": "Public Kandidaten vorhanden?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Public Kandidaten vorhanden?": {
-      "main": [
-        [
-          {
-            "node": "Public Kandidaten reranken",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Keine Public Evidenz",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Public Kandidaten reranken": {
-      "main": [
-        [
-          {
-            "node": "Evidenzschranke",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Evidenzschranke": {
-      "main": [
-        [
-          {
-            "node": "Policy und Routing bestimmen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Policy-Modell": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Policy und Routing bestimmen",
-            "type": "ai_languageModel",
-            "index": 0
-          },
-          {
-            "node": "Policy-Schema",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Policy-Schema": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "Policy und Routing bestimmen",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Keine Public Evidenz": {
-      "main": [
-        [
-          {
-            "node": "Policy und Routing bestimmen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Entscheidung routen": {
-      "main": [
-        [
-          {
-            "node": "Anwenderloesung formulieren",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Anwenderrueckfrage formulieren",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Internen Kommentar erzeugen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Internen Kommentar erzeugen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Anwenderloesung formulieren": {
-      "main": [
-        [
-          {
-            "node": "Sicherheitspruefung Anwendernachricht",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Anwender-Schreibmodell": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Anwenderloesung formulieren",
-            "type": "ai_languageModel",
-            "index": 0
-          },
-          {
-            "node": "Anwenderrueckfrage formulieren",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Sicherheitspruefung Anwendernachricht": {
-      "main": [
-        [
-          {
-            "node": "Anwendernachricht sicher?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Anwenderrueckfrage formulieren": {
-      "main": [
-        [
-          {
-            "node": "Sicherheitspruefung Anwendernachricht",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Anwendernachricht sicher?": {
-      "main": [
-        [
-          {
-            "node": "Oeffentlicher Schreibzugriff erlaubt?",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Internen Kommentar erzeugen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Oeffentlicher Schreibzugriff erlaubt?": {
-      "main": [
-        [
-          {
-            "node": "Anwendernachricht senden?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Anwendernachricht senden?": {
-      "main": [
-        [
-          {
-            "node": "Anwendernachricht senden",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Event abschliessen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Anwendernachricht senden": {
-      "main": [
-        [
-          {
-            "node": "Status In Arbeit",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Statuswarnung erzeugen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Status In Arbeit": {
-      "main": [
-        [
-          {
-            "node": "Set Waiting on Employee",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Statuswarnung erzeugen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Interner Schreibzugriff erlaubt?": {
-      "main": [
-        [
-          {
-            "node": "Internen Kommentar schreiben?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Internen Kommentar schreiben?": {
-      "main": [
-        [
-          {
-            "node": "Internen JSM-Kommentar anlegen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Event abschliessen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Internen JSM-Kommentar anlegen": {
-      "main": [
-        [
-          {
-            "node": "Event abschliessen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Statuswarnung erzeugen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Set Waiting on Employee": {
-      "main": [
-        [
-          {
-            "node": "Event abschliessen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Statuswarnung erzeugen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Externe Recherche freigeben": {
-      "main": [
-        [
-          {
-            "node": "Externe Recherche erforderlich?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Externe Recherche erforderlich?": {
-      "main": [
-        [
-          {
-            "node": "Externe Herstellerrecherche ausfuehren",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Interne Quellen verifizieren",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Externe Herstellerrecherche ausfuehren": {
-      "main": [
-        [
-          {
-            "node": "Externe Recherche uebernehmen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Externe Recherche uebernehmen": {
-      "main": [
-        [
-          {
-            "node": "Interne Quellen verifizieren",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Interne Quellen verifizieren": {
-      "main": [
-        [
-          {
-            "node": "Analyse und Identifikatoren absichern",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analyse und Identifikatoren absichern": {
-      "main": [
-        [
-          {
-            "node": "Public Search Embedding",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Policy und Routing bestimmen": {
-      "main": [
-        [
-          {
-            "node": "Policy geliefert?",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Lauf als fehlgeschlagen vermerken",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Feldpflege aufrufen": {
-      "main": [
-        [
-          {
-            "node": "Routing und Prioritaet ableiten",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Routing und Prioritaet ableiten": {
-      "main": [
-        [
-          {
-            "node": "Entscheidung routen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Internen Kommentar erzeugen": {
-      "main": [
-        [
-          {
-            "node": "Interne Zusatznotizen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Interne Zusatznotizen": {
-      "main": [
-        [
-          {
-            "node": "Interner Schreibzugriff erlaubt?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Statuswarnung erzeugen": {
-      "main": [
-        [
-          {
-            "node": "Event mit Statuswarnung abschliessen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Event mit Statuswarnung abschliessen": {
-      "main": [
-        [
-          {
-            "node": "Fehler an n8n melden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Policy geliefert?": {
-      "main": [
-        [
-          {
-            "node": "Feldpflege aufrufen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Lauf als fehlgeschlagen vermerken",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  },
-  "settings": {
-    "executionOrder": "v1",
-    "availableInMCP": true,
-    "binaryMode": "separate",
-    "timeSavedMode": "fixed",
-    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
-    "saveManualExecutions": false,
-    "callerPolicy": "workflowsFromSameOwner",
-    "executionTimeout": 900,
-    "timeSavedPerExecution": 15
-  },
   "nodeGroups": [],
-  "description": "Beantwortet neu angelegte SSD-Tickets. Maschinenticket-Filter, Recherchepflicht ueber semantische Suche, Volltextsuche und Herstellerrecherche, Public-Retrieval mit Evidenzschranke, Redundanzpruefung der Rueckfragen. Je Ticket eine Aktion."
+  "tags": [],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true
+  },
+  "parentFolderId": null,
+  "description": "Beantwortet neu angelegte SSD-Tickets. Maschinenticket-Filter, Recherchepflicht ueber semantische Suche, Volltextsuche und Herstellerrecherche, Public-Retrieval mit Evidenzschranke, Redundanzpruefung der Rueckfragen. Je Ticket eine Aktion.",
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
 }

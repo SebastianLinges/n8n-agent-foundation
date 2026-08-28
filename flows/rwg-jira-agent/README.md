@@ -38,9 +38,21 @@ Damit greift die `status = 'failed'`-Bedingung der Claim-Query, und der Vorgang 
 
 Der Atlassian-MCP-Node (`@n8n/mcp-registry.atlassian`) ist als `ai_tool` deklariert und damit nur als Werkzeug an einem Agenten nutzbar, nicht als feste Aktion im Ablauf. Für die Schreibpfade kommt er nicht in Frage. Als Recherchewerkzeug am `Interner Support-Analyst` ist er einen eigenen Vergleich wert — dafür steht `RWG Test - MCP vs RAG` bereit.
 
+## Der Parameter `temperature` gehört nicht an das Policy-Modell
+
+`Policy-Modell` trug `temperature: 0` — ein Wert, den die GPT-5-Generation ablehnt. Solange der Node über Chat Completions lief, blieb das folgenlos. Mit der Umstellung auf die Responses-API quittierte die API jede Anfrage mit `Bad request - please check your parameters`. Die Policy wurde damit **gar nicht mehr befragt**.
+
+Sichtbar war das nicht an der Ausführungsliste: Der Fehler lief über den Fehlerausgang von `Policy und Routing bestimmen` auf `Lauf als fehlgeschlagen vermerken`, und n8n meldet den Lauf deshalb als `success`. Genau dafür ist dieser Weg gebaut — der Vorgang wird in `jira_agent_events` auf `failed` gesetzt und bleibt beanspruchbar. Die Absicherung hat gehalten; sie ersetzt aber keine Wirkungskontrolle.
+
+Belegte Zeitschiene: Lauf `108547` (27.08., 12:28) liefert eine vollständige Policy mit `nextAction: IT`. Die Läufe `109605` und `109799` (28.08.) enden im Fehlerausgang, `Policy-Schema` wird nie erreicht.
+
+`Analyse-Modell` trägt weiterhin `temperature: 0`, läuft aber über Chat Completions und arbeitet nachweislich. Der Node bleibt unangetastet, solange kein Befund dagegen spricht.
+
 ## Offen
 
-**Wirkung messen.** Vor dem Umbau brachen 9 von 60 Läufen am Policy-Schema ab, Quote 15 %, jeweils mit `Invalid JSON in model output`. Seither gab es **keinen sauberen Lauf**: der einzige Lauf nach dem ersten Publish lief in einen Konfigurationsfehler, der inzwischen behoben ist. Die Messung beginnt mit dem nächsten neuen SSD-Ticket. Ziel ist eine Quote nahe null über mindestens 60 Läufe.
+**Wirkung messen.** Vor dem Umbau brachen 9 von 60 Läufen am Policy-Schema ab, Quote 15 %, jeweils mit `Invalid JSON in model output`. Diese Messung steht weiterhin aus: Seit dem 27.08. nachmittags scheiterte die Policy am Konfigurationsfehler oben, sodass kein Lauf die neue Absicherung inhaltlich prüfen konnte. Nach dem Laufzeitprofil betrifft das rund 13 Vorgänge — kurze Läufe von etwa 7 s sind Maschinentickets und erreichen die Policy nicht. Die Messung beginnt mit dem nächsten SSD-Ticket nach dem Entfernen von `temperature`. Ziel ist eine Quote nahe null über mindestens 60 Läufe.
+
+Sollte der nächste Lauf erneut `Bad request` melden, ist der nächste Verdächtige `verbosity` in `textFormat.textOptions` — der einzige weitere Parameter, den `Policy-Modell` gegenüber dem funktionierenden `Analyse-Modell` zusätzlich trägt.
 
 **Kommentarkopf in `Internen Kommentar erzeugen`.** Trägt weiterhin `V6.1`, `AENDERUNGEN GEGENUEBER V6` und `[FIX 1]`–`[FIX 6]`. Die bereinigte Fassung liegt in `code/` und muss von Hand eingefügt werden — Begründung dort.
 
