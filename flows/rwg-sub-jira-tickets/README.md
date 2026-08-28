@@ -4,7 +4,7 @@ Werkzeug-Subworkflow (`HoCch7AkiSroyJBB`) für Ticketfragen des Teams-Agenten. A
 
 ## Ablauf
 
-`Aufruf vom Agenten` → `Anfrage pruefen` → `Absicht per LLM` → `Absicht auswerten` → `Nutzerkonto aufloesen` → `JQL bauen` → `Jira abfragen` → `Tickets aufbereiten`
+`Aufruf vom Agenten` → `Anfrage pruefen` → `Absicht per LLM` → `Absicht auswerten` → `Person in Entra suchen` → `Adresse festlegen` → `Nutzerkonto aufloesen` → `JQL bauen` → `Jira abfragen` → `Tickets aufbereiten`
 
 ## Autorisierung
 
@@ -34,14 +34,23 @@ Diese Absicherung bleibt bestehen, unabhängig vom eingesetzten Modell. Sie ist 
 
 Deshalb liest `Absicht auswerten` den Schlüssel ergänzend aus `frage + suchtext`, wenn das Modell keinen erkannt hat. Das ist unbedenklich: Der Schlüssel ist ein festes Muster und keine Berechtigung. `JQL bauen` ergänzt das Kontogate unabhängig davon per `AND` — für den Fachbereich ausnahmslos. Ein erfundener Schlüssel öffnet daher keinen Vorgang, auf den die fragende Person ohnehin kein Recht hat.
 
-## Grenze der Namensauflösung
+## Namensauflösung über Entra
 
-Der Jira-`displayName` folgt in dieser Instanz der Adresse und nicht dem Namen: Konten heißen `andre.kamp` oder `vincent-hendrik.borresch`. Eine Suche nach „Andre Kamp" findet deshalb nichts — der Umweg über die konstruierte Adresse `vorname.nachname@rwg-r.de` ist die Folge, nicht ein Versehen.
+Der Jira-`displayName` folgt in dieser Instanz der Adresse und nicht dem Namen: Konten heißen `andre.kamp` oder `vincent-hendrik.borresch`. Eine Suche nach „Andre Kamp" findet dort deshalb nichts. `Absicht auswerten` konstruiert aus dem Namen die Adresse `vorname.nachname@rwg-r.de` — eine Konvention, die bei Akzenten, Namenszusätzen und abweichenden Adressen nicht trägt.
 
-Die Konstruktion ist aber eine Konvention, keine Auskunft. Sie entumlautet nur `ä ö ü ß`; andere diakritische Zeichen fallen der Filterung `[^a-z0-9-]` zum Opfer und erzeugen eine Adresse, die es nicht gibt. Ebenso brechen Doppelnamen, Namenszusätze und jede Abweichung vom Schema. Das Verhalten bleibt dabei sicher — ohne eindeutiges Konto wird `gueltig = false` gesetzt und nichts geraten — aber die Person wird nicht gefunden, obwohl sie existiert.
+Deshalb fragt `Person in Entra suchen` das Verzeichnis, das den echten Namen samt verbindlicher Adresse führt. Zwei Eigenheiten sind dabei berücksichtigt:
 
-Die belastbare Quelle für Klarnamen ist Entra: Dort steht der echte Anzeigename (`Linges Sebastian`) samt verbindlicher Adresse, und die Anbindung besteht bereits über `RWG Sub - Identity & Audience Resolver`. Ein Namensschlag gegen Entra statt der Konstruktion wäre der deterministische Weg — noch nicht umgesetzt.
+- **Akzente.** Der OData-Filter vergleicht zeichengenau, `startswith(givenName,'Andre')` findet „André" also nicht. Der Filter nutzt je Namensteil nur den führenden ASCII-Abschnitt — aus „André" wird `Andr`, was beide Schreibweisen trifft. Beginnt ein Name mit einem Nicht-ASCII-Zeichen, unterbleibt die Suche und die konstruierte Adresse bleibt der Rückfall.
+- **Reihenfolge.** Entra führt den Anzeigenamen als „Nachname Vorname" (`Linges Sebastian`), die Frage nennt ihn umgekehrt. Geprüft wird deshalb gegen `givenName` und `surname` in beiden Zuordnungen.
+
+`Adresse festlegen` gleicht die Kandidaten anschließend im Code ab. Beide Seiten werden identisch normalisiert — NFD-Zerlegung, Verwerfen aller Nicht-ASCII-Reste — sodass Akzent- und Umlautschreibweisen zusammenfallen. Die Adresse wird **nur bei genau einem Treffer** übernommen. Mehrere Treffer erzeugen eine Rückfrage statt einer Auswahl; kein Treffer lässt die konstruierte Adresse stehen. Trägt auch die nicht, meldet `JQL bauen` weiterhin `gueltig = false`.
+
+Das Feld `entraStatus` weist den genommenen Weg aus: `eindeutig`, `mehrdeutig`, `kein_treffer`, `ohne_adresse` oder `nicht_gesucht`.
+
+Der Aufruf läuft bei jeder Ticketfrage mit, auch ohne dritte Person — dann mit einem Filter, der bewusst nichts findet. Das kostet einen Verzeichnisaufruf und hält den Strang dafür linear. Gewirkt wird ausschließlich bei `personBezug = 'andere'`; für den Fachbereich steht der Wert weiter oben hart auf `selbst`, die Verzeichnissuche ist dort strukturell unerreichbar.
 
 ## Offen
 
-Wirkung des Modellwechsels ist noch nicht an echten Läufen belegt. Prüfkriterium ist `absichtQuelle = 'llm'` bei gleichzeitig korrektem `personBezug` — insbesondere bei Fragen mit Selbstbezug und bei Fragen nach einer namentlich genannten Person.
+Weder der Modellwechsel noch die Entra-Auflösung sind an echten Läufen belegt. Prüfkriterien im Lauf: `absichtQuelle = 'llm'`, `entraStatus = 'eindeutig'` bei einer namentlich genannten Person und ein korrekter `personBezug` bei Fragen mit Selbstbezug.
+
+Ob das Verzeichnis-Credential die Suche über andere Konten überhaupt zulässt, ist offen. Reicht die Berechtigung nicht, liefert der Aufruf einen Fehlerkörper statt `value`, `entraStatus` steht auf `kein_treffer` und die konstruierte Adresse greift wie zuvor — das Verhalten fällt dann auf den bisherigen Stand zurück, ohne Ausfall.
