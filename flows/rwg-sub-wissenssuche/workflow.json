@@ -1,0 +1,290 @@
+{
+  "id": "GD256mxClPHHbngI",
+  "name": "RWG Sub - Wissenssuche",
+  "active": true,
+  "isArchived": false,
+  "versionId": "98594cfc-fd43-4528-b883-03b56920b5ae",
+  "activeVersionId": "98594cfc-fd43-4528-b883-03b56920b5ae",
+  "triggerCount": 0,
+  "createdAt": "2026-08-20T09:10:20.716Z",
+  "updatedAt": "2026-08-28T14:04:19.311Z",
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 120,
+    "timeSavedPerExecution": 5
+  },
+  "connections": {
+    "Aufruf vom Agenten": {
+      "main": [
+        [
+          {
+            "node": "Eingaben pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eingaben pruefen": {
+      "main": [
+        [
+          {
+            "node": "Suchvektor erzeugen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suchvektor erzeugen": {
+      "main": [
+        [
+          {
+            "node": "Wissen hybrid abrufen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wissen hybrid abrufen": {
+      "main": [
+        [
+          {
+            "node": "Kandidaten reranken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kandidaten reranken": {
+      "main": [
+        [
+          {
+            "node": "Treffer aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "e21e043c-3e2d-47a8-b718-debc9016ad9d",
+      "name": "Aufruf vom Agenten",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "suchtext",
+              "type": "string"
+            },
+            {
+              "name": "audienceCsv",
+              "type": "string"
+            },
+            {
+              "name": "topN",
+              "type": "number"
+            },
+            {
+              "name": "userEmail",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "35ac2589-adb0-488a-b4bc-9565631554aa",
+      "name": "Eingaben pruefen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Fail closed: audienceCsv kommt ausschliesslich aus dem Parent-Kontext,\n// niemals vom Modell. Unbekannte Werte werden verworfen, nicht durchgereicht.\nconst ERLAUBT = ['public', 'it_internal'];\nconst inp = $input.first().json ?? {};\nconst auds = String(inp.audienceCsv ?? '')\n  .split(',').map(a => a.trim().toLowerCase())\n  .filter(a => ERLAUBT.includes(a));\nconst uniq = [...new Set(auds)];\nconst suchtext = String(inp.suchtext ?? '').trim().slice(0, 800);\nconst topN = Math.min(Math.max(Number(inp.topN ?? 8) || 8, 1), 12);\n\n// FIX 08/2026 (Beleg: Lauf 104948): Eine Vorgangskennung im Suchtext wurde\n// bisher wie ein gewoehnliches Suchwort behandelt. Der strenge Volltextpfad\n// verknuepft alle Begriffe mit UND - ein einziger Begriff ohne Entsprechung in\n// der Wissensbasis setzt ihn zwingend auf null. Im Beleglauf war das \"SZU\",\n// das in keinem einzigen Chunk vorkommt (verifiziert, 0 Treffer ueber alle\n// Quellen). SSD-3512 lag mit 20 Chunks im Index und wurde trotzdem nicht\n// gefunden. Die Kennung wird deshalb hier extrahiert und im SQL als direkter\n// Lookup ohne Score-Bewertung ausgewertet.\n// Bewusst tolerant gemustert: Ein Fehltreffer wie \"COVID-19\" trifft im SQL auf\n// kein source_ref und liefert null Zeilen. Der Pfad kann nichts kaputtmachen,\n// nur zusaetzlich finden.\nconst KENNUNG = /\\b[A-Za-z]{2,10}-\\d{1,6}\\b/g;\nconst identKeys = [...new Set((suchtext.match(KENNUNG) || []).map(k => k.toUpperCase()))].slice(0, 5);\n\n// FIX 08/2026 (Beleg: Lauf 104980): userEmail kommt wie audienceCsv aus dem\n// Parent-Kontext, nie vom Modell. Sie dient ausschliesslich dem Abgleich mit\n// Melder, Bearbeiter und Request-Teilnehmer eines Vorgangs - sie erweitert\n// keinen Zugriff. Ohne gueltige Adresse bleibt die Zuordnung schlicht leer.\nconst roh = String(inp.userEmail ?? '').trim().toLowerCase();\nconst userEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(roh) ? roh.slice(0, 200) : '';\n\n// Leere Liste => SQL liefert null Zeilen (verifiziert). Kein Bypass moeglich.\n// Gleiches gilt fuer identCsv: leerer String => string_to_array liefert ein\n// Array der Laenge 0 => die ident-CTE bleibt leer.\nreturn [{ json: {\n  suchtext,\n  audienceCsv: uniq.join(','),\n  identCsv: identKeys.join(','),\n  identKeys,\n  userEmail,\n  topN,\n  gueltig: uniq.length > 0 && suchtext.length > 1\n} }];"
+      }
+    },
+    {
+      "id": "db607dbc-2f4c-41bc-b64d-c521021db5dd",
+      "name": "Suchvektor erzeugen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"text-embedding-3-small\", dimensions: 1536, encoding_format: \"float\", input: $json.gueltig ? $json.suchtext : \"leer\" }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "id": "26bc7e24-4495-4b0d-871a-60faa1244ad5",
+      "name": "Wissen hybrid abrufen",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "options": {
+          "queryReplacement": "={{ [ '[' + ($json.data?.[0]?.embedding ?? []).join(',') + ']', $('Eingaben pruefen').first().json.audienceCsv, $('Eingaben pruefen').first().json.suchtext, $('Eingaben pruefen').first().json.identCsv, $('Eingaben pruefen').first().json.userEmail ] }}"
+        },
+        "query": "WITH settings AS MATERIALIZED (\n  SELECT set_config('hnsw.iterative_scan','strict_order',true) AS s1,\n         set_config('hnsw.ef_search','120',true) AS s2\n),\nparams AS MATERIALIZED (\n  SELECT $1::extensions.vector(1536) AS qe,\n         string_to_array($2, ',') AS auds,\n         $3::text AS qt,\n         string_to_array(upper(btrim($4)), ',') AS ids,\n         lower(btrim($5)) AS email\n  FROM settings\n),\ngate AS MATERIALIZED (\n  SELECT p.* FROM params p\n  WHERE array_length(p.auds, 1) >= 1\n    AND p.auds <@ ARRAY['public','it_internal']\n),\n-- FIX 08/2026 (Beleg: Lauf 104948): Direkter Lookup auf die Vorgangskennung,\n-- vollstaendig an Vektor, Volltext und Reranker vorbei. Eine Kennung ist ein\n-- exakter Identifier und keine Aehnlichkeitsfrage - sie darf nicht an einem\n-- Score-Boden scheitern. Der Audience-Gate gilt hier unveraendert: gefiltert\n-- wird ueber dieselbe geprueft Liste, kein Bypass.\n-- Anders als in vec/lex ist der header-Chunk hier NICHT ausgeschlossen. Genau\n-- dort stehen Status, Prioritaet, Typ und Projekt - bei einer Frage nach einem\n-- konkreten Vorgang ist das die wertvollste Zeile, nicht Rauschen.\nident AS MATERIALIZED (\n  SELECT * FROM (\n    SELECT dc.id, dc.source_type, dc.source_ref, dc.audience, dc.metadata, dc.chunk_text,\n           COALESCE(dc.metadata->>'chunk_type','content') AS ct,\n           -- FIX 08/2026 (Beleg: Lauf 104980): Auf die Frage \"ist das meins?\" hat\n           -- der Agent den Besitz aus dem Gespraechsverlauf abgeleitet statt ihn\n           -- zu belegen. Das war zufaellig richtig und grundsaetzlich ungedeckt:\n           -- ein geschlossener eigener Vorgang stand nie in der Liste offener\n           -- Tickets, aus der er schloss. Die Zuordnung steht in jira_tickets -\n           -- sie gehoert mitgeliefert, dann braucht es dafuer keinen zweiten\n           -- Werkzeugaufruf, auf den sich das Modell ohnehin nicht verlassen laesst.\n           CASE\n             WHEN dc.source_type <> 'jira' THEN NULL\n             WHEN COALESCE(g.email,'') = '' THEN NULL\n             WHEN jt.ticket_key IS NULL THEN 'unbekannt'\n             WHEN lower(COALESCE(jt.reporter_email,'')) = g.email THEN 'melder'\n             WHEN lower(COALESCE(jt.assignee_email,'')) = g.email THEN 'bearbeiter'\n             WHEN EXISTS (\n               SELECT 1 FROM jsonb_array_elements(\n                 COALESCE(jt.raw_payload->'fields'->'customfield_10032','[]'::jsonb)) tn\n               WHERE lower(COALESCE(tn->>'emailAddress','')) = g.email\n             ) THEN 'teilnehmer'\n             ELSE 'fremd'\n           END AS zuordnung,\n           row_number() OVER (\n             ORDER BY array_position(g.ids, upper(dc.source_ref)),\n                      CASE COALESCE(dc.metadata->>'chunk_type','content')\n                        WHEN 'header' THEN 0 WHEN 'content' THEN 1\n                        WHEN 'solution' THEN 2 WHEN 'comment' THEN 3 ELSE 4 END,\n                      dc.chunk_index\n           ) AS rn\n    FROM public.document_chunks dc CROSS JOIN gate g\n    LEFT JOIN public.jira_tickets jt ON jt.ticket_key = dc.source_ref\n    WHERE COALESCE(array_length(g.ids, 1), 0) >= 1\n      AND upper(dc.source_ref) = ANY (g.ids)\n      AND dc.audience = ANY (g.auds)\n      AND COALESCE(dc.metadata->>'qualitaet','ok') <> 'fehlerhaft'\n      AND COALESCE(dc.metadata->>'chunk_type','content') <> 'image_attachment'\n  ) x\n  WHERE rn <= 16\n),\n-- Bildchunks sind je 1.500 bis 4.500 Zeichen lang und wuerden den Vorgangstext\n-- verdraengen. Sie werden im Identifier-Pfad ausgelassen, aber gezaehlt, damit\n-- der Agent die Anhaenge erwaehnen kann statt sie zu verschweigen.\nident_bilder AS MATERIALIZED (\n  SELECT count(*) AS n\n  FROM public.document_chunks dc CROSS JOIN gate g\n  WHERE COALESCE(array_length(g.ids, 1), 0) >= 1\n    AND upper(dc.source_ref) = ANY (g.ids)\n    AND dc.audience = ANY (g.auds)\n    AND COALESCE(dc.metadata->>'chunk_type','content') = 'image_attachment'\n),\nvec AS MATERIALIZED (\n  SELECT dc.id, row_number() OVER (ORDER BY dc.embedding <=> g.qe) AS rnk\n  FROM public.document_chunks dc CROSS JOIN gate g\n  WHERE dc.audience = ANY (g.auds)\n    AND dc.embedding IS NOT NULL\n    AND COALESCE(dc.metadata->>'chunk_type','content') <> 'header'\n    AND COALESCE(dc.metadata->>'qualitaet','ok') <> 'fehlerhaft'\n  ORDER BY dc.embedding <=> g.qe\n  LIMIT 40\n),\n-- Strenge Lesart: websearch_to_tsquery verknuepft alle Begriffe mit UND.\nlex_strict AS MATERIALIZED (\n  SELECT dc.id, row_number() OVER (ORDER BY ts_rank(to_tsvector('german', dc.chunk_text), websearch_to_tsquery('german', g.qt)) DESC) AS rnk\n  FROM public.document_chunks dc CROSS JOIN gate g\n  WHERE dc.audience = ANY (g.auds)\n    AND COALESCE(dc.metadata->>'chunk_type','content') <> 'header'\n    AND COALESCE(dc.metadata->>'qualitaet','ok') <> 'fehlerhaft'\n    AND length(btrim(g.qt)) > 2\n    AND to_tsvector('german', dc.chunk_text) @@ websearch_to_tsquery('german', g.qt)\n  LIMIT 40\n),\n-- FIX 08/2026 (Beleg: Lauf 102529): Bei mehrgliedrigen Suchtexten traf die\n-- UND-Verknuepfung strukturell nie - kein Chunk enthaelt sechs Begriffe\n-- gleichzeitig. Der Agent sah null Volltexttreffer und sagte ab. Der Rueckfall\n-- auf ODER greift ausschliesslich dann, wenn die strenge Lesart leer bleibt,\n-- und liegt im SQL statt im Prompt: so ist er keine Bitte, sondern Code.\nlex_or AS MATERIALIZED (\n  SELECT dc.id, row_number() OVER (ORDER BY ts_rank(to_tsvector('german', dc.chunk_text), websearch_to_tsquery('german', regexp_replace(btrim(g.qt), '\\s+', ' OR ', 'g'))) DESC) AS rnk\n  FROM public.document_chunks dc CROSS JOIN gate g\n  WHERE NOT EXISTS (SELECT 1 FROM lex_strict)\n    AND dc.audience = ANY (g.auds)\n    AND COALESCE(dc.metadata->>'chunk_type','content') <> 'header'\n    AND COALESCE(dc.metadata->>'qualitaet','ok') <> 'fehlerhaft'\n    AND length(btrim(g.qt)) > 2\n    AND to_tsvector('german', dc.chunk_text) @@ websearch_to_tsquery('german', regexp_replace(btrim(g.qt), '\\s+', ' OR ', 'g'))\n  LIMIT 40\n),\nlex AS (\n  SELECT id, rnk FROM lex_strict\n  UNION ALL\n  SELECT id, rnk FROM lex_or\n),\nfused AS (\n  SELECT id, SUM(sc) AS rrf FROM (\n    SELECT id, 1.0/(60 + rnk) AS sc FROM vec\n    UNION ALL\n    SELECT id, 1.0/(60 + rnk) AS sc FROM lex\n  ) u GROUP BY id ORDER BY rrf DESC LIMIT 24\n)\nSELECT\n  COALESCE(jsonb_agg(jsonb_build_object(\n    'sourceType', dc.source_type,\n    'sourceRef', dc.source_ref,\n    'audience', dc.audience,\n    'chunkType', COALESCE(dc.metadata->>'chunk_type','content'),\n    'title', COALESCE(NULLIF(dc.metadata->>'title',''), NULLIF(dc.metadata->>'file_name',''), dc.source_ref),\n    'url', COALESCE(NULLIF(dc.metadata->>'url',''), NULLIF(dc.metadata->>'sharepoint_url','')),\n    'text', left(dc.chunk_text, 2000)\n  ) ORDER BY f.rrf DESC), '[]'::jsonb) AS candidates,\n  count(*) AS \"candidateCount\",\n  (SELECT count(*) FROM lex_strict) AS \"lexStrikt\",\n  (SELECT count(*) FROM lex_or) AS \"lexOder\",\n  (SELECT COALESCE(jsonb_agg(jsonb_build_object(\n     'sourceType', i.source_type,\n     'sourceRef', i.source_ref,\n     'audience', i.audience,\n     'chunkType', i.ct,\n     'zuordnung', i.zuordnung,\n     'title', COALESCE(NULLIF(i.metadata->>'title',''), NULLIF(i.metadata->>'file_name',''), i.source_ref),\n     'url', COALESCE(NULLIF(i.metadata->>'url',''), NULLIF(i.metadata->>'sharepoint_url','')),\n     'text', left(i.chunk_text, 1400)\n   ) ORDER BY i.rn), '[]'::jsonb) FROM ident i) AS \"identHits\",\n  (SELECT count(*) FROM ident) AS \"identCount\",\n  (SELECT n FROM ident_bilder) AS \"identBilder\"\nFROM fused f JOIN public.document_chunks dc ON dc.id = f.id;"
+      }
+    },
+    {
+      "id": "7c13e71a-07d0-470f-8e15-b534442f78b0",
+      "name": "Kandidaten reranken",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.com/v2/rerank",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "cohereApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"rerank-v3.5\", query: $('Eingaben pruefen').first().json.suchtext || \"Support-Anfrage\", top_n: Math.min(Number($json.candidateCount) || 1, 10), documents: ($json.candidates ?? []).map(c => (c.title ? c.title + \"\\n\" : \"\") + c.text) }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "48c671a4-9ef7-449e-8f08-c8eb03ee2a02",
+      "name": "Treffer aufbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const src = $('Wissen hybrid abrufen').first().json ?? {};\nconst cand = Array.isArray(src.candidates) ? src.candidates : [];\nconst ctl = $('Eingaben pruefen').first().json ?? {};\nconst resp = $input.first().json ?? {};\nconst results = Array.isArray(resp.results) ? resp.results : [];\n\n// FIX 08/2026 (Beleg: Lauf 104948): Direkttreffer ueber die Vorgangskennung.\n// Sie kommen aus einer eigenen SQL-CTE, laufen bewusst NICHT durch den\n// Reranker und unterliegen keinem Score-Boden. Eine Kennung ist eine exakte\n// Referenz, keine Aehnlichkeit - der Reranker wuerde sie an der Wortwahl der\n// Frage messen und dabei zwangslaeufig verwerfen (im Beleglauf Bestwert\n// 0.0825 gegen Boden 0.15, obwohl 20 Chunks zum Vorgang im Index lagen).\nconst identRoh = Array.isArray(src.identHits) ? src.identHits : [];\nconst identBilder = Number(src.identBilder ?? 0);\nconst identPfad = identRoh.length > 0;\n\n// Cohere rerank-v3.5 liefert bei deutscher Fachdokumentation flache,\n// unkalibrierte Scores. Absolute Schwellen taugen nur als Muellfilter;\n// die fachliche Gewichtung macht der Agent anhand des Wertes.\nconst BODEN = 0.05;\n// Im gelockerten Volltextpfad (ODER statt UND) landen zwangslaeufig Chunks im\n// Pool, die nur ein einzelnes Allerweltswort teilen. Beleg Lauf 102613: auf\n// eine AWS-Frage kamen Debitorencockpit-Seiten mit Bestwert 0.1014 durch.\n// Deshalb muss sich der Rueckfall seine Treffer verdienen - sonst ist eine\n// offene Absage die bessere Antwort als drei glaubwuerdige Fehltreffer.\nconst BODEN_RUECKFALL = 0.15;\nconst MAX_JE_QUELLE = 2;   // ein Dokument darf die Liste nicht dominieren\nconst MAX_BILDCHUNKS = 1;  // Bildbeschreibungen sind lang und verdraengen Doku\n\n// Die Rolle steht in der angefragten Audience. Sie kommt aus dem\n// Parent-Kontext und wurde in 'Eingaben pruefen' gegen die Whitelist geprueft.\nconst istITAnfrage = String(ctl.audienceCsv || '').split(',').map(a => a.trim()).includes('it_internal');\n\nconst lexStrikt = Number(src.lexStrikt ?? 0);\nconst lexOder = Number(src.lexOder ?? 0);\nconst lexRueckfall = lexStrikt === 0 && lexOder > 0;\nconst boden = lexRueckfall ? BODEN_RUECKFALL : BODEN;\n\nlet ranked;\nif (results.length) {\n  ranked = results\n    .map(r => { const c = cand[Number(r.index)]; return c ? { ...c, score: Number(r.relevance_score ?? 0) } : null; })\n    .filter(Boolean)\n    .sort((a, b) => b.score - a.score);\n} else {\n  // Ohne Reranker-Antwort auf die RRF-Reihenfolge zurueckfallen, nicht leer liefern.\n  ranked = cand.map(c => ({ ...c, score: null }));\n}\n\n// Liegt ein Direkttreffer vor, ist die Frage beantwortet. Die semantischen\n// Kandidaten sind dann nur noch Beiwerk und duerfen den Vorgang nicht\n// zutexten. Im gelockerten Volltextpfad entfallen sie ganz: dort ist der Pool\n// per Konstruktion Rauschen, und Rauschen neben einem gesicherten Treffer ist\n// schaedlicher als anderswo, weil es glaubwuerdig danebensteht.\nconst limit = identPfad\n  ? (lexRueckfall ? 0 : 3)\n  : (Number(ctl.topN) || 8);\n\nconst istBild = r => String(r.chunkType) === 'image_attachment';\nconst hatTextTreffer = ranked.some(r => !istBild(r) && (r.score === null || r.score >= boden));\n\nconst gewaehlt = [];\nconst jeQuelle = {};\nlet bildzahl = 0;\n\nfor (const r of ranked) {\n  if (gewaehlt.length >= limit) break;\n  if (r.score !== null && r.score < boden) continue;\n\n  const ref = String(r.sourceRef || '?');\n  if ((jeQuelle[ref] || 0) >= MAX_JE_QUELLE) continue;\n\n  // Was der Identifier-Pfad schon geliefert hat, nicht doppelt ausgeben.\n  if (identPfad && identRoh.some(i => String(i.sourceRef) === ref)) continue;\n\n  if (istBild(r)) {\n    if (bildzahl >= MAX_BILDCHUNKS) continue;\n    // Kein Bildchunk auf Platz 1, solange echte Doku verfuegbar ist.\n    if (gewaehlt.length === 0 && hatTextTreffer) continue;\n    bildzahl++;\n  }\n\n  jeQuelle[ref] = (jeQuelle[ref] || 0) + 1;\n  gewaehlt.push(r);\n}\n\n// ENTSCHEIDUNG 08/2026: Confluence-Links gehen an die IT, nicht an den\n// Fachbereich. Wer den Inhalt sehen darf, darf auch wissen, wo er steht - die\n// Audience-Pruefung hat den Zugriff bereits entschieden. Fuer alle anderen\n// wird die URL entfernt, damit kein Verweis auf eine Seite entsteht, die sie\n// nicht oeffnen koennen. Bewusst im Code statt im Systemprompt: der Agent gibt\n// nur Links aus, die im Werkzeugergebnis stehen.\nconst istConfluence = r => String(r.sourceType) === 'confluence';\nconst linkUnterdruecken = r => istConfluence(r) && !istITAnfrage;\n\n// Signaturbloecke ranken hoch, weil sie in fast jedem Ticket stehen, taugen\n// aber nicht als Stammdatenquelle: In den Signaturen kommen mehrere\n// verschiedene Dienstsitze vor (Siemensring 44 L, Anrather Str. 3-5, Zum\n// Gueterbahnhof 1). Der Agent griff bisher einen davon heraus und antwortete\n// glaubwuerdig falsch. Erkennen statt loeschen: der Chunk kann daneben\n// echten Ticketinhalt enthalten.\nconst signaturMuster = [\n  /Dienstsitz\\s*\\|/i,\n  /Amtsgericht\\s+Krefeld\\s+GnR/i,\n  /(viele|freundliche|mit freundlichen)\\s+gr(ü|u)(ß|ss)e/i,\n  /www\\.rwg-r\\.de/i\n];\nconst istSignatur = r => signaturMuster.filter(m => m.test(String(r.text || ''))).length >= 2;\nconst signaturTreffer = gewaehlt.filter(istSignatur).length;\n\n// Direkttreffer zuerst: sie sind die belastbare Auskunft, alles danach ist\n// Kontext. 'relevanz' bleibt bewusst null - es gibt keinen Score, weil nicht\n// gescort wurde. 'gesichert' sagt dem Agenten, worauf er sich stuetzen darf.\n// FIX 08/2026 (Beleg: Lauf 104964): Die Sichtbarkeitsstufe fehlte im Treffer.\n// Bei der Frage, was ein Anwender sehen darf, konnte der Agent interne von\n// oeffentlichen Inhalten nur daran unterscheiden, dass im Chunktext zufaellig\n// \"| intern |\" stand. Das hat funktioniert, war aber Zufall statt Mechanismus.\n// Die Stufe steht ohnehin in der Zeile - sie gehoert ausgegeben.\nconst identTreffer = identRoh.map(r => ({\n  titel: r.title,\n  quelle: r.sourceType,\n  referenz: r.sourceRef,\n  art: r.chunkType,\n  audience: r.audience,\n  zuordnung: r.zuordnung ?? null,\n  url: linkUnterdruecken(r) ? '' : (r.url || ''),\n  relevanz: null,\n  gesichert: true,\n  text: String(r.text ?? '').slice(0, 1400)\n}));\n\nconst semantischeTreffer = gewaehlt.map(r => ({\n  titel: r.title,\n  quelle: r.sourceType,\n  referenz: r.sourceRef,\n  art: r.chunkType,\n  audience: r.audience,\n  url: linkUnterdruecken(r) ? '' : (r.url || ''),\n  relevanz: r.score === null ? null : Number(r.score.toFixed(4)),\n  gesichert: false,\n  text: String(r.text ?? '').slice(0, 1800)\n}));\n\nconst treffer = [...identTreffer, ...semantischeTreffer];\n\nconst linksUnterdrueckt = identRoh.filter(linkUnterdruecken).length\n  + gewaehlt.filter(linkUnterdruecken).length;\n\n// Diagnose: belegt, welche Audiences ueberhaupt in den Kandidatenpool kamen.\nconst nachAudience = {};\nfor (const c of cand) { const a = String(c.audience || '?'); nachAudience[a] = (nachAudience[a] || 0) + 1; }\nconst identNachAudience = {};\nfor (const c of identRoh) { const a = String(c.audience || '?'); identNachAudience[a] = (identNachAudience[a] || 0) + 1; }\n\n// Anweisung statt blosser Feststellung: im Werkzeugergebnis wirkt sie\n// zuverlaessiger als eine Regel im Systemprompt (Beleg: Vollstaendigkeits-\n// hinweis im Jira-Subflow). Bei null Treffern soll der Agent die Luecke offen\n// benennen und nicht aus Allgemeinwissen weiterreden.\nconst hinweise = [];\nif (!treffer.length) {\n  if (ctl.identKeys && ctl.identKeys.length) {\n    hinweise.push('Zu der genannten Kennung (' + ctl.identKeys.join(', ') + ') liegt in der Wissensbasis kein Vorgang vor, auf den diese Anfrage zugreifen darf. Sage das offen. Erfinde keinen Vorgang und rate keine Kennung.');\n  } else {\n    hinweise.push('Keine passenden Wissenstreffer fuer diese Anfrage. Sage offen, dass die interne Wissensbasis dazu nichts enthaelt. Beantworte die Frage nicht aus Allgemeinwissen und erfinde keine Quelle. Geht es um ein externes Thema ohne internen Bezug, nutze stattdessen die Web-Recherche.');\n  }\n} else {\n  // FIX 08/2026 (Beleg: Lauf 104980): Zuordnung kommt jetzt belegt aus\n  // jira_tickets mit. Als Anweisung im Werkzeugergebnis statt als Regel im\n  // Systemprompt - dort hat die Vorgabe \"erst Inhalt, dann Besitz\" nicht\n  // gegriffen, das Modell hat den Besitz stattdessen geraten.\n  const zuordnungJeRef = {};\n  for (const r of identRoh) { if (r.zuordnung) zuordnungJeRef[String(r.sourceRef)] = r.zuordnung; }\n  const paare = Object.entries(zuordnungJeRef);\n  const eigene = paare.filter(([, z]) => z === 'melder' || z === 'bearbeiter' || z === 'teilnehmer');\n  const fremde = paare.filter(([, z]) => z === 'fremd');\n  const unklar = paare.filter(([, z]) => z === 'unbekannt');\n  if (eigene.length) {\n    hinweise.push('Belegte Zuordnung: ' + eigene.map(([k, z]) => k + ' = ' + z).join(', ') + '. Die fragende Person ist dort beteiligt, du darfst den Vorgang als ihren bezeichnen.');\n  }\n  if (fremde.length) {\n    hinweise.push('Belegte Zuordnung: ' + fremde.map(([k]) => k).join(', ') + ' ist der fragenden Person nicht zugeordnet. Formuliere neutral und behaupte nicht, es sei ihr Vorgang. Leite den Besitz nie aus dem Gespraechsverlauf ab.');\n  }\n  if (unklar.length) {\n    hinweise.push('Zur Zuordnung von ' + unklar.map(([k]) => k).join(', ') + ' liegen keine Daten vor. Sage dazu nichts ueber den Besitz.');\n  }\n  if (identPfad) {\n    hinweise.push('Die Treffer mit \"gesichert\": true stammen aus einem direkten Zugriff auf die genannte Vorgangskennung und sind vollstaendig fuer die angefragte Sichtbarkeit. Stuetze deine Antwort auf diese Treffer und werte sie aus, statt nur Titel und Status zu nennen. Kommentare stehen in zeitlicher Reihenfolge; der letzte gibt den aktuellen Stand wieder.');\n    if (identBilder > 0) {\n      hinweise.push('Zu dem Vorgang liegen ausserdem ' + identBilder + ' Bildanhaenge vor, die hier aus Platzgruenden nicht mitgeliefert wurden. Erwaehne, dass es sie gibt, und beschreibe ihren Inhalt nicht.');\n    }\n  }\n  if (treffer.some(t => t.audience === 'it_internal')) {\n    hinweise.push('Jeder Treffer traegt das Feld \"audience\". \"public\" heisst fuer Anwender sichtbar, \"it_internal\" heisst ausschliesslich intern fuer die IT. Unterscheidet die Frage danach, was Anwender sehen duerfen, stuetze diese Unterscheidung allein auf dieses Feld und nicht auf den Wortlaut des Textes. Gib interne Inhalte nicht als Anwendersicht aus.');\n  }\n  // FIX 08/2026 (Beleg: Lauf 104989, \"drucker geht nicht\"): Der Agent zaehlte\n  // drei aehnliche Tickets auf und nannte nur deren Problembeschreibung,\n  // obwohl in denselben Treffern die Loesung stand. Fuer den Anwender ist die\n  // Ticketnummer wertlos, der Loesungsweg ist der Punkt.\n  if (treffer.some(t => String(t.art) === 'solution')) {\n    hinweise.push('Unter den Treffern stehen dokumentierte Loesungen (art: solution). Gib die Loesungsschritte konkret wieder, statt nur Ticketnummer und Problembeschreibung zu nennen.');\n  }\n  if (lexRueckfall && semantischeTreffer.length) {\n    hinweise.push('Die Volltextsuche traf erst in der gelockerten Lesart. Pruefe die Treffer am Wortlaut der Frage, bevor du sie als Antwort nutzt, und nenne sie nicht als gesicherte Auskunft.');\n  }\n  if (signaturTreffer >= Math.ceil(treffer.length / 2)) {\n    hinweise.push('Die Treffer stammen ueberwiegend aus E-Mail-Signaturen in Tickets. Signaturen sind als Quelle fuer Stammdaten wie Standort, Anschrift, Telefonnummer oder Zustaendigkeit unzuverlaessig, weil darin mehrere verschiedene Dienstsitze vorkommen. Stuetze darauf keine Aussage. Geht es um eine oeffentlich verfuegbare Angabe zur RWG, nutze stattdessen die Web-Recherche.');\n  }\n  if (linksUnterdrueckt > 0) {\n    hinweise.push('Zu Confluence-Treffern liegt hier bewusst keine URL vor. Nenne den Titel der Seite als Quelle und verlinke sie nicht.');\n  }\n}\n\nreturn [{ json: {\n  trefferAnzahl: treffer.length,\n  treffer,\n  hinweis: hinweise.join(' '),\n  diagnose: {\n    kandidatenAnzahl: cand.length,\n    rerankerAktiv: results.length > 0,\n    kandidatenNachAudience: nachAudience,\n    angefragteAudiences: ctl.audienceCsv,\n    istITAnfrage,\n    identPfad,\n    identKeys: ctl.identKeys ?? [],\n    identAnzahl: identRoh.length,\n    identNachAudience,\n    identBilderUnterdrueckt: identBilder,\n    semantischeTreffer: semantischeTreffer.length,\n    linksUnterdrueckt,\n    verschiedeneQuellen: Object.keys(jeQuelle).length,\n    bildchunks: bildzahl,\n    signaturTreffer,\n    lexStrikt,\n    lexOder,\n    lexRueckfall,\n    bodenAngewandt: boden,\n    bestScore: ranked.length && ranked[0].score !== null ? Number(ranked[0].score.toFixed(4)) : null\n  }\n} }];"
+      }
+    },
+    {
+      "id": "3855a32a-5ea4-4c17-be59-4431dde39cd7",
+      "name": "Note 1 Eingang und Audience-Gate",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -560
+      ],
+      "parameters": {
+        "width": 480,
+        "height": 720,
+        "content": "## 1 Eingang und Audience-Gate\n\n**Aufruf vom Agenten** nimmt suchtext, audienceCsv, topN und userEmail entgegen.\n\n**Eingaben pruefen** ist die Sicherheitsstelle des Flows. audienceCsv kommt aus dem Parent-Kontext und nie vom Modell; unbekannte Werte werden gegen die Whitelist public/it_internal verworfen statt durchgereicht. Dasselbe gilt fuer userEmail - sie dient ausschliesslich dem Abgleich mit Melder, Bearbeiter und Teilnehmer eines Vorgangs und erweitert keinen Zugriff.\n\nBleibt nach der Pruefung keine gueltige Audience uebrig, liefert die Abfrage null Treffer. Nachgerechnet: string_to_array('', ',') ergibt ein leeres Array, array_length darauf NULL, die gate-CTE bleibt damit leer - und jeder Suchpfad haengt per CROSS JOIN daran. Fail closed, kein Bypass.\n\nHier wird ausserdem eine Vorgangskennung wie SSD-1234 aus dem Suchtext extrahiert und als identCsv weitergereicht."
+      }
+    },
+    {
+      "id": "d8247b6d-3627-44c4-b46a-e3d17739c415",
+      "name": "Note 2 Hybride Suche",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -560
+      ],
+      "parameters": {
+        "width": 448,
+        "height": 720,
+        "content": "## 2 Hybride Suche mit Direktpfad\n\n**Suchvektor erzeugen** holt das Embedding zur Frage.\n\n**Wissen hybrid abrufen** vereint drei Wege und filtert in jedem einzeln auf `dc.audience`:\n\n- `ident` - direkter Zugriff ueber die Vorgangskennung, vollstaendig an Vektor, Volltext und Reranker vorbei. Eine Kennung ist eine exakte Referenz und darf nicht an einem Score-Boden scheitern. Hier ist der header-Chunk bewusst NICHT ausgeschlossen: dort stehen Status, Prioritaet und Typ.\n- `vec` - Vektorsuche ueber die Embeddings.\n- `lex` - deutsche Volltextsuche. Die strenge Lesart verknuepft alle Begriffe mit UND; nur wenn sie leer bleibt, greift der gelockerte ODER-Pfad.\n\nDie Zuordnung (melder, bearbeiter, teilnehmer, fremd) kommt belegt aus `jira_tickets` mit, damit der Agent den Besitz eines Vorgangs nicht aus dem Gespraechsverlauf ableitet."
+      }
+    },
+    {
+      "id": "e17acadf-ad94-465d-a531-2395afb32548",
+      "name": "Note 3 Reranking und Ergebnis",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -560
+      ],
+      "parameters": {
+        "width": 560,
+        "height": 720,
+        "content": "## 3 Reranking, Auswahl und Anweisungen\n\n**Kandidaten reranken** schickt Titel und Text der Kandidaten an Cohere rerank-v3.5.\n\n> Damit verlassen Trefferinhalte das Haus, bei IT-Anfragen auch `it_internal`. Das ist eine bewusste Entscheidung; die datenschutzrechtliche Bewertung ist zurueckgestellt. Faellt der Aufruf aus, wird auf die RRF-Reihenfolge zurueckgefallen statt leer zu liefern.\n\n**Treffer aufbereiten** waehlt aus. Zwei Bodenwerte: 0.05 im Normalfall, 0.15 wenn der gelockerte Volltextpfad gegriffen hat - dort ist der Pool per Konstruktion Rauschen und muss sich seine Treffer verdienen. Hoechstens zwei Treffer je Quelle, hoechstens ein Bildchunk, und ein Bildchunk nie auf Platz 1, solange echte Doku vorhanden ist.\n\nConfluence-Links gehen nur an die IT. Fuer den Fachbereich wird die URL entfernt, damit kein Verweis auf eine Seite entsteht, die er nicht oeffnen kann.\n\nDie Hinweise im Ergebnis sind als Anweisung an den Agenten formuliert, nicht als blosse Feststellung. Im Werkzeugergebnis wirken sie zuverlaessiger als eine Regel im Systemprompt."
+      }
+    }
+  ],
+  "nodeGroups": [],
+  "tags": [],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "parentFolderId": null,
+  "description": "Audience-gefilterte semantische Wissenssuche als Agent-Tool. Hybrid aus Vektorsuche und deutscher Volltextsuche mit RRF-Fusion, danach Cohere rerank-v3.5. audienceCsv kommt aus dem Parent-Kontext, nie vom Modell; ungueltige oder leere Werte liefern null T",
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
+}
