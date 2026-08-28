@@ -77,7 +77,9 @@ Ein Verweis-Scan über 28 Workflows — alle produktiven RWG- und KAPA-Flows —
 
 Das Kriterium „null Ausführungen" allein trägt nicht: Bei `RWG Monitor` und `RAG-Confluence-Ingest` steht `saveDataSuccessExecution: none`, dort werden erfolgreiche Läufe gar nicht erst gespeichert. Belastbar ist erst der Verweis-Scan.
 
-**`Jira Issue Create` ist gesondert zu betrachten.** Er ist der Baustein für die Ticketanlage aus Teams, ausführlich dokumentiert und nie verdrahtet. Ob er wegfällt, ist eine fachliche und keine Aufräumfrage.
+**`Jira Issue Create` wird aufgehoben.** Er ist der fertige, ausführlich dokumentierte Baustein für die Ticketanlage aus Teams und nie verdrahtet worden. Die Ticketanlage ist **später geplant, aktuell aber nicht vorgesehen**.
+
+Er darf deshalb deaktiviert, aber **nicht gelöscht oder archiviert** werden. Wer künftig aufräumt: Dieser eine ist kein Altbestand, sondern Vorrat.
 
 ### Zum Deaktivieren
 
