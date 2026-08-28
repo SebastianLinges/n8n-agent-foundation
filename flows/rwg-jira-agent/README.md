@@ -6,16 +6,11 @@ Workflow `RWG_Jira-Agent` (`QXCWIsTzDEmfwPwK`), aktiv, 75 Nodes, Jira-Trigger au
 
 Die Policy entscheidet über Routing und Betriebssignale und liefert dafür ein JSON mit zwölf Feldern und zwei verschachtelten Objektarrays — aus einem Regelwerk von rund 10.000 Zeichen. Diese Ausgabe ist der empfindlichste Punkt des Workflows und deshalb dreifach abgesichert.
 
-**1. Die API erzwingt die Form.** `Policy-Modell` läuft über die Responses-API mit `textFormat.textOptions.type = json_schema` und `strict: true`. Damit sind nicht nur ungültiges JSON, sondern auch fehlende Felder, falsche Typen und unbekannte Enum-Werte auf API-Ebene ausgeschlossen.
+**1. Die API erzwingt gültiges JSON.** `Policy-Modell` läuft über Chat Completions mit `responseFormat: json_object`. Der Parameter `temperature` darf nicht gesetzt sein — die GPT-5-Generation lehnt ihn ab, und die Policy wird dann gar nicht erst befragt.
 
-Zwei Regeln gelten dabei, beide an echten Läufen bezahlt:
-
-- Das Schema muss als **JSON-String** übergeben werden. Als Objekt meldet der Node zur Laufzeit `Failed to parse schema`, und die Policy wird gar nicht erst befragt.
-- Der Strict-Modus kennt **kein `minItems`**. Die Mindestlänge von `anliegen` steht deshalb nur im Parser, nicht im API-Schema. Das vollständige Schema inklusive `minItems` liegt in `policy-schema.json`; an die API geht es ohne.
-
-Die Wertelisten im Schema sind gegen `Routing und Prioritaet ableiten` abgeglichen — `nextAction`, `selfServiceCategory`, `scope`, `businessImpact` und `businessProcess`, fünf von fünf deckungsgleich. Dieser Abgleich muss bestehen bleiben: Weicht das Schema ab, erzwingt die API einen Wert, den das Routing anschließend verwirft.
-
-`temperature` darf am Node nicht stehen — siehe unten.
+> **Die Responses-API darf hier nicht eingeschaltet werden.** Mit `responsesApiEnabled: true` liefert das Modell zwar einwandfreies, schemakonformes JSON — der Structured-Output-Parser bekommt aber nicht dieses JSON, sondern die Hülle der Responses-API: `[{"type":"text","text":"{…}","annotations":[],"phase":"final_answer"}]`. Er kann sie nicht auspacken, prüft sie gegen das Policy-Schema und scheitert mit `Invalid JSON in model output`. Belegt an den Läufen `109902` und `109916`, in denen die Modellausgabe vollständig korrekt war und trotzdem verworfen wurde.
+>
+> Das gilt unabhängig davon, ob `json_object` oder `json_schema` mit `strict` gesetzt ist — die Hülle entsteht in beiden Fällen. `policy-schema.json` bleibt deshalb Dokumentation der zulässigen Werte und geht nicht an die API.
 
 **2. Der Parser repariert.** `Policy-Schema` prüft die Struktur mit `autoFix`. Weicht die Ausgabe ab, wird das Modell mit der Fehlermeldung erneut befragt, statt den Lauf zu beenden. Der Parser prüft Form und Typen ohne die Wertelisten; die zulässigen Werte stehen im Prompt und in `policy-schema.json`.
 
