@@ -1,0 +1,257 @@
+{
+  "name": "RWG Sub - Jira Tickets",
+  "nodes": [
+    {
+      "id": "f963bab9-bc36-44a6-b899-ddd3d6dffe43",
+      "name": "Aufruf vom Agenten",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "suchtext",
+              "type": "string"
+            },
+            {
+              "name": "originalFrage",
+              "type": "string"
+            },
+            {
+              "name": "userEmail",
+              "type": "string"
+            },
+            {
+              "name": "istIT",
+              "type": "boolean"
+            },
+            {
+              "name": "topN",
+              "type": "number"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "eff324a3-dc98-4b01-aaa3-1f215e98c8b6",
+      "name": "Anfrage pruefen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// istIT und userEmail kommen ausschliesslich aus dem Parent-Kontext, nie aus\n// dem Modell. Ab 08/2026 gilt das auch fuer originalFrage: der Agent formuliert\n// suchtext frei um - aus \"Insgesamt offen?\" wurde \"alle offenen Vorgaenge von\n// Sebastian\" (Beleg: Lauf 102546). Nur die durchgereichte Originalfrage ist als\n// Absichtsquelle belastbar. suchtext bleibt Rueckfall, falls das Feld leer ist.\nconst inp = $input.first().json ?? {};\nconst istIT = inp.istIT === true || String(inp.istIT).toLowerCase() === 'true';\nconst userEmail = String(inp.userEmail ?? '').trim().toLowerCase();\nconst suchtext = String(inp.suchtext ?? '').trim().slice(0, 300);\nconst originalFrage = String(inp.originalFrage ?? '').trim().slice(0, 500);\nconst topN = Math.min(Math.max(Number(inp.topN ?? 5) || 5, 1), 10);\nconst frage = originalFrage || suchtext;\n\nconst entumlauten = s => String(s)\n  .replace(/\\u00e4/g, 'ae').replace(/\\u00f6/g, 'oe').replace(/\\u00fc/g, 'ue').replace(/\\u00df/g, 'ss');\nconst ql = entumlauten(frage.toLowerCase());\n\n// Ab hier nur noch die Rueckfallebene. Sie greift, wenn das Modell in\n// 'Absicht auswerten' kein gueltiges JSON liefert.\nconst keyTreffer = ql.match(/ssd[\\s-]?(\\d{2,6})/i);\nconst ticketKey = keyTreffer ? 'SSD-' + keyTreffer[1] : '';\n\nconst stopwords = ['wie','was','wer','wo','wann','warum','ist','sind','kann','koennen','ich','du','wir','ein','eine','der','die','das','und','oder','fuer','mit','von','zum','zur','den','dem','des','beim','vom','auf','bei','nach','ueber','unter','nicht','kein','keine','mein','meine','meinen','bitte','hilfe','brauche','moechte','frage','habe','hat','gibt','einen','ticket','tickets','offene','offen','offenen','zeig','zeige','mir','hast','welche','alle','liste','infos','info','information','informationen','status','jira','vorgang','vorgaenge','anfrage','suche','finde','aktuell','aktuelle','aktuellen','derzeit','noch','etwas','sowie','laufende','laufenden','unerledigt','unerledigte','insgesamt','gesamt'];\n\nconst namensTeile = (userEmail.split('@')[0] || '')\n  .split(/[._+-]+/).map(t => entumlauten(t.trim())).filter(t => t.length > 2);\nconst nameImText = namensTeile.some(t => new RegExp('\\\\b' + t + '\\\\b').test(ql));\n\nconst rohWoerter = frage.toLowerCase()\n  .replace(/ssd[\\s-]?\\d{2,6}/gi, ' ')\n  .split(/[^\\p{L}\\p{N}.]+/u).map(w => w.trim()).filter(Boolean);\n\nconst begriffe = [...new Set(rohWoerter\n  .filter(w => w.length > 2)\n  .filter(w => !stopwords.includes(entumlauten(w)))\n  .filter(w => !namensTeile.includes(entumlauten(w))))].slice(0, 4);\n\nconst willOffen = /\\b(offen|offene|offenen|unerledigt|unerledigte|aktiv|laufend|laufende|laufenden|open)\\b/.test(ql);\nconst willZu = /\\b(geschlossen|erledigt|abgeschlossen|closed|fertig)\\b/.test(ql);\nconst eigenWunsch = /\\b(mein|meine|meinen|meiner|meinem|ich|mir|mich|eigene|eigenen)\\b/.test(ql) || nameImText;\n\nconst heuristik = {\n  ticketKey,\n  personBezug: eigenWunsch ? 'selbst' : 'keiner',\n  personName: '',\n  status: willOffen ? 'offen' : (willZu ? 'erledigt' : 'egal'),\n  bereich: 'ssd',\n  zeitraum: null,\n  begriffe,\n  sortierung: 'updated'\n};\n\nconst anzeigeName = namensTeile.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' ');\n\nconst systemPrompt = [\n  'Du zerlegst eine Support-Frage in eine strukturierte Suchabsicht fuer Jira.',\n  'Antworte ausschliesslich mit einem JSON-Objekt, ohne Markdown und ohne Erklaerung.',\n  '',\n  'Felder:',\n  '- ticketKey: Schluessel wie \"SSD-1234\", sonst \"\".',\n  '- personBezug: \"selbst\" bei Fragen nach eigenen Vorgaengen. \"andere\" bei einer namentlich genannten anderen Person. \"keiner\" beim Gesamtbestand oder einem Sachthema.',\n  '- personName: nur bei \"andere\" der Name, sonst \"\".',\n  '- status: \"offen\", \"erledigt\" oder \"egal\".',\n  '- bereich: \"ssd\" fuer das Support-Projekt. \"jira_gesamt\" nur wenn ausdruecklich nach allen Jira-Projekten oder allen Vorgaengen ueber den Support hinaus gefragt wird.',\n  '- zeitraum: {\"feld\":\"created\"|\"updated\",\"tage\":N} bei Zeitangaben, sonst null.',\n  '- begriffe: bis zu vier Sachbegriffe fuer die Volltextsuche. Keine Personennamen, keine Statuswoerter, keine Fuellwoerter. Bei einer reinen Bestands- oder Statusfrage ein leeres Array.',\n  '- sortierung: \"updated\", \"created\" oder \"prioritaet\".',\n  '',\n  'Beispiele:',\n  '\"Meine offenen Vorgaenge?\" -> {\"ticketKey\":\"\",\"personBezug\":\"selbst\",\"personName\":\"\",\"status\":\"offen\",\"bereich\":\"ssd\",\"zeitraum\":null,\"begriffe\":[],\"sortierung\":\"updated\"}',\n  '\"Insgesamt offen?\" -> {\"ticketKey\":\"\",\"personBezug\":\"keiner\",\"personName\":\"\",\"status\":\"offen\",\"bereich\":\"ssd\",\"zeitraum\":null,\"begriffe\":[],\"sortierung\":\"updated\"}',\n  '\"Welche Tickets habe ich diese Woche gemeldet?\" -> {\"ticketKey\":\"\",\"personBezug\":\"selbst\",\"personName\":\"\",\"status\":\"egal\",\"bereich\":\"ssd\",\"zeitraum\":{\"feld\":\"created\",\"tage\":7},\"begriffe\":[],\"sortierung\":\"created\"}',\n  '\"Gibt es offene Tickets zu d.velop?\" -> {\"ticketKey\":\"\",\"personBezug\":\"keiner\",\"personName\":\"\",\"status\":\"offen\",\"bereich\":\"ssd\",\"zeitraum\":null,\"begriffe\":[\"d.velop\"],\"sortierung\":\"updated\"}',\n  '\"Status von SSD-8698?\" -> {\"ticketKey\":\"SSD-8698\",\"personBezug\":\"keiner\",\"personName\":\"\",\"status\":\"egal\",\"bereich\":\"ssd\",\"zeitraum\":null,\"begriffe\":[],\"sortierung\":\"updated\"}',\n  '\"Welche Vorgaenge hat Bernd Engelen offen?\" -> {\"ticketKey\":\"\",\"personBezug\":\"andere\",\"personName\":\"Bernd Engelen\",\"status\":\"offen\",\"bereich\":\"ssd\",\"zeitraum\":null,\"begriffe\":[],\"sortierung\":\"updated\"}'\n].join('\\n');\n\nconst frageFuerLLM = 'Anfragende Person: ' + (anzeigeName || userEmail) + '\\nFrage: ' + frage;\n\nreturn [{ json: { istIT, userEmail, topN, suchtext, originalFrage, frage, heuristik, systemPrompt, frageFuerLLM } }];"
+      }
+    },
+    {
+      "id": "2be24c76-3a82-4cb8-9a78-4d93c5b47389",
+      "name": "Nutzerkonto aufloesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://rwg-r.atlassian.net/rest/api/3/user/search?maxResults=5&query=' + encodeURIComponent($json.emailFuerSuche) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "bced03aa-f305-4f84-b12a-b862f0899043",
+      "name": "JQL bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Die JQL wird ausschliesslich hier gebaut, aus geprueften Absichtsfeldern.\n// Das Modell liefert nie eine Klausel und nie eine accountId.\nconst ctl = $('Absicht auswerten').first().json ?? {};\nconst a = ctl.absicht ?? {};\nconst istIT = ctl.istIT === true;\nconst kandidaten = $input.all().map(i => i.json).filter(u => u && u.accountId);\n\n// Kontoaufloesung. Ist die Adresse in Jira verborgen (DSGVO), zaehlt nur ein\n// eindeutiger Einzeltreffer. Mehrdeutig => kein Konto.\nconst gesucht = String(ctl.emailFuerSuche || '').toLowerCase();\nconst perMail = kandidaten.find(u => String(u.emailAddress || '').toLowerCase() === gesucht);\nconst user = perMail || (kandidaten.length === 1 ? kandidaten[0] : null);\nconst accountId = user ? String(user.accountId || '').replace(/[^\\w:-]/g, '') : '';\n\nconst esc = s => String(s).replace(/[^\\p{L}\\p{N} _.-]/gu, '').trim();\nconst teile = [];\nlet gueltig = true;\nlet hinweis = '';\nlet gateAngewandt = false;\n\n// Bereich: der gesamte Jira-Bestand ist ausschliesslich fuer IT erreichbar.\n// Fachbereich bleibt unter jeder Formulierung auf SSD.\nconst bereich = (istIT && a.bereich === 'jira_gesamt') ? 'jira_gesamt' : 'ssd';\nif (bereich === 'ssd') teile.push('project = SSD');\n\n// ENTSCHEIDUNG 08/2026: Teilnehmer (\"Request participants\", in JSM die\n// CC-Rolle) gehoeren ins Gate. Jira selbst gewaehrt Teilnehmern Leserecht auf\n// den Vorgang - der Agent war bisher strenger als das System dahinter und\n// verschwieg Vorgaenge, die im Portal sichtbar sind. Gemessen an einem Konto:\n// 75 Vorgaenge als Teilnehmer, davon 60 weder gemeldet noch bearbeitet noch\n// angelegt. Feldname gegen SSD verifiziert (JQL \"Request participants\",\n// REST-Feld customfield_10032, beidseitige Gegenprobe).\nconst gate = accountId\n  ? '(reporter = \"' + accountId + '\" OR assignee = \"' + accountId + '\" OR creator = \"' + accountId + '\" OR \"Request participants\" = \"' + accountId + '\")'\n  : '';\n\n// Fail closed: ohne aufgeloestes Konto wird kein Personenbezug geraten.\nif (!istIT) {\n  if (!gate) {\n    gueltig = false;\n    hinweis = 'Der Ticketzugriff konnte nicht geprueft werden, weil das Jira-Konto der Person nicht eindeutig zugeordnet werden konnte.';\n  } else {\n    teile.push(gate);\n    gateAngewandt = true;\n  }\n} else if (a.personBezug === 'selbst' || a.personBezug === 'andere') {\n  if (gate) {\n    teile.push(gate);\n    gateAngewandt = true;\n  } else {\n    gueltig = false;\n    hinweis = a.personBezug === 'andere'\n      ? 'Die genannte Person konnte in Jira nicht eindeutig zugeordnet werden.'\n      : 'Das eigene Jira-Konto konnte nicht eindeutig zugeordnet werden.';\n  }\n}\n\n// Eine Rueckfrage schlaegt jede andere Meldung. Sie entsteht nur dort, wo ohne\n// Nachfrage strukturell falsch geantwortet wuerde - nicht bei blosser Unschaerfe.\nconst rueckfrage = String(ctl.rueckfrage || '');\nif (rueckfrage) {\n  gueltig = false;\n  hinweis = rueckfrage;\n}\n\nif (a.ticketKey) {\n  teile.push('key = ' + a.ticketKey);\n} else {\n  const bg = (Array.isArray(a.begriffe) ? a.begriffe : []).map(esc).filter(b => b.length > 2);\n  if (bg.length) teile.push('(' + bg.map(b => 'text ~ \"' + b + '\"').join(' OR ') + ')');\n}\n\nif (a.status === 'offen') teile.push('statusCategory != Done');\nelse if (a.status === 'erledigt') teile.push('statusCategory = Done');\n\nif (a.zeitraum && a.zeitraum.feld && a.zeitraum.tage) {\n  teile.push(a.zeitraum.feld + ' >= -' + Number(a.zeitraum.tage) + 'd');\n}\n\nconst sortFeld = a.sortierung === 'created' ? 'created' : (a.sortierung === 'prioritaet' ? 'priority' : 'updated');\nconst basis = teile.length ? teile.join(' AND ') : 'created >= -3650d';\n\n// Ungueltig => syntaktisch korrekte Abfrage ohne Treffer, kein Bypass.\nconst jql = gueltig\n  ? basis + ' ORDER BY ' + sortFeld + ' DESC'\n  : 'project = SSD AND created > \"2999/01/01\"';\n\n// Bestandsfrage: kein Volltextfilter und kein Schluessel, also will die Person\n// die vollstaendige Liste sehen und nicht die Top-N einer Relevanzsortierung.\nconst bestandsfrage = !a.ticketKey && !(Array.isArray(a.begriffe) && a.begriffe.length);\n\nreturn [{ json: {\n  ...ctl,\n  jql,\n  gueltig,\n  accountId,\n  gateAngewandt,\n  bereich,\n  bestandsfrage,\n  rueckfrageNoetig: Boolean(rueckfrage),\n  ticketKey: a.ticketKey || '',\n  begriffe: Array.isArray(a.begriffe) ? a.begriffe : [],\n  hinweis\n} }];"
+      }
+    },
+    {
+      "id": "7349c7ee-64fe-4ba5-ade0-a5ca1b001691",
+      "name": "Jira abfragen",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "limit": "={{ $json.bestandsfrage ? 300 : 20 }}",
+        "operation": "getAll",
+        "options": {
+          "fields": "key,summary,description,status,priority,updated,created,reporter,creator,assignee,resolution,customfield_10032",
+          "jql": "={{ $json.jql }}"
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "9b1dd88f-6aa4-4d1b-b5c6-9d58be35923e",
+      "name": "Tickets aufbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const ctl = $('JQL bauen').first().json ?? {};\nconst a = ctl.absicht ?? {};\nconst roh = $input.all().map(i => i.json).filter(t => t && t.key && t.fields);\nconst accountId = String(ctl.accountId || '');\nconst istIT = ctl.istIT === true;\n\n// Muss zur limit-Einstellung in 'Jira abfragen' passen: Bestandsfragen holen\n// 300 Vorgaenge, alles andere 20. Die grosse Menge kostet nur Laufzeit im\n// Workflow - der Agent sieht nie mehr als 20 Tickets.\nconst ABFRAGE_LIMIT = ctl.bestandsfrage ? 300 : 20;\n\n// Teilnehmerfeld (\"Request participants\"). Die JQL kennt den Klarnamen, die\n// REST-Antwort nur die Feld-ID. Gegen SSD verifiziert 08/2026.\nconst TEILNEHMER_FELD = 'customfield_10032';\nconst teilnehmerListe = f => {\n  const v = f ? f[TEILNEHMER_FELD] : null;\n  return Array.isArray(v) ? v.filter(p => p && p.accountId) : [];\n};\n\n// FIX 08/2026 (Beleg: Lauf 102704): Die Rollenangabe war aus Sicht der\n// anfragenden Person formuliert (\"in Bearbeitung durch dich\"). Bei einer\n// IT-Abfrage ueber eine andere Person - dort personBezug='andere', Konto\n// Marcel Commes - bezieht sie sich aber auf die abgefragte Person. Der Agent\n// haette der IT gemeldet, sie selbst bearbeite einen fremden Vorgang. Deshalb\n// sind die Werte jetzt personenunabhaengig; wer gemeint ist, steht in\n// rolleGiltFuer.\nconst rollenVon = (f, konto) => {\n  if (!konto) return [];\n  const ist = p => p && String(p.accountId || '') === konto;\n  const r = [];\n  if (ist(f.reporter)) r.push('gemeldet');\n  if (ist(f.assignee)) r.push('in Bearbeitung');\n  if (ist(f.creator) && !ist(f.reporter)) r.push('angelegt');\n  if (teilnehmerListe(f).some(ist)) r.push('Teilnehmer');\n  return r;\n};\n\nconst fremdabfrage = a.personBezug === 'andere';\nconst rolleGiltFuer = fremdabfrage\n  ? (a.personName || 'die abgefragte Person')\n  : 'die anfragende Person';\n\n// Zweite Sperre nach der JQL-Klausel. Kein Fallback auf fremde Tickets.\n// Muss dieselben vier Rollen kennen wie die JQL, sonst wirft sie genau die\n// Vorgaenge wieder raus, die das erweiterte Gate hereingelassen hat.\nconst erlaubt = istIT ? roh : roh.filter(t => {\n  if (!accountId) return false;\n  return rollenVon(t.fields || {}, accountId).length > 0;\n});\n\n// FIX 08/2026: Der Agent hat die Laenge der zurueckgegebenen Liste als\n// Bestandszahl ausgegeben - \"insgesamt 20 offene Tickets\", tatsaechlich 43 in\n// SSD und 464 im gesamten Jira (Beleg: Lauf 102567). trefferAnzahl ist die\n// Anzahl der genannten Vorgaenge, gesamtAnzahl der Bestand. Ist das\n// Abfragelimit erreicht, ist der Bestand nur eine Untergrenze.\nconst gesamtAnzahl = erlaubt.length;\nconst gesamtAnzahlExakt = roh.length < ABFRAGE_LIMIT;\n\nconst sauber = d => String(d || '')\n  .replace(/\\{code(:[^}]*)?\\}/gi, ' ').replace(/\\{noformat\\}/gi, ' ')\n  .replace(/\\{quote\\}/gi, ' ').replace(/\\{color[^}]*\\}/gi, '').replace(/\\{\\{|\\}\\}/g, '')\n  .replace(/\\{panel[^}]*\\}/gi, ' ')\n  .replace(/(^|[\\s.])h[1-6]\\.\\s+/gi, '$1')\n  .replace(/[*_+]{1,2}([^*_+\\n]+)[*_+]{1,2}/g, '$1')\n  .replace(/\\|+/g, ' ').replace(/\\s+/g, ' ').trim();\n\n// Bei Stichwortsuchen zaehlt zusaetzlich die Begriffsdeckung, damit nicht das\n// juengste statt des passenden Tickets oben steht.\nconst begriffe = Array.isArray(ctl.begriffe) ? ctl.begriffe : [];\nconst bewertet = erlaubt.map((t, idx) => {\n  const f = t.fields || {};\n  const titel = String(f.summary || '');\n  const text = sauber(f.description);\n  let punkte = 0;\n  for (const b of begriffe) {\n    const bl = String(b).toLowerCase();\n    if (titel.toLowerCase().includes(bl)) punkte += 3;\n    if (text.toLowerCase().includes(bl)) punkte += 1;\n  }\n  return { t, f, titel, text, punkte, idx };\n});\n\nif (ctl.bestandsfrage) bewertet.sort((x, y) => x.idx - y.idx);\nelse bewertet.sort((x, y) => y.punkte - x.punkte || x.idx - y.idx);\n\nconst limit = ctl.bestandsfrage ? 20 : (Number(ctl.topN) || 5);\n\nconst tickets = bewertet.slice(0, limit).map(x => {\n  const rollen = rollenVon(x.f, accountId);\n  return {\n    key: x.t.key,\n    titel: x.titel,\n    status: x.f.status?.name || '',\n    prioritaet: x.f.priority?.name || '',\n    bearbeiter: x.f.assignee?.displayName || 'nicht zugewiesen',\n    gemeldetVon: x.f.reporter?.displayName || '',\n    // Warum dieser Vorgang in der Liste steht. Neutral formuliert - auf wen\n    // sich die Rolle bezieht, steht in rolleGiltFuer.\n    rolle: rollen.join(', '),\n    rolleGiltFuer,\n    nurTeilnehmer: rollen.length === 1 && rollen[0] === 'Teilnehmer',\n    aktualisiert: x.f.updated || '',\n    beschreibung: x.text.slice(0, 600),\n    url: 'https://rwg-r.atlassian.net/browse/' + x.t.key\n  };\n});\n\nconst hinweise = [];\nif (ctl.hinweis) hinweise.push(String(ctl.hinweis));\n\nif (tickets.length === 0 && !ctl.hinweis) {\n  hinweise.push(istIT\n    ? 'Keine passenden Vorgaenge gefunden.'\n    : 'Zu dieser Anfrage sind keine Tickets vorhanden, die dieser Person gehoeren. Tickets anderer Personen werden nicht ausgegeben.');\n}\n\nif (tickets.length > 0) {\n  if (!gesamtAnzahlExakt) {\n    hinweise.push('Bestand: mindestens ' + gesamtAnzahl + ' Vorgaenge, die genaue Zahl steht nicht fest. Nur als Untergrenze nennen.');\n  } else {\n    hinweise.push('Bestand: genau ' + gesamtAnzahl + ' Vorgaenge. Diese Zahl nennen, wenn nach einer Anzahl gefragt wurde.');\n  }\n  if (gesamtAnzahl > tickets.length) {\n    hinweise.push('Diese Antwort enthaelt nur ' + tickets.length + ' der ' + gesamtAnzahl + ' Vorgaenge, naemlich die zuletzt aktualisierten. Sage ausdruecklich, dass die Liste unvollstaendig ist. Behaupte nie, sie sei vollstaendig.');\n  } else if (ctl.bestandsfrage) {\n    hinweise.push('Die Liste ist vollstaendig. Alle Eintraege nennen, nicht nur den ersten.');\n  }\n\n  // Anweisung statt blosser Feststellung - im Werkzeugergebnis wirkt sie\n  // zuverlaessiger als eine Regel im Systemprompt.\n  const nurTeilnehmerZahl = tickets.filter(t => t.nurTeilnehmer).length;\n  if (fremdabfrage) {\n    hinweise.push('Das Feld rolle beschreibt die Rolle von ' + rolleGiltFuer + ', nicht die der anfragenden Person. Formuliere entsprechend, zum Beispiel \"' + rolleGiltFuer + ' ist dort als Teilnehmer eingetragen\". Sage niemals \"du\" ueber diese Rolle.');\n  }\n  if (nurTeilnehmerZahl > 0) {\n    hinweise.push('Bei ' + nurTeilnehmerZahl + ' der genannten Vorgaenge lautet die Rolle nur \"Teilnehmer\" - der Vorgang wurde also weder gemeldet noch angelegt noch bearbeitet, sondern die Person wurde lediglich hinzugefuegt. Nenne bei jedem Vorgang kurz das Feld rolle, damit erkennbar bleibt, warum er in der Liste steht.');\n  }\n}\n\n// eigentumBestaetigt gilt nur, wenn das Kontogate auf die anfragende Person\n// selbst angewandt wurde - nicht bei einer Abfrage ueber eine andere Person.\nconst gateAngewandt = ctl.gateAngewandt === true;\nconst eigenerBezug = a.personBezug === 'selbst';\n\nreturn [{ json: {\n  trefferAnzahl: tickets.length,\n  gesamtAnzahl,\n  gesamtAnzahlExakt,\n  tickets,\n  hinweis: hinweise.join(' '),\n  eigentumBestaetigt: gateAngewandt && eigenerBezug && tickets.length > 0,\n  diagnose: {\n    rohTreffer: roh.length,\n    nachEigentumsfilter: erlaubt.length,\n    nurTeilnehmer: tickets.filter(t => t.nurTeilnehmer).length,\n    rolleGiltFuer,\n    fremdabfrage,\n    abfrageLimit: ABFRAGE_LIMIT,\n    istIT,\n    kontoAufgeloest: Boolean(accountId),\n    gateAngewandt,\n    bestandsfrage: ctl.bestandsfrage === true,\n    bereich: ctl.bereich || 'ssd',\n    absichtQuelle: ctl.absichtQuelle || '',\n    absichtFehler: ctl.absichtFehler || '',\n    personBezug: a.personBezug || '',\n    personName: a.personName || '',\n    personMail: ctl.personMail || '',\n    status: a.status || '',\n    zeitraum: a.zeitraum || null,\n    ticketKey: ctl.ticketKey || null,\n    begriffe,\n    jql: ctl.jql || ''\n  }\n} }];"
+      }
+    },
+    {
+      "id": "84915530-fb90-4f20-9d79-ff71b2f1850d",
+      "name": "Absicht per LLM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o-mini', temperature: 0, max_tokens: 300, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: $json.systemPrompt }, { role: 'user', content: $json.frageFuerLLM } ] }) }}",
+        "method": "POST",
+        "nodeCredentialType": "openAiApi",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 20000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "url": "https://api.openai.com/v1/chat/completions"
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "id": "5edc0211-6318-409e-98f8-7abe46f6903d",
+      "name": "Absicht auswerten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Das Modell liefert ausschliesslich Absicht, niemals JQL. Jeder Wert wird\n// gegen eine Whitelist geprueft; die Autorisierung entscheidet der Code.\nconst ctl = $('Anfrage pruefen').first().json ?? {};\nconst antwort = $input.first().json ?? {};\n\nconst erlaubtPerson = ['selbst','andere','keiner'];\nconst erlaubtStatus = ['offen','erledigt','egal'];\nconst erlaubtBereich = ['ssd','jira_gesamt'];\nconst erlaubtSort = ['updated','created','prioritaet'];\n\nlet absicht = null;\nlet quelle = 'heuristik';\nlet fehler = '';\n\ntry {\n  const text = antwort?.choices?.[0]?.message?.content;\n  if (text) {\n    const p = JSON.parse(String(text));\n    absicht = {\n      ticketKey: /^SSD-\\d{2,6}$/i.test(String(p.ticketKey || '')) ? String(p.ticketKey).toUpperCase() : '',\n      personBezug: erlaubtPerson.includes(p.personBezug) ? p.personBezug : 'keiner',\n      personName: String(p.personName || '').replace(/[^\\p{L}\\s.'-]/gu, '').trim().slice(0, 60),\n      status: erlaubtStatus.includes(p.status) ? p.status : 'egal',\n      bereich: erlaubtBereich.includes(p.bereich) ? p.bereich : 'ssd',\n      zeitraum: (p.zeitraum && ['created','updated'].includes(p.zeitraum.feld) && Number(p.zeitraum.tage) > 0)\n        ? { feld: p.zeitraum.feld, tage: Math.min(Math.round(Number(p.zeitraum.tage)), 730) }\n        : null,\n      begriffe: Array.isArray(p.begriffe)\n        ? [...new Set(p.begriffe.map(b => String(b).trim()).filter(b => b.length > 2))].slice(0, 4)\n        : [],\n      sortierung: erlaubtSort.includes(p.sortierung) ? p.sortierung : 'updated'\n    };\n    quelle = 'llm';\n  } else {\n    fehler = 'keine Modellantwort';\n  }\n} catch (e) {\n  fehler = String(e && e.message ? e.message : e).slice(0, 200);\n}\n\nif (!absicht) absicht = { ...(ctl.heuristik || {}) };\n\n// Fachbereich: der Personenbezug ist nicht verhandelbar und der Bereich bleibt\n// SSD. Damit kann keine Modellausgabe das Kontogate umgehen.\nif (ctl.istIT !== true) {\n  absicht.personBezug = 'selbst';\n  absicht.personName = '';\n  absicht.bereich = 'ssd';\n}\nif (absicht.personBezug !== 'andere') absicht.personName = '';\n\n// Ein Ticketschluessel schlaegt jede Volltextsuche.\nif (absicht.ticketKey) absicht.begriffe = [];\n\n// FIX 08/2026: Die Kontosuche ueber den Klarnamen scheiterte, weil der\n// Jira-displayName der Adresse folgt und nicht dem Namen - \"Sebastian Linges\"\n// fand nichts, der Account heisst \"sebastian.linges\" (Beleg: Lauf 102557,\n// gueltig=false). Geprueft an zehn Konten: die Adresse folgt durchgaengig\n// vorname.nachname@rwg-r.de, Umlaute entumlautet, Bindestriche im Vornamen\n// erhalten (vincent-hendrik.borresch@rwg-r.de). Deshalb wird der Name in eine\n// Adresse uebersetzt statt als Freitext gesucht.\nconst entumlauten = s => String(s)\n  .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');\n\nconst nameZuMail = n => {\n  const teile = entumlauten(String(n).toLowerCase().trim())\n    .split(/\\s+/).map(t => t.replace(/[^a-z0-9-]/g, '')).filter(Boolean);\n  if (teile.length < 2) return '';\n  const nachname = teile[teile.length - 1];\n  const vorname = teile.slice(0, -1).join('-');\n  return vorname + '.' + nachname + '@rwg-r.de';\n};\n\nlet emailFuerSuche = ctl.userEmail || 'kein-treffer@invalid.local';\nlet personMail = '';\nlet rueckfrage = '';\n\nif (absicht.personBezug === 'andere' && absicht.personName) {\n  // FIX 08/2026 (Beleg: Lauf 102605): Bei einem blossen Vornamen ergaenzt das\n  // Modell eigenmaechtig einen Nachnamen - aus \"Was hat Sebastian offen?\" wurde\n  // \"Sebastian Linges\", also der Name der anfragenden Person aus dem Prompt.\n  // Die Pruefung auf zwei Namensteile in nameZuMail greift dadurch nie, und der\n  // Agent haette fremde Ticketlisten unter falschem Namen praesentiert.\n  // Belastbar ist nur der Abgleich gegen den Fragetext: jedes Namensteil muss\n  // dort wirklich stehen. Steht es nicht da, wird nicht geraten, sondern\n  // zurueckgefragt.\n  const frageNorm = entumlauten(String(ctl.frage || '').toLowerCase());\n  const teile = entumlauten(absicht.personName.toLowerCase()).split(/\\s+/).filter(Boolean);\n  const wirklichGefragt = teile.length >= 2 && teile.every(t => frageNorm.includes(t));\n\n  if (wirklichGefragt) {\n    personMail = nameZuMail(absicht.personName);\n    emailFuerSuche = personMail || 'kein-treffer@invalid.local';\n  } else if (/\\b(mein|meine|meinen|meiner|meinem|ich|mir|mich|eigene|eigenen)\\b/.test(frageNorm)) {\n    // Die Frage traegt einen klaren Selbstbezug (\"von mir\", \"meine\", \"mein Todo\"),\n    // und der vom Modell genannte Name steht nicht vollstaendig im Fragetext.\n    // Dann ist es keine Fremdabfrage, sondern eine Frage nach eigenen Vorgaengen.\n    // Die Korrektur geht ausschliesslich von \"andere\" nach \"selbst\" und damit auf\n    // die engere Sicht - fremde Vorgaenge werden dadurch nie zugaenglich.\n    absicht.personBezug = 'selbst';\n    absicht.personName = '';\n    emailFuerSuche = ctl.userEmail || 'kein-treffer@invalid.local';\n  } else {\n    const genannt = String(absicht.personName).split(/\\s+/)[0] || 'die genannte Person';\n    rueckfrage = 'Rueckfrage stellen: Zu \"' + genannt + '\" gibt es keinen eindeutigen Treffer, weil nur ein Namensteil genannt wurde. Frage nach Vor- und Nachname, zum Beispiel \"Was hat Stefan Kox offen?\". Nenne keine Tickets und ergaenze den Namen nicht selbst.';\n    absicht.personName = '';\n    emailFuerSuche = 'kein-treffer@invalid.local';\n  }\n}\n\nreturn [{ json: {\n  istIT: ctl.istIT === true,\n  userEmail: ctl.userEmail || '',\n  topN: ctl.topN || 5,\n  frage: ctl.frage || '',\n  suchtext: ctl.suchtext || '',\n  originalFrage: ctl.originalFrage || '',\n  absicht,\n  absichtQuelle: quelle,\n  absichtFehler: fehler,\n  personMail,\n  rueckfrage,\n  emailFuerSuche\n} }];"
+      }
+    }
+  ],
+  "connections": {
+    "Aufruf vom Agenten": {
+      "main": [
+        [
+          {
+            "node": "Anfrage pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nutzerkonto aufloesen": {
+      "main": [
+        [
+          {
+            "node": "JQL bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JQL bauen": {
+      "main": [
+        [
+          {
+            "node": "Jira abfragen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira abfragen": {
+      "main": [
+        [
+          {
+            "node": "Tickets aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anfrage pruefen": {
+      "main": [
+        [
+          {
+            "node": "Absicht per LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Absicht per LLM": {
+      "main": [
+        [
+          {
+            "node": "Absicht auswerten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Absicht auswerten": {
+      "main": [
+        [
+          {
+            "node": "Nutzerkonto aufloesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "executionTimeout": 120,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "nodeGroups": [],
+  "description": "Ticketsuche im Projekt SSD als Agent-Tool. istIT und userEmail kommen aus dem Parent-Kontext, nie vom Modell. Fachbereich sieht ausschliesslich eigene Tickets (Reporter/Bearbeiter/Ersteller ueber accountId), fail closed ohne Kontoaufloesung. Kein Fallback"
+}
