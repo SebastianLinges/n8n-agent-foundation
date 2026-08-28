@@ -3,8 +3,8 @@
   "name": "RWG_Jira-Agent",
   "active": true,
   "isArchived": false,
-  "versionId": "810ad6fd-89c1-4aed-902c-c2edde40b31f",
-  "activeVersionId": "810ad6fd-89c1-4aed-902c-c2edde40b31f",
+  "versionId": "c1878c90-1c54-4f61-812d-98a56ac1761a",
+  "activeVersionId": "c1878c90-1c54-4f61-812d-98a56ac1761a",
   "triggerCount": 1,
   "createdAt": "2026-07-19T13:13:30.872Z",
   "updatedAt": "2026-08-28T12:59:27.460Z",
@@ -2569,7 +2569,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2288,
+        2352,
         -544
       ]
     },
@@ -2602,7 +2602,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2608,
+        2672,
         -336
       ]
     },
