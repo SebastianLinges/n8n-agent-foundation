@@ -28,11 +28,16 @@ Die Korrektur verläuft ausschließlich von `andere` nach `selbst`, also zur eng
 
 Diese Absicherung bleibt bestehen, unabhängig vom eingesetzten Modell. Sie ist deterministisch und deshalb die belastbarere Ebene; das Modell verbessert nur die Trefferquote davor.
 
-## Anschlussfragen behalten den Ticketschlüssel
+## Was aus der Originalfrage stammt und was nicht
 
-`Anfrage pruefen` leitet die Absicht bewusst aus der **Originalfrage** ab und nicht aus dem `suchtext`, den der Agent frei formuliert. Für den Personenbezug ist das richtig. Für den Ticketschlüssel war es zu eng: Auf „und wer bearbeitet das?" enthält die Originalfrage keine Kennung mehr, der Agent hatte den Bezug im `suchtext` aber bereits korrekt auf `SSD-9083` aufgelöst. Der Schlüssel ging verloren, und aus der Abfrage wurde `project = SSD ORDER BY updated DESC` — die Gesamtliste statt des gemeinten Vorgangs.
+`Anfrage pruefen` leitet die Absicht bewusst aus der **Originalfrage** ab und nicht aus dem `suchtext`, den der Agent frei formuliert. Für den **Personenbezug** ist das zwingend: Der `suchtext` ist Modellausgabe, und ein dort erfundener Name würde sonst eine fremde Ticketliste öffnen. Genau das ist die Aufgabe des Namensabgleichs weiter unten.
 
-Deshalb liest `Absicht auswerten` den Schlüssel ergänzend aus `frage + suchtext`, wenn das Modell keinen erkannt hat. Das ist unbedenklich: Der Schlüssel ist ein festes Muster und keine Berechtigung. `JQL bauen` ergänzt das Kontogate unabhängig davon per `AND` — für den Fachbereich ausnahmslos. Ein erfundener Schlüssel öffnet daher keinen Vorgang, auf den die fragende Person ohnehin kein Recht hat.
+Für zwei Felder gilt das nicht, weil sie keine Berechtigung tragen:
+
+- **Ticketschlüssel.** Auf „und wer bearbeitet das?" enthält die Originalfrage keine Kennung mehr, der `suchtext` sehr wohl. Ohne Rückgriff wurde aus der Abfrage `project = SSD ORDER BY updated DESC` — die Gesamtliste statt des gemeinten Vorgangs.
+- **Status.** Auf eine Sammelfrage wie „Stefan udn lars kutzki" steht die Einschränkung „offen" nur im `suchtext`. Ohne Rückgriff blieb `status: 'egal'`, und geschlossene wie erledigte Vorgänge kamen mit in die Liste — 100 Treffer, aus denen das Modell die offenen selbst heraussuchen musste.
+
+Beide sind unbedenklich: Der Schlüssel ist ein festes Muster, der Status engt nur ein. `JQL bauen` ergänzt das Kontogate unabhängig davon per `AND` — für den Fachbereich ausnahmslos. Ein erfundener Schlüssel öffnet keinen Vorgang, auf den die fragende Person kein Recht hat, und ein Statuswort öffnet gar nichts.
 
 ## Namensauflösung über Entra
 
