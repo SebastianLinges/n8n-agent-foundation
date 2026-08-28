@@ -30,6 +30,16 @@ Gegengeprüft: „wie wird das wetter morgen in erkelenz?" löst **keinen** Werk
 
 Bemerkenswert: Die Tool-Beschreibung setzt sich gegen den Systemprompt durch, der Städte ausdrücklich als Web-Fall führt. Der spezifischere Hinweis am Werkzeug gewinnt.
 
+## Gespräch schlägt Werkzeug — entschärft
+
+Der Gesprächsspeicher ist kein Sub-Node, sondern eigengebaut: `Save Memory` schreibt Frage und Antwort nach `public.agent_conversation_memory` und hält die letzten 40 Einträge; der Verlauf geht als `memoryText` in die Agent-Eingabe. Der Agent liest seine früheren Antworten also als Text im Prompt.
+
+Das führte zu einem stillen Fehlverhalten: Hatte der Agent zu einem Namen einmal zurückgefragt („zu diesem Namen gibt es mehrere Personen"), beantwortete er dieselbe Frage danach **ohne jeden Werkzeugaufruf** aus dem Verlauf. Belege: Läufe `109808` und `109815`, beide mit `tool_calls.completed: 0` und nur einem Modellaufruf, bei gleichzeitig null Ausführungen des Sub-Workflows. Aus Modellsicht folgerichtig — es hatte um eine Angabe gebeten, die Person wiederholte die Frage, also wiederholte es die Bitte. Fachlich falsch, weil eine zwischenzeitliche Korrektur so nie sichtbar wird.
+
+Die `description` des Werkzeugs `Jira-Tickets` verlangt deshalb jetzt ausdrücklich einen frischen Aufruf bei jeder Vorgangsfrage und untersagt, eine frühere Auskunft **oder Rückfrage** aus dem Gedächtnis zu wiederholen.
+
+Dieselbe Stelle war schon einmal der wirksame Hebel: Die Tool-Beschreibung setzt sich in diesem Agenten gegen den Systemprompt durch.
+
 ## Offene Punkte
 
 **Zuständigkeitsfragen sind nicht stabil.** Auf „wer kümmert sich um X" kommen mal Rollen, mal Namen — bei identischem Prompt und Modell. Die vorbereitete Prompt-Ergänzung in `prompt-ergaenzung-identitaet.md` schreibt die Kontaktübersicht bei Personenfragen verbindlich vor. Noch nicht eingespielt.
