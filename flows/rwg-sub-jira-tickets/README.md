@@ -28,6 +28,20 @@ Die Korrektur verläuft ausschließlich von `andere` nach `selbst`, also zur eng
 
 Diese Absicherung bleibt bestehen, unabhängig vom eingesetzten Modell. Sie ist deterministisch und deshalb die belastbarere Ebene; das Modell verbessert nur die Trefferquote davor.
 
+## Anschlussfragen behalten den Ticketschlüssel
+
+`Anfrage pruefen` leitet die Absicht bewusst aus der **Originalfrage** ab und nicht aus dem `suchtext`, den der Agent frei formuliert. Für den Personenbezug ist das richtig. Für den Ticketschlüssel war es zu eng: Auf „und wer bearbeitet das?" enthält die Originalfrage keine Kennung mehr, der Agent hatte den Bezug im `suchtext` aber bereits korrekt auf `SSD-9083` aufgelöst. Der Schlüssel ging verloren, und aus der Abfrage wurde `project = SSD ORDER BY updated DESC` — die Gesamtliste statt des gemeinten Vorgangs.
+
+Deshalb liest `Absicht auswerten` den Schlüssel ergänzend aus `frage + suchtext`, wenn das Modell keinen erkannt hat. Das ist unbedenklich: Der Schlüssel ist ein festes Muster und keine Berechtigung. `JQL bauen` ergänzt das Kontogate unabhängig davon per `AND` — für den Fachbereich ausnahmslos. Ein erfundener Schlüssel öffnet daher keinen Vorgang, auf den die fragende Person ohnehin kein Recht hat.
+
+## Grenze der Namensauflösung
+
+Der Jira-`displayName` folgt in dieser Instanz der Adresse und nicht dem Namen: Konten heißen `andre.kamp` oder `vincent-hendrik.borresch`. Eine Suche nach „Andre Kamp" findet deshalb nichts — der Umweg über die konstruierte Adresse `vorname.nachname@rwg-r.de` ist die Folge, nicht ein Versehen.
+
+Die Konstruktion ist aber eine Konvention, keine Auskunft. Sie entumlautet nur `ä ö ü ß`; andere diakritische Zeichen fallen der Filterung `[^a-z0-9-]` zum Opfer und erzeugen eine Adresse, die es nicht gibt. Ebenso brechen Doppelnamen, Namenszusätze und jede Abweichung vom Schema. Das Verhalten bleibt dabei sicher — ohne eindeutiges Konto wird `gueltig = false` gesetzt und nichts geraten — aber die Person wird nicht gefunden, obwohl sie existiert.
+
+Die belastbare Quelle für Klarnamen ist Entra: Dort steht der echte Anzeigename (`Linges Sebastian`) samt verbindlicher Adresse, und die Anbindung besteht bereits über `RWG Sub - Identity & Audience Resolver`. Ein Namensschlag gegen Entra statt der Konstruktion wäre der deterministische Weg — noch nicht umgesetzt.
+
 ## Offen
 
 Wirkung des Modellwechsels ist noch nicht an echten Läufen belegt. Prüfkriterium ist `absichtQuelle = 'llm'` bei gleichzeitig korrektem `personBezug` — insbesondere bei Fragen mit Selbstbezug und bei Fragen nach einer namentlich genannten Person.
