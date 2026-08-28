@@ -61,7 +61,9 @@ Mehr ruft der Agent nicht. Die übrigen `RWG Sub -`-Workflows in der Instanz sta
 
 ## Abgelöste Subflows der früheren Architektur
 
-Vor dem heutigen Aufbau lief das Routing über einen eigenen Agenten-Subflow. Acht Workflows stammen aus dieser Zeit. Sie sind alle auf `active: true`, haben null Ausführungen und werden von **keinem** produktiven Flow mehr aufgerufen.
+Vor dem heutigen Aufbau lief das Routing über einen eigenen Agenten-Subflow. Acht Workflows stammen aus dieser Zeit. Sie werden von **keinem** produktiven Flow mehr aufgerufen und sind inzwischen **deaktiviert und in den Ordner `00_Idias` verschoben**.
+
+Der Ordner führt damit zweierlei: Ideen und stillgelegte Flows. Wer dort aufräumt, kann nicht mehr vom Ordner auf den Charakter schließen — maßgeblich ist die Liste unten.
 
 Sie hängen in zwei Gruppen zusammen:
 
