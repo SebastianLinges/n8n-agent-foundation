@@ -73,4 +73,8 @@ Deshalb trug `Anwender-Schreibmodell` mit `temperature: 0.2` eine scharfe Störu
 
 Sollte der nächste Lauf erneut `Bad request` melden, ist der nächste Verdächtige `verbosity` in `textFormat.textOptions` — der einzige weitere Parameter, den `Policy-Modell` gegenüber dem funktionierenden `Analyse-Modell` zusätzlich trägt.
 
-**Canvas.** Der Graph spannt über 12.100 px; `Analysierbar?` verbindet über 9.400 px direkt auf `Event abschliessen`. Das ist kein Layoutproblem, sondern strukturell: `Event abschliessen` ist gemeinsamer Endpunkt für sieben Pfade, darunter der früheste Ausstieg. Auflösen ließe es sich nur durch einen zweiten Abschluss-Node nahe dem frühen Ausstieg — das dupliziert Logik und ist eine offene Entscheidung.
+**Canvas.** Gemessen: 11.984 × 976 px, 69 Funktions-Nodes, 84 Verbindungen. Die Anordnung ist konsistent — Regelabstand 192 bis 208 px, alle Nodes von einer der sechs Notizen gedeckt, die Notizen in Ablaufreihenfolge nummeriert. Die verbleibenden engen Paare bei 128 bis 144 px sind ausschließlich Sub-Nodes, für die das der übliche Abstand ist.
+
+Eine Verbindung fällt heraus: `Analysierbar?` läuft **9.392 px** quer über die gesamte Leinwand direkt auf `Event abschliessen` — 78 % der Gesamtbreite in einer einzigen Kante. Das ist kein Layoutproblem, sondern strukturell: `Event abschliessen` ist gemeinsamer Endpunkt für sieben Pfade, darunter der früheste Ausstieg. Auflösen ließe es sich nur durch einen zweiten Abschluss-Node nahe dem frühen Ausstieg — das dupliziert die SQL und ist eine offene Entscheidung.
+
+Sieben Kanten laufen rückwärts. Bis auf `Wissens-Reranker → Semantische Wissenssuche` sind das durchweg Sub-Node-Verbindungen, die per Definition auf ihren Elternknoten zurückzeigen. Kein Befund.

@@ -3,8 +3,8 @@
   "name": "RWG_Jira-Agent",
   "active": true,
   "isArchived": false,
-  "versionId": "c1878c90-1c54-4f61-812d-98a56ac1761a",
-  "activeVersionId": "c1878c90-1c54-4f61-812d-98a56ac1761a",
+  "versionId": "c8d33b13-1630-4c0e-99f5-8fc7624b9f89",
+  "activeVersionId": "c8d33b13-1630-4c0e-99f5-8fc7624b9f89",
   "triggerCount": 1,
   "createdAt": "2026-07-19T13:13:30.872Z",
   "updatedAt": "2026-08-28T12:59:27.460Z",
@@ -1730,7 +1730,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        2768,
+        2880,
         -352
       ],
       "retryOnFail": true,
@@ -1750,7 +1750,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        2976,
+        3088,
         -352
       ],
       "retryOnFail": true,
