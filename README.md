@@ -14,6 +14,10 @@ flows/<flow-name>/
 | Flow | Ordner | n8n-ID |
 |---|---|---|
 | RWG Jira-Agent | `flows/rwg-jira-agent/` | `QXCWIsTzDEmfwPwK` |
+| RWG Teams Agent | `flows/rwg-teams-agent/` | `BWswB3XA8S2gMwoT` |
+| RWG Sub - Jira Tickets | `flows/rwg-sub-jira-tickets/` | `HoCch7AkiSroyJBB` |
+
+Der Teams-Agent ruft zwei weitere Subflows: `RWG Sub - Identity & Audience Resolver` (`B2kmRuBHRbJx8HBI`) und `RWG Sub – Teams Image Read` (`omHDN0g9Lusb6H87`). Beide sind auf der n8n-Leinwand dokumentiert und im README des Teams-Agenten eingeordnet; einen eigenen Ordner bekommen sie erst, wenn dort mehr als der Export abzulegen ist.
 
 ## Arbeitsweise
 

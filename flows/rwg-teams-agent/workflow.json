@@ -3,11 +3,11 @@
   "name": "RWG Teams Agent",
   "active": true,
   "isArchived": false,
-  "versionId": "37c82f8c-1aea-456d-bc27-50fa3e83101e",
-  "activeVersionId": "37c82f8c-1aea-456d-bc27-50fa3e83101e",
+  "versionId": "69cc7603-1cec-40ab-ab55-5037f6c1bed7",
+  "activeVersionId": "69cc7603-1cec-40ab-ab55-5037f6c1bed7",
   "triggerCount": 1,
   "createdAt": "2026-08-14T23:02:00.796Z",
-  "updatedAt": "2026-08-28T11:13:07.192Z",
+  "updatedAt": "2026-08-28T13:03:34.978Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -672,12 +672,12 @@
     },
     {
       "parameters": {
-        "content": "## Phase 1: INPUT\nManual Test (oben) + Microsoft Teams Trigger (unten)\nTeams: Extract IDs → Load Message → Normalize → IF Should Process",
+        "content": "## 1 Eingang und Duplikatschutz\n\nDer **Microsoft Teams Trigger1** meldet neue Chatnachrichten. Er feuert auch auf die eigene Antwort des Bots, deshalb steht der Duplikatschutz unmittelbar dahinter.\n\n**Claim Message** beansprucht die Nachrichten-ID atomar in der Datenbank. Ist sie bereits vergeben, endet der Lauf ueber **IF Message Claimed** und **Ignore Duplicate** ohne Wirkung.\n\nDer Trigger liefert nur eine ID, keinen Inhalt und keinen Absender. **Extract IDs**, **Load Chat Details** und **Load Full Message** holen beides ueber Microsoft Graph nach, **Merge Chat + Message** fuehrt es zusammen. **Normalize & Sanitize** bereinigt den Text, **IF Should Process** entscheidet ueber die Weiterverarbeitung.\n\nWeil der Absender erst nach dem Nachladen bekannt ist, laesst sich keine Absenderpruefung vor den Claim ziehen.",
         "height": 506,
         "width": 2220
       },
       "id": "ff2d73d3-596b-4306-9078-c4cbdb39c5fa",
-      "name": "Note 1",
+      "name": "Note 1 Eingang und Duplikatschutz",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -687,13 +687,13 @@
     },
     {
       "parameters": {
-        "content": "## Phase 2: IDENTITY\nResolve Identity Subworkflow\nIT vs. Fachbereich\nE-Mail für Ticket-Filter",
+        "content": "## 2 Identitaet, Gedaechtnis und Lesebestaetigung\n\n**Resolve Identity** ruft den Subflow RWG Sub - Identity & Audience Resolver und liefert Rolle, allowedAudiences und die dienstliche Mailadresse aus dem Graph-Profil. Die IT-Erkennung laeuft ueber einen exakten Abgleich des Abteilungsnamens gegen eine Whitelist. Ist das Profil nicht aufloesbar, gilt public.\n\n**Build Teams Context** friert diese Werte ein. Alles, was Zugriff steuert - isIT, userEmail, allowedAudiences - stammt ab hier fest von hier und nie aus dem Modell.\n\n**Reaktion setzen** quittiert dem Anwender den Eingang. **Load Memory** und **Format Memory** holen den bisherigen Gespraechsverlauf aus agent_conversation_memory.",
         "height": 510,
         "width": 904,
         "color": 5
       },
       "id": "551d7703-926d-40c7-ac4f-e2a0c6fd0b23",
-      "name": "Note 2",
+      "name": "Note 2 Identitaet und Gedaechtnis",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -703,13 +703,13 @@
     },
     {
       "parameters": {
-        "content": "## Phase 3: UNIFIED INPUT\nBeide Pfade kommen hier zusammen",
+        "content": "## 3 Begruessungsweiche\n\n**Greeting-Gate** erkennt reine Begruessungen, **IF Begruessung** trennt sie vom fachlichen Pfad.\n\nEine Begruessung bekommt eine kurze Antwort ohne Werkzeugaufruf und ohne Wissenssuche.",
         "height": 512,
         "width": 906,
         "color": 3
       },
       "id": "55f16635-91d3-471f-a37a-b7c7b814e926",
-      "name": "Note 3",
+      "name": "Note 3 Begruessungsweiche",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -719,13 +719,13 @@
     },
     {
       "parameters": {
-        "content": "## Phase 4: GREETING-PFAD + BILDANALYSE\nBegruessung: eigener kurzer LLM-Aufruf\nAnfrage: Bildpruefung, dann Agent",
+        "content": "## 4 Begruessungsantwort und Bildanalyse\n\nOben der Begruessungspfad: **Format Greeting** und **Greeting Reply**.\n\nUnten der fachliche Pfad. **IF Has Images (Pre-Search)** prueft auf Bildanhaenge. Liegen welche vor, liest **Read Images** sie ueber den Subflow RWG Sub - Teams Image Read aus und liefert Beschreibung und erkannten Text; sonst laeuft **No Images**. **After Image Check** fuehrt beide Faelle wieder zusammen.",
         "height": 1138,
         "width": 1660,
         "color": 4
       },
       "id": "66b99b7e-7340-4ecd-9550-984e05be7917",
-      "name": "Note 4",
+      "name": "Note 4 Begruessung und Bildanalyse",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -735,12 +735,12 @@
     },
     {
       "parameters": {
-        "content": "## Phase 5: AGENT-EINGABE\nNur Kontext:\nDatum, Person, Rolle,\nGedaechtnis, Bild-Insights\nDie Beschaffung macht der Agent",
+        "content": "## 5 Agent-Eingabe\n\n**Agent-Eingabe bauen** sammelt ausschliesslich Kontext: Datum, Person, Rolle, Gespraechsverlauf und Bildbefunde.\n\nDie Beschaffung von Wissen macht der Agent selbst ueber seine Werkzeuge. Hier wird nichts vorgesucht.",
         "height": 1142,
         "width": 360
       },
       "id": "fefbf7f2-7bb6-4f47-8d25-b5c53792140f",
-      "name": "Note 5",
+      "name": "Note 5 Agent-Eingabe",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -750,12 +750,12 @@
     },
     {
       "parameters": {
-        "content": "## Phase 6: AI AGENT (gpt-4o)\nTool-Layer statt fester Suchkette\nAudience-Gate in den Sub-Workflows",
+        "content": "## 6 Agent und Werkzeuge\n\n**AI Agent** mit **OpenAI Chat Model** auf gpt-5.4, reasoningEffort low, maxTokens 2500. Der Parameter temperature fehlt bewusst: Die GPT-5-Generation lehnt ihn ab, und der Agent stirbt sonst bei jeder Nachricht an Bad request.\n\nSechs Werkzeuge statt fester Suchkette. Das Audience-Gate sitzt in den Sub-Workflows und in der SQL-Abfrage, nicht im Modell - der Agent kann es weder sehen noch umgehen.\n\nDie Web-Recherche kostet Geld. Ihre toolDescription verlangt deshalb ausdruecklich einen dienstlichen Bezug und untersagt private Themen.\n\nTicketfragen brauchen immer einen frischen Aufruf. Der Agent hat frueher eine schon gegebene Rueckfrage aus dem Gespraechsverlauf wiederholt, ohne das Werkzeug ueberhaupt zu rufen; die toolDescription von Jira-Tickets untersagt das jetzt.",
         "height": 1142,
         "width": 404
       },
       "id": "c2ebedb1-e7b5-45a0-aab1-fb9f3f89c0d5",
-      "name": "Note 6",
+      "name": "Note 6 Agent und Werkzeuge",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -765,12 +765,12 @@
     },
     {
       "parameters": {
-        "content": "## Phase 7: OUTPUT GUARD\nLeak-Protection\nBeleidigungsfilter\nLängenbegrenzung 4000 Zeichen",
+        "content": "## 7 Ausgabepruefung\n\n**Output Guard** prueft die Antwort vor dem Versand: Schutz gegen das Durchreichen interner Angaben, Beleidigungsfilter, Laengenbegrenzung auf 4000 Zeichen.",
         "height": 1140,
         "width": 372
       },
       "id": "1772f04c-9010-460c-93d3-ef8c3f0dbf10",
-      "name": "Note 7",
+      "name": "Note 7 Ausgabepruefung",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -780,13 +780,13 @@
     },
     {
       "parameters": {
-        "content": "## Phase 8: REPLY\nManual: JSON Output\nTeams: Markdown→HTML\nSend via MS Graph API",
+        "content": "## 8 Antwort und Gedaechtnis\n\n**Format Reply for Teams** wandelt Markdown nach HTML, **Send Message via Graph** stellt zu, **Reaktion entfernen** nimmt die Eingangsquittung zurueck.\n\n**Prep Save Memory** und **Save Memory** schreiben Frage und Antwort nach agent_conversation_memory und halten die letzten 40 Eintraege je Chat.\n\nDieser Verlauf geht beim naechsten Lauf als Text in die Agent-Eingabe. Der Agent liest also seine eigenen frueheren Antworten und kann daraus schliessen, statt neu nachzusehen - siehe Notiz 6.",
         "height": 1140,
         "width": 1096,
         "color": 7
       },
       "id": "5771779b-55cd-45db-8b8b-6d00730f4355",
-      "name": "Note 8",
+      "name": "Note 8 Antwort und Gedaechtnis",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -1144,7 +1144,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Deterministisches Gate statt LLM-Klassifikation: spart einen Modellaufruf je Nachricht\n// und kann eine Fachfrage nicht faelschlich als Smalltalk abtun.\nconst ctx = $input.first().json ?? {};\nconst q = String(ctx.userQuestion || '').trim();\n\n// Fragezeichen zaehlt vor der Bereinigung, sonst geht es beim Strippen verloren.\nconst hatFrage = q.includes('?');\nconst hatTicket = /ssd[\\s-]?\\d{2,6}/i.test(q);\n\n// FIX 08/2026: Umlaute normalisieren. Das Grussmuster ist umlautfrei notiert\n// (tschuess, dankeschoen, schoenes wochenende), der Nutzertext war es nicht.\n// \"Tschuess\" traf, \"Tschuess\" mit Umlaut fiel durch und loeste einen vollen\n// gpt-4o-Lauf samt Werkzeugaufruf fuer eine Verabschiedung aus.\nconst entumlauten = s => String(s)\n  .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');\n\n// FIX 08/2026, zweiter Anlauf (Beleg: Lauf 102715). Der erste Versuch entfernte\n// gezielt Emojis und scheiterte trotzdem: \"Tschuess du Nase 👃”\" endete auf ein\n// typografisches Anfuehrungszeichen, das weder vom Emoji- noch vom\n// Interpunktionsmuster erfasst wurde. Statt eine Liste stoerender Zeichen zu\n// pflegen, bleiben jetzt nur Buchstaben und Ziffern stehen - Emojis,\n// Anfuehrungszeichen, Klammern und Sonderzeichen fallen gemeinsam weg. Sie\n// tragen bei einer Verabschiedung ohnehin keine Bedeutung.\nconst ql = entumlauten(q.toLowerCase())\n  .replace(/[^\\p{L}\\p{N}]+/gu, ' ')\n  .trim();\nconst woerter = ql ? ql.split(' ').filter(Boolean) : [];\n\n// Grenze von vier auf sechs Woerter: Gruesse wie \"danke dir schoenes\n// wochenende\" lagen sonst knapp darueber und loesten einen vollen Agentenlauf aus.\nconst grussMuster = /^(hallo|hi|hey|moin|servus|guten morgen|guten tag|guten abend|na|danke|vielen dank|danke dir|dankeschoen|besten dank|super|perfekt|klasse|alles klar|ok|okay|passt|verstanden|tschuess|ciao|bis dann|bis morgen|bis spaeter|schoenes wochenende|schoenen feierabend)([ ][a-z]{1,15})*$/;\n\n// Bild ohne Text ist keine Begruessung, sondern eine Anfrage an den Agenten.\nconst istBegruessung = Boolean(ql)\n  && ctx.hasImages !== true\n  && !hatFrage\n  && !hatTicket\n  && woerter.length <= 6\n  && grussMuster.test(ql);\n\nreturn [{ json: { ...ctx, istBegruessung } }];"
+        "jsCode": "// Deterministisches Gate statt LLM-Klassifikation: spart einen Modellaufruf je Nachricht\n// und kann eine Fachfrage nicht faelschlich als Smalltalk abtun.\nconst ctx = $input.first().json ?? {};\nconst q = String(ctx.userQuestion || '').trim();\n\n// Fragezeichen zaehlt vor der Bereinigung, sonst geht es beim Strippen verloren.\nconst hatFrage = q.includes('?');\nconst hatTicket = /ssd[\\s-]?\\d{2,6}/i.test(q);\n\n// FIX 08/2026: Umlaute normalisieren. Das Grussmuster ist umlautfrei notiert\n// (tschuess, dankeschoen, schoenes wochenende), der Nutzertext war es nicht.\n// \"Tschuess\" traf, \"Tschuess\" mit Umlaut fiel durch und loeste einen vollen\n// Agentenlauf samt Werkzeugaufruf fuer eine Verabschiedung aus.\nconst entumlauten = s => String(s)\n  .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');\n\n// FIX 08/2026, zweiter Anlauf (Beleg: Lauf 102715). Der erste Versuch entfernte\n// gezielt Emojis und scheiterte trotzdem: \"Tschuess du Nase 👃”\" endete auf ein\n// typografisches Anfuehrungszeichen, das weder vom Emoji- noch vom\n// Interpunktionsmuster erfasst wurde. Statt eine Liste stoerender Zeichen zu\n// pflegen, bleiben jetzt nur Buchstaben und Ziffern stehen - Emojis,\n// Anfuehrungszeichen, Klammern und Sonderzeichen fallen gemeinsam weg. Sie\n// tragen bei einer Verabschiedung ohnehin keine Bedeutung.\nconst ql = entumlauten(q.toLowerCase())\n  .replace(/[^\\p{L}\\p{N}]+/gu, ' ')\n  .trim();\nconst woerter = ql ? ql.split(' ').filter(Boolean) : [];\n\n// Grenze von vier auf sechs Woerter: Gruesse wie \"danke dir schoenes\n// wochenende\" lagen sonst knapp darueber und loesten einen vollen Agentenlauf aus.\nconst grussMuster = /^(hallo|hi|hey|moin|servus|guten morgen|guten tag|guten abend|na|danke|vielen dank|danke dir|dankeschoen|besten dank|super|perfekt|klasse|alles klar|ok|okay|passt|verstanden|tschuess|ciao|bis dann|bis morgen|bis spaeter|schoenes wochenende|schoenen feierabend)([ ][a-z]{1,15})*$/;\n\n// Bild ohne Text ist keine Begruessung, sondern eine Anfrage an den Agenten.\nconst istBegruessung = Boolean(ql)\n  && ctx.hasImages !== true\n  && !hatFrage\n  && !hatTicket\n  && woerter.length <= 6\n  && grussMuster.test(ql);\n\nreturn [{ json: { ...ctx, istBegruessung } }];"
       },
       "id": "2a6c93eb-e135-4938-8111-e48503303b0f",
       "name": "Greeting-Gate",
@@ -1498,7 +1498,7 @@
     "templateCredsSetupCompleted": true
   },
   "parentFolderId": null,
-  "description": "LLM Agent für Jira-Suche: User-Frage → LLM generiert beste Antwort aus Issues",
+  "description": "IT-Assistent im Microsoft-Teams-Chat. Identitaet und Sichtbarkeit aus dem Graph-Profil, sechs Werkzeuge fuer Wissen, Tickets und Herstellerrecherche. Audience-Gate in den Sub-Workflows, nie im Modell. Duplikatschutz ueber Claim, Verlauf je Chat.",
   "scopes": [
     "execution:reveal",
     "workflow:create",

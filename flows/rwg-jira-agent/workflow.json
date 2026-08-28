@@ -3,11 +3,11 @@
   "name": "RWG_Jira-Agent",
   "active": true,
   "isArchived": false,
-  "versionId": "37cf56d7-983d-4724-bdeb-c17c3046eb0d",
-  "activeVersionId": "37cf56d7-983d-4724-bdeb-c17c3046eb0d",
+  "versionId": "2d5fd24e-d68c-4bfd-a265-41b191149bea",
+  "activeVersionId": "2d5fd24e-d68c-4bfd-a265-41b191149bea",
   "triggerCount": 1,
   "createdAt": "2026-07-19T13:13:30.872Z",
-  "updatedAt": "2026-08-27T16:04:21.236Z",
+  "updatedAt": "2026-08-28T12:59:27.460Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -2435,7 +2435,7 @@
     },
     {
       "parameters": {
-        "content": "## 5 Policy, Feldpflege und Routing\n\nDie Policy bewertet die Ticketlage und liefert vier Betriebssignale: scope, businessImpact, businessProcess, securityRisk. Sie sieht dabei die bisherige Ticketkommunikation und prueft vor jeder Rueckfrage, ob die Antwort bereits im Ticket steht.\n\nDie Ausgabe ist doppelt abgesichert. Das **Policy-Modell** liefert ueber die Responses-API mit striktem json_schema — ungueltiges JSON ist damit auf API-Ebene ausgeschlossen. Weicht die Struktur dennoch ab, befragt **Policy-Schema** per autoFix das Modell mit der Fehlermeldung erneut, statt den Lauf zu beenden.\n\nScheitert die Policy trotzdem, fuehrt ihr Fehlerausgang auf **Lauf als fehlgeschlagen vermerken**. Der Vorgang wird auf failed gesetzt und traegt den Fehlertext. Damit kann die Claim-Query ihn erneut beanspruchen, statt ihn unbemerkt auf processing stehen zu lassen.\n\n**Feldpflege aufrufen** uebergibt issueKey und die vier Signale an den Subflow RWG_Jira-Feldpflege. Der ist der alleinige Schreiber auf den Jira-Feldern Prioritaet und Support-Level. Weil die Signale mitkommen und ein frisch angelegtes Ticket keine neue Evidenz hat, faellt dort bei der Erstbewertung kein Modellaufruf an. Faellt der Subflow aus, laeuft der Agent weiter, die Felder bleiben unangetastet und der Grund steht in feldpflegeFehler.\n\n**Routing und Prioritaet ableiten** entscheidet das Routing nach SOLVE, ASK, IT_ACTION oder NEEDS_REVIEW, sanitisiert die Rueckfragen und uebernimmt die Prioritaet aus dem Subflow in den Ausgabe-Vertrag. Die Fragenpruefung existiert nur hier, an genau einer Stelle.\n\n**Entscheidung routen** verteilt auf die drei Ausgabewege: Anwenderloesung, Anwenderrueckfrage oder interner IT-Hinweis.",
+        "content": "## 5 Policy, Feldpflege und Routing\n\nDie Policy bewertet die Ticketlage und liefert vier Betriebssignale: scope, businessImpact, businessProcess, securityRisk. Sie sieht dabei die bisherige Ticketkommunikation und prueft vor jeder Rueckfrage, ob die Antwort bereits im Ticket steht.\n\nDie Ausgabe ist dreifach abgesichert. Das **Policy-Modell** laeuft ueber die Responses-API mit textFormat json_object - ungueltiges JSON ist damit auf API-Ebene ausgeschlossen. Weicht die Struktur ab, befragt **Policy-Schema** per autoFix das Modell mit der Fehlermeldung erneut, statt den Lauf zu beenden. Der Parameter temperature darf hier nicht stehen: Die GPT-5-Generation lehnt ihn ab, und die Policy wird dann gar nicht erst befragt.\n\nScheitert sie trotzdem, fuehren zwei Wege auf **Lauf als fehlgeschlagen vermerken** - der Fehlerausgang der Chain fuer Fehler im Node selbst, und **Policy geliefert?** fuer Fehler in den Sub-Nodes. Der zweite ist der wichtigere: Faellt Modell oder Parser aus, reicht die Chain die Eingangsdaten ohne output-Feld durch, und der Lauf gilt als erfolgreich, obwohl nichts entschieden wurde. Der Vorgang wird auf failed gesetzt und traegt den Fehlertext, damit die Claim-Query ihn erneut beanspruchen kann.\n\n**Feldpflege aufrufen** uebergibt issueKey und die vier Signale an den Subflow RWG_Jira-Feldpflege. Der ist der alleinige Schreiber auf den Jira-Feldern Prioritaet und Support-Level. Weil die Signale mitkommen und ein frisch angelegtes Ticket keine neue Evidenz hat, faellt dort bei der Erstbewertung kein Modellaufruf an. Faellt der Subflow aus, laeuft der Agent weiter, die Felder bleiben unangetastet und der Grund steht in feldpflegeFehler.\n\n**Routing und Prioritaet ableiten** entscheidet das Routing nach SOLVE, ASK, IT_ACTION oder NEEDS_REVIEW, sanitisiert die Rueckfragen und uebernimmt die Prioritaet aus dem Subflow in den Ausgabe-Vertrag. Die Fragenpruefung existiert nur hier, an genau einer Stelle.\n\n**Entscheidung routen** verteilt auf die drei Ausgabewege: Anwenderloesung, Anwenderrueckfrage oder interner IT-Hinweis.",
         "height": 1360,
         "width": 2140,
         "color": 6
@@ -2760,7 +2760,7 @@
     },
     {
       "parameters": {
-        "content": "## 2 Ticketkontext und Bildanalyse\n\n**Ticketkontext aufbereiten** flacht die Jira-Beschreibung und den Kommentarverlauf aus dem ADF-Format zu Text ab und filtert die Anhaenge auf auswertbare Bilder vor. **Analysierbar?** stoppt Tickets ohne verwertbaren Inhalt.\n\nLiegen Bilder vor, zerlegt **Split Out** sie in Einzelposten, **Jira-Bild laden** holt die Binaerdaten und **Bild analysieren** beschreibt sie. Maximal drei Bilder je Ticket. **Aggregate** fuehrt die Einzelbefunde wieder zusammen.\n\n**Supportfall zusammenstellen** ist der gemeinsame Sammelpunkt beider Wege, mit und ohne Bildbefund.",
+        "content": "## 2 Ticketkontext und Bildanalyse\n\n**Ticketkontext aufbereiten** flacht die Jira-Beschreibung und den Kommentarverlauf aus dem ADF-Format zu Text ab und filtert die Anhaenge auf auswertbare Bilder vor. **Analysierbar?** stoppt Tickets ohne verwertbaren Inhalt.\n\n**Bildanhaenge vorhanden?** trennt die beiden Wege. Liegen Bilder vor, zerlegt **Bildanhaenge aufteilen** sie in Einzelposten, **Jira-Bild laden** holt die Binaerdaten und **Bild analysieren** beschreibt sie. Maximal drei Bilder je Ticket. **Bildbefunde buendeln** und **Bildbefund setzen** fuehren die Einzelbefunde wieder zusammen; ohne Bilder laeuft **Kein Bildbefund**.\n\n**Supportfall zusammenstellen** ist der gemeinsame Sammelpunkt beider Wege.",
         "height": 1352,
         "width": 1556,
         "color": 5

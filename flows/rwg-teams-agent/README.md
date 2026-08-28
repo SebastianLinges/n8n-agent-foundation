@@ -40,7 +40,28 @@ Die `description` des Werkzeugs `Jira-Tickets` verlangt deshalb jetzt ausdrückl
 
 Dieselbe Stelle war schon einmal der wirksame Hebel: Die Tool-Beschreibung setzt sich in diesem Agenten gegen den Systemprompt durch.
 
+## Dokumentation auf der Leinwand
+
+Acht Notizen entlang der acht Phasen, jede an der Nodegruppe, die sie beschreibt. Drei waren überholt und sind ersetzt: Phase 1 nannte einen manuellen Testpfad, den es nicht gibt — der Workflow hat genau einen Trigger; Phase 6 nannte `gpt-4o`; Phase 8 verwies auf eine JSON-Ausgabe des Testpfads.
+
+Drei Verhaltensweisen standen in keiner Notiz und sind ergänzt: die Claim-Kette gegen Doppelverarbeitung, der Gesprächsspeicher samt seiner Rückwirkung auf den Agenten, und die Kostenbremse der Web-Recherche.
+
+Jede fett ausgezeichnete Node-Referenz in den Notizen wird gegen die tatsächlichen Node-Namen geprüft. Aktuell ist keine Referenz ungültig.
+
+### Subflows des Teams-Agenten
+
+| Subflow | n8n-ID | Rolle |
+|---|---|---|
+| RWG Sub - Identity & Audience Resolver | `B2kmRuBHRbJx8HBI` | Rolle und `allowedAudiences` aus dem Graph-Profil |
+| RWG Sub – Teams Image Read | `omHDN0g9Lusb6H87` | Bildinhalte aus Teams und SharePoint |
+| RWG Sub - Wissenssuche | `GD256mxClPHHbngI` | semantische Suche, audience-gefiltert |
+| RWG Sub - Jira Tickets | `HoCch7AkiSroyJBB` | Ticketfragen |
+
+Mehr ruft der Agent nicht. Die übrigen `RWG Sub -`-Workflows in der Instanz stammen aus der früheren Router-Architektur, haben keine Ausführungen und sind Kandidaten für die Löschung.
+
 ## Offene Punkte
+
+**Begrüßungsantwort läuft auf `gpt-4o-mini`.** Der Node `Greeting Reply` nutzt ein eigenes, altes Modell mit `temperature 0.6`. Das ist kein Fehler — gpt-4o-mini akzeptiert den Parameter — aber eine Modellgeneration hinter dem Agenten. Ein Wechsel wäre eine Verhaltensänderung und keine Bereinigung; deshalb offen.
 
 **Zuständigkeitsfragen sind nicht stabil.** Auf „wer kümmert sich um X" kommen mal Rollen, mal Namen — bei identischem Prompt und Modell. Die vorbereitete Prompt-Ergänzung in `prompt-ergaenzung-identitaet.md` schreibt die Kontaktübersicht bei Personenfragen verbindlich vor. Noch nicht eingespielt.
 
