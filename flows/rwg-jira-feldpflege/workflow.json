@@ -1,0 +1,773 @@
+{
+  "id": "k4SmnNrz7ASMdFwk",
+  "name": "RWG_Jira-Feldpflege",
+  "active": true,
+  "isArchived": false,
+  "versionId": "ce120231-eb15-4c4e-8509-cda79da3d637",
+  "activeVersionId": "ce120231-eb15-4c4e-8509-cda79da3d637",
+  "triggerCount": 1,
+  "createdAt": "2026-08-20T14:38:00.440Z",
+  "updatedAt": "2026-08-28T14:26:40.758Z",
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 300,
+    "timeSavedPerExecution": 5
+  },
+  "connections": {
+    "Aufruf aus Jira-Agent": {
+      "main": [
+        [
+          {
+            "node": "Agentenaufruf normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agentenaufruf normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Kandidat und Konfiguration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticketdaten laden": {
+      "main": [
+        [
+          {
+            "node": "Ticketkontext aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Support-Level bewerten": {
+      "main": [
+        [
+          {
+            "node": "Prioritaet ableiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bewertungsmodell": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Support-Level bewerten",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bewertungsschema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Support-Level bewerten",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feldaenderungen buendeln": {
+      "main": [
+        [
+          {
+            "node": "Schreiben erforderlich?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schreiben erforderlich?": {
+      "main": [
+        [
+          {
+            "node": "Jira-Felder schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Kein Schreibvorgang",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira-Felder schreiben": {
+      "main": [
+        [
+          {
+            "node": "Schreibergebnis erfassen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Support-Level festlegen": {
+      "main": [
+        [
+          {
+            "node": "Feldaenderungen buendeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioritaet ableiten": {
+      "main": [
+        [
+          {
+            "node": "Support-Level festlegen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticketereignis pruefen": {
+      "main": [
+        [
+          {
+            "node": "Kandidat und Konfiguration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Ticketereignis": {
+      "main": [
+        [
+          {
+            "node": "Ticketereignis pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kandidat und Konfiguration": {
+      "main": [
+        [
+          {
+            "node": "Ticketdaten laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schreibergebnis erfassen": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kein Schreibvorgang": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticketkontext aufbereiten": {
+      "main": [
+        [
+          {
+            "node": "Bewertung erforderlich?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bewertung erforderlich?": {
+      "main": [
+        [
+          {
+            "node": "Support-Level bewerten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bewertung uebersprungen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bewertung uebersprungen": {
+      "main": [
+        [
+          {
+            "node": "Prioritaet ableiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "issueKey"
+            },
+            {
+              "name": "scope"
+            },
+            {
+              "name": "businessImpact"
+            },
+            {
+              "name": "businessProcess"
+            },
+            {
+              "name": "securityRisk",
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "id": "2498a11d-0366-4466-a250-5aaba787ad0a",
+      "name": "Aufruf aus Jira-Agent",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1360,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\nfor (const it of $input.all()) {\n  const j = it.json || {};\n  const key = String(j.issueKey || j.ticketKey || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  const scope = String(j.scope || \"\").trim().toUpperCase();\n  const impact = String(j.businessImpact || \"\").trim().toUpperCase();\n  const proc = String(j.businessProcess || \"\").trim().toUpperCase();\n  const hatVorgabe = scope.length > 0 || impact.length > 0;\n\n  out.push({ json: {\n    issueKey: key,\n    source: \"agent\",\n    ausloeser: \"Erstbewertung durch Jira-Agent\",\n    vorgabeVorhanden: hatVorgabe,\n    vorgabeScope: scope || \"UNKNOWN\",\n    vorgabeBusinessImpact: impact || \"UNKNOWN\",\n    vorgabeBusinessProcess: proc || \"UNKNOWN\",\n    vorgabeSecurityRisk: j.securityRisk === true\n  } });\n}\nreturn out;"
+      },
+      "id": "f13c4be8-13f6-4fe9-8a2c-79a66b3fe106",
+      "name": "Agentenaufruf normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cfg-dry",
+              "name": "dryRun",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "id": "cfg-base",
+              "name": "jiraBaseUrl",
+              "type": "string",
+              "value": "https://rwg-r.atlassian.net"
+            },
+            {
+              "id": "cfg-run",
+              "name": "runStartedAt",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "421984a7-1f99-49db-8472-afcddaa3a13a",
+      "name": "Kandidat und Konfiguration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -864,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "additionalFields": {
+          "filter": "project = SSD AND statusCategory != Done"
+        },
+        "events": [
+          "jira:issue_updated",
+          "comment_created",
+          "comment_updated"
+        ],
+        "jiraVersion": "cloud"
+      },
+      "id": "1d7afcf4-fb89-4683-9e5a-90d09e759a75",
+      "name": "Jira Ticketereignis",
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1360,
+        -64
+      ],
+      "webhookId": "79c3c665-03a3-4d93-b161-8d8f00beeb56"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \") } });\n}\n\nreturn out;"
+      },
+      "id": "06901308-4d12-4d1f-badf-bad748b32287",
+      "name": "Ticketereignis pruefen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.jiraBaseUrl }}/rest/api/3/issue/{{ $json.issueKey }}?expand=changelog&fields=summary,description,status,assignee,priority,comment,customfield_10777",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f65150f0-80f0-4ddd-8c45-98b95077d59d",
+      "name": "Ticketdaten laden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -624,
+        -176
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const SUPPORT_FIELD = \"customfield_10777\";\nconst STATUS_GWS = \"10373\";\nconst AUTOMATION = [\"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\", \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\", \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\", \"60242eda988758006893fa52\"];\nconst cand = $(\"Kandidat und Konfiguration\").first().json || {};\nconst issue = $input.first().json || {};\nconst f = issue.fields || {};\n\nfunction adfText(v) {\n  if (v === null || v === undefined) return \"\";\n  if (typeof v === \"string\") return v;\n  if (Array.isArray(v)) return v.map(adfText).join(\"\");\n  if (typeof v !== \"object\") return String(v);\n  let s = \"\";\n  if (v.type === \"text\" && typeof v.text === \"string\") s += v.text;\n  if (v.type === \"hardBreak\") s += \"\\n\";\n  if (Array.isArray(v.content)) s += v.content.map(adfText).join(\"\");\n  if (v.type === \"paragraph\") s += \"\\n\";\n  return s;\n}\n\nconst histories = (issue.changelog && Array.isArray(issue.changelog.histories)) ? issue.changelog.histories : [];\nconst statusHistory = [];\nconst levelHistory = [];\nlet assigneeChangeCount = 0;\nfor (const h of histories) {\n  const at = String(h.created || \"\");\n  const accountId = String((h.author && h.author.accountId) || \"\");\n  const who = String((h.author && h.author.displayName) || \"\");\n  const isAutomation = AUTOMATION.indexOf(accountId) !== -1;\n  const items = Array.isArray(h.items) ? h.items : [];\n  for (const it of items) {\n    const fid = String((it.fieldId || it.field) || \"\");\n    if (fid.toLowerCase() === \"status\") {\n      statusHistory.push({ at: at, von: String(it.fromString || \"\"), nach: String(it.toString || \"\"), durch: who, automatisiert: isAutomation });\n    } else if (fid === SUPPORT_FIELD || fid === \"Support-Level\") {\n      levelHistory.push({ at: at, von: String(it.fromString || \"\"), nach: String(it.toString || \"\"), durch: who, automatisiert: isAutomation });\n    } else if (fid.toLowerCase() === \"assignee\") {\n      assigneeChangeCount += 1;\n    }\n  }\n}\nstatusHistory.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });\nlevelHistory.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });\n\nconst manualLevel = levelHistory.filter(function (e) { return e.automatisiert !== true; });\nconst lastManual = manualLevel.length > 0 ? manualLevel[manualLevel.length - 1] : null;\nconst levelSetManually = lastManual !== null;\nconst levelLastSetAt = lastManual ? lastManual.at : \"\";\nlet statusChangedAfterLevel = statusHistory.length > 0;\nif (levelSetManually) {\n  statusChangedAfterLevel = statusHistory.some(function (s) { return String(s.at) > String(levelLastSetAt); });\n}\n\nconst rawComments = (f.comment && Array.isArray(f.comment.comments)) ? f.comment.comments : [];\nconst comments = [];\nfor (const c of rawComments.slice(-14)) {\n  const accountId = String((c.author && c.author.accountId) || \"\");\n  const text = adfText(c.body).replace(/\\n{3,}/g, \"\\n\\n\").trim().slice(0, 1500);\n  if (!text) continue;\n  comments.push({\n    at: String(c.created || \"\"),\n    autor: String((c.author && c.author.displayName) || \"\"),\n    automatisiert: AUTOMATION.indexOf(accountId) !== -1,\n    text: text\n  });\n}\n\nconst levelField = f[SUPPORT_FIELD] || null;\nconst statusId = String((f.status && f.status.id) || \"\");\nconst currentLevelValue = String((levelField && levelField.value) || \"\");\n\nconst hatMenschKommentar = comments.some(function (c) { return c.automatisiert !== true; });\nconst hatMenschStatus = statusHistory.some(function (s) { return s.automatisiert !== true; });\nconst frischesTicket = !hatMenschKommentar && !hatMenschStatus && (currentLevelValue === \"\" || currentLevelValue === \"1st-Lvl.\") && statusId !== STATUS_GWS;\nconst vorgabeVorhanden = cand.vorgabeVorhanden === true;\n\nconst result = {};\nresult.issueKey = String(issue.key || cand.issueKey || \"\");\nresult.source = String(cand.source || \"unbekannt\");\nresult.ausloeser = String(cand.ausloeser || \"\");\nresult.dryRun = cand.dryRun !== false;\nresult.jiraBaseUrl = String(cand.jiraBaseUrl || \"https://rwg-r.atlassian.net\");\nresult.vorgabeVorhanden = vorgabeVorhanden;\nresult.vorgabeScope = String(cand.vorgabeScope || \"UNKNOWN\");\nresult.vorgabeBusinessImpact = String(cand.vorgabeBusinessImpact || \"UNKNOWN\");\nresult.vorgabeBusinessProcess = String(cand.vorgabeBusinessProcess || \"UNKNOWN\");\nresult.vorgabeSecurityRisk = cand.vorgabeSecurityRisk === true;\nresult.bewertungNoetig = !(vorgabeVorhanden && frischesTicket);\nresult.summary = String(f.summary || \"\").slice(0, 500);\nresult.description = adfText(f.description).replace(/\\n{3,}/g, \"\\n\\n\").trim().slice(0, 4000);\nresult.statusId = statusId;\nresult.statusName = String((f.status && f.status.name) || \"\");\nresult.assigneeName = String((f.assignee && f.assignee.displayName) || \"\");\nresult.assigneeChangeCount = assigneeChangeCount;\nresult.currentPriorityId = String((f.priority && f.priority.id) || \"\");\nresult.currentPriorityName = String((f.priority && f.priority.name) || \"\");\nresult.currentLevelId = String((levelField && levelField.id) || \"\");\nresult.currentLevelValue = currentLevelValue;\nresult.levelSetManually = levelSetManually;\nresult.levelLastSetAt = levelLastSetAt;\nresult.statusChangedAfterLevel = statusChangedAfterLevel;\nresult.statusHistory = statusHistory.slice(-15);\nresult.levelHistory = levelHistory.slice(-8);\nresult.comments = comments;\nreturn [{ json: result }];"
+      },
+      "id": "4bcc73a3-f3d1-4751-a2ba-9c003d8f8603",
+      "name": "Ticketkontext aufbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Leitet die Zielprioritaet aus den Betriebssignalen ab.\n//\n// GRUNDSATZ (fachliche Festlegung RWG):\n//   Unterhalb von Medium liegen ausschliesslich planbare Anfragen.\n//   Jede echte Stoerung ist mindestens Medium - auch wenn nur ein einzelner\n//   Anwender betroffen ist. Wer nicht arbeiten kann, ist unternehmerisch ein\n//   Schaden, unabhaengig von der Zahl der Betroffenen.\n//   Niedrig und Sehr Niedrig sind daher nur bei SERVICE_REQUEST erreichbar.\n\nconst ctx = $(\"Ticketkontext aufbereiten\").first().json || {};\nconst raw = $input.first().json || {};\nconst a = raw.output || {};\nconst uebersprungen = raw.bewertungUebersprungen === true;\n\nconst PRIORITY = {};\nPRIORITY[\"1\"] = { id: \"1\", name: \"Sehr Hoch\", rank: 5 };\nPRIORITY[\"2\"] = { id: \"2\", name: \"Hoch\", rank: 4 };\nPRIORITY[\"3\"] = { id: \"3\", name: \"Medium\", rank: 3 };\nPRIORITY[\"4\"] = { id: \"4\", name: \"Niedrig\", rank: 2 };\nPRIORITY[\"5\"] = { id: \"5\", name: \"Sehr Niedrig\", rank: 1 };\nconst SCOPES = [\"UNKNOWN\", \"SINGLE_USER\", \"MULTIPLE_USERS\", \"SITE\", \"COMPANY\"];\nconst IMPACTS = [\"UNKNOWN\", \"CRITICAL_PROCESS_STOPPED\", \"MAJOR_RESTRICTION\", \"LIMITED\", \"SERVICE_REQUEST\"];\nconst PROCS = [\"UNKNOWN\", \"SALES\", \"LOGISTICS\", \"BILLING\", \"POS\", \"ERP\", \"PAYMENT\", \"OTHER\"];\nconst OPERATIONAL = [\"SALES\", \"LOGISTICS\", \"BILLING\", \"POS\", \"ERP\", \"PAYMENT\"];\nfunction up(v, d) { return String(v === null || v === undefined ? d : v).trim().toUpperCase(); }\n\nconst out = Object.assign({}, ctx);\nout.bewertungUebersprungen = uebersprungen;\nout.llmLevel = String(a.level || \"\");\nout.llmConfidence = String(a.confidence || \"\").trim().toUpperCase();\nout.llmEvidence = String(a.evidence || \"\").slice(0, 1500);\nout.llmReason = String(a.reason || \"\").slice(0, 1000);\nout.llmMissingInfo = String(a.missingInfo || \"\").slice(0, 500);\n\nlet scope = up(a.scope || ctx.vorgabeScope, \"UNKNOWN\");\nif (SCOPES.indexOf(scope) === -1) scope = \"UNKNOWN\";\nlet businessImpact = up(a.businessImpact || ctx.vorgabeBusinessImpact, \"UNKNOWN\");\nif (IMPACTS.indexOf(businessImpact) === -1) businessImpact = \"UNKNOWN\";\nlet businessProcess = up(a.businessProcess || ctx.vorgabeBusinessProcess, \"UNKNOWN\");\nif (PROCS.indexOf(businessProcess) === -1) businessProcess = \"UNKNOWN\";\nconst securityRisk = (a.securityRisk === true) || (ctx.vorgabeSecurityRisk === true);\n\nout.signalScope = scope;\nout.signalBusinessImpact = businessImpact;\nout.signalBusinessProcess = businessProcess;\nout.signalSecurityRisk = securityRisk;\nout.signalQuelle = uebersprungen ? \"vorgabe\" : \"bewertung\";\n\nconst currentPriorityId = String(ctx.currentPriorityId || \"\").trim();\nconst currentPriority = PRIORITY[currentPriorityId] || null;\n\nif (scope === \"UNKNOWN\" && businessImpact === \"UNKNOWN\" && !securityRisk) {\n  out.shouldUpdatePriority = false;\n  out.priorityId = currentPriorityId;\n  out.priorityName = String(ctx.currentPriorityName || \"\");\n  out.priorityDirection = \"unveraendert\";\n  out.priorityReason = \"Keine belastbaren Betriebssignale; Prioritaet bleibt unangetastet.\";\n  return [{ json: out }];\n}\n\nconst istStoerung = businessImpact !== \"SERVICE_REQUEST\";\n\nlet targetId = \"3\";\nlet priorityReason = \"Stoerung ohne weitere Eskalationsmerkmale; Medium als Grundwert.\";\nif (securityRisk) {\n  targetId = \"1\"; priorityReason = \"Konkreter Sicherheitsverdacht.\";\n} else if (businessImpact === \"CRITICAL_PROCESS_STOPPED\" && scope === \"COMPANY\") {\n  targetId = \"1\"; priorityReason = \"Kritischer Prozess unternehmensweit gestoppt.\";\n} else if (businessImpact === \"CRITICAL_PROCESS_STOPPED\") {\n  targetId = \"2\"; priorityReason = \"Kritischer Prozess ist nach Ticketlage gestoppt.\";\n} else if (scope === \"COMPANY\") {\n  targetId = \"2\"; priorityReason = \"Unternehmensweit betroffen.\";\n} else if (scope === \"SITE\" && businessImpact === \"MAJOR_RESTRICTION\") {\n  targetId = \"2\"; priorityReason = \"Ganzer Standort mit wesentlicher Einschraenkung betroffen.\";\n} else if (businessImpact === \"MAJOR_RESTRICTION\" && (scope === \"MULTIPLE_USERS\" || scope === \"SITE\")) {\n  targetId = \"2\"; priorityReason = \"Wesentliche Einschraenkung fuer mehrere Anwender oder Standort.\";\n} else if (businessImpact === \"SERVICE_REQUEST\") {\n  if (OPERATIONAL.indexOf(businessProcess) !== -1) { targetId = \"4\"; priorityReason = \"Planbare Anfrage im operativen Umfeld ohne Stoerung.\"; }\n  else { targetId = \"5\"; priorityReason = \"Planbare Service-Anfrage ohne Betriebsbezug.\"; }\n}\n\n// Untergrenze: eine echte Stoerung faellt nie unter Medium.\nif (istStoerung && PRIORITY[targetId].rank < 3) {\n  targetId = \"3\";\n  priorityReason = \"Stoerung der Arbeitsfaehigkeit; mindestens Medium unabhaengig von der Zahl der Betroffenen.\";\n}\n\nlet targetPriority = PRIORITY[targetId];\n\n// Guard 1: bewusst hoch gesetzte Tickets werden nie automatisch gesenkt.\nif (currentPriority && currentPriority.rank >= 4 && targetPriority.rank < currentPriority.rank) {\n  targetPriority = currentPriority; targetId = currentPriority.id;\n  priorityReason = \"Bestehende hohe Prioritaet (\" + currentPriority.name + \") wird nicht automatisch gesenkt.\";\n}\n\n// Guard 2: herabstufen nur bei planbarer Anfrage ohne Sicherheitsbezug.\nconst downgradeSafe = !securityRisk && businessImpact === \"SERVICE_REQUEST\";\nif (currentPriority && targetPriority.rank < currentPriority.rank && !downgradeSafe) {\n  targetPriority = currentPriority; targetId = currentPriority.id;\n  priorityReason = \"Herabstufung nur bei planbarer Anfrage zulaessig; bestehender Wert bleibt.\";\n}\n\nconst shouldUpdatePriority = targetPriority.id !== currentPriorityId;\nlet priorityDirection = \"unveraendert\";\nif (shouldUpdatePriority && currentPriority) priorityDirection = targetPriority.rank > currentPriority.rank ? \"hochgestuft\" : \"herabgestuft\";\nelse if (shouldUpdatePriority) priorityDirection = \"gesetzt\";\n\nout.priorityId = targetPriority.id;\nout.priorityName = targetPriority.name;\nout.priorityReason = priorityReason;\nout.priorityDirection = priorityDirection;\nout.shouldUpdatePriority = shouldUpdatePriority;\nreturn [{ json: out }];"
+      },
+      "id": "e937a6ca-597a-4bc8-866a-97d5db87f78f",
+      "name": "Prioritaet ableiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=TICKET\n{{ JSON.stringify({ ticketKey: $json.issueKey, summary: $json.summary, description: $json.description, status: $json.statusName, bearbeiter: $json.assigneeName, anzahlBearbeiterwechsel: $json.assigneeChangeCount }, null, 2) }}\n\nAKTUELLES SUPPORT-LEVEL\n{{ $json.currentLevelValue || \"[nicht gesetzt]\" }} (manuell gesetzt: {{ $json.levelSetManually ? \"ja\" : \"nein\" }})\n\nSTATUSHISTORIE\n{{ JSON.stringify($json.statusHistory || [], null, 2) }}\n\nHISTORIE DES SUPPORT-LEVELS\n{{ JSON.stringify($json.levelHistory || [], null, 2) }}\n\nKOMMENTARVERLAUF\n{{ JSON.stringify($json.comments || [], null, 2) }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Du bist ein Jira-Governance-Agent für den RWG Support Service Desk (Projekt SSD).\nDu hast zwei getrennte Aufgaben zum selben Ticket.\n\n=== AUFGABE 1: SUPPORT-LEVEL ===\n\nBestimme das fachlich korrekte Support-Level.\nZulässige Werte: 1st-Lvl., 2nd-Lvl., 3rd-Lvl. Wenn keine sichere Aussage möglich ist: UNKNOWN.\nMaßgeblich sind die Prozesse IT-04, IT-04-01, IT-04-02 und IT-04-03.\nDas Support-Level beschreibt die AKTUELL verantwortliche Bearbeitungsebene, nicht die höchste jemals erreichte.\n\nAUSGANGSLAGE\nJedes SSD-Ticket startet automatisch auf 1st-Lvl. Der Normalfall ist daher eine Hochstufung.\nEine Herabstufung ist nur zulässig, wenn eine Rückgabe an eine niedrigere Ebene ausdrücklich im Ticket dokumentiert ist.\n\nFIRST LEVEL\nTicketaufnahme, Klassifizierung, Rückfragen, Standardprüfungen, bekannte Standardlösungen, einfache Benutzer- und Arbeitsplatzthemen, einfache Serviceanfragen.\nAuch dann 1st-Lvl., wenn lediglich Informationen vom Anwender fehlen oder der First Level das Anliegen selbst lösen kann.\n\nSECOND LEVEL\nNur wenn aus Ticketinhalt, Bearbeitungshistorie oder Dokumentation eindeutig hervorgeht, dass qualifiziert an einen internen Fach- oder Systemspezialisten übergeben wurde und eine vertiefte Bearbeitung notwendig ist.\nMerkmale: Standardbearbeitung reicht nicht aus, vertiefte fach- oder systembezogene Analyse, Untersuchung von Logs, Konfigurationen, Schnittstellen oder Systemverhalten innerhalb bestehender Systeme und Verantwortlichkeiten.\nEine reine personelle Zuweisung an einen anderen IT-Mitarbeiter reicht NICHT aus. Es muss eine fachliche Weitergabe oder erhöhte Bearbeitungstiefe erkennbar sein.\n\nTHIRD LEVEL\nWenn dokumentiert ist, dass der Vorgang den Verantwortungsrahmen des Second Levels überschreitet und an Hersteller, GWS, spezialisierten externen Dienstleister oder internen Third-Level-Support eskaliert wurde.\nEbenso bei tiefgreifender Ursachenanalyse: systemübergreifende Ursache, wiederkehrende oder strukturelle Störung, grundlegendes technisches Problem, Herstelleranalyse, grundlegende Systemveränderung, Architektur- oder Plattformproblem.\n\nSTATUS WARTEN AUF EXTERN\nDas ist KEIN automatisches Third-Level-Kriterium. Prüfe den Inhalt.\nEin externer Partner, der lediglich bei einem klar abgegrenzten bestehenden Systemthema unterstützt, kann weiterhin 2nd-Lvl. sein.\nMuss ein Hersteller oder Spezialdienstleister eine Ursache analysieren, die intern nicht mehr verantwortbar gelöst werden kann, ist es 3rd-Lvl.\nIst die Abgrenzung nicht eindeutig möglich: level UNKNOWN und confidence LOW.\n\nNICHT ALS LEVEL-KRITERIUM VERWENDEN\nBearbeitername, Teammitglied, Priorität, Alter des Tickets, meldender Benutzer, Standort, Komponente, Anzahl Kommentare, lange Bearbeitungsdauer, Status WARTEN AUF EXTERN allein, einzelne technische Schlüsselwörter.\n\nconfidence HIGH nur, wenn du eine wörtliche Fundstelle aus Ticket, Kommentar oder Historie in evidence zitieren kannst, die die Einstufung eindeutig belegt.\nOhne solche Fundstelle: confidence MEDIUM oder LOW.\nBei UNKNOWN beschreibe in missingInfo knapp, welche Information zur eindeutigen Entscheidung fehlt.\n\n=== AUFGABE 2: BETRIEBSSIGNALE ===\n\nLeite unabhängig vom Support-Level vier Betriebssignale aus der Ticketlage ab. Sie dienen der Prioritätsbestimmung und werden nachgelagert deterministisch verrechnet. Bestimme selbst KEINE Priorität.\n\nscope: Wie viele Anwender sind nach Aktenlage betroffen?\nUNKNOWN | SINGLE_USER | MULTIPLE_USERS | SITE | COMPANY\n\nbusinessImpact: Wie stark ist die Arbeitsfähigkeit eingeschränkt?\nUNKNOWN | CRITICAL_PROCESS_STOPPED (ein Geschäftsprozess steht still) | MAJOR_RESTRICTION (wesentliche Einschränkung, Arbeit nur erschwert möglich) | LIMITED (eng begrenzt, Ausweichweg vorhanden) | SERVICE_REQUEST (planbare Anfrage ohne Störung)\n\nbusinessProcess: Welcher Geschäftsprozess ist berührt?\nUNKNOWN | SALES | LOGISTICS | BILLING | POS | ERP | PAYMENT | OTHER\n\nsecurityRisk: true nur bei einem konkreten Sicherheitsverdacht (Phishing, Schadsoftware, unbefugter Zugriff, Datenabfluss). Bei bloßem Verdacht ohne Anhaltspunkt false.\n\nWICHTIG: Wähle UNKNOWN, wenn das Ticket keine belastbare Aussage hergibt. Rate nicht. UNKNOWN führt dazu, dass die Priorität unangetastet bleibt, und das ist der gewünschte sichere Ausgang.\n\nTriff keine Vermutungen. Antworte ausschließlich im vorgegebenen JSON-Format."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "94307010-2b85-4c95-b05b-188241115b89",
+      "name": "Support-Level bewerten",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        16,
+        -352
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "temperature": 0,
+          "maxRetries": 2
+        }
+      },
+      "id": "46d7e3e9-2408-495f-b3ad-8ed700159468",
+      "name": "Bewertungsmodell",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        -144
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"level\": \"2nd-Lvl.\",\n  \"confidence\": \"HIGH\",\n  \"evidence\": \"Woertliche Fundstelle aus Ticket, Kommentar oder Statushistorie.\",\n  \"reason\": \"Kurze fachliche Begruendung in einem Satz.\",\n  \"missingInfo\": \"\",\n  \"scope\": \"SINGLE_USER\",\n  \"businessImpact\": \"MAJOR_RESTRICTION\",\n  \"businessProcess\": \"ERP\",\n  \"securityRisk\": false\n}"
+      },
+      "id": "66c70af1-76fd-4d24-8926-4b330255a0a9",
+      "name": "Bewertungsschema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        -144
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Bestimmt das Ziel-Support-Level und sichert es gegen Fehlentscheidungen ab.\n//\n// GRUNDSATZ (fachliche Festlegung RWG):\n//   Kann nicht sicher bewertet werden, bleibt der bestehende Wert stehen.\n//   Spaetere Ereignisse liefern womoeglich einen besseren Bewertungspunkt.\n//   Ist gar kein Wert gesetzt, wird 1st-Lvl. nachgetragen - ein leeres Feld\n//   ist nie ein gueltiger Zustand.\n//   Es wird nichts nach aussen gemeldet. Der Workflow ist in sich abgeschlossen.\n\nconst c = $input.first().json || {};\nconst STATUS_GWS = \"10373\";\nconst LEVEL_ID = {};\nLEVEL_ID[\"1st-Lvl.\"] = \"10354\";\nLEVEL_ID[\"2nd-Lvl.\"] = \"10355\";\nLEVEL_ID[\"3rd-Lvl.\"] = \"10356\";\nconst RANK = {};\nRANK[\"1st-Lvl.\"] = 1;\nRANK[\"2nd-Lvl.\"] = 2;\nRANK[\"3rd-Lvl.\"] = 3;\nconst ALLOWED = [\"1st-Lvl.\", \"2nd-Lvl.\", \"3rd-Lvl.\"];\nconst RETURN_EVIDENCE = /(zur(ue|ü)ckgegeben|zur(ue|ü)ck gegeben|r(ue|ü)ckgabe|zur(ue|ü)ck an|wieder an den (first|second))/i;\n\nconst out = Object.assign({}, c);\nconst currentLevel = String(c.currentLevelValue || \"\");\nconst currentRank = RANK[currentLevel] || 0;\nconst statusId = String(c.statusId || \"\");\n\nlet targetLevel = \"\";\nlet confidence = \"\";\nlet evidence = \"\";\nlet reason = \"\";\nlet missingInfo = \"\";\nlet decisionSource = \"\";\n\nif (statusId === STATUS_GWS) {\n  targetLevel = \"3rd-Lvl.\";\n  confidence = \"HIGH\";\n  evidence = \"Status: \" + String(c.statusName || \"\");\n  reason = \"Harte RWG-Regel: Status WARTEN AUF GWS bedeutet Third Level.\";\n  decisionSource = \"rule\";\n} else if (c.bewertungUebersprungen === true) {\n  targetLevel = currentLevel;\n  confidence = \"HIGH\";\n  evidence = \"Erstbewertung ohne neue Evidenz\";\n  reason = \"Frisches Ticket ohne dokumentierte Weitergabe; Support-Level bleibt auf dem Anlagewert.\";\n  decisionSource = \"skip\";\n} else if (c.levelSetManually === true && c.statusChangedAfterLevel !== true) {\n  targetLevel = currentLevel;\n  confidence = \"HIGH\";\n  evidence = \"Manueller Eintrag vom \" + String(c.levelLastSetAt || \"\");\n  reason = \"Manuell gesetztes Support-Level ohne nachfolgende Level-Uebergabe; Wert wird respektiert.\";\n  decisionSource = \"rule\";\n} else {\n  targetLevel = String(c.llmLevel || \"\");\n  confidence = String(c.llmConfidence || \"\");\n  evidence = String(c.llmEvidence || \"\");\n  reason = String(c.llmReason || \"\");\n  missingInfo = String(c.llmMissingInfo || \"\");\n  decisionSource = \"llm\";\n}\n\nlet shouldUpdateLevel = false;\nlet unsicher = false;\nlet levelDirection = \"unveraendert\";\nlet guardReason = \"\";\n\nif (decisionSource === \"skip\") {\n  guardReason = \"Keine Bewertung noetig; Anlagewert bleibt bestehen.\";\n} else if (ALLOWED.indexOf(targetLevel) === -1) {\n  unsicher = true;\n  guardReason = \"Kein zulaessiger Level-Wert ermittelt; bestehender Wert bleibt.\";\n  targetLevel = currentLevel;\n} else if (decisionSource === \"llm\" && confidence !== \"HIGH\") {\n  unsicher = true;\n  guardReason = \"Bewertungssicherheit unter HIGH; bestehender Wert bleibt bis zu einem besseren Bewertungspunkt.\";\n  targetLevel = currentLevel;\n} else if (decisionSource === \"llm\" && evidence.trim().length < 10) {\n  unsicher = true;\n  guardReason = \"Keine belastbare Fundstelle geliefert; bestehender Wert bleibt.\";\n  targetLevel = currentLevel;\n} else if (targetLevel === currentLevel) {\n  guardReason = \"Zielwert entspricht dem Ist-Wert.\";\n} else {\n  const targetRank = RANK[targetLevel] || 0;\n  if (targetRank < currentRank && currentRank > 0) {\n    if (decisionSource === \"llm\" && !RETURN_EVIDENCE.test(evidence)) {\n      unsicher = true;\n      guardReason = \"Herabstufung ohne dokumentierte Rueckgabe verhindert; bestehender Wert bleibt.\";\n      targetLevel = currentLevel;\n    } else {\n      shouldUpdateLevel = true;\n      levelDirection = \"herabgestuft\";\n    }\n  } else {\n    shouldUpdateLevel = true;\n    levelDirection = currentRank === 0 ? \"gesetzt\" : \"hochgestuft\";\n  }\n}\n\n// Manuell gesetzte Werte nicht ohne eindeutigen Beleg ueberschreiben.\nif (c.levelSetManually === true && shouldUpdateLevel && statusId !== STATUS_GWS && decisionSource === \"llm\" && confidence !== \"HIGH\") {\n  shouldUpdateLevel = false;\n  unsicher = true;\n  guardReason = \"Manuell gesetzter Wert wird ohne eindeutigen Beleg nicht ueberschrieben.\";\n  targetLevel = currentLevel;\n  levelDirection = \"unveraendert\";\n}\n\n// Letzte Absicherung: ein leeres Feld ist nie ein gueltiger Zustand.\n// Unabhaengig davon, warum kein Zielwert zustande kam, wird der Anlagewert\n// 1st-Lvl. nachgetragen.\nif (ALLOWED.indexOf(targetLevel) === -1) {\n  targetLevel = \"1st-Lvl.\";\n  shouldUpdateLevel = true;\n  levelDirection = \"gesetzt\";\n  guardReason = \"Kein Support-Level gesetzt; Anlagewert 1st-Lvl. nachgetragen.\";\n}\n\nout.levelDecisionSource = decisionSource;\nout.targetLevelValue = targetLevel;\nout.targetLevelId = LEVEL_ID[targetLevel] || \"\";\nout.levelConfidence = confidence;\nout.levelEvidence = evidence;\nout.levelReason = reason;\nout.levelMissingInfo = missingInfo;\nout.levelGuardReason = guardReason;\nout.levelDirection = levelDirection;\nout.shouldUpdateLevel = shouldUpdateLevel;\nout.levelUnsicher = unsicher;\n// Das unsichere Ergebnis wird gemeldet, statt still verworfen zu werden.\n// Bis hierher stand hier fest false - der Empfaenger im Jira-Agent war da,\n// es kam nur nie etwas an. Reine Meldung: kein Schreibvorgang und kein\n// Routing haengt an diesem Feld.\nout.needsManualReview = unsicher;\nreturn [{ json: out }];"
+      },
+      "id": "5b1224a1-3284-4971-bea3-0b215e3dd077",
+      "name": "Support-Level festlegen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const c = $input.first().json || {};\nconst SUPPORT_FIELD = \"customfield_10777\";\nconst fields = {};\nconst changed = [];\n\nif (c.shouldUpdateLevel === true && String(c.targetLevelId || \"\").length > 0) {\n  fields[SUPPORT_FIELD] = { id: String(c.targetLevelId) };\n  changed.push(\"Support-Level\");\n}\nif (c.shouldUpdatePriority === true && String(c.priorityId || \"\").length > 0) {\n  fields.priority = { id: String(c.priorityId) };\n  changed.push(\"Prioritaet\");\n}\n\nconst out = Object.assign({}, c);\nout.fields = fields;\nout.changedFields = changed;\nout.shouldWrite = changed.length > 0;\nreturn [{ json: out }];"
+      },
+      "id": "25edcfb0-7f30-4849-acfc-b537f105353b",
+      "name": "Feldaenderungen buendeln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c-write",
+              "leftValue": "={{ $json.shouldWrite }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c-dry",
+              "leftValue": "={{ $json.dryRun }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5c53b25d-0fdb-4f8a-9730-40727acc472d",
+      "name": "Schreiben erforderlich?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        912,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.jiraBaseUrl }}/rest/api/3/issue/{{ $json.issueKey }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ fields: $json.fields }) }}",
+        "options": {}
+      },
+      "id": "55b114fa-c939-4faa-8acd-8458571d5c82",
+      "name": "Jira-Felder schreiben",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1152,
+        -304
+      ],
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $(\"Feldaenderungen buendeln\").first().json || {};\nconst res = $input.first().json || {};\nlet errText = \"\";\nif (typeof res.error === \"string\") errText = res.error;\nelse if (res.error && res.error.message) errText = String(res.error.message);\nelse if (res.message) errText = String(res.message);\n\nconst out = Object.assign({}, ctx);\nif (errText) {\n  out.writeStatus = \"failed\";\n  out.writeError = errText.slice(0, 2000);\n} else {\n  out.writeStatus = \"written\";\n  out.writeError = \"\";\n}\nreturn [{ json: out }];"
+      },
+      "id": "d8bf9067-189d-4b12-8b5a-8dfe8e340463",
+      "name": "Schreibergebnis erfassen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const c = $input.first().json || {};\nconst out = Object.assign({}, c);\nif (c.shouldWrite === true && c.dryRun === true) out.writeStatus = \"dry_run\";\nelse out.writeStatus = \"no_change\";\nout.writeError = \"\";\nreturn [{ json: out }];"
+      },
+      "id": "1dddaadf-e110-4e60-9ea9-a394afc69b6c",
+      "name": "Kein Schreibvorgang",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Zwei Eingaenge, die sich nicht ueberschneiden\n\n**Aufruf aus Jira-Agent**\nGenau einmal je Ticket, bei der Anlage. Der Agent uebergibt issueKey und die vier Betriebssignale. Weil ein frisches Ticket keine neue Evidenz hat und die Signale mitkommen, faellt hier kein Modellaufruf an. Praktisch wird nur die Prioritaet gesetzt, denn das Support-Level steht bei Anlage immer auf 1st-Lvl.\n\n**Jira Ticketereignis**\nAlles, was nach der Anlage passiert. Der Agent selbst sieht ein Ticket nur bei Anlage, deshalb ist dies der einzige Weg, auf dem sich das Support-Level je aendern kann. 2nd-Lvl. und 3rd-Lvl. entstehen ausschliesslich spaeter.\n\nAusgewertet werden Statuswechsel, neue und geaenderte Kommentare, Beschreibung, Zusammenfassung und Vorgangstyp.\n\nBewusst verworfen:\n- Aenderungen durch RWG.Automate und die Automation-for-Jira-Regel. Sonst laeuft direkt nach dem Agentenaufruf ein zweiter Lauf, ausgeloest durch die automatische Bearbeiterzuweisung.\n- Bearbeiter, Labels und Komponenten. Das Regelwerk schliesst sie als Level-Kriterium aus, ein Modellaufruf darauf kann nie zu einer Aenderung fuehren.\n- Aenderungen an Prioritaet und Support-Level selbst. Das sind die Felder dieses Workflows oder eine bewusste manuelle Korrektur.\n\nKein Zeitplan. Ein Ticket, das sich nicht bewegt, hat keine neue Evidenz.",
+        "height": 844,
+        "width": 1000,
+        "color": 4
+      },
+      "id": "78f7fc2a-c5a9-440b-b0e9-45ad6ee06636",
+      "name": "Sticky Note e35ab5b5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        -768
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Schreibschalter\n\n`dryRun` in **Kandidat und Konfiguration** ist der einzige Schalter dieses Workflows.\n\n- `false` = scharf. Ermittelte Aenderungen werden per PUT nach Jira geschrieben.\n- `true` = Probelauf. Es wird alles berechnet und zurueckgemeldet, aber nichts geschrieben. Der Schreibstatus lautet dann dry_run.\n\nDer aufrufende Jira-Agent wertet den Schreibstatus aus. Nur bei written meldet er im internen Kommentar eine tatsaechliche Aenderung. Im Probelauf schreibt er stattdessen, dass die Zielprioritaet nur ermittelt wurde.\n\nAktueller Stand: scharf.",
+        "height": 860,
+        "width": 368,
+        "color": 5
+      },
+      "id": "a7c6ae10-2dab-4034-836d-b138dba6aa06",
+      "name": "Sticky Note 56e40e2b",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        -768
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Entscheidungslogik\n\nEin einziger Modellaufruf liefert beides: die Support-Level-Bewertung und die vier Betriebssignale fuer die Prioritaet. Danach wird deterministisch verrechnet.\n\nREGELN VOR DER BEWERTUNG\n- Status WARTEN AUF GWS (10373) erzwingt 3rd-Lvl.\n- Manuell gesetzter Wert ohne nachfolgende Level-Uebergabe bleibt unangetastet\n\nGRUNDANNAHME SUPPORT-LEVEL\nJedes SSD-Ticket startet auf 1st-Lvl. und behaelt diesen Default. Der Normalfall ist eine Hochstufung.\nEine Herabstufung erfordert eine im Ticket dokumentierte Rueckgabe.\nOhne confidence HIGH und ohne woertliche Fundstelle wird nicht geschrieben, sondern im Ergebnis zur manuellen Pruefung markiert.\n\nGRUNDSATZ PRIORITAET\nUnterhalb von Medium liegen ausschliesslich planbare Anfragen (SERVICE_REQUEST).\nJede echte Stoerung ist mindestens Medium, auch bei nur einem betroffenen Anwender. Wer nicht arbeiten kann, ist unternehmerisch ein Schaden.\nSignale UNKNOWN lassen die Prioritaet unangetastet. Bestehende hohe Prioritaeten werden nie automatisch gesenkt.\n\nFeld-IDs: Support-Level = customfield_10777, 1st = 10354, 2nd = 10355, 3rd = 10356.\nPrioritaeten: 1 Sehr Hoch, 2 Hoch, 3 Medium, 4 Niedrig, 5 Sehr Niedrig.",
+        "height": 580,
+        "width": 1108,
+        "color": 6
+      },
+      "id": "ca6d3fe7-7f2c-4b57-b726-c9a8e3b02f60",
+      "name": "Sticky Note de8f4f33",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -976
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Zustandslos\n\nKeine eigene Datenhaltung. Der Workflow liest Jira, entscheidet und schreibt nach Jira zurueck. Die Aenderungshistorie ist die Changelog des Tickets.\n\n**Ergebnis** gibt die Bewertung strukturiert zurueck: an den aufrufenden Jira-Agent und lesbar im Ausfuehrungsprotokoll. Enthalten sind Vorher- und Nachher-Werte beider Felder, die Begruendung, die woertliche Fundstelle und der Schreibstatus.\n\nUnsichere Faelle traegt das Ergebnis als `manuellePruefungNoetig` aus - gespeist aus `levelUnsicher` in **Support-Level festlegen**. Das Feld stand frueher fest auf false, sodass diese Faelle nie sichtbar wurden.\n\nOffen: Einen eigenen Meldekanal gibt es dafuer weiterhin nicht. Die Faelle sind nur im Ausfuehrungsprotokoll und im Rueckgabewert an den Agenten sichtbar; der Agent rendert sie derzeit nicht in den internen Kommentar.",
+        "height": 624,
+        "width": 340,
+        "color": 7
+      },
+      "id": "cdbe5439-497c-426a-8afc-d5994138c048",
+      "name": "Sticky Note a1f5266a",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        -832
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const c = $input.first().json || {};\n\nconst r = {};\nr.ticket = String(c.issueKey || \"\");\nr.ausloeser = String(c.source || \"\");\nr.ausloeserDetail = String(c.ausloeser || \"\");\nr.status = String(c.statusName || \"\");\n\nr.levelVorher = String(c.currentLevelValue || \"\");\nr.levelNachher = String(c.targetLevelValue || \"\");\nr.levelGeaendert = c.shouldUpdateLevel === true;\nr.levelRichtung = String(c.levelDirection || \"\");\nr.levelQuelle = String(c.levelDecisionSource || \"\");\nr.levelSicherheit = String(c.levelConfidence || \"\");\nr.levelFundstelle = String(c.levelEvidence || \"\");\nr.levelBegruendung = String(c.levelReason || \"\");\n\nr.prioritaetVorher = String(c.currentPriorityName || \"\");\nr.prioritaetNachher = String(c.priorityName || \"\");\nr.prioritaetGeaendert = c.shouldUpdatePriority === true;\nr.prioritaetRichtung = String(c.priorityDirection || \"\");\nr.prioritaetBegruendung = String(c.priorityReason || \"\");\nr.signale = {\n  scope: String(c.signalScope || \"\"),\n  businessImpact: String(c.signalBusinessImpact || \"\"),\n  businessProcess: String(c.signalBusinessProcess || \"\"),\n  securityRisk: c.signalSecurityRisk === true\n};\n\nr.manuellePruefungNoetig = c.needsManualReview === true;\nr.guardGrund = String(c.levelGuardReason || \"\");\nr.fehlendeInfo = String(c.levelMissingInfo || \"\");\n\nr.schreibstatus = String(c.writeStatus || \"\");\nr.schreibfehler = String(c.writeError || \"\");\nr.geaenderteFelder = Array.isArray(c.changedFields) ? c.changedFields : [];\nr.dryRun = c.dryRun === true;\nr.bewertetAm = new Date().toISOString();\nreturn [{ json: r }];"
+      },
+      "id": "6e4d2e4f-b4ad-4c17-a1f3-aa0d6fc94ef0",
+      "name": "Ergebnis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c-bew",
+              "leftValue": "={{ $json.bewertungNoetig }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              }
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "id": "bee5e925-562b-464b-980a-2c97289db8ac",
+      "name": "Bewertung erforderlich?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -256,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "skip-flag",
+              "name": "bewertungUebersprungen",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "1c3cb362-88e4-486f-b8f9-b9b277b78b78",
+      "name": "Bewertung uebersprungen",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        48
+      ]
+    }
+  ],
+  "nodeGroups": [],
+  "tags": [],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "parentFolderId": null,
+  "description": "Setzt Support-Level (customfield_10777) und Prioritaet in Jira SSD. Zwei ueberschneidungsfreie Eingaenge: Aufruf aus dem Jira-Agent bei Anlage, eigener Jira-Trigger fuer alles danach. Schreibschalter: dryRun.",
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
+}
