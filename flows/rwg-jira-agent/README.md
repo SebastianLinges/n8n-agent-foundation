@@ -46,7 +46,19 @@ Sichtbar war das nicht an der Ausführungsliste: Der Fehler lief über den Fehle
 
 Belegte Zeitschiene: Lauf `108547` (27.08., 12:28) liefert eine vollständige Policy mit `nextAction: IT`. Die Läufe `109605` und `109799` (28.08.) enden im Fehlerausgang, `Policy-Schema` wird nie erreicht.
 
-`Analyse-Modell` trägt weiterhin `temperature: 0`, läuft aber über Chat Completions und arbeitet nachweislich. Der Node bleibt unangetastet, solange kein Befund dagegen spricht.
+### Die Regel, die daraus folgt
+
+Ein Sweep über alle Modellnodes ergibt ein klares Bild:
+
+| Fall | Verhalten |
+|---|---|
+| `temperature: 0`, Chat Completions | läuft — n8n sendet den Wert offenbar nicht mit |
+| `temperature: 0`, Responses-API | **Bad request** — der Ausfall vom 27./28.08. |
+| `temperature` ungleich 0 | **Bad request**, unabhängig vom Pfad |
+
+Deshalb trug `Anwender-Schreibmodell` mit `temperature: 0.2` eine scharfe Störung: Der Node speist `Anwenderloesung formulieren` und `Anwenderrueckfrage formulieren`, also **jede** Nachricht an einen Anwender. Aufgefallen war das nie, weil die beobachteten Läufe alle nach IT routeten und den Pfad nicht berührten. Der Parameter ist entfernt.
+
+`Analyse-Modell` trägt weiterhin `temperature: 0` über Chat Completions und arbeitet nachweislich — vier Sub-Läufe je Ticket. Der Node bleibt unangetastet: Ein Eingriff in einen laufenden Node auf Basis einer Theorie hat heute schon einmal die Policy stillgelegt. Wer ihn anfasst, darf `temperature` nicht auf einen Wert ungleich null setzen.
 
 ## Offen
 

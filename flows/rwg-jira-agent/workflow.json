@@ -3,8 +3,8 @@
   "name": "RWG_Jira-Agent",
   "active": true,
   "isArchived": false,
-  "versionId": "2d5fd24e-d68c-4bfd-a265-41b191149bea",
-  "activeVersionId": "2d5fd24e-d68c-4bfd-a265-41b191149bea",
+  "versionId": "7c05ff94-b346-4aa9-9f4d-dddfc31972f5",
+  "activeVersionId": "7c05ff94-b346-4aa9-9f4d-dddfc31972f5",
   "triggerCount": 1,
   "createdAt": "2026-07-19T13:13:30.872Z",
   "updatedAt": "2026-08-28T12:59:27.460Z",
@@ -2058,7 +2058,6 @@
         },
         "responsesApiEnabled": false,
         "options": {
-          "temperature": 0.2,
           "timeout": 120000,
           "maxRetries": 2
         }
