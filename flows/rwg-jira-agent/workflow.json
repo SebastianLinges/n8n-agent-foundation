@@ -3,8 +3,8 @@
   "name": "RWG_Jira-Agent",
   "active": true,
   "isArchived": false,
-  "versionId": "7c05ff94-b346-4aa9-9f4d-dddfc31972f5",
-  "activeVersionId": "7c05ff94-b346-4aa9-9f4d-dddfc31972f5",
+  "versionId": "810ad6fd-89c1-4aed-902c-c2edde40b31f",
+  "activeVersionId": "810ad6fd-89c1-4aed-902c-c2edde40b31f",
   "triggerCount": 1,
   "createdAt": "2026-07-19T13:13:30.872Z",
   "updatedAt": "2026-08-28T12:59:27.460Z",
@@ -1848,8 +1848,10 @@
         "options": {
           "textFormat": {
             "textOptions": {
-              "type": "json_object",
-              "verbosity": "low"
+              "type": "json_schema",
+              "name": "policy_entscheidung",
+              "strict": true,
+              "schema": "{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"nextAction\",\"classificationReason\",\"bereitsImTicketBeantwortet\",\"userQuestions\",\"safeUserAction\",\"selfServiceCategory\",\"publicEvidenceRefs\",\"securityRisk\",\"scope\",\"businessImpact\",\"businessProcess\",\"anliegen\"],\"properties\":{\"nextAction\":{\"type\":\"string\",\"enum\":[\"USER\",\"ASK\",\"IT\",\"REVIEW\"]},\"classificationReason\":{\"type\":\"string\"},\"bereitsImTicketBeantwortet\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"userQuestions\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"category\",\"question\"],\"properties\":{\"category\":{\"type\":\"string\",\"enum\":[\"WORTLAUT\",\"AUSLOESER\",\"ZEITPUNKT\",\"GERAET_ORT\",\"REICHWEITE\",\"REPRODUZIERBARKEIT\",\"SCREENSHOT\"]},\"question\":{\"type\":\"string\"}}}},\"safeUserAction\":{\"type\":\"string\"},\"selfServiceCategory\":{\"type\":\"string\",\"enum\":[\"OFFICE_USAGE\",\"BROWSER_CACHE\",\"SIGN_IN_REFRESH\",\"PRINTER_SELECTION\",\"PASSWORD_SELF_SERVICE\",\"TEAMS_OUTLOOK_RESTART\",\"GENERIC_APP_RESTART\",\"RAG_PUBLIC_KB\",\"NONE\"]},\"publicEvidenceRefs\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"securityRisk\":{\"type\":\"boolean\"},\"scope\":{\"type\":\"string\",\"enum\":[\"UNKNOWN\",\"SINGLE_USER\",\"MULTIPLE_USERS\",\"SITE\",\"COMPANY\"]},\"businessImpact\":{\"type\":\"string\",\"enum\":[\"UNKNOWN\",\"CRITICAL_PROCESS_STOPPED\",\"MAJOR_RESTRICTION\",\"LIMITED\",\"SERVICE_REQUEST\"]},\"businessProcess\":{\"type\":\"string\",\"enum\":[\"UNKNOWN\",\"SALES\",\"LOGISTICS\",\"BILLING\",\"POS\",\"ERP\",\"PAYMENT\",\"OTHER\"]},\"anliegen\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"nr\",\"thema\",\"zielUnklar\",\"lesarten\",\"vorgehenGleich\",\"fehlt\"],\"properties\":{\"nr\":{\"type\":\"integer\"},\"thema\":{\"type\":\"string\"},\"zielUnklar\":{\"type\":\"boolean\"},\"lesarten\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"vorgehenGleich\":{\"type\":\"boolean\"},\"fehlt\":{\"type\":\"string\"}}}}}}"
             }
           },
           "reasoningEffort": "low",

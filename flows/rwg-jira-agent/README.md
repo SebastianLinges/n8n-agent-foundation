@@ -6,9 +6,16 @@ Workflow `RWG_Jira-Agent` (`QXCWIsTzDEmfwPwK`), aktiv, 75 Nodes, Jira-Trigger au
 
 Die Policy entscheidet über Routing und Betriebssignale und liefert dafür ein JSON mit zwölf Feldern und zwei verschachtelten Objektarrays — aus einem Regelwerk von rund 10.000 Zeichen. Diese Ausgabe ist der empfindlichste Punkt des Workflows und deshalb dreifach abgesichert.
 
-**1. Die API erzwingt gültiges JSON.** `Policy-Modell` läuft über die Responses-API mit `textFormat.type = json_object`. Damit ist ungültiges JSON auf API-Ebene ausgeschlossen — genau der Fehler, an dem die Policy zuvor abbrach.
+**1. Die API erzwingt die Form.** `Policy-Modell` läuft über die Responses-API mit `textFormat.textOptions.type = json_schema` und `strict: true`. Damit sind nicht nur ungültiges JSON, sondern auch fehlende Felder, falsche Typen und unbekannte Enum-Werte auf API-Ebene ausgeschlossen.
 
-> `json_schema` mit `strict: true` wäre stärker, weil es zusätzlich die Felder erzwingt. Das Feld `options.textFormat.textOptions.schema` muss dafür als **JSON-String** übergeben werden, nicht als Objekt — als Objekt meldet der Node zur Laufzeit `Failed to parse schema`, und die Policy wird gar nicht erst befragt. Der Wechsel ist erst sinnvoll, wenn `json_object` an echten Läufen bestätigt ist; das vollständige Schema liegt in `policy-schema.json`.
+Zwei Regeln gelten dabei, beide an echten Läufen bezahlt:
+
+- Das Schema muss als **JSON-String** übergeben werden. Als Objekt meldet der Node zur Laufzeit `Failed to parse schema`, und die Policy wird gar nicht erst befragt.
+- Der Strict-Modus kennt **kein `minItems`**. Die Mindestlänge von `anliegen` steht deshalb nur im Parser, nicht im API-Schema. Das vollständige Schema inklusive `minItems` liegt in `policy-schema.json`; an die API geht es ohne.
+
+Die Wertelisten im Schema sind gegen `Routing und Prioritaet ableiten` abgeglichen — `nextAction`, `selfServiceCategory`, `scope`, `businessImpact` und `businessProcess`, fünf von fünf deckungsgleich. Dieser Abgleich muss bestehen bleiben: Weicht das Schema ab, erzwingt die API einen Wert, den das Routing anschließend verwirft.
+
+`temperature` darf am Node nicht stehen — siehe unten.
 
 **2. Der Parser repariert.** `Policy-Schema` prüft die Struktur mit `autoFix`. Weicht die Ausgabe ab, wird das Modell mit der Fehlermeldung erneut befragt, statt den Lauf zu beenden. Der Parser prüft Form und Typen ohne die Wertelisten; die zulässigen Werte stehen im Prompt und in `policy-schema.json`.
 
