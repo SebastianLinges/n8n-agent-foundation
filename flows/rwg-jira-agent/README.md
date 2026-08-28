@@ -67,6 +67,14 @@ Deshalb trug `Anwender-Schreibmodell` mit `temperature: 0.2` eine scharfe Störu
 
 `Analyse-Modell` trägt weiterhin `temperature: 0` über Chat Completions und arbeitet nachweislich — vier Sub-Läufe je Ticket. Der Node bleibt unangetastet: Ein Eingriff in einen laufenden Node auf Basis einer Theorie hat heute schon einmal die Policy stillgelegt. Wer ihn anfasst, darf `temperature` nicht auf einen Wert ungleich null setzen.
 
+## Entschieden: die ausgefallenen Vorgänge werden nicht nachgezogen
+
+Zwischen dem 27.08. mittags und dem 28.08. mittags haben rund 15 SSD-Tickets keine Agentenantwort und keine Feldpflege bekommen — erst wegen `temperature` an der Responses-API, dann wegen der Schemakonformität. Sie stehen in `jira_agent_events` auf `failed`.
+
+Automatisch kommen sie nicht zurück: `jira:issue_created` feuert genau einmal. Ein Nachziehen wäre nur über einen Eingriff in die Datenbank plus künstliches Ereignis möglich.
+
+**Entscheidung: kein Nachziehen.** Die betroffenen Vorgänge laufen im normalen Support weiter. Der Eingriff in `jira_agent_events` unterbleibt.
+
 ## Offen
 
 **Wirkung messen.** Vor dem Umbau brachen 9 von 60 Läufen am Policy-Schema ab, Quote 15 %, jeweils mit `Invalid JSON in model output`. Diese Messung steht weiterhin aus: Seit dem 27.08. nachmittags scheiterte die Policy am Konfigurationsfehler oben, sodass kein Lauf die neue Absicherung inhaltlich prüfen konnte. Nach dem Laufzeitprofil betrifft das rund 13 Vorgänge — kurze Läufe von etwa 7 s sind Maschinentickets und erreichen die Policy nicht. Die Messung beginnt mit dem nächsten SSD-Ticket nach dem Entfernen von `temperature`. Ziel ist eine Quote nahe null über mindestens 60 Läufe.

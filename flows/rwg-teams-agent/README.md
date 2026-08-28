@@ -59,9 +59,17 @@ Jede fett ausgezeichnete Node-Referenz in den Notizen wird gegen die tatsächlic
 
 Mehr ruft der Agent nicht. Die übrigen `RWG Sub -`-Workflows in der Instanz stammen aus der früheren Router-Architektur, haben keine Ausführungen und sind Kandidaten für die Löschung.
 
+## Entschieden: Reranking über Cohere bleibt vorerst unangetastet
+
+Der Subflow `RWG Sub - Wissenssuche` schickt im Node `Kandidaten reranken` die Trefferinhalte an `api.cohere.com` — Titel plus bis zu 2.000 Zeichen je Kandidat, bis zu 24 Kandidaten je Anfrage. Bei IT-Anfragen sind darunter `it_internal`-Inhalte; in Ticket-Chunks stecken Signaturblöcke mit Namen, Anschriften und Telefonnummern.
+
+**Entscheidung: bleibt so.** Die datenschutzrechtliche Bewertung wird bewusst zurückgestellt, nicht übersehen. Wird sie aufgenommen, ist dieser Node der Ansatzpunkt.
+
 ## Offene Punkte
 
 **Begrüßungsantwort läuft auf `gpt-4o-mini`.** Der Node `Greeting Reply` nutzt ein eigenes, altes Modell mit `temperature 0.6`. Das ist kein Fehler — gpt-4o-mini akzeptiert den Parameter — aber eine Modellgeneration hinter dem Agenten. Ein Wechsel wäre eine Verhaltensänderung und keine Bereinigung; deshalb offen.
+
+**Zulässigkeitsprüfung (T07) terminiert.** Der Test mit einem Konto außerhalb der drei gelisteten IT-Abteilungen ist für den kommenden Monat geplant. Die IT-Vergleichswerte liegen im Laufprotokoll: Läufe `109674` (IF-BC-BST-021) und `109678` (SSD-9083). Taucht davon beim Fachbereich Inhalt auf, ist der Test durchgefallen.
 
 **Zuständigkeitsfragen sind nicht stabil.** Auf „wer kümmert sich um X" kommen mal Rollen, mal Namen — bei identischem Prompt und Modell. Die vorbereitete Prompt-Ergänzung in `prompt-ergaenzung-identitaet.md` schreibt die Kontaktübersicht bei Personenfragen verbindlich vor. Noch nicht eingespielt.
 
