@@ -26,7 +26,7 @@ WHERE event_key = $1
 RETURNING event_key, status, attempt_count;
 ```
 
-Damit greift die `status = 'failed'`-Bedingung der Claim-Query, und der Vorgang ist erneut beanspruchbar. Ohne diesen Weg bliebe er auf `processing` stehen: die Zeitbedingung der Claim-Query greift nur bei einem erneuten Ereignis, und `issue_created` kommt genau einmal.
+Damit greift die `status = 'failed'`-Bedingung der Claim-Query, und der Vorgang ist erneut beanspruchbar. Dass der Node samt Credential trägt, ist an den Läufen `109605` und `109799` belegt: Er lief an und gab `event_key`, `status: failed` und `attempt_count: 1` zurück. Ohne diesen Weg bliebe er auf `processing` stehen: die Zeitbedingung der Claim-Query greift nur bei einem erneuten Ereignis, und `issue_created` kommt genau einmal.
 
 ## Laufzeit
 
@@ -54,8 +54,4 @@ Belegte Zeitschiene: Lauf `108547` (27.08., 12:28) liefert eine vollständige Po
 
 Sollte der nächste Lauf erneut `Bad request` melden, ist der nächste Verdächtige `verbosity` in `textFormat.textOptions` — der einzige weitere Parameter, den `Policy-Modell` gegenüber dem funktionierenden `Analyse-Modell` zusätzlich trägt.
 
-**Kommentarkopf in `Internen Kommentar erzeugen`.** Trägt weiterhin `V6.1`, `AENDERUNGEN GEGENUEBER V6` und `[FIX 1]`–`[FIX 6]`. Die bereinigte Fassung liegt in `code/` und muss von Hand eingefügt werden — Begründung dort.
-
 **Canvas.** Der Graph spannt über 12.100 px; `Analysierbar?` verbindet über 9.400 px direkt auf `Event abschliessen`. Das ist kein Layoutproblem, sondern strukturell: `Event abschliessen` ist gemeinsamer Endpunkt für sieben Pfade, darunter der früheste Ausstieg. Auflösen ließe es sich nur durch einen zweiten Abschluss-Node nahe dem frühen Ausstieg — das dupliziert Logik und ist eine offene Entscheidung.
-
-**Credential am neuen Node.** `Lauf als fehlgeschlagen vermerken` wurde `Postgres account: Linges` zugewiesen. Über die MCP-Schnittstelle ist das nicht verifizierbar — sie redigiert Credentials grundsätzlich. Prüfung nur in der Oberfläche möglich. Solange das offen ist, greift die Absicherung aus Punkt 3 nicht.
