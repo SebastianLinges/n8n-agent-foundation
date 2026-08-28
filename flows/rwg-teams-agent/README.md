@@ -22,6 +22,14 @@ Der Wechsel von `gpt-4o` hat einen Testfall unmittelbar gelöst: Bei Verortungsf
 
 Die Identität geht fest verdrahtet an das Jira-Werkzeug (`userEmail`, `istIT`) und stammt nie aus dem Modell.
 
+## Kostenbremse der Web-Recherche
+
+Der Node `Web-Recherche` ruft Tavily auf und wird vom Agenten selbst ausgelöst — ohne Vorprüfung, anders als beim Jira-Agenten, der eine vierfach bedingte Freigabe davorschaltet. Nachdem ein privater Wetterabruf einen bezahlten Aufruf ausgelöst hatte, verlangt die `toolDescription` jetzt ausdrücklich einen dienstlichen Bezug und untersagt Wetter, Sport, Nachrichten, Unterhaltung, Rezepte, Reiseplanung und Einkauf.
+
+Gegengeprüft: „wie wird das wetter morgen in erkelenz?" löst **keinen** Werkzeugaufruf mehr aus (ein Modellaufruf, 4,4 s). „gibt es bei zebra bekannte probleme mit dem tc52?" führt zu drei zunehmend gezielteren Suchen, zuletzt mit `site:`-Einschränkung auf die Herstellerdomain, und liefert belegte Treffer mit Originallinks.
+
+Bemerkenswert: Die Tool-Beschreibung setzt sich gegen den Systemprompt durch, der Städte ausdrücklich als Web-Fall führt. Der spezifischere Hinweis am Werkzeug gewinnt.
+
 ## Offene Punkte
 
 **Zuständigkeitsfragen sind nicht stabil.** Auf „wer kümmert sich um X" kommen mal Rollen, mal Namen — bei identischem Prompt und Modell. Die vorbereitete Prompt-Ergänzung in `prompt-ergaenzung-identitaet.md` schreibt die Kontaktübersicht bei Personenfragen verbindlich vor. Noch nicht eingespielt.

@@ -918,7 +918,7 @@
     },
     {
       "parameters": {
-        "toolDescription": "Sucht im oeffentlichen Internet. Nur benutzen fuer allgemeines Wissen ausserhalb der RWG, das die internen Quellen nicht beantworten koennen - oeffentliche Produktinfos, Herstellerangaben, allgemeine Fakten. Niemals fuer interne Tickets, interne Dokumente oder Zustaendigkeiten.",
+        "toolDescription": "Sucht im oeffentlichen Internet. Nur benutzen fuer allgemeines Wissen ausserhalb der RWG, das die internen Quellen nicht beantworten koennen - oeffentliche Produktinfos, Herstellerangaben, Fehlercodes, Normen, Behoerden und Geschaeftspartner. Niemals fuer interne Tickets, interne Dokumente oder Zustaendigkeiten.\n\nNUR BEI DIENSTLICHEM BEZUG. Die Suche kostet Geld und ist fuer die Arbeit da, nicht fuer Privates. Rufe sie nicht auf bei Wetter, Sport, Nachrichten, Unterhaltung, Rezepten, Reiseplanung, Einkaufen oder aehnlichen privaten Anliegen. Sage in solchen Faellen ohne jeden Werkzeugaufruf in einem freundlichen Satz, dass du dafuer nicht zustaendig bist, und biete Hilfe bei einem dienstlichen Anliegen an.\n\nIm Zweifel gilt: Laesst sich die Frage einem Arbeitsvorgang, einem System, einem Geraet oder einem Geschaeftspartner der RWG zuordnen, ist sie dienstlich. Geht es um das Privatleben der fragenden Person, ist sie es nicht.",
         "method": "POST",
         "url": "https://api.tavily.com/search",
         "authentication": "genericCredentialType",
