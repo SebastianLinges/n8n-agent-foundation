@@ -72,9 +72,13 @@ Automatisch kommen sie nicht zurück: `jira:issue_created` feuert genau einmal. 
 
 ## Offen
 
-**Wirkung messen.** Vor dem Umbau brachen 9 von 60 Läufen am Policy-Schema ab, Quote 15 %, jeweils mit `Invalid JSON in model output`. Diese Messung steht weiterhin aus: Seit dem 27.08. nachmittags scheiterte die Policy am Konfigurationsfehler oben, sodass kein Lauf die neue Absicherung inhaltlich prüfen konnte. Nach dem Laufzeitprofil betrifft das rund 13 Vorgänge — kurze Läufe von etwa 7 s sind Maschinentickets und erreichen die Policy nicht. Die Messung beginnt mit dem nächsten SSD-Ticket nach dem Entfernen von `temperature`. Ziel ist eine Quote nahe null über mindestens 60 Läufe.
+**Wirkung messen.** Der erste Lauf nach der Rücknahme der Responses-API ist durchgelaufen: Testticket SSD-9158, Lauf `110033`. `Policy-Modell` brauchte **einen** Aufruf statt vier, `Policy-Schema` zwei Versuche statt sechs, `Lauf als fehlgeschlagen vermerken` wurde gar nicht erst angesteuert.
 
-Sollte der nächste Lauf erneut `Bad request` melden, ist der nächste Verdächtige `verbosity` in `textFormat.textOptions` — der einzige weitere Parameter, den `Policy-Modell` gegenüber dem funktionierenden `Analyse-Modell` zusätzlich trägt.
+In Jira gegengeprüft: Priorität von Medium auf Sehr Niedrig herabgestuft (id 5), Support-Level `1st-Lvl.`, interner Kommentar mit Einordnung und Prüfschritten geschrieben. Die Kette Analyse → Policy → Feldpflege → Jira trägt wieder.
+
+Die eigentliche Quotenmessung beginnt damit erst. Ziel bleibt eine Fehlerquote nahe null über mindestens 60 Läufe; Ausgangswert vor dem Umbau waren 9 von 60 mit `Invalid JSON in model output`.
+
+**Inkonsistenz im Ausgabe-Vertrag.** `Routing und Prioritaet ableiten` gab in Lauf `110033` `priorityId: "3"` bei `priorityName: "Sehr Niedrig"` aus — richtig wäre `5`. Der Name kommt aus dem Subflow, die ID wird nicht nachgezogen. Folgenlos, solange niemand die ID verwendet: Geschrieben hat die Feldpflege mit ihrer eigenen, korrekten ID, und der interne Kommentar rendert die Namen. Als Falle für künftige Nutzung des Feldes hier vermerkt.
 
 **Canvas.** Gemessen: 11.984 × 976 px, 69 Funktions-Nodes, 84 Verbindungen. Die Anordnung ist konsistent — Regelabstand 192 bis 208 px, alle Nodes von einer der sechs Notizen gedeckt, die Notizen in Ablaufreihenfolge nummeriert. Die verbleibenden engen Paare bei 128 bis 144 px sind ausschließlich Sub-Nodes, für die das der übliche Abstand ist.
 
