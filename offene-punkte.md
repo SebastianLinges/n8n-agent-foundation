@@ -46,9 +46,22 @@ Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberst
 
 
 ### Ingest ueber Graph-Delta statt Power Automate
-Belegt mit Lauf 110377: Der Delta-Abruf liefert je Bibliothek einen Zustandsanker und erfasst Loeschung, Neuanlage und Aenderung. Der Plan liegt Sebastian vor.
+Der Plan liegt Sebastian vor. Belegt ist: Der Delta-Abruf liefert je Bibliothek einen Zustandsanker und erfasst Loeschung, Neuanlage und Aenderung (Lauf 110377).
 
-Der Umfang steht: **Start bei Shared Documents der Untersite Schulungen**, spaeter erweiterbar. Was Power Automate heute daneben noch erfasst, ist von aussen nicht einsehbar - der Abgleich in Schritt 4 des Plans wird es zeigen.
+**Befund vom 29.08.: Vier der sechs gewuenschten Formate fehlen vollstaendig im RAG.** 259 Dokumente sind eingelesen, ausschliesslich pdf, xlsx und xls. In Shared Documents liegen 132 Word- und 119 PowerPoint-Dateien - keine davon im Wissensspeicher. `ingestion_errors` ist leer, es scheitert also nichts, es kommt nichts an.
+
+Der Weg dorthin ist belegt (Lauf 110388): Graph konvertiert docx nach PDF, 56 KB Quelle liefern ein echtes PDF mit 108 KB. Word und PowerPoint koennen damit durch dieselbe OCR-Strecke wie die 227 PDFs.
+
+Drei Entscheidungen stehen aus: Formatliste, Sichtbarkeit, Vorgehen bei der Erstbefuellung.
+
+### Am Ingest-Flow zu verbessern
+- **Excel liest nur das erste Blatt.** Die Extract-Nodes laufen ohne Blattangabe. Eine Arbeitsmappe mit zwoelf Registern liefert eines, ohne Fehlermeldung.
+- **Metadaten haengen am Webhook.** Bereich, Autor, Version, Schlagworte und Vertraulichkeit kommen aus dem Power-Automate-Text. Beim Umbau muessen sie aus Graph geholt werden.
+- **Textstuecke kennen ihr Kapitel nicht.** Jeder Chunk traegt den Dateinamen, aber nicht die Ueberschrift. Mistral liefert sie als Markdown mit.
+- Alle 259 Dokumente tragen `audience = public`. Ob das so bleibt, ist eine fachliche Frage.
+
+Nicht zu aendern: Chunking und Tabellenaufbereitung sind sorgfaeltig gebaut - Absatzgrenzen, harter Split bei Ueberlaenge, Overlap auf Wortgrenze, Tabellenzeilen mit Spaltennamen.
+
 
 ## Content Studio, weitere Themen
 
