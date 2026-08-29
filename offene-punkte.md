@@ -30,6 +30,18 @@ Der Flow schreibt unter `Sebastian.Linges`. Ändert sich das Passwort oder verl�
 ### Zwei EK-Ordner in Confluence
 `EK – Einkauf` und `EK - Einkauf` unterscheiden sich nur im Bindestrich. `EK-01` hängt im einen, `EK-02` im anderen. Der Flow meldet die Dublette in `bereichsordner_dubletten` und legt beide zusammen ab — technisch unauffällig, fachlich zu bereinigen.
 
+## SharePoint Schulungen
+
+### Leere Ordner entfernen
+In Shared Documents stehen 22 oberste leere Ordner. 18 davon sind Reste vom 10.09.2024 unter `Allgemeine Informationen` - Kandidaten zum Entfernen. Vier liegen auf oberster Ebene mit sprechenden Namen (`Baumarkt Prozesse`, `Baustoff Prozesse`, `Dispo Prozesse`, `Videos/Gebuchte Belege stornieren`) und sehen nach vorbereiteter Struktur aus. Ueber die entscheidet Sebastian.
+
+Nebenbefund: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Frage.
+
+### Ingest ueber Graph-Delta statt Power Automate
+Belegt mit Lauf 110377: Der Delta-Abruf liefert je Bibliothek einen Zustandsanker und erfasst Loeschung, Neuanlage und Aenderung. Der Plan liegt Sebastian vor.
+
+Offen vor dem Bau: Welche Bibliotheken sollen ueberhaupt ins Wissenssystem? Das steht heute in Power Automate und ist von aussen nicht einsehbar.
+
 ## Content Studio, weitere Themen
 
 ### Beiträge auf Use Cases ausrichten
