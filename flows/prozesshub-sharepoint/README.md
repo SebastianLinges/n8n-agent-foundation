@@ -4,7 +4,7 @@ Spiegelt den Confluence-Bereich **ProzessHub** als HTML-Dokumente in eine ShareP
 
 Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spiegel`, kein Bezug zum RAG-Ingest und keine gemeinsame Datenhaltung mit ihm. Eine spätere Erweiterung auf weitere Bereiche mit eigenen Regeln ist vorgesehen.
 
-**Stand: Prototyp, schreibend erprobt.** Lauf 110349 hat vier Dokumente des Bereichs `EK` tatsächlich in SharePoint abgelegt. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
+**Stand: Prototyp, schreibend erprobt.** Lauf 110352 hat zwei Dokumente des Bereichs `MKT` in KAPA-Digital-Gestaltung nach SharePoint geschrieben. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
 
 ## Aufbau
 
@@ -86,20 +86,23 @@ Gelöschte Seiten werden im Ziel **entfernt**, nicht archiviert.
 - selbst erzeugtes Inhaltsverzeichnis aus den H2-Überschriften, mit Ankern
 - Tabelle **ohne** Kopfzeile wird als Kennblock gesetzt, Tabelle **mit** Kopfzeile als Ablauftabelle
 - `panel-info` wird zum Hinweiskasten
-- Fußzeile mit dem Hinweis, dass Änderungen in den ProzessHub gehören, nicht in die Datei
+- Fußzeile mit dem Hinweis, dass Änderungen in den ProzessHub gehören, nicht in die Datei — und dass **Änderungen am ProzessHub ausschließlich durch Sebastian Linges nach Rücksprache erfolgen**
 - `@media print`-Regeln, damit später ein PDF aus derselben Datei entstehen kann
 
 Die beiden Makro-Platzhalter am Seitenanfang (Inhaltsverzeichnis, Änderungshistorie) werden entfernt. Der Bereinigungsteil kennt **beide** Schreibweisen — Storage-Format mit `ac:structured-macro` und ADF-Ausgabe mit `data-type`-Divs —, weil sich erst am Bereich entscheidet, welche ankommt.
 
 ### Farben
 
-| Token | Wert | Verwendung |
-|---|---|---|
-| `--gruen-primaer` | `#65B22E` | RWG-Primärgrün: Kopflinie, Kanten von Verzeichnis und Hinweiskasten |
-| `--gruen` | `#3D701B` | Text und Flächen mit weißem Text |
-| `--gruen-hell` | `#EDF7E3` | Hintergrund für Kennblock und Hinweise |
+Gestaltung nach KAPA Digital, Werte aus dem Content Studio:
 
-Das Primärgrün trägt **keinen weißen Text**: gemessen 2,64 : 1, gefordert sind 4,5 : 1. Tabellenköpfe und das Prozesskürzel im Titelblock nutzen deshalb die dunklere Abstufung mit 5,95 : 1. Wer die Farbe ändert, muss diesen Unterschied erhalten.
+| Token | Wert | Verwendung | Weißer Text darauf |
+|---|---|---|---|
+| `--marke` | `#1B4FD8` | Kopflinie, Tabellenköpfe, Prozesskürzel, Textfarbe | 6,65 : 1 |
+| `--marke-tief` | `#0D2B55` | Überschriften der Abschnitte | 14,06 : 1 |
+| `--akzent` | `#0891B2` | Kanten von Verzeichnis und Hinweiskasten | 3,68 : 1 |
+| `--marke-hell` | `#E8EEFC` | Hintergrund für Kennblock und Hinweise | — |
+
+Das Cyan trägt **keinen Text**: 3,68 : 1 gegen geforderte 4,5 : 1. Es steht deshalb ausschließlich an Kanten. Primär- und Dunkelblau tragen weißen Text mit Reserve.
 
 ### Interne Links
 
@@ -138,7 +141,6 @@ Das Konto **RWG.Automate hat keine Confluence-Lizenz** und bekommt auf jeden Con
 
 ## Offene Punkte
 
-- **Der Bestand enthält vier Bereiche, die nie geschrieben wurden.** Die Trockenläufe vor dem SharePoint-Zugang haben `Bestand fortschreiben` trotzdem ausgeführt, deshalb behauptet die Data Table für `BS`, `LOG`, `MKT` und `GF`, deren Dateien lägen in SharePoint. Sie liegen dort nicht. Vor dem nächsten Lauf dieser Bereiche müssen die Zeilen entfernt werden, sonst gelten die Seiten als unverändert und werden übersprungen.
 - **Der Export fehlt.** Er wird nachgezogen, sobald der Flow publiziert ist; bis dahin ändert sich der Aufbau noch mit dem SharePoint-Teil.
 - **Zwei Ordner mit Kürzel `EK`** in Confluence, die sich nur im Bindestrich unterscheiden: `EK – Einkauf` und `EK - Einkauf`. `EK-01` hängt im einen, `EK-02` im anderen. Der Flow meldet das in `bereichsordner_dubletten`, in SharePoint landen beide im selben Ordner. Fachlich zu klären.
 - **Bilder und BPMN-Diagramme** werden nicht mitgespiegelt. Der ProzessHub hat eine eigene Orientierungsseite zu BPMN-Standards, die Diagramme sind also gewollt und zahlreich.
