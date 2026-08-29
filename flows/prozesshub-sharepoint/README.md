@@ -4,7 +4,7 @@ Spiegelt den Confluence-Bereich **ProzessHub** als HTML-Dokumente in eine ShareP
 
 Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spiegel`, kein Bezug zum RAG-Ingest und keine gemeinsame Datenhaltung mit ihm. Eine spätere Erweiterung auf weitere Bereiche mit eigenen Regeln ist vorgesehen.
 
-**Stand: Prototyp, schreibend erprobt.** Lauf 110352 hat zwei Dokumente des Bereichs `MKT` in KAPA-Digital-Gestaltung nach SharePoint geschrieben. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
+**Stand: Prototyp, schreibend erprobt.** Lauf 110354 hat die MKT-Dokumente nach Korrektur der Panel-Behandlung neu geschrieben. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
 
 ## Aufbau
 
@@ -69,6 +69,8 @@ Ordner- und Dateinamen laufen durch `sicherName()`: Die in SharePoint verbotenen
 
 Belegt in Lauf 110323: Derselbe Bereich ein zweites Mal gelaufen ergab neunmal `nichts`, keine Neuaufbereitung.
 
+**`neuAufbauen` in `Config`** erzwingt das Neuschreiben aller Seiten, auch wenn sich der Inhalt nicht geändert hat. Der `content_hash` bildet nämlich nur die Confluence-Seite ab, nicht die Aufbereitung — ohne diesen Schalter bliebe eine Änderung am Template unsichtbar. Nach Gebrauch wieder auf `false` setzen, sonst schreibt jeder Lauf alles neu.
+
 ## Löschsicherung
 
 Übernommen aus dem RAG-Ingest, wo sie sich bewährt hat. Zwei Riegel in `Abgleich`:
@@ -84,10 +86,30 @@ Gelöschte Seiten werden im Ziel **entfernt**, nicht archiviert.
 
 - Kopf mit `RWG Rheinland eG`, Bereichspfad, Prozesskürzel und Stand
 - selbst erzeugtes Inhaltsverzeichnis aus den H2-Überschriften, mit Ankern
-- Tabelle **ohne** Kopfzeile wird als Kennblock gesetzt, Tabelle **mit** Kopfzeile als Ablauftabelle
-- `panel-info` wird zum Hinweiskasten
+- Tabellen bekommen einheitliche Kopfzellen. Confluence liefert die Kopfzeile als `<tr><th>` **ohne** `<thead>` — wer auf `thead` stylt, trifft nichts
+- Panels werden zu Hinweiskästen
 - Fußzeile mit dem Hinweis, dass Änderungen in den ProzessHub gehören, nicht in die Datei — und dass **Änderungen am ProzessHub ausschließlich durch Sebastian Linges nach Rücksprache erfolgen**
 - `@media print`-Regeln, damit später ein PDF aus derselben Datei entstehen kann
+
+### Was Confluence tatsächlich liefert
+
+Der ProzessHub mischt zwei Formate, und beide brauchen eigene Behandlung:
+
+**Klassische Makros** wie `info` kommen als `<ac:structured-macro>` mit `<ac:rich-text-body>`.
+
+**ADF-Panels** kommen als `<ac:adf-extension>` und tragen ihren Inhalt **doppelt**:
+
+```xml
+<ac:adf-extension>
+  <ac:adf-node type="panel">
+    <ac:adf-attribute key="panel-type">note</ac:adf-attribute>
+    <ac:adf-content>...der Text...</ac:adf-content>
+  </ac:adf-node>
+  <ac:adf-fallback>...derselbe Text mit Inline-Styles...</ac:adf-fallback>
+</ac:adf-extension>
+```
+
+Wer hier nur die Tags abräumt, bekommt drei Fehler auf einmal: das Wort `note` erscheint als Text, der Absatz steht zweimal da, und die Inline-Styles des Fallbacks überschreiben die eigene Gestaltung. Die Aufbereitung ersetzt deshalb den **ganzen Block** durch den Inhalt von `adf-content` und verwirft Attribut und Fallback. Anschließend fliegen alle verbliebenen `style`-Angaben raus.
 
 Die beiden Makro-Platzhalter am Seitenanfang (Inhaltsverzeichnis, Änderungshistorie) werden entfernt. Der Bereinigungsteil kennt **beide** Schreibweisen — Storage-Format mit `ac:structured-macro` und ADF-Ausgabe mit `data-type`-Divs —, weil sich erst am Bereich entscheidet, welche ankommt.
 
