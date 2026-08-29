@@ -45,25 +45,30 @@ Sebastian entscheidet, ob sie bleiben. Der Aufraeumflow ist archiviert, laesst s
 Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Freigabe.
 
 
-### Mistral-Guthaben aufgebraucht - blockiert PDF, Word und PowerPoint
-**Dringend, und nur von Sebastian loesbar.** Lauf 110391 endete mit HTTP 402 von `api.mistral.ai/v1/files`, Meldung *Payment required*, Verweis auf https://admin.mistral.ai/subscription.
+### Doubletten beim Umschalten - vor dem Produktivgang klaeren
+**Power Automate und der Delta-Leser vergeben unterschiedliche doc_ids fuer dieselbe Datei.** Belegt mit Lauf 110451: Die Testdatei stand zweimal im RAG - einmal mit Graph-Item-ID (`01SZZYEH...`), einmal mit der Kennung von Power Automate (`RWGID-197270985-1845`).
 
-Betroffen sind alle Typen, die ueber die OCR-Strecke laufen: pdf, docx, doc, pptx, ppt. Das sind zusammen 446 der 499 verwertbaren Dateien in Shared Documents. Der Delta-Leser laeuft nachweislich bis dorthin - die Sperre liegt nicht am Flow.
+Solange beide Wege laufen, entstehen bei jeder Aenderung Doubletten. Und beim Umschalten wuerden die 259 Altdokumente ein zweites Mal angelegt, weil der Delta-Leser sie nicht wiedererkennt.
 
-Sobald das Guthaben steht: `aktiveTypen` in der Config des Delta-Lesers auf `[pdf]` setzen, `verarbeiten` und `ingestAufrufen` auf true, Lauf pruefen. Danach `docx`, dann `pptx`.
+Drei Wege stehen offen:
+
+- Power Automate abschalten und den Altbestand einmal leeren, dann mit `ankerIgnorieren` neu einlesen. Sauber, aber die 499 Dateien laufen einmal komplett durch.
+- Den Altbestand stehen lassen und nur Neues ueber den Delta-Leser einlesen. Dann bleiben Altdokumente ohne Aktualisierung liegen.
+- Eine Zuordnung zwischen beiden Kennungen bauen. Aufwendig und nur sinnvoll, wenn der Altbestand gross ist.
+
+Mein Vorschlag ist der erste Weg.
 
 
 ### Delta-Leser scharfschalten
-Der Flow steht (`bvmSDgOm1T5ciKqk`) und ist fuer txt, xls und xlsx belegt. Die Mehrblatt-Erkennung laeuft ueber die Workbook-API - eine Mappe mit zwoelf Blaettern und 1930 Zeilen landete als ein Dokument mit 35077 Woertern im RAG (Lauf 110430). Loeschungen werden erkannt und weitergegeben, der Zustandsanker ist belegt (110436/110437).
+Der Flow steht (`bvmSDgOm1T5ciKqk`) und **alle vorhandenen Dateitypen sind einzeln belegt**: pdf, docx, pptx, txt, xls, xlsx. Fuer csv und xlsm liegt keine Datei in der Bibliothek.
 
-Zum Produktivgang fehlen:
+Ebenfalls belegt: Mehrblatt-Erkennung mit Unterscheidung Tabelle/Notiz, Loeschzweig, Zustandsanker, inkrementeller Betrieb.
 
-- **pdf, docx, pptx** - ausgesetzt bis 01.09., siehe Mistral-Punkt. Danach `ankerIgnorieren` auf true setzen, sonst sieht der Flow die unveraenderten PDFs nicht.
-- **Loeschzweig ungeprueft** - der Weg ist gebaut, aber es gab in den Testlaeufen keine echte Loeschung im Delta. Faellt beim ersten Lauf nach einer echten Loeschung an.
-- **Webhook abschalten** - erst wenn ein voller Zyklus ueber den Delta-Leser belegt ist. Der Power-Automate-Flow laeuft bis dahin unveraendert weiter, beide Wege stoeren sich nicht.
-- **Export ins Repo** - `flows/sharepoint-delta-rag/workflow.json` fehlt noch. Faellt beim naechsten Arbeitsschritt am Flow an, dann in einem Zug.
+Zum Scharfschalten: drei Schalter in der Config auf true, Trigger aktivieren, publizieren. Vorher die Doubletten-Frage entscheiden.
 
-csv und xlsm liessen sich nicht pruefen - in der Bibliothek liegt keine einzige solche Datei.
+Der Webhook von Power Automate bleibt bis dahin unberuehrt - beide Wege stoeren sich nicht, erzeugen aber Doubletten.
+
+**Export ins Repo fehlt noch**: `flows/sharepoint-delta-rag/workflow.json`.
 
 
 ## Content Studio, weitere Themen

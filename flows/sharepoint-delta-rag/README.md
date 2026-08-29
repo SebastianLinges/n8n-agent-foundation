@@ -84,22 +84,27 @@ Data Table `sharepoint_delta` (`RbdhNeubkrmgZkOC`), eine Zeile je Bibliothek: `d
 
 ## Stand der Dateitypen
 
-| Typ | Stand |
-|---|---|
-| `txt` | belegt, Lauf 110432 |
-| `xls` | belegt, Lauf 110432 — 2 555 Wörter, `relational` |
-| `xlsx` | belegt, Lauf 110430 — 12 Blätter, 1 930 Zeilen, 35 077 Wörter |
-| `pdf`, `docx`, `doc`, `pptx`, `ppt` | **ausgesetzt bis 01.09.** — Mistral-Guthaben |
-| `csv`, `xlsm` | nicht prüfbar — in der Bibliothek liegt keine einzige Datei davon |
+**Alle vorhandenen Typen sind einzeln belegt.**
 
-Die Sperre bei PDF, Word und PowerPoint liegt **nicht an diesem Flow**. Lauf 110391 endete mit HTTP 402 an `api.mistral.ai`; die Kette lief nachweislich bis dorthin.
+| Typ | Lauf | Ergebnis |
+|---|---|---|
+| `pdf` | 110458 | 174 Wörter, 3 Chunks, `mistral-ocr-latest` |
+| `docx` | 110460 | 158 Wörter — über `format=pdf` gewandelt |
+| `pptx` | 110462 | 1 360 Wörter, 9 Textstücke **und 20 beschriebene Bilder** |
+| `txt` | 110432 | eine Datei, `semantic` |
+| `xls` | 110432 | 2 555 Wörter, `relational` |
+| `xlsx` | 110430 | 12 Blätter, 1 930 Zeilen, 35 077 Wörter |
+| `csv`, `xlsm` | — | in der Bibliothek liegt keine Datei davon. Die Wege sind gebaut, aber nicht an echten Daten belegt |
 
-### So geht es ab dem 01.09. weiter
+Bei PowerPoint zeigt sich der Vorteil der PDF-Wandlung am deutlichsten: Die Folien werden gerendert, und Mistral erfasst nicht nur den Text, sondern beschreibt auch die 20 enthaltenen Bilder. Ein direkter `pptx`-Weg hätte das nicht geliefert.
 
-1. `aktiveTypen` auf `['pdf']` setzen
-2. `ankerIgnorieren` auf `true` — sonst sieht der Flow die PDFs nicht
-3. `verarbeiten` und `ingestAufrufen` auf `true`, `zustandSchreiben` auf `false` lassen
-4. Lauf prüfen, dann `docx`, dann `pptx`
+### Zum Scharfschalten
+
+1. `verarbeiten`, `ingestAufrufen` und `zustandSchreiben` auf `true`
+2. Trigger `Stuendlich` aktivieren, Flow publizieren
+
+Für eine **Erstbefüllung des Altbestands** zusätzlich `ankerIgnorieren: true` — sonst sieht der Flow nur Änderungen, und die 499 vorhandenen Dateien tauchen nie auf. Vorher die Doubletten-Frage klären.
+
 
 ## Ein Fallstrick, der zweimal zuschlug
 
