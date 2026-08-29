@@ -4,7 +4,7 @@ Spiegelt den Confluence-Bereich **ProzessHub** als HTML-Dokumente in eine ShareP
 
 Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spiegel`, kein Bezug zum RAG-Ingest und keine gemeinsame Datenhaltung mit ihm. Eine spätere Erweiterung auf weitere Bereiche mit eigenen Regeln ist vorgesehen.
 
-**Stand: Prototyp, schreibend erprobt.** Lauf 110357 hat die MKT-Dokumente nach allen Korrekturen neu geschrieben. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
+**Stand: Prototyp, schreibend erprobt.** Lauf 110360 hat den Bereich IT gespiegelt: 16 Prozessdokumente in sechs Gruppenordnern, 186 KB. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
 
 ## Aufbau
 
@@ -41,17 +41,18 @@ Site *Qualitätsmanagement und Prozessbeschreibungen*, Bibliothek **Freigegebene
 ```
 <H1-Bereichsordner>/
    <H2-Gruppenordner>/
-      00 Uebersicht <H2>.html
       <H3-Prozess>.html
 ```
 
-Beispiel aus Lauf 110330:
+Beispiel aus Lauf 110360:
 
 ```
-MKT - Marketing/MKT-01 Kampagnenmanagement/MKT-01-01 Marketingkampagne planen und durchführen.html
+IT - Informationstechnologie/IT-04 IT-Support und Service Management/IT-04-01 IT-First-Level-Support leisten.html
 ```
 
-**Die H2-Gruppenseite wird Ordner *und* Datei darin.** Sie trägt eigenen fachlichen Inhalt — „Worum geht es?", „Geltungsbereich & Abgrenzung", „Rollen & Verantwortung", „Steuerung & Review" —, der bei einer reinen Ordnerabbildung verlorenginge. Das führende `00` im Dateinamen sortiert sie über die Prozesse.
+**Die H2-Gruppenseite wird nur zum Ordner, nicht zum Dokument.** Sie liefert den Ordnernamen und wird dafür weiterhin gelesen — abgelegt wird sie nicht. Der Schalter `gruppenseitenSpiegeln` in `Config` kehrt das um, falls ihr fachlicher Inhalt später doch gebraucht wird; er steht auf `false`.
+
+**Leere Gruppenordner entstehen nicht.** Graph legt einen Ordner erst an, wenn eine Datei hineingeschrieben wird. Im IT-Lauf gab es zehn Gruppen, aber nur sechs Ordner — vier Gruppen haben in Confluence noch keine Prozessseiten.
 
 **Die Ordner legt Graph selbst an.** Beim pfadbasierten Schreiben entstehen fehlende Zwischenebenen automatisch — belegt am Testlauf, der `ZZ TEST n8n/Unterordner/probe.html` in einem Zug erzeugt hat. Ein eigener Node zum Anlegen der Ordner ist deshalb nicht nötig und wurde wieder entfernt.
 
