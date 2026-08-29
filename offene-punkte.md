@@ -67,8 +67,18 @@ Dafuer braeuchte es einen zweiten Weg: Tabellendaten strukturiert ablegen und de
 Zu klaeren waere zuerst: Welche Tabellen sind ueberhaupt gemeint, und wie stabil ist ihre Struktur? Die Sichtung vom 30.08. zeigt, dass viele Excel-Blaetter gar keine Tabellen sind, sondern Formulare und Notizen.
 
 ### Sechs Dokumente ohne Chunks
-Der Bestand zaehlt 267 Dokumente, aber nur 261 haben Chunks (Lauf 110466). Sechs stehen also in `sharepoint_documents`, ohne im Wissensspeicher auffindbar zu sein. Vermutlich Dateien, bei denen die Extraktion leer blieb. Nicht dringend, aber unsauber.
+Sechs Eintraege stehen in `sharepoint_documents`, haben aber keine Chunks - sie sind in der Wissenssuche unsichtbar. Alle vom 22.08., alle Regaletiketten-PDFs mit 3600 bis 11500 Woertern. Der Text wurde also extrahiert, das Einbetten schlug fehl oder brach ab.
 
+Ein Neueinlese-Versuch am 30.08. lief an, dauerte aber laenger als mein Zeitfenster. Beim naechsten Mal gezielt mit `nurDatei: regaletiketten`, `ankerIgnorieren: true` und **`zustandSchreiben: false`** - sonst rueckt der Produktivanker mit und der stuendliche Betrieb ueberspringt Aenderungen.
+
+### Formatpaare und unklare Doubletten - fachlich zu entscheiden
+Bei der Bereinigung am 30.08. blieben zwei Gruppen absichtlich stehen:
+
+**23 Formatpaare**: Dieselbe Unterlage liegt in SharePoint als `pptx` und als `pdf`, meist Regalplaene. Beide Eintraege sind technisch richtig. Ob beide im Wissensspeicher stehen sollen, ist eine fachliche Frage - doppelter Inhalt verwaessert die Suche, aber die Formate koennen unterschiedlich aktuell sein.
+
+**5 unklare Faelle**: Gleicher Dateiname, deutlich verschiedener Inhalt. Etwa `Debitorencockpit.pdf` mit 2495 gegen 480 Woerter oder `Aufteilung Standorte.xlsx` mit 795 gegen 432. Da steckt Unterschiedliches drin; welche Fassung gilt, kann nur der Fachbereich sagen.
+
+Der Wartungsflow `RWG Wartung - RAG-Bestand pruefen` (`O5FKXpsz2UfcjNQg`) listet beide Gruppen bei jedem Lauf auf.
 
 ## Content Studio, weitere Themen
 
