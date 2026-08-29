@@ -32,7 +32,7 @@ Der Teams-Agent ruft zwei weitere Subflows: `RWG Sub - Identity & Audience Resol
 
 ## Offene Punkte
 
-Was ansteht und was zum Abarbeiten fehlt, steht in [offene-punkte.md](offene-punkte.md). Erledigtes wird dort geloescht, nicht abgehakt - der Verlauf liegt in `tests/laufprotokoll.csv` und in der Git-Historie. Was noch keine Aufgabe ist, sondern erst ein Gedanke, steht in [ideen.md](ideen.md).
+Was ansteht und was zum Abarbeiten fehlt, steht in [offene-punkte.md](offene-punkte.md). Erledigtes wird dort geloescht, nicht abgehakt - der Verlauf liegt in `tests/laufprotokoll.csv` und in der Git-Historie. Was noch keine Aufgabe ist, sondern erst ein Gedanke, steht in [ideen.md](ideen.md). Fuer den Einstieg in eine neue Sitzung liegt eine Zusammenfassung in [uebergabe.md](uebergabe.md).
 
 ## Arbeitsweise
 

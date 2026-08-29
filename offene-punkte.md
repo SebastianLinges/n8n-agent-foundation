@@ -50,19 +50,22 @@ Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberst
 
 Was bleibt: Der Power-Automate-Flow selbst liegt ausserhalb von n8n und muss dort entfernt werden. Er ist am Ziel erkennbar: `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`. Solange er laeuft, schickt er ins Leere - der Webhook nimmt nichts mehr an.
 
-### Unvollstaendige Eintraege nach Abbruch
-Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Am 30.08. sind so aus 6 solchen Eintraegen 15 geworden, als mein Testlauf nach fuenf Minuten abgeschnitten wurde.
+### Dokumenteintrag vor den Chunks - Reihenfolge im Ingest
+Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: 15 solcher Eintraege, neun davon durch einen abgebrochenen Testlauf entstanden.
 
-Der Abgleich erkennt sie jetzt: Ein Dokument ohne Chunk mit Index 0 gilt als unvollstaendig und wird neu eingelesen. Solche Eintraege kommen in der Warteschlange **zuerst**, weil sie sonst dauerhaft einen Platz im Bestand blockieren.
+**Abgefangen ist es**: Der Abgleich erkennt sie ueber den fehlenden Kopfsatz (`chunk_index = 0`) und liest sie neu ein - mit Vorrang, weil sie sonst dauerhaft einen Platz blockieren.
 
-Sauberer waere, den Eintrag erst nach den Chunks zu schreiben. Das ist ein Umbau an der Verarbeitung und bleibt offen - die Nachpruefung im Abgleich faengt den Fall zuverlaessig ab.
+Sauberer waere, den Eintrag erst nach den Chunks zu schreiben. Das ist ein Umbau an der Verarbeitung und bleibt offen. Die Nachpruefung im Abgleich faengt den Fall zuverlaessig ab, also nicht dringend.
 
-### Erstbefuellung: 490 Dateien fehlen
-Der erste Abgleich (Lauf 110501) zeigt: Von 499 verwertbaren Dateien in Shared Documents stehen erst 9 unter einer Graph-Kennung in der Wissensbasis. Die uebrigen 490 fehlen - Power Automate hatte nur PDF und Excel geschickt, Word und PowerPoint nie.
 
-Bei `maxJeLauf: 20` holt der naechtliche Abgleich das in rund 25 Tagen auf. Fuer eine schnellere Erstbefuellung den Wert voruebergehend erhoehen - etwa auf 100, dann sind es fuenf Naechte. Zu bedenken: Jede Datei kostet einen OCR-Durchlauf bei Mistral.
+### Erstbefuellung laeuft an - 458 Dateien fehlen noch
+Von 499 verwertbaren Dateien in Shared Documents stehen erst wenige unter einer Graph-Kennung in der Wissensbasis. Power Automate hatte nur PDF und Excel geschickt, Word und PowerPoint nie.
 
-Die 247 Dokumente mit Power-Automate-Kennung bleiben dabei unangetastet, bis ihre Datei erneut eingelesen wird - dann entfernt der Uebergangsmechanismus die Altfassung.
+Der naechtliche Abgleich holt jetzt **30 je Nacht** nach - gut zwei Wochen bis zur Vollstaendigkeit. Wer schneller will, setzt `maxJeLauf` in der Steuerung hoeher; jede Datei kostet einen OCR-Durchlauf bei Mistral.
+
+Die 247 Dokumente mit Power-Automate-Kennung bleiben unangetastet, bis ihre Datei erneut eingelesen wird - dann entfernt der Uebergangsmechanismus die Altfassung.
+
+**Erster echter Abgleich: 30.08. um 03:30.** Ergebnis am Morgen in der Laufbilanz nachsehen.
 
 
 ### Tabellendaten abfragbar machen
@@ -76,10 +79,6 @@ Dafuer braeuchte es einen zweiten Weg: Tabellendaten strukturiert ablegen und de
 
 Zu klaeren waere zuerst: Welche Tabellen sind ueberhaupt gemeint, und wie stabil ist ihre Struktur? Die Sichtung vom 30.08. zeigt, dass viele Excel-Blaetter gar keine Tabellen sind, sondern Formulare und Notizen.
 
-### Sechs Dokumente ohne Chunks
-Sechs Eintraege stehen in `sharepoint_documents`, haben aber keine Chunks - sie sind in der Wissenssuche unsichtbar. Alle vom 22.08., alle Regaletiketten-PDFs mit 3600 bis 11500 Woertern. Der Text wurde also extrahiert, das Einbetten schlug fehl oder brach ab.
-
-Ein Neueinlese-Versuch am 30.08. lief an, dauerte aber laenger als mein Zeitfenster. Beim naechsten Mal gezielt mit `nurDatei: regaletiketten`, `ankerIgnorieren: true` und **`zustandSchreiben: false`** - sonst rueckt der Produktivanker mit und der stuendliche Betrieb ueberspringt Aenderungen.
 
 ### Formatpaare und unklare Doubletten - fachlich zu entscheiden
 Bei der Bereinigung am 30.08. blieben zwei Gruppen absichtlich stehen:
