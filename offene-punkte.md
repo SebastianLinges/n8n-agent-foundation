@@ -69,8 +69,6 @@ Vier Modell-Nodes im Content Studio und je zwei in den KI-Daily-Flows tragen das
 
 Bleibt liegen, bis diese Nodes ohnehin angefasst werden.
 
-### Eigener Repo-Ordner
-Die drei Marketing-Flows haben noch keinen Ordner unter `flows/`. Fällig, sobald an ihnen mehr als punktuell gearbeitet wird.
 
 ## Später
 

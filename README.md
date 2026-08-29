@@ -20,9 +20,12 @@ flows/<flow-name>/
 | RWG_Jira-Feldpflege | `flows/rwg-jira-feldpflege/` | `k4SmnNrz7ASMdFwk` |
 | KI Daily - Collect [WF-1] | `flows/ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
 | KI Daily - Analyze & Deliver [WF-2] | `flows/ki-daily-analyze/` | `objM2PQrcTpEzik7` |
+| KAPA Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |
 | RWG ProzessHub nach SharePoint | `flows/prozesshub-sharepoint/` | `Muss6GBGPuG9fjE2` |
 
 Die beiden KI-Daily-Flows gehören zusammen und müssen **auf denselben Wochentagen laufen** — die Kopplung trägt über Zustände in Supabase, nicht über ein Datum. Wer den Cron des einen ändert, muss den anderen mitändern. Die Begründung steht in beiden Flow-READMEs.
+
+Die drei Marketing-Flows bilden eine Kette: Collect sammelt, Analyze wertet aus und legt Use Cases und Marketing-Ideen ab, das Content Studio verbraucht sie. Das Studio laeuft **einen Tag vor dem Posttag** - der `weekday` in `content_schedule` meint deshalb den Posttag, nicht den Lauftag.
 
 Der Teams-Agent ruft zwei weitere Subflows: `RWG Sub - Identity & Audience Resolver` (`B2kmRuBHRbJx8HBI`) und `RWG Sub – Teams Image Read` (`omHDN0g9Lusb6H87`). Beide sind auf der n8n-Leinwand dokumentiert und im README des Teams-Agenten eingeordnet; einen eigenen Ordner bekommen sie erst, wenn dort mehr als der Export abzulegen ist.
 
