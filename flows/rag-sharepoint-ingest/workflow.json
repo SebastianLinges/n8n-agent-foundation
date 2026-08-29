@@ -10,7 +10,8 @@
     "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
     "callerPolicy": "workflowsFromSameOwner",
     "executionTimeout": 3600,
-    "timeSavedPerExecution": 15
+    "timeSavedPerExecution": 15,
+    "timezone": "Europe/Berlin"
   },
   "connections": {
     "Webhook SharePoint": {
@@ -969,17 +970,6 @@
         ]
       ]
     },
-    "Wissensbasis-Bestand": {
-      "main": [
-        [
-          {
-            "node": "Aufgaben bestimmen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Aufgaben bestimmen": {
       "main": [
         [
@@ -1247,6 +1237,28 @@
         [
           {
             "node": "Laufbilanz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wissensbasis-Bestand": {
+      "main": [
+        [
+          {
+            "node": "Chunkzahlen laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunkzahlen laden": {
+      "main": [
+        [
+          {
+            "node": "Aufgaben bestimmen",
             "type": "main",
             "index": 0
           }
@@ -2997,7 +3009,7 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "30 3 * * *"
+              "expression": "55 1 * * *"
             }
           ]
         }
@@ -3025,7 +3037,7 @@
         -40
       ],
       "parameters": {
-        "jsCode": "// ============================================================\n// STEUERUNG DES LAUFS\n//\n// Zwei Betriebsarten, ein Verarbeitungsweg:\n//\n//   DELTA - stuendlich. Microsoft Graph liefert genau das, was sich\n//   seit dem letzten Anker geaendert hat. Schnell und guenstig; ohne\n//   Aenderungen ist der Lauf nach einer halben Sekunde fertig.\n//\n//   ABGLEICH - naechtlich um 03:30. Der vollstaendige\n//   SharePoint-Bestand wird gegen die Wissensbasis gehalten. Das\n//   findet, was das Delta nicht finden kann: Eine Loeschung meldet\n//   Graph genau einmal; scheitert dieser Lauf, ist die Meldung fort\n//   und der Eintrag bliebe fuer immer stehen. Der Abgleich fasst\n//   ausserdem die Erstbefuellung ab - was nie eingelesen wurde,\n//   faellt dort als fehlend auf.\n//\n// Der Vergleich selbst kostet keine OCR. Nur was wirklich fehlt oder\n// sich geaendert hat, wird verarbeitet.\n// ============================================================\nlet laufart = 'delta';\ntry { if ($('Taeglich (Abgleich)').isExecuted) laufart = 'abgleich'; } catch (e) { laufart = 'delta'; }\n\nconst steuerung = {\n  laufart,\n\n  driveId: 'b!C2yhEx592Ei36yvay6U9n6Opn9Rg7v1LnJCWDZ9ZCSJEbUEViC4mS52f5_kGkuq_',\n  driveName: 'Documents (Shared Documents) der Untersite Schulungen',\n  siteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen',\n\n  // Alle Typen sind einzeln belegt. Bilder, Videos, Verknuepfungen\n  // und Weblinks bleiben aussen vor - sie machen zwei Drittel der\n  // Bibliothek aus, tragen aber keinen durchsuchbaren Text.\n  aktiveTypen: ['pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'csv', 'xlsx', 'xls', 'xlsm'],\n\n  // Obergrenze je Lauf. Eine grosse PDF braucht mehrere Minuten in\n  // der OCR; ohne Bremse liefe der Abgleich in den Zeitrahmen. Was\n  // diesmal nicht drankommt, findet der naechste Abgleich wieder.\n  //\n  // Stand 30.08.: 490 Dateien fehlen noch in der Wissensbasis, weil\n  // Power Automate nur PDF und Excel geschickt hat. Bei 20 je Nacht\n  // dauert das Aufholen rund 25 Tage. Fuer eine schnellere\n  // Erstbefuellung diesen Wert voruebergehend erhoehen.\n  maxJeLauf: 20,\n\n  // Namensfilter fuer gezielte Nacharbeit. Im Betrieb leer.\n  nurDatei: '',\n\n  verarbeiten: true,\n  loeschungenMelden: true,\n  zustandSchreiben: true,\n\n  audience: 'public',\n  maxDateiMb: 40,\n  maxZeilenJeBlatt: 5000\n};\n\n// Word und PowerPoint gehen ueber die PDF-Wandlung von Graph in\n// dieselbe OCR-Strecke wie die PDFs. Bei PowerPoint zahlt sich das\n// besonders aus: Mistral erfasst dann auch die Folienbilder.\nsteuerung.ueberPdf = ['docx', 'doc', 'pptx', 'ppt'];\n\n// Arbeitsmappen werden ueber die Workbook-API gelesen, weil der\n// Extract-Node nur ein Blatt kennt und die uebrigen lautlos weglaesst.\nsteuerung.ueberWorkbook = ['xlsx', 'xlsm'];\n\n// Beim Abgleich zaehlt der Anker nicht - es soll ja der ganze\n// Bestand gesehen werden. Fortgeschrieben wird er trotzdem, damit\n// der naechste Delta-Lauf sauber aufsetzt.\nsteuerung.ankerIgnorieren = laufart === 'abgleich';\n\nreturn [{ json: { _steuerung: steuerung } }];"
+        "jsCode": "// ============================================================\n// STEUERUNG DES LAUFS\n//\n// Zwei Betriebsarten, ein Verarbeitungsweg:\n//\n//   DELTA - stuendlich. Microsoft Graph liefert genau das, was sich\n//   seit dem letzten Anker geaendert hat. Ohne Aenderungen ist der\n//   Lauf nach einer halben Sekunde fertig.\n//\n//   ABGLEICH - naechtlich um 03:30. Der vollstaendige\n//   SharePoint-Bestand wird gegen die Wissensbasis gehalten. Das\n//   findet, was das Delta nicht finden kann: Eine Loeschung meldet\n//   Graph genau einmal; scheitert dieser Lauf, ist die Meldung fort\n//   und der Eintrag bliebe fuer immer stehen. Der Abgleich fasst\n//   ausserdem die Erstbefuellung ab und holt unvollstaendige\n//   Eintraege nach - solche, bei denen ein Abbruch zwischen dem\n//   Anlegen des Dokuments und dem Schreiben der Chunks lag.\n//\n// Der Vergleich selbst kostet keine OCR. Nur was wirklich fehlt oder\n// sich geaendert hat, wird verarbeitet.\n// ============================================================\nlet laufart = 'delta';\ntry { if ($('Taeglich (Abgleich)').isExecuted) laufart = 'abgleich'; } catch (e) { laufart = 'delta'; }\n\nconst steuerung = {\n  laufart,\n\n  driveId: 'b!C2yhEx592Ei36yvay6U9n6Opn9Rg7v1LnJCWDZ9ZCSJEbUEViC4mS52f5_kGkuq_',\n  driveName: 'Documents (Shared Documents) der Untersite Schulungen',\n  siteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen',\n\n  // Bilder, Videos, Verknuepfungen und Weblinks bleiben aussen vor -\n  // sie machen zwei Drittel der Bibliothek aus, tragen aber keinen\n  // durchsuchbaren Text.\n  aktiveTypen: ['pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'csv', 'xlsx', 'xls', 'xlsm'],\n\n  // Obergrenze je Lauf. Eine grosse PDF braucht mehrere Minuten in\n  // der OCR. Stand 30.08. fehlen noch rund 460 Dateien, weil Power\n  // Automate nur PDF und Excel geschickt hat - bei 30 je Nacht\n  // dauert das Aufholen gut zwei Wochen. Fuer eine schnellere\n  // Erstbefuellung diesen Wert voruebergehend erhoehen.\n  maxJeLauf: 30,\n\n  // Namensfilter fuer gezielte Nacharbeit. Im Betrieb leer.\n  nurDatei: '',\n\n  verarbeiten: true,\n  loeschungenMelden: true,\n  zustandSchreiben: true,\n\n  audience: 'public',\n  maxDateiMb: 40,\n  maxZeilenJeBlatt: 5000\n};\n\n// Word und PowerPoint gehen ueber die PDF-Wandlung von Graph in\n// dieselbe OCR-Strecke wie die PDFs. Bei PowerPoint zahlt sich das\n// besonders aus: Mistral erfasst dann auch die Folienbilder.\nsteuerung.ueberPdf = ['docx', 'doc', 'pptx', 'ppt'];\n\n// Arbeitsmappen werden ueber die Workbook-API gelesen, weil der\n// Extract-Node nur ein Blatt kennt und die uebrigen lautlos weglaesst.\nsteuerung.ueberWorkbook = ['xlsx', 'xlsm'];\n\nsteuerung.ankerIgnorieren = laufart === 'abgleich';\n\nreturn [{ json: { _steuerung: steuerung } }];"
       }
     },
     {
@@ -3147,7 +3159,7 @@
         -40
       ],
       "parameters": {
-        "jsCode": "// ============================================================\n// WAS IST ZU TUN?\n//\n// Aus dem SharePoint-Bestand und der Wissensbasis entstehen hier die\n// Aufgaben. Je nach Betriebsart auf zwei Wegen:\n//\n//   DELTA - Graph hat bereits gefiltert. Was kommt, hat sich\n//   geaendert. Loeschungen tragen einen deleted-Vermerk.\n//\n//   ABGLEICH - der volle Bestand liegt vor und wird gegen die\n//   Wissensbasis gehalten. Drei Befunde:\n//     fehlend    - liegt in SharePoint, steht nicht im RAG\n//     veraltet   - in SharePoint neuer als die letzte Einlesung\n//     verwaist   - steht im RAG, liegt nicht mehr in SharePoint\n//\n// VORSICHT BEIM VERWAIST-BEFUND\n// Die Wissensbasis enthaelt auch Dokumente, die nicht aus dieser\n// Bibliothek stammen - aus der Power-Automate-Zeit laesst sich ihre\n// Herkunft nicht sicher bestimmen, weil dort der Pfad anders\n// geschrieben wurde. Als verwaist gilt deshalb nur, was eine\n// Graph-Item-ID traegt und damit nachweislich von hier kommt.\n// ============================================================\nconst st = $('Steuerung').first().json._steuerung;\nconst aktiv = new Set(st.aktiveTypen.map(t => String(t).toLowerCase()));\nconst ueberPdf = new Set((st.ueberPdf || []).map(t => String(t).toLowerCase()));\nconst ueberWorkbook = new Set((st.ueberWorkbook || []).map(t => String(t).toLowerCase()));\nconst maxBytes = Number(st.maxDateiMb || 40) * 1048576;\nconst nurDatei = String(st.nurDatei || '').trim().toLowerCase();\nconst istAbgleich = st.laufart === 'abgleich';\n\n// --- SharePoint-Bestand einsammeln, Doppelungen ausschliessen ---\nconst spNachId = {};\nlet deltaLink = null;\nlet spSeiten = 0;\nfor (const s of $('SharePoint-Bestand').all()) {\n  const b = s.json || {};\n  spSeiten++;\n  for (const v of (b.value || [])) spNachId[String(v.id)] = v;\n  if (b['@odata.deltaLink']) deltaLink = b['@odata.deltaLink'];\n}\nconst spItems = Object.keys(spNachId).map(k => spNachId[k]);\n\n// --- Wissensbasis einsammeln, ebenfalls entdoppelt ---\n// Der Seitenabruf kann dieselbe Seite mehrfach liefern, wenn der\n// Knoten je Eingangsitem laeuft. Ohne Entdopplung waeren die Zahlen\n// und damit die Sicherungsrechnung falsch.\nconst ragNachId = {};\nfor (const i of $('Wissensbasis-Bestand').all()) {\n  const d = i.json;\n  if (d && d.doc_id) ragNachId[String(d.doc_id)] = d;\n}\nconst ragDocs = Object.keys(ragNachId).map(k => ragNachId[k]);\n\nconst ragNachName = {};\nfor (const d of ragDocs) {\n  const n = String(d.file_name || '').toLowerCase();\n  if (!n) continue;\n  if (!ragNachName[n]) ragNachName[n] = [];\n  ragNachName[n].push(d);\n}\nconst istGraphKennung = (id) => /^01[A-Z0-9]{20,}$/.test(String(id || ''));\n\nfunction endung(name) {\n  const t = String(name || '').split('.');\n  return t.length > 1 ? t.pop().toLowerCase() : '';\n}\nfunction ohneEndung(name) {\n  const s = String(name || '');\n  const i = s.lastIndexOf('.');\n  return i > 0 ? s.slice(0, i) : s;\n}\nfunction pfadVon(it) {\n  const p = (it.parentReference && it.parentReference.path) || '';\n  const rein = p.replace(/^\\/drives?\\/[^/]+\\/root:?/, '');\n  return (rein ? decodeURIComponent(rein) : '') + '/' + it.name;\n}\nfunction bereichVon(pfad) {\n  const teile = String(pfad || '').split('/').filter(Boolean);\n  return teile.length > 1 ? teile[0] : null;\n}\n\nfunction aufgabeAus(it, grund) {\n  const ext = endung(it.name);\n  const pfad = pfadVon(it);\n  const erst = (it.createdBy && it.createdBy.user) || {};\n  const letzt = (it.lastModifiedBy && it.lastModifiedBy.user) || {};\n  const istMappe = ueberWorkbook.has(ext);\n\n  // Liegt dieselbe Datei schon unter fremder Kennung im RAG? Dann\n  // wird sie nach dem Einlesen entfernt - Uebergang aus der\n  // Power-Automate-Zeit. Nur bei genau einem fremden Treffer.\n  const gleichnamig = (ragNachName[String(it.name || '').toLowerCase()] || [])\n    .filter(d => String(d.doc_id) !== String(it.id));\n\n  return {\n    aktion: istMappe ? 'tabelle' : 'datei',\n    grund,\n    item_id: it.id,\n    drive_id: st.driveId,\n    filename: it.name,\n    uebergabe_name: istMappe ? (ohneEndung(it.name) + ' (' + ext + ', alle Blaetter).csv') : it.name,\n    endung: ext,\n    als_pdf: ueberPdf.has(ext),\n    bytes: Number(it.size || 0),\n    file_path: pfad,\n    department: bereichVon(pfad),\n    sharepoint_url: it.webUrl || null,\n    author_name: erst.displayName || null,\n    author_email: erst.email || null,\n    last_modified_by: letzt.displayName || null,\n    created_at_sp: it.createdDateTime || null,\n    last_modified_sp: it.lastModifiedDateTime || null,\n    etag: it.eTag || null,\n    audience: st.audience,\n    alt_doc_id: gleichnamig.length === 1 ? String(gleichnamig[0].doc_id) : null\n  };\n}\n\nconst aufgaben = [];\nconst gesehen = {};\nconst uebersprungen = { falscher_typ: 0, zu_gross: 0, namensfilter: 0, unveraendert: 0, limit_erreicht: 0 };\nlet geloeschtGemeldet = 0;\n\nconst dateien = [];\nconst spIds = new Set();\n\nfor (const it of spItems) {\n  if (it.deleted) {\n    geloeschtGemeldet++;\n    if (st.loeschungenMelden) {\n      aufgaben.push({ aktion: 'loeschen', grund: 'in SharePoint geloescht', item_id: it.id, filename: it.name || null, drive_id: st.driveId });\n    }\n    continue;\n  }\n  if (!it.file) continue;\n  dateien.push(it);\n  spIds.add(String(it.id));\n}\n\nfor (const it of dateien) {\n  const ext = endung(it.name);\n  gesehen[ext] = (gesehen[ext] || 0) + 1;\n  if (!aktiv.has(ext)) { uebersprungen.falscher_typ++; continue; }\n  if (nurDatei && String(it.name || '').toLowerCase().indexOf(nurDatei) === -1) { uebersprungen.namensfilter++; continue; }\n  if (Number(it.size || 0) > maxBytes) { uebersprungen.zu_gross++; continue; }\n\n  const imRag = ragNachId[String(it.id)];\n\n  if (istAbgleich && imRag) {\n    const spZeit = Date.parse(it.lastModifiedDateTime || 0) || 0;\n    const ragZeit = Date.parse(imRag.last_ingested_at || 0) || 0;\n    if (spZeit <= ragZeit) { uebersprungen.unveraendert++; continue; }\n    aufgaben.push(aufgabeAus(it, 'in SharePoint neuer als im RAG'));\n    continue;\n  }\n\n  aufgaben.push(aufgabeAus(it, istAbgleich ? 'fehlt in der Wissensbasis' : 'aus dem Delta'));\n}\n\n// --- Verwaiste Eintraege, nur im Abgleich ---\nconst verwaist = [];\nlet nichtZuordenbar = 0;\nif (istAbgleich) {\n  for (const d of ragDocs) {\n    const id = String(d.doc_id);\n    if (!istGraphKennung(id)) { nichtZuordenbar++; continue; }\n    if (spIds.has(id)) continue;\n    verwaist.push({ aktion: 'loeschen', grund: 'liegt nicht mehr in SharePoint', item_id: id, filename: d.file_name || null, drive_id: st.driveId });\n  }\n\n  const zuordenbar = ragDocs.length - nichtZuordenbar;\n  if (zuordenbar > 0 && verwaist.length > Math.max(5, zuordenbar * 0.2)) {\n    throw new Error('SICHERUNG: ' + verwaist.length + ' von ' + zuordenbar + ' zuordenbaren Dokumenten gaelten als verwaist. Abgleich abgebrochen.');\n  }\n  for (const v of verwaist) aufgaben.push(v);\n}\n\n// --- Mengenbremse ---\nconst max = Number(st.maxJeLauf || 20);\nconst einlesen = aufgaben.filter(a => a.aktion !== 'loeschen');\nconst loeschen = aufgaben.filter(a => a.aktion === 'loeschen');\nif (einlesen.length > max) uebersprungen.limit_erreicht = einlesen.length - max;\nconst liste = loeschen.concat(einlesen.slice(0, max));\n\nconst formate = Object.keys(gesehen).sort((a, b) => gesehen[b] - gesehen[a]).map(e => e + ':' + gesehen[e]);\n\nreturn [{ json: {\n  _lauf: {\n    laufart: st.laufart,\n    sp_seiten: spSeiten,\n    items_im_bestand: spItems.length,\n    dateien: dateien.length,\n    rag_dokumente: ragDocs.length,\n    rag_nicht_zuordenbar: nichtZuordenbar,\n    formate_gesehen: formate,\n    geloescht_gemeldet: geloeschtGemeldet,\n    verwaist_gefunden: verwaist.length,\n    fehlend_gesamt: einlesen.length,\n    einzulesen: Math.min(einlesen.length, max),\n    zu_loeschen: loeschen.length,\n    aufgaben_gesamt: liste.length,\n    uebersprungen,\n    delta_link: deltaLink,\n    delta_link_erhalten: !!deltaLink,\n    vollabruf: !!st.ankerIgnorieren\n  },\n  aufgaben: liste\n} }];"
+        "jsCode": "// ============================================================\n// WAS IST ZU TUN?\n//\n//   DELTA - Graph hat gefiltert. Was kommt, hat sich geaendert.\n//   ABGLEICH - der volle Bestand wird gegen die Wissensbasis\n//   gehalten. Vier Befunde: fehlend, unvollstaendig, veraltet,\n//   verwaist.\n//\n// UNVOLLSTAENDIGE EINTRAEGE\n// Der Ingest legt das Dokument an, bevor er die Chunks schreibt.\n// Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks\n// stehen - in der Wissenssuche unsichtbar. Ohne diese Pruefung\n// gaelte er als vorhanden und bliebe fuer immer leer.\n//\n// Antwortet die Chunk-Abfrage nicht, wird der Befund uebersprungen\n// und alles Vorhandene als vollstaendig behandelt. Lieber eine\n// Nacht spaeter nachgeholt als der ganze Abgleich blockiert.\n//\n// VORSICHT BEIM VERWAIST-BEFUND\n// Als verwaist gilt nur, was eine Graph-Item-ID traegt und damit\n// nachweislich aus dieser Bibliothek stammt. Dokumente aus der\n// Power-Automate-Zeit bleiben unangetastet.\n// ============================================================\nconst st = $('Steuerung').first().json._steuerung;\nconst aktiv = new Set(st.aktiveTypen.map(t => String(t).toLowerCase()));\nconst ueberPdf = new Set((st.ueberPdf || []).map(t => String(t).toLowerCase()));\nconst ueberWorkbook = new Set((st.ueberWorkbook || []).map(t => String(t).toLowerCase()));\nconst maxBytes = Number(st.maxDateiMb || 40) * 1048576;\nconst nurDatei = String(st.nurDatei || '').trim().toLowerCase();\nconst istAbgleich = st.laufart === 'abgleich';\n\nconst spNachId = {};\nlet deltaLink = null;\nfor (const s of $('SharePoint-Bestand').all()) {\n  const b = s.json || {};\n  for (const v of (b.value || [])) spNachId[String(v.id)] = v;\n  if (b['@odata.deltaLink']) deltaLink = b['@odata.deltaLink'];\n}\nconst spItems = Object.keys(spNachId).map(k => spNachId[k]);\n\n// Entdoppelt: Der Seitenabruf kann dieselbe Seite mehrfach liefern,\n// wenn der Knoten je Eingangsitem laeuft.\nconst ragNachId = {};\nfor (const i of $('Wissensbasis-Bestand').all()) {\n  const d = i.json;\n  if (d && d.doc_id) ragNachId[String(d.doc_id)] = d;\n}\nconst ragDocs = Object.keys(ragNachId).map(k => ragNachId[k]);\n\n// Chunkpruefung, sofern die Abfrage geantwortet hat\nconst mitChunks = {};\nlet chunkpruefung = false;\nfor (const i of $('Chunkzahlen laden').all()) {\n  const ref = i.json && i.json.source_ref;\n  if (ref) { mitChunks[String(ref)] = true; chunkpruefung = true; }\n}\n\nconst ragNachName = {};\nfor (const d of ragDocs) {\n  const n = String(d.file_name || '').toLowerCase();\n  if (!n) continue;\n  if (!ragNachName[n]) ragNachName[n] = [];\n  ragNachName[n].push(d);\n}\nconst istGraphKennung = (id) => /^01[A-Z0-9]{20,}$/.test(String(id || ''));\n\nfunction endung(name) {\n  const t = String(name || '').split('.');\n  return t.length > 1 ? t.pop().toLowerCase() : '';\n}\nfunction ohneEndung(name) {\n  const s = String(name || '');\n  const i = s.lastIndexOf('.');\n  return i > 0 ? s.slice(0, i) : s;\n}\nfunction pfadVon(it) {\n  const p = (it.parentReference && it.parentReference.path) || '';\n  const rein = p.replace(/^\\/drives?\\/[^/]+\\/root:?/, '');\n  return (rein ? decodeURIComponent(rein) : '') + '/' + it.name;\n}\nfunction bereichVon(pfad) {\n  const teile = String(pfad || '').split('/').filter(Boolean);\n  return teile.length > 1 ? teile[0] : null;\n}\n\nfunction aufgabeAus(it, grund) {\n  const ext = endung(it.name);\n  const pfad = pfadVon(it);\n  const erst = (it.createdBy && it.createdBy.user) || {};\n  const letzt = (it.lastModifiedBy && it.lastModifiedBy.user) || {};\n  const istMappe = ueberWorkbook.has(ext);\n  const gleichnamig = (ragNachName[String(it.name || '').toLowerCase()] || [])\n    .filter(d => String(d.doc_id) !== String(it.id));\n\n  return {\n    aktion: istMappe ? 'tabelle' : 'datei',\n    grund,\n    item_id: it.id,\n    drive_id: st.driveId,\n    filename: it.name,\n    uebergabe_name: istMappe ? (ohneEndung(it.name) + ' (' + ext + ', alle Blaetter).csv') : it.name,\n    endung: ext,\n    als_pdf: ueberPdf.has(ext),\n    bytes: Number(it.size || 0),\n    file_path: pfad,\n    department: bereichVon(pfad),\n    sharepoint_url: it.webUrl || null,\n    author_name: erst.displayName || null,\n    author_email: erst.email || null,\n    last_modified_by: letzt.displayName || null,\n    created_at_sp: it.createdDateTime || null,\n    last_modified_sp: it.lastModifiedDateTime || null,\n    etag: it.eTag || null,\n    audience: st.audience,\n    alt_doc_id: gleichnamig.length === 1 ? String(gleichnamig[0].doc_id) : null\n  };\n}\n\nconst aufgaben = [];\nconst gesehen = {};\nconst uebersprungen = { falscher_typ: 0, zu_gross: 0, namensfilter: 0, unveraendert: 0, limit_erreicht: 0 };\nlet geloeschtGemeldet = 0;\nlet unvollstaendig = 0;\n\nconst dateien = [];\nconst spIds = new Set();\n\nfor (const it of spItems) {\n  if (it.deleted) {\n    geloeschtGemeldet++;\n    if (st.loeschungenMelden) {\n      aufgaben.push({ aktion: 'loeschen', grund: 'in SharePoint geloescht', item_id: it.id, filename: it.name || null, drive_id: st.driveId });\n    }\n    continue;\n  }\n  if (!it.file) continue;\n  dateien.push(it);\n  spIds.add(String(it.id));\n}\n\nfor (const it of dateien) {\n  const ext = endung(it.name);\n  gesehen[ext] = (gesehen[ext] || 0) + 1;\n  if (!aktiv.has(ext)) { uebersprungen.falscher_typ++; continue; }\n  if (nurDatei && String(it.name || '').toLowerCase().indexOf(nurDatei) === -1) { uebersprungen.namensfilter++; continue; }\n  if (Number(it.size || 0) > maxBytes) { uebersprungen.zu_gross++; continue; }\n\n  const imRag = ragNachId[String(it.id)];\n\n  if (istAbgleich && imRag) {\n    if (chunkpruefung && !mitChunks[String(it.id)]) {\n      unvollstaendig++;\n      aufgaben.push(aufgabeAus(it, 'im RAG ohne Chunks'));\n      continue;\n    }\n    const spZeit = Date.parse(it.lastModifiedDateTime || 0) || 0;\n    const ragZeit = Date.parse(imRag.last_ingested_at || 0) || 0;\n    if (spZeit <= ragZeit) { uebersprungen.unveraendert++; continue; }\n    aufgaben.push(aufgabeAus(it, 'in SharePoint neuer als im RAG'));\n    continue;\n  }\n\n  aufgaben.push(aufgabeAus(it, istAbgleich ? 'fehlt in der Wissensbasis' : 'aus dem Delta'));\n}\n\nconst verwaist = [];\nlet nichtZuordenbar = 0;\nif (istAbgleich) {\n  for (const d of ragDocs) {\n    const id = String(d.doc_id);\n    if (!istGraphKennung(id)) { nichtZuordenbar++; continue; }\n    if (spIds.has(id)) continue;\n    verwaist.push({ aktion: 'loeschen', grund: 'liegt nicht mehr in SharePoint', item_id: id, filename: d.file_name || null, drive_id: st.driveId });\n  }\n  const zuordenbar = ragDocs.length - nichtZuordenbar;\n  if (zuordenbar > 0 && verwaist.length > Math.max(5, zuordenbar * 0.2)) {\n    throw new Error('SICHERUNG: ' + verwaist.length + ' von ' + zuordenbar + ' zuordenbaren Dokumenten gaelten als verwaist. Abgleich abgebrochen.');\n  }\n  for (const v of verwaist) aufgaben.push(v);\n}\n\n// Unvollstaendige zuerst: Sie sind bereits angelegt und blockieren\n// sonst dauerhaft einen Platz im Bestand.\nconst max = Number(st.maxJeLauf || 20);\nconst loeschen = aufgaben.filter(a => a.aktion === 'loeschen');\nconst luecken = aufgaben.filter(a => a.aktion !== 'loeschen' && a.grund === 'im RAG ohne Chunks');\nconst uebrige = aufgaben.filter(a => a.aktion !== 'loeschen' && a.grund !== 'im RAG ohne Chunks');\nconst einlesen = luecken.concat(uebrige);\nif (einlesen.length > max) uebersprungen.limit_erreicht = einlesen.length - max;\nconst liste = loeschen.concat(einlesen.slice(0, max));\n\nconst formate = Object.keys(gesehen).sort((a, b) => gesehen[b] - gesehen[a]).map(e => e + ':' + gesehen[e]);\n\nreturn [{ json: {\n  _lauf: {\n    laufart: st.laufart,\n    items_im_bestand: spItems.length,\n    dateien: dateien.length,\n    rag_dokumente: ragDocs.length,\n    chunkpruefung_moeglich: chunkpruefung,\n    rag_mit_chunks: Object.keys(mitChunks).length,\n    rag_nicht_zuordenbar: nichtZuordenbar,\n    formate_gesehen: formate,\n    geloescht_gemeldet: geloeschtGemeldet,\n    verwaist_gefunden: verwaist.length,\n    unvollstaendig_gefunden: unvollstaendig,\n    fehlend_gesamt: einlesen.length,\n    einzulesen: Math.min(einlesen.length, max),\n    zu_loeschen: loeschen.length,\n    aufgaben_gesamt: liste.length,\n    uebersprungen,\n    delta_link: deltaLink,\n    delta_link_erhalten: !!deltaLink,\n    vollabruf: !!st.ankerIgnorieren\n  },\n  aufgaben: liste\n} }];"
       }
     },
     {
@@ -3576,6 +3588,63 @@
       "parameters": {
         "jsCode": "// In einer splitInBatches-Schleife liefert $('Node').all() nur den\n// letzten Durchlauf. Der zweite Parameter ist der Durchlaufindex; er\n// wird hochgezaehlt, bis kein Durchlauf mehr kommt.\nfunction sammle(name) {\n  const raus = [];\n  for (let i = 0; i < 2000; i++) {\n    let items;\n    try { items = $(name).all(0, i); } catch (e) { break; }\n    if (!items || !items.length) break;\n    for (const it of items) raus.push(it.json || {});\n  }\n  return raus;\n}\n\nconst st = $('Steuerung').first().json._steuerung;\nconst lauf = $('Aufgaben bestimmen').first().json._lauf || {};\nconst aufgaben = $('Aufgaben bestimmen').first().json.aufgaben || [];\n\nconst eingelesen = sammle('Workflow Summary');\nconst geloescht = sammle('Delete Workflow Summary');\nconst unveraendert = sammle('No Change Summary');\nconst fehler = sammle('Ingest Error Summary');\nconst uebersprungen = sammle('Uebergabe Datei').concat(sammle('Tabelle als CSV bauen')).filter(j => j._uebersprungen);\nconst mappen = sammle('Tabelle als CSV bauen').filter(j => !j._uebersprungen);\n\nreturn [{ json: {\n  laufart: lauf.laufart,\n  bibliothek: st.driveName,\n\n  gesehen: {\n    items_im_bestand: lauf.items_im_bestand,\n    dateien: lauf.dateien,\n    rag_dokumente: lauf.rag_dokumente,\n    rag_nicht_zuordenbar: lauf.rag_nicht_zuordenbar,\n    formate: lauf.formate_gesehen\n  },\n\n  geplant: {\n    einzulesen: lauf.einzulesen,\n    zu_loeschen: lauf.zu_loeschen,\n    verwaist_gefunden: lauf.verwaist_gefunden,\n    geloescht_gemeldet: lauf.geloescht_gemeldet,\n    uebersprungen: lauf.uebersprungen\n  },\n\n  ergebnis: {\n    neu_oder_geaendert: eingelesen.length,\n    unveraendert: unveraendert.length,\n    geloescht: geloescht.length,\n    uebersprungen: uebersprungen.length,\n    fehler: fehler.length\n  },\n\n  woerter_eingelesen: eingelesen.reduce((s, j) => s + (Number(j.word_count) || 0), 0),\n  chunks_geschrieben: eingelesen.reduce((s, j) => s + (Number(j.expected_chunk_count) || 0), 0),\n  bilder_erkannt: eingelesen.reduce((s, j) => s + (Number(j.image_count) || 0), 0),\n\n  arbeitsmappen: mappen.map(m => ({\n    datei: m.filename,\n    als_tabelle: m._blaetter_tabelle,\n    als_text: m._blaetter_text,\n    zeilen: (Number(m._zeilen_tabelle) || 0) + (Number(m._zeilen_text) || 0)\n  })),\n\n  uebersprungene: uebersprungen.map(j => (j.filename || j.item_id) + ': ' + j._uebersprungen),\n  fehlerdetails: fehler.slice(0, 10).map(j => String(j.error_code || j.message || JSON.stringify(j)).slice(0, 160)),\n\n  anker_geschrieben: !!st.zustandSchreiben && !!lauf.delta_link_erhalten,\n  aufgabenliste: aufgaben.slice(0, 40).map(a => a.aktion + ' | ' + (a.grund || '-') + ' | ' + (a.filename || a.item_id))\n} }];"
       }
+    },
+    {
+      "id": "73a761de-3a73-4742-843c-dce26a001fb8",
+      "name": "Chunkzahlen laden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -520,
+        140
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://zjabiweaihsezjjeycko.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&chunk_index=eq.0&select=source_ref&order=source_ref.asc",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "updateAParameterInEachRequest",
+              "parameters": {
+                "parameters": [
+                  {
+                    "type": "qs",
+                    "name": "offset",
+                    "value": "={{ $pageCount * 1000 }}"
+                  },
+                  {
+                    "type": "qs",
+                    "name": "limit",
+                    "value": "1000"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ $response.body.length < 1000 }}",
+              "limitPagesFetched": true,
+              "maxRequests": 5
+            }
+          },
+          "timeout": 20000
+        }
+      },
+      "notes": "Welches Dokument hat wie viele Chunks? Ein Eintrag ohne Chunks ist in der Wissenssuche unsichtbar - er entsteht, wenn ein Lauf zwischen dem Anlegen des Dokuments und dem Schreiben der Chunks abbricht. Ohne diese Pruefung gaelte er beim Abgleich als vorhanden und bliebe fuer immer leer.",
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
     }
   ],
   "nodeGroups": [],
