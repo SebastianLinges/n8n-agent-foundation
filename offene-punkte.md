@@ -32,15 +32,23 @@ Der Flow schreibt unter `Sebastian.Linges`. √Ñndert sich das Passwort oder verl√
 
 ## SharePoint Schulungen
 
-### Leere Ordner entfernen
-In Shared Documents stehen 22 oberste leere Ordner. 18 davon sind Reste vom 10.09.2024 unter `Allgemeine Informationen` - Kandidaten zum Entfernen. Vier liegen auf oberster Ebene mit sprechenden Namen (`Baumarkt Prozesse`, `Baustoff Prozesse`, `Dispo Prozesse`, `Videos/Gebuchte Belege stornieren`) und sehen nach vorbereiteter Struktur aus. Ueber die entscheidet Sebastian.
+### Vier leere Ordner - Entscheidung offen
+In Shared Documents sind die 18 Reste unter `Allgemeine Informationen` entfernt (Lauf 110380, nachgemessen mit 110382: keine Datei verloren). Stehen geblieben sind vier, weil sie nach vorbereiteter Struktur aussehen und nicht nach Rest:
 
-Nebenbefund: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Frage.
+- `/Baumarkt Prozesse`
+- `/Baustoff Prozesse`
+- `/Dispo Prozesse`
+- `/Videos/Gebuchte Belege stornieren`
+
+Sebastian entscheidet, ob sie bleiben. Der Aufraeumflow ist archiviert, laesst sich aber jederzeit wiederholen - das Praefix in `Config` ist die einzige Stellschraube.
+
+Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Freigabe.
+
 
 ### Ingest ueber Graph-Delta statt Power Automate
 Belegt mit Lauf 110377: Der Delta-Abruf liefert je Bibliothek einen Zustandsanker und erfasst Loeschung, Neuanlage und Aenderung. Der Plan liegt Sebastian vor.
 
-Offen vor dem Bau: Welche Bibliotheken sollen ueberhaupt ins Wissenssystem? Das steht heute in Power Automate und ist von aussen nicht einsehbar.
+Der Umfang steht: **Start bei Shared Documents der Untersite Schulungen**, spaeter erweiterbar. Was Power Automate heute daneben noch erfasst, ist von aussen nicht einsehbar - der Abgleich in Schritt 4 des Plans wird es zeigen.
 
 ## Content Studio, weitere Themen
 
