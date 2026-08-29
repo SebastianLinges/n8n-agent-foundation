@@ -45,14 +45,23 @@ Sebastian entscheidet, ob sie bleiben. Der Aufraeumflow ist archiviert, laesst s
 Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Freigabe.
 
 
-### Ingest ueber Graph-Delta statt Power Automate
-Der Plan liegt Sebastian vor. Belegt ist: Der Delta-Abruf liefert je Bibliothek einen Zustandsanker und erfasst Loeschung, Neuanlage und Aenderung (Lauf 110377).
+### Mistral-Guthaben aufgebraucht - blockiert PDF, Word und PowerPoint
+**Dringend, und nur von Sebastian loesbar.** Lauf 110391 endete mit HTTP 402 von `api.mistral.ai/v1/files`, Meldung *Payment required*, Verweis auf https://admin.mistral.ai/subscription.
 
-**Befund vom 29.08.: Vier der sechs gewuenschten Formate fehlen vollstaendig im RAG.** 259 Dokumente sind eingelesen, ausschliesslich pdf, xlsx und xls. In Shared Documents liegen 132 Word- und 119 PowerPoint-Dateien - keine davon im Wissensspeicher. `ingestion_errors` ist leer, es scheitert also nichts, es kommt nichts an.
+Betroffen sind alle Typen, die ueber die OCR-Strecke laufen: pdf, docx, doc, pptx, ppt. Das sind zusammen 446 der 499 verwertbaren Dateien in Shared Documents. Der Delta-Leser laeuft nachweislich bis dorthin - die Sperre liegt nicht am Flow.
 
-Der Weg dorthin ist belegt (Lauf 110388): Graph konvertiert docx nach PDF, 56 KB Quelle liefern ein echtes PDF mit 108 KB. Word und PowerPoint koennen damit durch dieselbe OCR-Strecke wie die 227 PDFs.
+Sobald das Guthaben steht: `aktiveTypen` in der Config des Delta-Lesers auf `[pdf]` setzen, `verarbeiten` und `ingestAufrufen` auf true, Lauf pruefen. Danach `docx`, dann `pptx`.
 
-Drei Entscheidungen stehen aus: Formatliste, Sichtbarkeit, Vorgehen bei der Erstbefuellung.
+### Excel liest nur das erste Blatt
+Der Extract-Node kennt `sheetName` fuer genau ein Blatt, keine Option fuer alle. Die Workbook-API von Graph liefert die Blattnamen (belegt mit Lauf 110400), der Umbau steht aus.
+
+Zwei Wege stehen offen: eine Blattschleife im Ingest, oder der Delta-Leser liefert je Blatt einen eigenen Aufruf mit CSV-Inhalt. Der zweite Weg kaeme ohne Umbau am produktiven Ingest aus und wuerde jedes Blatt zu einem eigenen Dokument machen - fuer die Wissenssuche eher ein Vorteil.
+
+### Delta-Leser scharfschalten
+Der Flow steht (`iWTELblNOt46LhhF`), belegt fuer txt, xlsx und xls. Zum Produktivgang fehlen: die blockierten Typen, der Mehrblatt-Umbau, das Fortschreiben des Zustandsankers (Node ist noch nicht verdrahtet) und der Abgleich gegen den Bestand.
+
+csv und xlsm liessen sich nicht pruefen - in der Bibliothek liegt keine einzige solche Datei.
+
 
 ### Am Ingest-Flow zu verbessern
 - **Excel liest nur das erste Blatt.** Die Extract-Nodes laufen ohne Blattangabe. Eine Arbeitsmappe mit zwoelf Registern liefert eines, ohne Fehlermeldung.
