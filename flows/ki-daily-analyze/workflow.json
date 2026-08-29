@@ -1,0 +1,1745 @@
+{
+  "id": "objM2PQrcTpEzik7",
+  "name": "KI Daily - Analyze & Deliver [WF-2]",
+  "active": true,
+  "isArchived": false,
+  "versionId": "bf3cdc27-8e33-4b46-8804-c47d7be51f6c",
+  "activeVersionId": "bf3cdc27-8e33-4b46-8804-c47d7be51f6c",
+  "triggerCount": 1,
+  "createdAt": "2026-08-09T16:32:40.514Z",
+  "updatedAt": "2026-08-29T07:14:31.070Z",
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 1800,
+    "timeSavedPerExecution": 2
+  },
+  "connections": {
+    "Kandidaten buendeln": {
+      "main": [
+        [
+          {
+            "node": "Redaktion (Brief)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redaktion (Brief)": {
+      "main": [
+        [
+          {
+            "node": "Brief bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redaktion Modell (gpt-4o)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Redaktion (Brief)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brief bauen": {
+      "main": [
+        [
+          {
+            "node": "Telegram senden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram senden": {
+      "main": [
+        [
+          {
+            "node": "Persist vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Business Scout": {
+      "main": [
+        [
+          {
+            "node": "use_cases aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scout Modell Business (gpt-4o-mini)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Business Scout",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Scout": {
+      "main": [
+        [
+          {
+            "node": "marketing_idea aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scout Modell Marketing (gpt-4o-mini)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Marketing Scout",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Behandelte Themen lesen": {
+      "main": [
+        [
+          {
+            "node": "Themen sammeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Themen sammeln": {
+      "main": [
+        [
+          {
+            "node": "Kandidaten lesen (triaged)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kandidaten lesen (triaged)": {
+      "main": [
+        [
+          {
+            "node": "Kandidaten buendeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Persist vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "news_memory aktualisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "news_memory aktualisieren": {
+      "main": [
+        [
+          {
+            "node": "Heutigen Lauf holen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Heutigen Lauf holen": {
+      "main": [
+        [
+          {
+            "node": "runs schliessen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "use_cases aufbereiten": {
+      "main": [
+        [
+          {
+            "node": "use_cases schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "marketing_idea aufbereiten": {
+      "main": [
+        [
+          {
+            "node": "marketing_idea schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blocklist lesen": {
+      "main": [
+        [
+          {
+            "node": "Behandelte Themen lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "runs schliessen": {
+      "main": [
+        [
+          {
+            "node": "Redaktionsauswahl aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redaktionsauswahl aufbereiten": {
+      "main": [
+        [
+          {
+            "node": "Business Scout",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marketing Scout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Mo/Mi/Fr 06:20": {
+      "main": [
+        [
+          {
+            "node": "Blocklist lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "20 6 * * 1,3,5"
+            }
+          ]
+        }
+      },
+      "id": "47fb4ff5-22fb-4a89-932d-8b66e6805362",
+      "name": "Trigger Mo/Mi/Fr 06:20",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -448,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i=>i.json);\nconst cutoff = Date.now() - 14*86400000;\nconst set = new Set();\nfor(const r of rows){ const tk = String(r.topic_key||'').trim(); if(!tk) continue; const d = r.reported_date ? Date.parse(r.reported_date) : NaN; if(!isNaN(d) && d < cutoff) continue; set.add(tk); }\nconst coveredTopics = Array.from(set).slice(0,60).join(', ');\nreturn [{ json: { coveredTopics, coveredCount: set.size } }];"
+      },
+      "id": "30bc3db5-b9a9-4aba-8ef0-c42c3ea885f9",
+      "name": "Themen sammeln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\n// Gewichtete Sortierung: inhaltlicher Score bleibt fuehrend, Trust-Score der Quelle als sekundaeres Signal\nconst weighted = rows.map(r => ({ ...r, _weighted: (r.score||0) + (((r.trust_score!=null?r.trust_score:5))/10)*2 }));\nweighted.sort((a,b) => b._weighted - a._weighted);\nconst top = weighted.slice(0, 40);\nconst cand = top.map((r, idx) => ({ i: idx, url_hash: r.url_hash, url: r.url, title: r.title, source: r.source, score: r.score, category: r.category, region: r.region||'INT', trust_score: (r.trust_score!=null?r.trust_score:5), summary: String(r.summary||'').slice(0,300) }));\nconst payload = JSON.stringify(cand.map(c => ({ i: c.i, t: c.title, s: c.source, sc: c.score, cat: c.category, reg: c.region, tr: c.trust_score, sum: c.summary })));\nconst allHashes = rows.map(r => r.url_hash);\nconst coveredTopics = ($('Themen sammeln').first().json.coveredTopics) || '';\nreturn [{ json: { count: cand.length, payload, cand, allHashes, coveredTopics } }];"
+      },
+      "id": "870e769a-2266-4129-a9dd-5e2d2c737127",
+      "name": "Kandidaten buendeln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Kandidaten (JSON-Array, Feld i ist der Index, reg=Region der Quelle, tr=Trust-Score der Quelle):\n{{ $json.payload }}\n\nBereits in den letzten 14 Tagen behandelt (diese Themen NICHT erneut aufnehmen): {{ $json.coveredTopics }}\n\nGib das redigierte Briefing ausschliesslich als JSON zurueck.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Du bist Chefredakteur eines taeglichen KI-Intelligence-Briefings fuer einen IT- und Digitalisierungs-Verantwortlichen. Waehle aus den Kandidaten die wirklich relevanten Meldungen und gruppiere Duplikate. Ueberspringe Themen, die bereits behandelt wurden. Jeder Kandidat hat zusaetzlich 'reg' (Region der Quelle: DE|EU|INT) und 'tr' (Trust-Score der Quelle, 0-10, hoeher = vertrauenswuerdiger/autoritativer, z.B. Behoerden und etablierte Anbieter vs. offene Discovery-Quellen). Nutze das so: bei inhaltlich aehnlicher Relevanz bevorzuge DE/EU-Quellen und hoeheren Trust-Score gegenueber INT und niedrigem Trust-Score (unter 5). Meldungen mit sehr niedrigem Trust-Score (unter 5) nur aufnehmen, wenn sie inhaltlich eindeutig relevant UND durch mindestens ein plausibles Detail gestuetzt sind, nicht bei vagen Andeutungen. Ton: problemorientiert, sachlich, kein Hype, kein Marketing-Sprech. Antworte AUSSCHLIESSLICH mit gueltigem JSON, keine Prosa, kein Markdown. Struktur: {\"main\":[bis 8],\"apps\":[bis 3],\"radar\":[bis 3]}. Jedes Element: {\"i\":<index aus Eingabe>,\"headline\":\"<praegnante deutsche Schlagzeile>\",\"why\":\"<1 Satz warum relevant fuer IT/Digitalisierung>\",\"topic_key\":\"<kurzer slug>\",\"development_stage\":\"<Release|Beta|Forschung|Ankuendigung|Analyse>\",\"strategic\":true|false}. main=wichtigste Modelle/Agenten/Enterprise-Meldungen; apps=konkrete Tools/Anwendungen; radar=Trends/Strategie zum Beobachten. Waehle hart aus, lieber wenige relevante. Nutze nur vorhandene Indizes i, erfinde nichts."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "bffaad63-c515-42e1-ad9f-ad5ce9d87ef5",
+      "name": "Redaktion (Brief)",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        912,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "4ed112c5-67c3-4489-a2e4-9caa63c0620b",
+      "name": "Redaktion Modell (gpt-4o)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : '');\nlet brief = {}; try { brief = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); } catch(e){ brief = { main:[], apps:[], radar:[] }; }\nconst b = $('Kandidaten buendeln').first().json;\nconst cand = b.cand || []; const allHashes = b.allHashes || [];\nconst byI = {}; cand.forEach(c => { byI[c.i] = c; });\nfunction esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }\nfunction sect(list, cap){ return (Array.isArray(list)?list:[]).slice(0,cap); }\nconst main = sect(brief.main,8), apps = sect(brief.apps,3), radar = sect(brief.radar,3);\nconst selected = []; const lines = [];\nlines.push('<b>KI Daily \\u00b7 ' + $now.toFormat('dd.LL.yyyy') + '</b>');\nfunction render(title, list){ if(!list.length) return; lines.push(''); lines.push('<b>'+title+'</b>'); for(const it of list){ const c = byI[it.i]; if(!c) continue; const flag = it.strategic ? ' \\u2691' : ''; lines.push('\\u2022 <a href=\"'+esc(c.url)+'\">'+esc(it.headline||c.title)+'</a>'+flag); if(it.why) lines.push('  <i>'+esc(it.why)+'</i>'); selected.push({ url_hash: c.url_hash, section: title, topic_key: it.topic_key||'', development_stage: it.development_stage||'', strategic: !!it.strategic }); } }\nrender('Wichtig', main); render('Tools & Apps', apps); render('Auf dem Radar', radar);\nconst telegram_html = lines.join('\\n');\nconst selSet = new Set(selected.map(s => s.url_hash));\nconst archived = allHashes.filter(h => !selSet.has(h));\nreturn [{ json: { telegram_html, selected, archived, reported_count: selected.length } }];"
+      },
+      "id": "f7d57aec-6ac8-472d-98ec-e08f5fb1d357",
+      "name": "Brief bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "6341837340",
+        "text": "={{ $json.telegram_html }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "411be7f5-609a-48bf-86ab-f0084208abb4",
+      "name": "Telegram senden",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        320
+      ],
+      "executeOnce": true,
+      "webhookId": "038cddca-9f4d-4e3c-bc93-2092b958442b",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const brief = $('Brief bauen').first().json;\nconst sel = brief.selected || []; const arch = brief.archived || [];\nconst nowIso = $now.toISO();\nconst out = [];\nfor(const s of sel){ out.push({ json: { url_hash: s.url_hash, status: 'reported', reported: true, reported_date: nowIso, topic_key: s.topic_key || '', development_stage: s.development_stage || '' } }); }\nfor(const h of arch){ out.push({ json: { url_hash: h, status: 'archived', reported: false, reported_date: nowIso, topic_key: '', development_stage: '' } }); }\nreturn out;"
+      },
+      "id": "ab99f113-61e9-4efb-9417-a51e8bdffa22",
+      "name": "Persist vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Redaktionell ausgewaehlte Meldungen des Tages (JSON, bereits Blocklist-gefiltert):\n{{ $json.payload }}\n\nAnzahl: {{ $json.count }}\n\nAntworte ausschliesslich mit JSON.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Du bist Business-Analyst fuer KAPA Digital. KAPA automatisiert Prozesse in Handwerksbetrieben, kleinen Fertigern, Ingenieurbueros und der Bueroorganisation kleiner Unternehmen im DACH-Raum.\n\nDestilliere aus den Meldungen KONKRETE, umsetzbare Use-Cases fuer genau diese vier Bereiche. Jeder Use-Case muss einer Content-Saeule zugeordnet werden:\n- handwerk: Handwerk und Baustelle (Aufmass, Baustellenbericht, Angebot, Nachtrag, Stundenzettel, Wartungsprotokoll)\n- fertigung: Fertigung und Maschine (Auftragspapiere, Pruefprotokoll, Ausschussauswertung, Wartungsplanung, Lieferschein, Zeugnis)\n- engineering: Engineering und CAD/PDM (Stueckliste, Revisionsstand, Zeichnungsfreigabe, Datenuebergabe, Projektkoordination)\n- buero: Buero und Verwaltung (Rechnungseingang, Posteingang, Anfragen buendeln, Angebotsnachverfolgung, Reporting, Vertragsfristen, Compliance und Nachweispflichten)\n\nPflicht fuer jeden Use-Case:\n- Der Name benennt einen konkreten Prozess. Generische Namen wie 'Workflow-Automatisierung', 'Prozessoptimierung', 'KI-Integration', 'Digitalisierung' oder 'Automatisierung fuer kleine Unternehmen' sind VERBOTEN - sie sind austauschbar und unbrauchbar. Richtig waere 'Rechnungseingang automatisch dem Auftrag zuordnen' oder 'Pruefprotokoll aus Messdaten erzeugen'.\n- Das Problem benennt einen realen Arbeitsschritt und ein konkretes Dokument oder einen konkreten Beleg. Formulierungen wie 'Routineaufgaben', 'manuelle Prozesse' oder 'Datenanalyse' sind zu unspezifisch und nicht zulaessig.\n- Der Use-Case muss fuer einen Betrieb mit 5 bis 100 Mitarbeitern realistisch sein. Keine Konzern- oder Enterprise-Szenarien, keine Entwickler- und Softwareprojektthemen, keine Forschung, keine reinen Werkzeugvorstellungen.\n- Nenne niemals Wettbewerber, Beratungen, Agenturen oder Systemhaeuser.\n- Erfinde keine Kennzahlen. Uebernimm Zahlen nur, wenn sie in der Meldung stehen.\n\nBevorzuge Use-Cases fuer handwerk und fertigung, sofern die Meldungen das hergeben - diese beiden Saeulen sind im Bestand unterversorgt.\n\nAntworte AUSSCHLIESSLICH mit einem JSON-Array (max 4). Jedes Element: {\"name\":\"<konkreter Prozess, kein Oberbegriff>\",\"pillar\":\"handwerk|fertigung|engineering|buero\",\"target_group\":\"<Zielgruppe>\",\"problem\":\"<konkreter Arbeitsschritt mit benanntem Dokument>\",\"solution\":\"<Loesung>\",\"technology\":\"<Modell/Tool/Ansatz>\",\"business_model\":\"<wie Wert entsteht>\",\"trigger_source\":\"<Titel der ausloesenden Meldung>\",\"score\":<1-10>}.\n\nWenn nichts wirklich Konkretes dabei ist, gib [] zurueck. Ein leeres Ergebnis ist besser als ein austauschbarer Use-Case."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "aa729991-a97c-441e-8f53-94717a3bf931",
+      "name": "Business Scout",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3280,
+        96
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "cf74ef03-077b-4b49-898a-331810d25f5a",
+      "name": "Scout Modell Business (gpt-4o-mini)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3280,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : '');\nlet arr=[]; try{ arr = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); }catch(e){ arr=[]; }\nif(!Array.isArray(arr)) arr=[];\nconst VALID = ['handwerk','fertigung','engineering','buero'];\n\n// Austauschbare Namen werden verworfen, statt den Bestand zu verwaessern.\nconst GENERIC = ['workflow-automatisierung','workflow automation','prozessoptimierung','ki-integration','digitalisierung','automatisierung','automatisierung fuer kleine unternehmen','automatisierung f\\u00fcr kleine unternehmen','ki im mittelstand','effizienzsteigerung'];\nfunction istGenerisch(name){\n  const n = String(name||'').toLowerCase().trim().replace(/\\s+/g,' ');\n  if (n.length < 12) return true;\n  return GENERIC.some(g => n === g || n === g + ' fuer kleine unternehmen' || n === g + ' f\\u00fcr kleine unternehmen');\n}\nfunction fallbackPillar(u){\n  const blob = ((u.name||'')+' '+(u.target_group||'')+' '+(u.problem||'')+' '+(u.solution||'')).toLowerCase();\n  if (/handwerk|baustelle|montage|installat|aufmass|werkstatt|gewerk/.test(blob)) return 'handwerk';\n  if (/fertigung|produktion|maschine|pr\\u00fcfprotokoll|pruefprotokoll|qualit\\u00e4t|qualitaet|inspekt|ausschuss|cnc/.test(blob)) return 'fertigung';\n  if (/ingenieurb|konstruktion|cad|pdm|plm|st\\u00fcckliste|stueckliste|zeichnung|projektkoordination/.test(blob)) return 'engineering';\n  return 'buero';\n}\nconst nowIso=$now.toISO(); const base=Date.now(); const out=[];\narr.slice(0,4).forEach((u,idx)=>{\n  if(!u || !u.name) return;\n  if(istGenerisch(u.name)) return;\n  let pillar = String(u.pillar||'').toLowerCase().trim();\n  if (VALID.indexOf(pillar) < 0) pillar = fallbackPillar(u);\n  out.push({ json: {\n    uc_id:'uc_'+base+'_'+idx,\n    name:String(u.name||'').slice(0,200),\n    pillar,\n    target_group:String(u.target_group||''),\n    problem:String(u.problem||''),\n    solution:String(u.solution||''),\n    technology:String(u.technology||''),\n    trigger_source:String(u.trigger_source||''),\n    score:(typeof u.score==='number'?u.score:0),\n    business_model:String(u.business_model||''),\n    status:'new', first_seen:nowIso, last_evaluated:nowIso\n  } });\n});\nreturn out;"
+      },
+      "id": "6f0164eb-22b8-48a3-b990-00ea81fab6a5",
+      "name": "use_cases aufbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3600,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Redaktionell ausgewaehlte Meldungen des Tages (JSON, bereits Blocklist-gefiltert):\n{{ $json.payload }}\n\nAnzahl verfuegbarer Meldungen: {{ $json.count }}\nIn den letzten 14 Tagen bereits behandelt (nicht erneut aufgreifen): {{ $json.coveredTopics }}\n\nAntworte ausschliesslich mit JSON.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Du bist Content-Stratege fuer KAPA Digital. Marke: problemorientiert, sachlich, kein Hype, kein Sci-Fi, keine Nachrichtenwiedergabe.\n\nZielgruppe sind ausschliesslich Handwerksbetriebe, kleine Fertiger, Ingenieurbueros und die Bueroorganisation kleiner Unternehmen im DACH-Raum.\n\nPruefe die Meldungen und entwirf HOECHSTENS EINE Content-Idee. Eine Idee darf nur entstehen, wenn die Meldung einen konkreten, auf den Arbeitsalltag dieser Zielgruppe uebertragbaren Nutzen hat.\n\nGib ein leeres Objekt {} zurueck, wenn:\n- keine Meldung einen konkreten Bezug zu Handwerk, Fertigung, Engineering oder Bueroorganisation hat,\n- es sich nur um Modell-, Benchmark-, Forschungs- oder Enterprise-Meldungen handelt,\n- die Meldung nur ein Anbieter-Update ohne Praxisnutzen ist,\n- oder das Thema bereits behandelt wurde.\nEin leeres Objekt ist ausdruecklich erwuenscht und besser als eine schwache Idee. Der Content-Workflow hat einen eigenen Use-Case-Bestand als Rueckfallebene.\n\nDie Kernbotschaft muss einen realen Arbeitsschritt und ein konkretes Dokument oder einen konkreten Beleg benennen (Aufmass, Pruefprotokoll, Stueckliste, Rechnungseingang, Lieferschein, Zeichnungsfreigabe, Angebot, Nachtrag). Formulierungen wie 'Routineaufgaben' oder 'Datenanalyse' sind nicht zulaessig.\nDer Hook ist eine Aussage, keine rhetorische Frage.\nNenne niemals Wettbewerber, Beratungen, Agenturen oder Systemhaeuser.\n\nAntworte AUSSCHLIESSLICH mit JSON: {\"topic\":\"<Thema>\",\"pillar\":\"handwerk|fertigung|engineering|buero\",\"hook\":\"<starker erster Satz, Aussage>\",\"target_group\":\"<Zielgruppe>\",\"core_message\":\"<Kernbotschaft mit benanntem Arbeitsschritt>\",\"content_format\":\"<Karussell|Einzelbild|Text>\",\"cta\":\"<Call-to-Action>\",\"source\":\"<exakter Titel der Meldung aus der Eingabe>\"} oder {}."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "6bea4740-5910-4778-8225-327822100ffc",
+      "name": "Marketing Scout",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3280,
+        496
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "7ae4cb8b-0795-4241-a129-56820765063c",
+      "name": "Scout Modell Marketing (gpt-4o-mini)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3280,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : '');\nlet o={}; try{ o = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); }catch(e){ o={}; }\nif(Array.isArray(o)) o=o[0]||{};\n// Leeres Objekt ist ein gueltiges Ergebnis: an diesem Tag entsteht keine News-Idee.\nif(!o || !o.topic) return [];\n\nconst sel = ($('Redaktionsauswahl aufbereiten').first().json.selected_clean) || [];\nfunction norm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(); }\nconst nSrc = norm(o.source);\nlet match = sel.find(c => norm(c.title) === nSrc);\nif(!match && nSrc) match = sel.find(c => norm(c.title).indexOf(nSrc) >= 0 || nSrc.indexOf(norm(c.title)) >= 0);\n\n// Ohne belegbare Quelle keine Idee - sonst entstehen Posts mit erfundener Herkunft.\nif(!match) return [];\n\nconst VALID = ['handwerk','fertigung','engineering','buero'];\nlet pillar = String(o.pillar||'').toLowerCase().trim();\nif (VALID.indexOf(pillar) < 0) pillar = 'buero';\n\nreturn [{ json: {\n  mi_id:'mi_'+Date.now(), use_case_ref:'',\n  topic:String(o.topic||'').slice(0,200),\n  hook:String(o.hook||''),\n  target_group:String(o.target_group||''),\n  core_message:String(o.core_message||''),\n  content_format:String(o.content_format||'Einzelbild'),\n  cta:String(o.cta||''),\n  source:String(match.title||''),\n  source_url:String(match.url||''),\n  idea_date:$now.toISO(), status:'new', produced:false\n} }];"
+      },
+      "id": "cd0b7438-8404-48a5-a4fa-a29d2ce8078a",
+      "name": "marketing_idea aufbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3600,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "news_memory",
+        "limit": 300,
+        "orderBy": "reported_date.desc",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "reported"
+            }
+          ]
+        }
+      },
+      "id": "a40ae342-3f7b-4ccf-9b63-510bbd62869e",
+      "name": "Behandelte Themen lesen",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        112,
+        320
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "news_memory",
+        "returnAll": true,
+        "orderBy": "score.desc",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "triaged"
+            }
+          ]
+        }
+      },
+      "id": "2e3f9777-90cc-4e9e-96a4-afb96ad101d4",
+      "name": "Kandidaten lesen (triaged)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        512,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "news_memory",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "url_hash",
+              "condition": "eq",
+              "keyValue": "={{ $json.url_hash }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "reported",
+              "fieldValue": "={{ $json.reported }}"
+            },
+            {
+              "fieldId": "reported_date",
+              "fieldValue": "={{ $json.reported_date }}"
+            },
+            {
+              "fieldId": "topic_key",
+              "fieldValue": "={{ $json.topic_key }}"
+            },
+            {
+              "fieldId": "development_stage",
+              "fieldValue": "={{ $json.development_stage }}"
+            }
+          ]
+        }
+      },
+      "id": "1d50e70a-f2f5-45b7-8e43-aa7edeeac605",
+      "name": "news_memory aktualisieren",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "runs",
+        "limit": 1,
+        "orderBy": "started_at.desc",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "running"
+            }
+          ]
+        }
+      },
+      "id": "152ef638-5848-4ecd-b06c-cc047cf551d6",
+      "name": "Heutigen Lauf holen",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        320
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "runs",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "run_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.run_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "success"
+            },
+            {
+              "fieldId": "scored",
+              "fieldValue": "={{ $(\"Kandidaten buendeln\").first().json.count }}"
+            },
+            {
+              "fieldId": "reported_count",
+              "fieldValue": "={{ $(\"Brief bauen\").first().json.reported_count }}"
+            },
+            {
+              "fieldId": "finished_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "177585b2-7a43-4100-bdb8-4f2a0a252039",
+      "name": "runs schliessen",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "use_cases",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "uc_id",
+              "fieldValue": "={{ $json.uc_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "pillar",
+              "fieldValue": "={{ $json.pillar }}"
+            },
+            {
+              "fieldId": "target_group",
+              "fieldValue": "={{ $json.target_group }}"
+            },
+            {
+              "fieldId": "problem",
+              "fieldValue": "={{ $json.problem }}"
+            },
+            {
+              "fieldId": "solution",
+              "fieldValue": "={{ $json.solution }}"
+            },
+            {
+              "fieldId": "technology",
+              "fieldValue": "={{ $json.technology }}"
+            },
+            {
+              "fieldId": "trigger_source",
+              "fieldValue": "={{ $json.trigger_source }}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{ $json.score }}"
+            },
+            {
+              "fieldId": "business_model",
+              "fieldValue": "={{ $json.business_model }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "first_seen",
+              "fieldValue": "={{ $json.first_seen }}"
+            },
+            {
+              "fieldId": "last_evaluated",
+              "fieldValue": "={{ $json.last_evaluated }}"
+            }
+          ]
+        }
+      },
+      "id": "039ca375-97c5-4d92-865c-c8cc852948c1",
+      "name": "use_cases schreiben",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3776,
+        96
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "marketing_ideas",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "mi_id",
+              "fieldValue": "={{ $json.mi_id }}"
+            },
+            {
+              "fieldId": "use_case_ref",
+              "fieldValue": "={{ $json.use_case_ref }}"
+            },
+            {
+              "fieldId": "topic",
+              "fieldValue": "={{ $json.topic }}"
+            },
+            {
+              "fieldId": "hook",
+              "fieldValue": "={{ $json.hook }}"
+            },
+            {
+              "fieldId": "target_group",
+              "fieldValue": "={{ $json.target_group }}"
+            },
+            {
+              "fieldId": "core_message",
+              "fieldValue": "={{ $json.core_message }}"
+            },
+            {
+              "fieldId": "content_format",
+              "fieldValue": "={{ $json.content_format }}"
+            },
+            {
+              "fieldId": "cta",
+              "fieldValue": "={{ $json.cta }}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "={{ $json.source }}"
+            },
+            {
+              "fieldId": "idea_date",
+              "fieldValue": "={{ $json.idea_date }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "produced",
+              "fieldValue": "={{ $json.produced }}"
+            },
+            {
+              "fieldId": "source_url",
+              "fieldValue": "={{ $json.source_url }}"
+            }
+          ]
+        }
+      },
+      "id": "9555b575-0958-43bc-974c-2aec364d59e8",
+      "name": "marketing_idea schreiben",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3776,
+        496
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "content_blocklist",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "046d5ec1-6e84-4bae-8d59-6f51bd5b533f",
+      "name": "Blocklist lesen",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        320
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// Nur die redaktionell ausgewaehlten Meldungen gehen weiter in\n// Business- und Marketing-Scout. Vorher liefen beide Scouts auf\n// dem ungefilterten Top-40-Rohpool und ignorierten die Redaktion.\n// Zusaetzlich greift hier die Blocklist.\n// ============================================================\nconst brief = $('Brief bauen').first().json;\nconst b = $('Kandidaten buendeln').first().json;\nconst cand = b.cand || [];\nconst byHash = {};\ncand.forEach(c => { byHash[c.url_hash] = c; });\n\nconst rules = $('Blocklist lesen').all().map(i => i.json).filter(r => r && r.pattern);\nconst domains = rules.filter(r => r.match_type === 'domain').map(r => String(r.pattern).toLowerCase());\nconst paths   = rules.filter(r => r.match_type === 'url_path').map(r => String(r.pattern).toLowerCase());\nconst titleKw = rules.filter(r => r.match_type === 'title_keyword').map(r => String(r.pattern).toLowerCase());\n\nfunction hostOf(u){ const m = String(u||'').match(/^https?:\\/\\/([^\\/?#]+)/i); return m ? m[1].toLowerCase().replace(/^www\\./,'') : ''; }\nfunction pathOf(u){ const m = String(u||'').match(/^https?:\\/\\/[^\\/?#]+([^?#]*)/i); return m ? m[1].toLowerCase() : ''; }\nfunction blockReason(url, title){\n  const h = hostOf(url), p = pathOf(url), t = String(title||'').toLowerCase();\n  if (!h) return 'keine URL';\n  for (const d of domains){ if (h === d || h.endsWith('.' + d)) return 'Domain: ' + d; }\n  for (const s of paths){ if (p.indexOf(s) >= 0) return 'Verkaufsseite: ' + s; }\n  for (const k of titleKw){ if (t.indexOf(k) >= 0) return 'Listicle: ' + k; }\n  return '';\n}\n\nconst sel = brief.selected || [];\nconst clean = [];\nconst dropped = [];\nfor (const s of sel) {\n  const c = byHash[s.url_hash];\n  if (!c) continue;\n  const r = blockReason(c.url, c.title);\n  if (r) { dropped.push(hostOf(c.url) + ' (' + r + ')'); continue; }\n  clean.push({\n    i: clean.length,\n    title: c.title,\n    domain: hostOf(c.url),\n    url: c.url,\n    section: s.section,\n    score: c.score,\n    category: c.category,\n    region: c.region,\n    summary: String(c.summary||'').slice(0,300)\n  });\n}\n\nconst payload = JSON.stringify(clean.map(c => ({ i: c.i, t: c.title, d: c.domain, sec: c.section, sc: c.score, cat: c.category, reg: c.region, sum: c.summary })));\n\nreturn [{ json: {\n  count: clean.length,\n  payload,\n  selected_clean: clean,\n  dropped: dropped.join(' | '),\n  coveredTopics: b.coveredTopics || ''\n} }];"
+      },
+      "id": "d4ac1d6e-aec7-4138-9c6e-ccca9de181d4",
+      "name": "Redaktionsauswahl aufbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2624,
+        320
+      ],
+      "executeOnce": true
+    }
+  ],
+  "nodeGroups": [],
+  "activeVersion": {
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "20 6 * * 1,3,5"
+              }
+            ]
+          }
+        },
+        "id": "47fb4ff5-22fb-4a89-932d-8b66e6805362",
+        "name": "Trigger Mo/Mi/Fr 06:20",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -448,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const rows = $input.all().map(i=>i.json);\nconst cutoff = Date.now() - 14*86400000;\nconst set = new Set();\nfor(const r of rows){ const tk = String(r.topic_key||'').trim(); if(!tk) continue; const d = r.reported_date ? Date.parse(r.reported_date) : NaN; if(!isNaN(d) && d < cutoff) continue; set.add(tk); }\nconst coveredTopics = Array.from(set).slice(0,60).join(', ');\nreturn [{ json: { coveredTopics, coveredCount: set.size } }];"
+        },
+        "id": "30bc3db5-b9a9-4aba-8ef0-c42c3ea885f9",
+        "name": "Themen sammeln",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          304,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const rows = $input.all().map(i => i.json);\n// Gewichtete Sortierung: inhaltlicher Score bleibt fuehrend, Trust-Score der Quelle als sekundaeres Signal\nconst weighted = rows.map(r => ({ ...r, _weighted: (r.score||0) + (((r.trust_score!=null?r.trust_score:5))/10)*2 }));\nweighted.sort((a,b) => b._weighted - a._weighted);\nconst top = weighted.slice(0, 40);\nconst cand = top.map((r, idx) => ({ i: idx, url_hash: r.url_hash, url: r.url, title: r.title, source: r.source, score: r.score, category: r.category, region: r.region||'INT', trust_score: (r.trust_score!=null?r.trust_score:5), summary: String(r.summary||'').slice(0,300) }));\nconst payload = JSON.stringify(cand.map(c => ({ i: c.i, t: c.title, s: c.source, sc: c.score, cat: c.category, reg: c.region, tr: c.trust_score, sum: c.summary })));\nconst allHashes = rows.map(r => r.url_hash);\nconst coveredTopics = ($('Themen sammeln').first().json.coveredTopics) || '';\nreturn [{ json: { count: cand.length, payload, cand, allHashes, coveredTopics } }];"
+        },
+        "id": "870e769a-2266-4129-a9dd-5e2d2c737127",
+        "name": "Kandidaten buendeln",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          704,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Kandidaten (JSON-Array, Feld i ist der Index, reg=Region der Quelle, tr=Trust-Score der Quelle):\n{{ $json.payload }}\n\nBereits in den letzten 14 Tagen behandelt (diese Themen NICHT erneut aufnehmen): {{ $json.coveredTopics }}\n\nGib das redigierte Briefing ausschliesslich als JSON zurueck.",
+          "messages": {
+            "messageValues": [
+              {
+                "message": "Du bist Chefredakteur eines taeglichen KI-Intelligence-Briefings fuer einen IT- und Digitalisierungs-Verantwortlichen. Waehle aus den Kandidaten die wirklich relevanten Meldungen und gruppiere Duplikate. Ueberspringe Themen, die bereits behandelt wurden. Jeder Kandidat hat zusaetzlich 'reg' (Region der Quelle: DE|EU|INT) und 'tr' (Trust-Score der Quelle, 0-10, hoeher = vertrauenswuerdiger/autoritativer, z.B. Behoerden und etablierte Anbieter vs. offene Discovery-Quellen). Nutze das so: bei inhaltlich aehnlicher Relevanz bevorzuge DE/EU-Quellen und hoeheren Trust-Score gegenueber INT und niedrigem Trust-Score (unter 5). Meldungen mit sehr niedrigem Trust-Score (unter 5) nur aufnehmen, wenn sie inhaltlich eindeutig relevant UND durch mindestens ein plausibles Detail gestuetzt sind, nicht bei vagen Andeutungen. Ton: problemorientiert, sachlich, kein Hype, kein Marketing-Sprech. Antworte AUSSCHLIESSLICH mit gueltigem JSON, keine Prosa, kein Markdown. Struktur: {\"main\":[bis 8],\"apps\":[bis 3],\"radar\":[bis 3]}. Jedes Element: {\"i\":<index aus Eingabe>,\"headline\":\"<praegnante deutsche Schlagzeile>\",\"why\":\"<1 Satz warum relevant fuer IT/Digitalisierung>\",\"topic_key\":\"<kurzer slug>\",\"development_stage\":\"<Release|Beta|Forschung|Ankuendigung|Analyse>\",\"strategic\":true|false}. main=wichtigste Modelle/Agenten/Enterprise-Meldungen; apps=konkrete Tools/Anwendungen; radar=Trends/Strategie zum Beobachten. Waehle hart aus, lieber wenige relevante. Nutze nur vorhandene Indizes i, erfinde nichts."
+              }
+            ]
+          },
+          "batching": {}
+        },
+        "id": "bffaad63-c515-42e1-ad9f-ad5ce9d87ef5",
+        "name": "Redaktion (Brief)",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          912,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o",
+            "cachedResultName": "gpt-4o"
+          },
+          "builtInTools": {},
+          "options": {
+            "temperature": 0.3
+          }
+        },
+        "id": "4ed112c5-67c3-4489-a2e4-9caa63c0620b",
+        "name": "Redaktion Modell (gpt-4o)",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          912,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : '');\nlet brief = {}; try { brief = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); } catch(e){ brief = { main:[], apps:[], radar:[] }; }\nconst b = $('Kandidaten buendeln').first().json;\nconst cand = b.cand || []; const allHashes = b.allHashes || [];\nconst byI = {}; cand.forEach(c => { byI[c.i] = c; });\nfunction esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }\nfunction sect(list, cap){ return (Array.isArray(list)?list:[]).slice(0,cap); }\nconst main = sect(brief.main,8), apps = sect(brief.apps,3), radar = sect(brief.radar,3);\nconst selected = []; const lines = [];\nlines.push('<b>KI Daily \\u00b7 ' + $now.toFormat('dd.LL.yyyy') + '</b>');\nfunction render(title, list){ if(!list.length) return; lines.push(''); lines.push('<b>'+title+'</b>'); for(const it of list){ const c = byI[it.i]; if(!c) continue; const flag = it.strategic ? ' \\u2691' : ''; lines.push('\\u2022 <a href=\"'+esc(c.url)+'\">'+esc(it.headline||c.title)+'</a>'+flag); if(it.why) lines.push('  <i>'+esc(it.why)+'</i>'); selected.push({ url_hash: c.url_hash, section: title, topic_key: it.topic_key||'', development_stage: it.development_stage||'', strategic: !!it.strategic }); } }\nrender('Wichtig', main); render('Tools & Apps', apps); render('Auf dem Radar', radar);\nconst telegram_html = lines.join('\\n');\nconst selSet = new Set(selected.map(s => s.url_hash));\nconst archived = allHashes.filter(h => !selSet.has(h));\nreturn [{ json: { telegram_html, selected, archived, reported_count: selected.length } }];"
+        },
+        "id": "f7d57aec-6ac8-472d-98ec-e08f5fb1d357",
+        "name": "Brief bauen",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1312,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "chatId": "6341837340",
+          "text": "={{ $json.telegram_html }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "disable_web_page_preview": true,
+            "parse_mode": "HTML"
+          }
+        },
+        "id": "411be7f5-609a-48bf-86ab-f0084208abb4",
+        "name": "Telegram senden",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1568,
+          320
+        ],
+        "executeOnce": true,
+        "webhookId": "038cddca-9f4d-4e3c-bc93-2092b958442b",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const brief = $('Brief bauen').first().json;\nconst sel = brief.selected || []; const arch = brief.archived || [];\nconst nowIso = $now.toISO();\nconst out = [];\nfor(const s of sel){ out.push({ json: { url_hash: s.url_hash, status: 'reported', reported: true, reported_date: nowIso, topic_key: s.topic_key || '', development_stage: s.development_stage || '' } }); }\nfor(const h of arch){ out.push({ json: { url_hash: h, status: 'archived', reported: false, reported_date: nowIso, topic_key: '', development_stage: '' } }); }\nreturn out;"
+        },
+        "id": "ab99f113-61e9-4efb-9417-a51e8bdffa22",
+        "name": "Persist vorbereiten",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Redaktionell ausgewaehlte Meldungen des Tages (JSON, bereits Blocklist-gefiltert):\n{{ $json.payload }}\n\nAnzahl: {{ $json.count }}\n\nAntworte ausschliesslich mit JSON.",
+          "messages": {
+            "messageValues": [
+              {
+                "message": "Du bist Business-Analyst fuer KAPA Digital. KAPA automatisiert Prozesse in Handwerksbetrieben, kleinen Fertigern, Ingenieurbueros und der Bueroorganisation kleiner Unternehmen im DACH-Raum.\n\nDestilliere aus den Meldungen KONKRETE, umsetzbare Use-Cases fuer genau diese vier Bereiche. Jeder Use-Case muss einer Content-Saeule zugeordnet werden:\n- handwerk: Handwerk und Baustelle (Aufmass, Baustellenbericht, Angebot, Nachtrag, Stundenzettel, Wartungsprotokoll)\n- fertigung: Fertigung und Maschine (Auftragspapiere, Pruefprotokoll, Ausschussauswertung, Wartungsplanung, Lieferschein, Zeugnis)\n- engineering: Engineering und CAD/PDM (Stueckliste, Revisionsstand, Zeichnungsfreigabe, Datenuebergabe, Projektkoordination)\n- buero: Buero und Verwaltung (Rechnungseingang, Posteingang, Anfragen buendeln, Angebotsnachverfolgung, Reporting, Vertragsfristen, Compliance und Nachweispflichten)\n\nPflicht fuer jeden Use-Case:\n- Der Name benennt einen konkreten Prozess. Generische Namen wie 'Workflow-Automatisierung', 'Prozessoptimierung', 'KI-Integration', 'Digitalisierung' oder 'Automatisierung fuer kleine Unternehmen' sind VERBOTEN - sie sind austauschbar und unbrauchbar. Richtig waere 'Rechnungseingang automatisch dem Auftrag zuordnen' oder 'Pruefprotokoll aus Messdaten erzeugen'.\n- Das Problem benennt einen realen Arbeitsschritt und ein konkretes Dokument oder einen konkreten Beleg. Formulierungen wie 'Routineaufgaben', 'manuelle Prozesse' oder 'Datenanalyse' sind zu unspezifisch und nicht zulaessig.\n- Der Use-Case muss fuer einen Betrieb mit 5 bis 100 Mitarbeitern realistisch sein. Keine Konzern- oder Enterprise-Szenarien, keine Entwickler- und Softwareprojektthemen, keine Forschung, keine reinen Werkzeugvorstellungen.\n- Nenne niemals Wettbewerber, Beratungen, Agenturen oder Systemhaeuser.\n- Erfinde keine Kennzahlen. Uebernimm Zahlen nur, wenn sie in der Meldung stehen.\n\nBevorzuge Use-Cases fuer handwerk und fertigung, sofern die Meldungen das hergeben - diese beiden Saeulen sind im Bestand unterversorgt.\n\nAntworte AUSSCHLIESSLICH mit einem JSON-Array (max 4). Jedes Element: {\"name\":\"<konkreter Prozess, kein Oberbegriff>\",\"pillar\":\"handwerk|fertigung|engineering|buero\",\"target_group\":\"<Zielgruppe>\",\"problem\":\"<konkreter Arbeitsschritt mit benanntem Dokument>\",\"solution\":\"<Loesung>\",\"technology\":\"<Modell/Tool/Ansatz>\",\"business_model\":\"<wie Wert entsteht>\",\"trigger_source\":\"<Titel der ausloesenden Meldung>\",\"score\":<1-10>}.\n\nWenn nichts wirklich Konkretes dabei ist, gib [] zurueck. Ein leeres Ergebnis ist besser als ein austauschbarer Use-Case."
+              }
+            ]
+          },
+          "batching": {}
+        },
+        "id": "aa729991-a97c-441e-8f53-94717a3bf931",
+        "name": "Business Scout",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          3280,
+          96
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "builtInTools": {},
+          "options": {
+            "temperature": 0.2
+          }
+        },
+        "id": "cf74ef03-077b-4b49-898a-331810d25f5a",
+        "name": "Scout Modell Business (gpt-4o-mini)",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          3280,
+          288
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : '');\nlet arr=[]; try{ arr = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); }catch(e){ arr=[]; }\nif(!Array.isArray(arr)) arr=[];\nconst VALID = ['handwerk','fertigung','engineering','buero'];\n\n// Austauschbare Namen werden verworfen, statt den Bestand zu verwaessern.\nconst GENERIC = ['workflow-automatisierung','workflow automation','prozessoptimierung','ki-integration','digitalisierung','automatisierung','automatisierung fuer kleine unternehmen','automatisierung f\\u00fcr kleine unternehmen','ki im mittelstand','effizienzsteigerung'];\nfunction istGenerisch(name){\n  const n = String(name||'').toLowerCase().trim().replace(/\\s+/g,' ');\n  if (n.length < 12) return true;\n  return GENERIC.some(g => n === g || n === g + ' fuer kleine unternehmen' || n === g + ' f\\u00fcr kleine unternehmen');\n}\nfunction fallbackPillar(u){\n  const blob = ((u.name||'')+' '+(u.target_group||'')+' '+(u.problem||'')+' '+(u.solution||'')).toLowerCase();\n  if (/handwerk|baustelle|montage|installat|aufmass|werkstatt|gewerk/.test(blob)) return 'handwerk';\n  if (/fertigung|produktion|maschine|pr\\u00fcfprotokoll|pruefprotokoll|qualit\\u00e4t|qualitaet|inspekt|ausschuss|cnc/.test(blob)) return 'fertigung';\n  if (/ingenieurb|konstruktion|cad|pdm|plm|st\\u00fcckliste|stueckliste|zeichnung|projektkoordination/.test(blob)) return 'engineering';\n  return 'buero';\n}\nconst nowIso=$now.toISO(); const base=Date.now(); const out=[];\narr.slice(0,4).forEach((u,idx)=>{\n  if(!u || !u.name) return;\n  if(istGenerisch(u.name)) return;\n  let pillar = String(u.pillar||'').toLowerCase().trim();\n  if (VALID.indexOf(pillar) < 0) pillar = fallbackPillar(u);\n  out.push({ json: {\n    uc_id:'uc_'+base+'_'+idx,\n    name:String(u.name||'').slice(0,200),\n    pillar,\n    target_group:String(u.target_group||''),\n    problem:String(u.problem||''),\n    solution:String(u.solution||''),\n    technology:String(u.technology||''),\n    trigger_source:String(u.trigger_source||''),\n    score:(typeof u.score==='number'?u.score:0),\n    business_model:String(u.business_model||''),\n    status:'new', first_seen:nowIso, last_evaluated:nowIso\n  } });\n});\nreturn out;"
+        },
+        "id": "6f0164eb-22b8-48a3-b990-00ea81fab6a5",
+        "name": "use_cases aufbereiten",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3600,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Redaktionell ausgewaehlte Meldungen des Tages (JSON, bereits Blocklist-gefiltert):\n{{ $json.payload }}\n\nAnzahl verfuegbarer Meldungen: {{ $json.count }}\nIn den letzten 14 Tagen bereits behandelt (nicht erneut aufgreifen): {{ $json.coveredTopics }}\n\nAntworte ausschliesslich mit JSON.",
+          "messages": {
+            "messageValues": [
+              {
+                "message": "Du bist Content-Stratege fuer KAPA Digital. Marke: problemorientiert, sachlich, kein Hype, kein Sci-Fi, keine Nachrichtenwiedergabe.\n\nZielgruppe sind ausschliesslich Handwerksbetriebe, kleine Fertiger, Ingenieurbueros und die Bueroorganisation kleiner Unternehmen im DACH-Raum.\n\nPruefe die Meldungen und entwirf HOECHSTENS EINE Content-Idee. Eine Idee darf nur entstehen, wenn die Meldung einen konkreten, auf den Arbeitsalltag dieser Zielgruppe uebertragbaren Nutzen hat.\n\nGib ein leeres Objekt {} zurueck, wenn:\n- keine Meldung einen konkreten Bezug zu Handwerk, Fertigung, Engineering oder Bueroorganisation hat,\n- es sich nur um Modell-, Benchmark-, Forschungs- oder Enterprise-Meldungen handelt,\n- die Meldung nur ein Anbieter-Update ohne Praxisnutzen ist,\n- oder das Thema bereits behandelt wurde.\nEin leeres Objekt ist ausdruecklich erwuenscht und besser als eine schwache Idee. Der Content-Workflow hat einen eigenen Use-Case-Bestand als Rueckfallebene.\n\nDie Kernbotschaft muss einen realen Arbeitsschritt und ein konkretes Dokument oder einen konkreten Beleg benennen (Aufmass, Pruefprotokoll, Stueckliste, Rechnungseingang, Lieferschein, Zeichnungsfreigabe, Angebot, Nachtrag). Formulierungen wie 'Routineaufgaben' oder 'Datenanalyse' sind nicht zulaessig.\nDer Hook ist eine Aussage, keine rhetorische Frage.\nNenne niemals Wettbewerber, Beratungen, Agenturen oder Systemhaeuser.\n\nAntworte AUSSCHLIESSLICH mit JSON: {\"topic\":\"<Thema>\",\"pillar\":\"handwerk|fertigung|engineering|buero\",\"hook\":\"<starker erster Satz, Aussage>\",\"target_group\":\"<Zielgruppe>\",\"core_message\":\"<Kernbotschaft mit benanntem Arbeitsschritt>\",\"content_format\":\"<Karussell|Einzelbild|Text>\",\"cta\":\"<Call-to-Action>\",\"source\":\"<exakter Titel der Meldung aus der Eingabe>\"} oder {}."
+              }
+            ]
+          },
+          "batching": {}
+        },
+        "id": "6bea4740-5910-4778-8225-327822100ffc",
+        "name": "Marketing Scout",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          3280,
+          496
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "builtInTools": {},
+          "options": {
+            "temperature": 0.4
+          }
+        },
+        "id": "7ae4cb8b-0795-4241-a129-56820765063c",
+        "name": "Scout Modell Marketing (gpt-4o-mini)",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          3280,
+          704
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : '');\nlet o={}; try{ o = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); }catch(e){ o={}; }\nif(Array.isArray(o)) o=o[0]||{};\n// Leeres Objekt ist ein gueltiges Ergebnis: an diesem Tag entsteht keine News-Idee.\nif(!o || !o.topic) return [];\n\nconst sel = ($('Redaktionsauswahl aufbereiten').first().json.selected_clean) || [];\nfunction norm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(); }\nconst nSrc = norm(o.source);\nlet match = sel.find(c => norm(c.title) === nSrc);\nif(!match && nSrc) match = sel.find(c => norm(c.title).indexOf(nSrc) >= 0 || nSrc.indexOf(norm(c.title)) >= 0);\n\n// Ohne belegbare Quelle keine Idee - sonst entstehen Posts mit erfundener Herkunft.\nif(!match) return [];\n\nconst VALID = ['handwerk','fertigung','engineering','buero'];\nlet pillar = String(o.pillar||'').toLowerCase().trim();\nif (VALID.indexOf(pillar) < 0) pillar = 'buero';\n\nreturn [{ json: {\n  mi_id:'mi_'+Date.now(), use_case_ref:'',\n  topic:String(o.topic||'').slice(0,200),\n  hook:String(o.hook||''),\n  target_group:String(o.target_group||''),\n  core_message:String(o.core_message||''),\n  content_format:String(o.content_format||'Einzelbild'),\n  cta:String(o.cta||''),\n  source:String(match.title||''),\n  source_url:String(match.url||''),\n  idea_date:$now.toISO(), status:'new', produced:false\n} }];"
+        },
+        "id": "cd0b7438-8404-48a5-a4fa-a29d2ce8078a",
+        "name": "marketing_idea aufbereiten",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3600,
+          496
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "news_memory",
+          "limit": 300,
+          "orderBy": "reported_date.desc",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "status",
+                "condition": "eq",
+                "keyValue": "reported"
+              }
+            ]
+          }
+        },
+        "id": "a40ae342-3f7b-4ccf-9b63-510bbd62869e",
+        "name": "Behandelte Themen lesen",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          112,
+          320
+        ],
+        "executeOnce": true
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "news_memory",
+          "returnAll": true,
+          "orderBy": "score.desc",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "status",
+                "condition": "eq",
+                "keyValue": "triaged"
+              }
+            ]
+          }
+        },
+        "id": "2e3f9777-90cc-4e9e-96a4-afb96ad101d4",
+        "name": "Kandidaten lesen (triaged)",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          512,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "news_memory",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "url_hash",
+                "condition": "eq",
+                "keyValue": "={{ $json.url_hash }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.status }}"
+              },
+              {
+                "fieldId": "reported",
+                "fieldValue": "={{ $json.reported }}"
+              },
+              {
+                "fieldId": "reported_date",
+                "fieldValue": "={{ $json.reported_date }}"
+              },
+              {
+                "fieldId": "topic_key",
+                "fieldValue": "={{ $json.topic_key }}"
+              },
+              {
+                "fieldId": "development_stage",
+                "fieldValue": "={{ $json.development_stage }}"
+              }
+            ]
+          }
+        },
+        "id": "1d50e70a-f2f5-45b7-8e43-aa7edeeac605",
+        "name": "news_memory aktualisieren",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1968,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "runs",
+          "limit": 1,
+          "orderBy": "started_at.desc",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "status",
+                "condition": "eq",
+                "keyValue": "running"
+              }
+            ]
+          }
+        },
+        "id": "152ef638-5848-4ecd-b06c-cc047cf551d6",
+        "name": "Heutigen Lauf holen",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2160,
+          320
+        ],
+        "executeOnce": true
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "runs",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "run_id",
+                "condition": "eq",
+                "keyValue": "={{ $json.run_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "success"
+              },
+              {
+                "fieldId": "scored",
+                "fieldValue": "={{ $(\"Kandidaten buendeln\").first().json.count }}"
+              },
+              {
+                "fieldId": "reported_count",
+                "fieldValue": "={{ $(\"Brief bauen\").first().json.reported_count }}"
+              },
+              {
+                "fieldId": "finished_at",
+                "fieldValue": "={{ $now.toISO() }}"
+              }
+            ]
+          }
+        },
+        "id": "177585b2-7a43-4100-bdb8-4f2a0a252039",
+        "name": "runs schliessen",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2368,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "tableId": "use_cases",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "uc_id",
+                "fieldValue": "={{ $json.uc_id }}"
+              },
+              {
+                "fieldId": "name",
+                "fieldValue": "={{ $json.name }}"
+              },
+              {
+                "fieldId": "pillar",
+                "fieldValue": "={{ $json.pillar }}"
+              },
+              {
+                "fieldId": "target_group",
+                "fieldValue": "={{ $json.target_group }}"
+              },
+              {
+                "fieldId": "problem",
+                "fieldValue": "={{ $json.problem }}"
+              },
+              {
+                "fieldId": "solution",
+                "fieldValue": "={{ $json.solution }}"
+              },
+              {
+                "fieldId": "technology",
+                "fieldValue": "={{ $json.technology }}"
+              },
+              {
+                "fieldId": "trigger_source",
+                "fieldValue": "={{ $json.trigger_source }}"
+              },
+              {
+                "fieldId": "score",
+                "fieldValue": "={{ $json.score }}"
+              },
+              {
+                "fieldId": "business_model",
+                "fieldValue": "={{ $json.business_model }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.status }}"
+              },
+              {
+                "fieldId": "first_seen",
+                "fieldValue": "={{ $json.first_seen }}"
+              },
+              {
+                "fieldId": "last_evaluated",
+                "fieldValue": "={{ $json.last_evaluated }}"
+              }
+            ]
+          }
+        },
+        "id": "039ca375-97c5-4d92-865c-c8cc852948c1",
+        "name": "use_cases schreiben",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3776,
+          96
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "tableId": "marketing_ideas",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "mi_id",
+                "fieldValue": "={{ $json.mi_id }}"
+              },
+              {
+                "fieldId": "use_case_ref",
+                "fieldValue": "={{ $json.use_case_ref }}"
+              },
+              {
+                "fieldId": "topic",
+                "fieldValue": "={{ $json.topic }}"
+              },
+              {
+                "fieldId": "hook",
+                "fieldValue": "={{ $json.hook }}"
+              },
+              {
+                "fieldId": "target_group",
+                "fieldValue": "={{ $json.target_group }}"
+              },
+              {
+                "fieldId": "core_message",
+                "fieldValue": "={{ $json.core_message }}"
+              },
+              {
+                "fieldId": "content_format",
+                "fieldValue": "={{ $json.content_format }}"
+              },
+              {
+                "fieldId": "cta",
+                "fieldValue": "={{ $json.cta }}"
+              },
+              {
+                "fieldId": "source",
+                "fieldValue": "={{ $json.source }}"
+              },
+              {
+                "fieldId": "idea_date",
+                "fieldValue": "={{ $json.idea_date }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.status }}"
+              },
+              {
+                "fieldId": "produced",
+                "fieldValue": "={{ $json.produced }}"
+              },
+              {
+                "fieldId": "source_url",
+                "fieldValue": "={{ $json.source_url }}"
+              }
+            ]
+          }
+        },
+        "id": "9555b575-0958-43bc-974c-2aec364d59e8",
+        "name": "marketing_idea schreiben",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3776,
+          496
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "content_blocklist",
+          "returnAll": true,
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "active",
+                "condition": "eq",
+                "keyValue": "true"
+              }
+            ]
+          }
+        },
+        "id": "046d5ec1-6e84-4bae-8d59-6f51bd5b533f",
+        "name": "Blocklist lesen",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -128,
+          320
+        ],
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "jsCode": "// ============================================================\n// Nur die redaktionell ausgewaehlten Meldungen gehen weiter in\n// Business- und Marketing-Scout. Vorher liefen beide Scouts auf\n// dem ungefilterten Top-40-Rohpool und ignorierten die Redaktion.\n// Zusaetzlich greift hier die Blocklist.\n// ============================================================\nconst brief = $('Brief bauen').first().json;\nconst b = $('Kandidaten buendeln').first().json;\nconst cand = b.cand || [];\nconst byHash = {};\ncand.forEach(c => { byHash[c.url_hash] = c; });\n\nconst rules = $('Blocklist lesen').all().map(i => i.json).filter(r => r && r.pattern);\nconst domains = rules.filter(r => r.match_type === 'domain').map(r => String(r.pattern).toLowerCase());\nconst paths   = rules.filter(r => r.match_type === 'url_path').map(r => String(r.pattern).toLowerCase());\nconst titleKw = rules.filter(r => r.match_type === 'title_keyword').map(r => String(r.pattern).toLowerCase());\n\nfunction hostOf(u){ const m = String(u||'').match(/^https?:\\/\\/([^\\/?#]+)/i); return m ? m[1].toLowerCase().replace(/^www\\./,'') : ''; }\nfunction pathOf(u){ const m = String(u||'').match(/^https?:\\/\\/[^\\/?#]+([^?#]*)/i); return m ? m[1].toLowerCase() : ''; }\nfunction blockReason(url, title){\n  const h = hostOf(url), p = pathOf(url), t = String(title||'').toLowerCase();\n  if (!h) return 'keine URL';\n  for (const d of domains){ if (h === d || h.endsWith('.' + d)) return 'Domain: ' + d; }\n  for (const s of paths){ if (p.indexOf(s) >= 0) return 'Verkaufsseite: ' + s; }\n  for (const k of titleKw){ if (t.indexOf(k) >= 0) return 'Listicle: ' + k; }\n  return '';\n}\n\nconst sel = brief.selected || [];\nconst clean = [];\nconst dropped = [];\nfor (const s of sel) {\n  const c = byHash[s.url_hash];\n  if (!c) continue;\n  const r = blockReason(c.url, c.title);\n  if (r) { dropped.push(hostOf(c.url) + ' (' + r + ')'); continue; }\n  clean.push({\n    i: clean.length,\n    title: c.title,\n    domain: hostOf(c.url),\n    url: c.url,\n    section: s.section,\n    score: c.score,\n    category: c.category,\n    region: c.region,\n    summary: String(c.summary||'').slice(0,300)\n  });\n}\n\nconst payload = JSON.stringify(clean.map(c => ({ i: c.i, t: c.title, d: c.domain, sec: c.section, sc: c.score, cat: c.category, reg: c.region, sum: c.summary })));\n\nreturn [{ json: {\n  count: clean.length,\n  payload,\n  selected_clean: clean,\n  dropped: dropped.join(' | '),\n  coveredTopics: b.coveredTopics || ''\n} }];"
+        },
+        "id": "d4ac1d6e-aec7-4138-9c6e-ccca9de181d4",
+        "name": "Redaktionsauswahl aufbereiten",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2624,
+          320
+        ],
+        "executeOnce": true
+      }
+    ],
+    "connections": {
+      "Kandidaten buendeln": {
+        "main": [
+          [
+            {
+              "node": "Redaktion (Brief)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redaktion (Brief)": {
+        "main": [
+          [
+            {
+              "node": "Brief bauen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redaktion Modell (gpt-4o)": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Redaktion (Brief)",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Brief bauen": {
+        "main": [
+          [
+            {
+              "node": "Telegram senden",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram senden": {
+        "main": [
+          [
+            {
+              "node": "Persist vorbereiten",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Business Scout": {
+        "main": [
+          [
+            {
+              "node": "use_cases aufbereiten",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Scout Modell Business (gpt-4o-mini)": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Business Scout",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Marketing Scout": {
+        "main": [
+          [
+            {
+              "node": "marketing_idea aufbereiten",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Scout Modell Marketing (gpt-4o-mini)": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Marketing Scout",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Behandelte Themen lesen": {
+        "main": [
+          [
+            {
+              "node": "Themen sammeln",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Themen sammeln": {
+        "main": [
+          [
+            {
+              "node": "Kandidaten lesen (triaged)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Kandidaten lesen (triaged)": {
+        "main": [
+          [
+            {
+              "node": "Kandidaten buendeln",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Persist vorbereiten": {
+        "main": [
+          [
+            {
+              "node": "news_memory aktualisieren",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "news_memory aktualisieren": {
+        "main": [
+          [
+            {
+              "node": "Heutigen Lauf holen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Heutigen Lauf holen": {
+        "main": [
+          [
+            {
+              "node": "runs schliessen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "use_cases aufbereiten": {
+        "main": [
+          [
+            {
+              "node": "use_cases schreiben",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "marketing_idea aufbereiten": {
+        "main": [
+          [
+            {
+              "node": "marketing_idea schreiben",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Blocklist lesen": {
+        "main": [
+          [
+            {
+              "node": "Behandelte Themen lesen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "runs schliessen": {
+        "main": [
+          [
+            {
+              "node": "Redaktionsauswahl aufbereiten",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redaktionsauswahl aufbereiten": {
+        "main": [
+          [
+            {
+              "node": "Business Scout",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Marketing Scout",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trigger Mo/Mi/Fr 06:20": {
+        "main": [
+          [
+            {
+              "node": "Blocklist lesen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": []
+  },
+  "tags": [],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true
+  },
+  "parentFolderId": null,
+  "description": "WF-2 komplett neu (Increment 1+2): 14-Tage-Themendedup vor der Redaktion, Business Scout schreibt use_cases (max 4), Marketing Scout schreibt genau 1 marketing_idea. Ersetzt die alte Increment-1-Version.",
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
+}

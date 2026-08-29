@@ -1,0 +1,2162 @@
+{
+  "id": "mzSLn4WzFQSv0cuX",
+  "name": "KI Daily - Collect [WF-1]",
+  "active": true,
+  "isArchived": false,
+  "versionId": "1d666b87-98a5-4de4-a322-7a1e4070ac3a",
+  "activeVersionId": "1d666b87-98a5-4de4-a322-7a1e4070ac3a",
+  "triggerCount": 1,
+  "createdAt": "2026-08-08T22:32:17.276Z",
+  "updatedAt": "2026-08-29T07:22:10.917Z",
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 120,
+    "timeSavedPerExecution": 30
+  },
+  "connections": {
+    "Hacker News KI": {
+      "main": [
+        [
+          {
+            "node": "Quellen zusammenfuehren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quellen zusammenfuehren": {
+      "main": [
+        [
+          {
+            "node": "Normalisieren und Hash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Suche KI": {
+      "main": [
+        [
+          {
+            "node": "Quellen zusammenfuehren",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Kandidaten buendeln": {
+      "main": [
+        [
+          {
+            "node": "Triage (0-10)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage (0-10)": {
+      "main": [
+        [
+          {
+            "node": "Score anwenden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage Modell (gpt-4o-mini)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Triage (0-10)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lauf initialisieren": {
+      "main": [
+        [
+          {
+            "node": "runs - Lauf anlegen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub Repo-Suche": {
+      "main": [
+        [
+          {
+            "node": "Quellen zusammenfuehren",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "RSS abrufen": {
+      "main": [
+        [
+          {
+            "node": "RSS XML lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS XML lesen": {
+      "main": [
+        [
+          {
+            "node": "RSS Eintraege",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Eintraege": {
+      "main": [
+        [
+          {
+            "node": "Quellen zusammenfuehren",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "HN Query Pool": {
+      "main": [
+        [
+          {
+            "node": "Hacker News KI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub Query Pool": {
+      "main": [
+        [
+          {
+            "node": "GitHub Repo-Suche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dynamic Query Gen": {
+      "main": [
+        [
+          {
+            "node": "Tavily Query Pool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Query Pool": {
+      "main": [
+        [
+          {
+            "node": "Tavily Suche KI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Modell (gpt-4o-mini)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Dynamic Query Gen",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nur PRUEFEN ausschliessen": {
+      "main": [
+        [
+          {
+            "node": "RSS abrufen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feeds Liste": {
+      "main": [
+        [
+          {
+            "node": "Nur PRUEFEN ausschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedup gegen news_memory": {
+      "main": [
+        [
+          {
+            "node": "Kandidaten buendeln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score anwenden": {
+      "main": [
+        [
+          {
+            "node": "In news_memory speichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "In news_memory speichern": {
+      "main": [
+        [
+          {
+            "node": "Lauf zaehlen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lauf zaehlen": {
+      "main": [
+        [
+          {
+            "node": "runs - Lauf abschliessen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "news_memory Keys laden": {
+      "main": [
+        [
+          {
+            "node": "Dedup gegen news_memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "runs - Lauf anlegen": {
+      "main": [
+        [
+          {
+            "node": "HN Query Pool",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Dynamic Query Gen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GitHub Query Pool",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Feeds Liste",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cleanup news_memory (60 Tage)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cleanup runs (180 Tage)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalisieren und Hash": {
+      "main": [
+        [
+          {
+            "node": "Blocklist lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blocklist lesen": {
+      "main": [
+        [
+          {
+            "node": "news_memory Keys laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Mo/Mi/Fr 06 Uhr": {
+      "main": [
+        [
+          {
+            "node": "Lauf initialisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * 1,3,5"
+            }
+          ]
+        }
+      },
+      "id": "80e4dfb7-a03f-4bb7-b57f-dbec46380a63",
+      "name": "Trigger Mo/Mi/Fr 06 Uhr",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1280,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://hn.algolia.com/api/v1/search_by_date",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "tags",
+              "value": "story"
+            },
+            {
+              "name": "query",
+              "value": "={{ $json.query }}"
+            },
+            {
+              "name": "hitsPerPage",
+              "value": "={{ $json.hitsPerPage }}"
+            },
+            {
+              "name": "numericFilters",
+              "value": "=created_at_i>{{ $json.since }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f779e7dd-5481-4ff2-8741-0fd5cde356e7",
+      "name": "Hacker News KI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        112,
+        -352
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "id": "8bcd3922-da01-4e0b-a5dd-e2cef405c61b",
+      "name": "Quellen zusammenfuehren",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        832,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ query: $json.query, topic: $json.topic, time_range: $json.time_range, search_depth: $json.search_depth, max_results: $json.max_results, include_answer: false, include_raw_content: false }) }}",
+        "options": {}
+      },
+      "id": "1ddcaf2a-5632-4182-8ac5-1fa829a06d2e",
+      "name": "Tavily Suche KI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        112,
+        -112
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// new URL() ist im Sandbox dieser Instanz unzuverlaessig -> Regex-Parsing.\nfunction hostOf(u){ const m = String(u||'').match(/^https?:\\/\\/([^\\/?#]+)/i); return m ? m[1].toLowerCase().replace(/^www\\./,'') : ''; }\nfunction pathOf(u){ const m = String(u||'').match(/^https?:\\/\\/[^\\/?#]+([^?#]*)/i); return m ? m[1].toLowerCase() : ''; }\nfunction norm(url){ const h = hostOf(url); const p = pathOf(url); let uh = h ? (h + p) : String(url).toLowerCase().trim(); while(uh.endsWith('/')) uh = uh.slice(0,-1); return uh; }\nfunction tnorm(t){ return String(t).toLowerCase().replace(/[^a-z0-9\\u00e4\\u00f6\\u00fc\\u00df ]/g,' ').replace(/ +/g,' ').trim(); }\nfunction regionOf(host){\n  if (/\\.de$/.test(host)) return 'DE';\n  if (/\\.(at|ch|eu|nl|fr|it|es|be|dk|se|fi|pl|cz)$/.test(host)) return 'EU';\n  return 'INT';\n}\n\nconst out = [];\nfor (const it of $input.all()) {\n  const j = it.json || {};\n\n  if (Array.isArray(j.hits)) {\n    // Hacker News\n    for (const h of j.hits) {\n      const title = h.title || h.story_title;\n      let url = h.url || h.story_url;\n      if (!title) continue;\n      if (!url) url = 'https://news.ycombinator.com/item?id=' + h.objectID;\n      const host = hostOf(url);\n      out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(title).trim(), source: host || 'news.ycombinator.com', provider: 'Hacker News', url: String(url), published_at: h.created_at || null, source_type: 'discovery', region: regionOf(host), trust_score: 4 } });\n    }\n  } else if (Array.isArray(j.results)) {\n    // Tavily\n    for (const r of j.results) {\n      const title = r.title; const url = r.url;\n      if (!title || !url) continue;\n      const host = hostOf(url);\n      out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(r.content || title).slice(0,600), source: host, provider: 'Tavily', url: String(url), published_at: r.published_date || null, source_type: 'search', region: regionOf(host), trust_score: 5 } });\n    }\n  } else if (Array.isArray(j.items)) {\n    // GitHub\n    for (const g of j.items) {\n      const title = g.full_name; const url = g.html_url;\n      if (!title || !url) continue;\n      out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(g.description || title).slice(0,600), source: 'github.com', provider: 'GitHub', url: String(url), published_at: g.pushed_at || null, source_type: 'discovery', region: 'INT', trust_score: 4 } });\n    }\n  } else if (j.title && (j.link || j.id || j.guid)) {\n    // RSS - Metadaten kommen bereits angereichert aus 'RSS Eintraege'\n    const title = j.title; const url = j.link || j.id || j.guid;\n    if (!title || !url) continue;\n    const host = hostOf(url);\n    out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(j.contentSnippet || j.content || title).slice(0,600), source: host || String(j.feed_source_name || 'RSS'), provider: String(j.feed_source_name || 'RSS'), url: String(url), published_at: j.isoDate || j.pubDate || null, source_type: String(j.feed_source_type || 'news'), region: String(j.feed_region || regionOf(host)), trust_score: (j.feed_trust_score != null ? j.feed_trust_score : 6) } });\n  }\n}\nreturn out;"
+      },
+      "id": "dea2ec66-b6a2-464e-9684-39acd2addac5",
+      "name": "Normalisieren und Hash",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Die Domain MUSS an die Triage gehen. Vorher stand in 'source' fuer alle\n// Tavily-Treffer nur der String 'Tavily' - das Modell konnte Quellenqualitaet\n// gar nicht bewerten, obwohl der Prompt genau das verlangt hat.\nconst items = $input.all().map((it, idx) => ({\n  i: idx,\n  t: it.json.title,\n  d: it.json.source,\n  st: it.json.source_type,\n  reg: it.json.region,\n  sum: String(it.json.summary || '').slice(0, 180)\n}));\nreturn [{ json: { count: items.length, payload: JSON.stringify(items) } }];"
+      },
+      "id": "e62d3776-78cb-4055-b8b3-d60e40974f67",
+      "name": "Kandidaten buendeln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "gpt-4o-mini",
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "b78d2c5c-58f7-455c-9195-4aa2838ab800",
+      "name": "Triage Modell (gpt-4o-mini)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1776,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Bewerte die folgenden Meldungen aus Sicht eines KMU-Entscheiders im DACH-/EU-Raum (Handwerk, Fertigung, Engineering, Bueroorganisation).\n\nFelder: i = Index, t = Titel, d = Domain, st = Quellentyp, reg = Region, sum = Kurzfassung.\n\nGib NUR ein JSON-Array zurueck, exakt ein Objekt pro Eingabe, im Format [{\"i\":<index>,\"score\":<0-10>,\"category\":\"automation|regulation|sme|handcraft|manufacturing|engineering|ai_models|comparison\"}]. Keine Prosa, kein Markdown.\n\nEingaben:\n{{ $json.payload }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Du bist der Triage-Filter fuer KAPA Digital, einen Anbieter fuer KI-Automatisierung und Prozessberatung bei Handwerksbetrieben, kleinen Fertigern, Ingenieurbueros und in der Bueroorganisation kleiner Unternehmen im DACH-/EU-Raum. Zielgruppe sind Geschaeftsfuehrer und Entscheider in Betrieben mit 5 bis 100 Mitarbeitern, nicht KI-Forscher und nicht Konzerne.\n\nDu bekommst Titel, Domain, Quellentyp und Kurzfassung. Die Domain ist ein zentrales Bewertungssignal.\n\nZWINGEND SCORE 0:\n- Verkaufs-, Leistungs- oder Loesungsseiten von Dienstleistern, Beratungen, Agenturen, Systemhaeusern und Softwareanbietern. Erkennbar an Titeln wie 'AI Automation Services', 'KI-Loesungen fuer...', 'Solutions & Services', 'Leitfaden' auf einer Anbieterdomain.\n- SEO-Listicles und Tool-Vergleiche ('Top 10', 'Best AI Tools', '5 Best...', 'Full breakdown').\n- Reine Werbung, Pressemitteilungen ohne Sachgehalt, Kursangebote, Webinar-Anmeldungen.\n- Reine Forschungspapiere, Benchmark-Wettrennen, Modell-Parameterzahlen ohne Anwendungsbezug.\n- Konzern- und Enterprise-Meldungen ohne Uebertragbarkeit auf kleine Betriebe.\n\nScore 1-4: Rauschen, Clickbait, fuer die Zielgruppe nicht umsetzbar.\nScore 5-6: grenzwertig, nur mit erkennbarem Praxisbezug.\nScore 7-8: konkret relevant - ein nutzbares Werkzeug, ein beschriebener Anwendungsfall aus einem realen Betrieb, eine regulatorische Pflicht (EU AI Act, BSI, NIS-2), ein Funktions- oder Preisupdate eines Anbieters, den die Zielgruppe tatsaechlich einsetzt.\nScore 9-10: direkt handlungsrelevant, mit konkretem Bezug zu Handwerk, Fertigung, Engineering oder Bueroorganisation.\n\nBevorzuge redaktionelle Quellen, Behoerden, Fachmedien und Forschungseinrichtungen gegenueber Anbieterdomains. Antworte ausschliesslich mit gueltigem JSON."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "4b35e65a-72a5-4bed-944c-22d39b48de98",
+      "name": "Triage (0-10)",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1776,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : (($json && $json.response && $json.response.text) ? $json.response.text : ''));\nlet arr = [];\ntry { arr = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); } catch (e) { arr = []; }\nconst scoreMap = {};\nfor (const o of arr) { if (o && o.i !== undefined) scoreMap[o.i] = o; }\n\nconst cands = $('Kandidaten buendeln').first().json;\nlet items = [];\ntry { items = JSON.parse(cands.payload); } catch (e) { items = []; }\nconst orig = $('Dedup gegen news_memory').all();\n\n// KAPA-Kernthemen werden hochgewichtet, Modell- und Vergleichsrauschen abgewertet.\nconst PRIO = { handcraft: 2, manufacturing: 2, engineering: 2, sme: 1, automation: 1, regulation: 0, ai_models: -1, comparison: -2 };\nconst MIN_SCORE = 7;\n\nconst out = [];\nitems.forEach((c, idx) => {\n  const r = (scoreMap[c.i] !== undefined) ? scoreMap[c.i] : scoreMap[idx];\n  const rawScore = (r && typeof r.score === 'number') ? r.score : 0;\n  const category = (r && r.category) ? r.category : '';\n  const adj = PRIO[category] !== undefined ? PRIO[category] : 0;\n  const eff = Math.max(0, Math.min(10, rawScore + adj));\n  if (eff < MIN_SCORE) return;\n  const base = orig[idx] ? orig[idx].json : {};\n  out.push({ json: Object.assign({}, base, {\n    score: eff,\n    category: category,\n    score_reason: 'roh ' + rawScore + ' | Korridor ' + (category||'-') + ' ' + (adj>=0?'+':'') + adj + ' | effektiv ' + eff\n  }) });\n});\nreturn out;"
+      },
+      "id": "78fa8887-8632-4d85-b6b3-93c4489666b1",
+      "name": "Score anwenden",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "run_id",
+              "type": "string",
+              "value": "={{ $now.toFormat('yyyyLLdd-HHmmss') }}"
+            },
+            {
+              "id": "a2",
+              "name": "started_at",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "id": "a3",
+              "name": "since_ts",
+              "type": "number",
+              "value": "={{ Math.floor($now.minus({ hours: 72 }).toSeconds()) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5ab2127-ab8e-416a-96bc-077abeb3b731",
+      "name": "Lauf initialisieren",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const run_id = $('Lauf initialisieren').first().json.run_id;\nconst collected = $('Normalisieren und Hash').all().length;\nconst triaged = $('Score anwenden').all().length;\nreturn [{ json: { run_id, collected, triaged, finished_at: $now.toISO() } }];"
+      },
+      "id": "cb2b4d25-1fcb-4501-b5ae-8817cb257855",
+      "name": "Lauf zaehlen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/search/repositories",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.q }}"
+            },
+            {
+              "name": "sort",
+              "value": "stars"
+            },
+            {
+              "name": "order",
+              "value": "desc"
+            },
+            {
+              "name": "per_page",
+              "value": "10"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "kapa-daily"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "90be6680-843d-4824-8dec-f140d4219155",
+      "name": "GitHub Repo-Suche",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        112,
+        240
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.feedUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "a2222222-2222-4222-8222-222222222222",
+      "name": "RSS abrufen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        112,
+        464
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {
+          "explicitArray": false,
+          "mergeAttrs": true,
+          "normalize": true,
+          "trim": true
+        }
+      },
+      "id": "a3333333-3333-4333-8333-333333333333",
+      "name": "RSS XML lesen",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        320,
+        464
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "function txt(v){ if(v==null) return ''; if(typeof v==='string') return v.trim(); if(typeof v==='object' && typeof v._==='string') return v._.trim(); return String(v).trim(); }\nfunction pickLink(l){ if(l==null) return ''; if(typeof l==='string') return l.trim(); if(Array.isArray(l)){ const alt = l.find(x=>x&&x.rel==='alternate') || l.find(x=>x&&x.href) || l[0]; return pickLink(alt); } if(typeof l==='object'){ if(l.href) return String(l.href).trim(); if(l._) return String(l._).trim(); } return ''; }\n\nconst MAX_PER_FEED = 30;\nconst MAX_AGE_DAYS = 10;\nconst now = Date.now();\n\n// Feed-Metadaten kommen ueber den Index, NICHT ueber itemMatching().\n// itemMatching() liefert auf dieser Instanz null, dadurch landeten BSI (authority/10)\n// und Fraunhofer (research/9) bisher als 'vendor' mit Default-Trust in news_memory.\nconst feeds = $('Nur PRUEFEN ausschliessen').all().map(i => i.json);\n\nconst items = $input.all();\nconst out = [];\nfor (let idx = 0; idx < items.length; idx++) {\n  const j = items[idx].json || {};\n  const meta = feeds[idx] || {};\n  let channelTitle = meta.source_name || 'RSS';\n  let entries = [];\n  if (j.rss && j.rss.channel){\n    const ch = j.rss.channel;\n    if (!meta.source_name) channelTitle = txt(ch.title) || 'RSS';\n    let its = ch.item || []; if(!Array.isArray(its)) its=[its];\n    entries = its.map(e => ({ title: txt(e.title), link: pickLink(e.link), contentSnippet: txt(e.description || e.summary), isoDate: txt(e.pubDate || e.published || e.updated) || null }));\n  } else if (j.feed){\n    const fe = j.feed;\n    if (!meta.source_name) channelTitle = txt(fe.title) || 'RSS';\n    let its = fe.entry || []; if(!Array.isArray(its)) its=[its];\n    entries = its.map(e => ({ title: txt(e.title), link: pickLink(e.link), contentSnippet: txt(e.summary || e.content), isoDate: txt(e.updated || e.published) || null }));\n  }\n  entries = entries.filter(e => e.title && e.link);\n  entries = entries.filter(e => { if(!e.isoDate) return true; const t = Date.parse(e.isoDate); if(isNaN(t)) return true; return (now - t) <= MAX_AGE_DAYS*86400000; });\n  entries = entries.slice(0, MAX_PER_FEED);\n  for (const en of entries){\n    out.push({ json: Object.assign({}, en, {\n      creator: channelTitle,\n      feed_source_name: channelTitle,\n      feed_source_type: meta.source_type || 'news',\n      feed_corridor: meta.corridor || '',\n      feed_region: meta.region || 'INT',\n      feed_trust_score: (meta.trust_score != null ? meta.trust_score : 6),\n      feed_vendor_bias: !!meta.vendor_bias\n    }) });\n  }\n}\nreturn out;"
+      },
+      "id": "a4444444-4444-4444-8444-444444444444",
+      "name": "RSS Eintraege",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Das Suchfenster steht zentral in 'Lauf initialisieren' als since_ts (Sekunden).\nconst since = $('Lauf initialisieren').first().json.since_ts;\nconst queries = ['AI automation','n8n','Power Automate','AI agent','LLM enterprise'];\nreturn queries.map(q => ({ json: { query: q, hitsPerPage: 20, since } }));"
+      },
+      "id": "99ea5c3d-c94c-498f-8cc1-60e41861ad0e",
+      "name": "HN Query Pool",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Das Suchfenster steht zentral in 'Lauf initialisieren' als since_ts (Sekunden).\n// GitHub erwartet ein Datum, deshalb die Umrechnung auf yyyy-mm-dd.\nconst since = new Date($('Lauf initialisieren').first().json.since_ts * 1000).toISOString().slice(0,10);\nconst queries = [\n 'AI agent',\n 'workflow automation AI',\n 'document automation AI',\n 'manufacturing AI',\n 'engineering AI',\n 'business process automation',\n 'n8n community AI',\n 'local LLM business automation'\n];\nreturn queries.map(q => ({ json: { q: q + ' pushed:>' + since, corridor: 'discovery', region: 'INT' } }));"
+      },
+      "id": "d4accb11-072c-449b-b0a3-60210711b087",
+      "name": "GitHub Query Pool",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "gpt-4o-mini",
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "41ecc00c-99e6-41b6-a914-e4a43f4ccc09",
+      "name": "Query Modell (gpt-4o-mini)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Erzeuge exakt 3 NEUE Tavily-Suchanfragen fuer die tagesaktuelle Recherche von KAPA Digital.\nZielgruppe: Handwerksbetriebe, kleine Fertiger, Ingenieurbueros und die Bueroorganisation kleiner Unternehmen im DACH-Raum (5 bis 100 Mitarbeiter).\n\nVorgaben:\n- Fokus auf Entwicklungen der letzten 24-72 Stunden.\n- mindestens 2 Queries auf Deutsch mit DACH-Bezug.\n- mindestens 1 Query nach einem konkreten Arbeitsschritt oder Dokument (z.B. Aufmass, Pruefprotokoll, Stueckliste, Rechnungseingang, Zeichnungsfreigabe).\n- KEINE Queries, die Anbieter-, Agentur- oder Beratungsseiten anziehen. Vermeide Formulierungen wie 'AI automation services', 'KI-Loesungen fuer', 'best tools', 'Leitfaden', 'Anbieter', 'Vergleich'.\n- KEINE rein akademische Forschung, KEINE Benchmark-Forschung.\n- KEINE Redundanz zu Standard-Queries wie 'EU AI Act', 'n8n new features', 'ChatGPT business update'.\n\nGib NUR ein JSON-Array zurueck, exakt im Format:\n[{\"query\":\"...\",\"corridor\":\"sme|automation|manufacturing|engineering|handcraft|regulation|ai_models|comparison|discovery\",\"region\":\"DE|EU|INT\"}]\nKeine Prosa, kein Markdown.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Du generierst praezise, praxisnahe Web-Suchanfragen fuer die Unternehmens-Recherche. Du zielst auf redaktionelle Berichte, Fachmedien, Behoerden und echte Praxisberichte, nicht auf Anbieter-Marketing. Du antwortest ausschliesslich mit gueltigem JSON."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "b0b6b0c3-e215-4b4d-b17f-bfc35aa39b84",
+      "name": "Dynamic Query Gen",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -464,
+        -112
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const MAX_QUERIES = 26;      // harte Obergrenze Tavily-Calls pro Lauf (Kosten)\nconst ROTATE_PER_RUN = 2;\nconst DEFAULT_MAX_RESULTS = 5;\n\n// KAPA-Kernthemen laufen taeglich. Modell- und Vergleichsrauschen rotiert nur.\nconst ALWAYS = ['handcraft','manufacturing','engineering','sme'];\nconst ROTATING = ['automation','regulation','ai_models','comparison'];\n\n// Entfernt wurden generische Kommerz-Keywords wie 'AI automation use case small\n// medium business' oder 'business process automation AI use case'. Genau dafuer\n// ranken Wettbewerber-Landingpages - sie waren die Hauptquelle der Fehltreffer.\nconst STATIC = [\n { q:'Handwerk Digitalisierung Aufmass Software', corridor:'handcraft', region:'DE' },\n { q:'Handwerksbetrieb Angebotserstellung digital', corridor:'handcraft', region:'DE' },\n { q:'Baustellendokumentation Handwerk App Erfahrung', corridor:'handcraft', region:'DE' },\n { q:'Handwerk Auftragsabwicklung Software Praxis', corridor:'handcraft', region:'DE' },\n { q:'AI field service documentation skilled trades', corridor:'handcraft', region:'INT' },\n { q:'Fertigung Pruefprotokoll digitalisieren', corridor:'manufacturing', region:'DE' },\n { q:'Lohnfertigung Auftragsabwicklung Digitalisierung', corridor:'manufacturing', region:'DE' },\n { q:'KI Qualitaetssicherung Produktion Mittelstand', corridor:'manufacturing', region:'DE' },\n { q:'Maschinendaten Rueckmeldung ERP Fertigung', corridor:'manufacturing', region:'DE' },\n { q:'AI visual inspection manufacturing small factory', corridor:'manufacturing', region:'INT' },\n { q:'CAD Stueckliste automatisch ERP Uebergabe', corridor:'engineering', region:'DE' },\n { q:'PDM PLM Einfuehrung Mittelstand Erfahrung', corridor:'engineering', region:'DE' },\n { q:'Ingenieurbuero Projektabwicklung Digitalisierung', corridor:'engineering', region:'DE' },\n { q:'Zeichnungsfreigabe Revisionsstand Prozess', corridor:'engineering', region:'DE' },\n { q:'AI CAD engineering automation workflow', corridor:'engineering', region:'INT' },\n { q:'Rechnungseingang automatisieren Mittelstand', corridor:'sme', region:'DE' },\n { q:'Belegerkennung Dokumentenerfassung KMU', corridor:'sme', region:'DE' },\n { q:'KMU Prozessautomatisierung Erfahrungsbericht', corridor:'sme', region:'DE' },\n { q:'Angebotsnachverfolgung kleine Unternehmen Prozess', corridor:'sme', region:'DE' },\n { q:'n8n new features', corridor:'automation', region:'INT' },\n { q:'n8n AI automation', corridor:'automation', region:'INT' },\n { q:'Power Automate new features', corridor:'automation', region:'INT' },\n { q:'workflow automation software business', corridor:'automation', region:'INT' },\n { q:'EU AI Act Unternehmen', corridor:'regulation', region:'EU' },\n { q:'AI Act Mittelstand Deutschland', corridor:'regulation', region:'DE' },\n { q:'BSI kuenstliche Intelligenz Unternehmen', corridor:'regulation', region:'DE' },\n { q:'NIS-2 Umsetzung Mittelstand', corridor:'regulation', region:'DE' },\n { q:'ChatGPT business update', corridor:'ai_models', region:'INT' },\n { q:'Claude business update', corridor:'ai_models', region:'INT' },\n { q:'Mistral AI business', corridor:'ai_models', region:'EU' },\n { q:'Microsoft Copilot business update', corridor:'ai_models', region:'INT' },\n { q:'AI model price performance comparison', corridor:'comparison', region:'INT' }\n];\n\nconst dayIndex = Math.floor(Date.now() / 86400000);\nconst rotSel = [];\nfor (let k = 0; k < ROTATE_PER_RUN && k < ROTATING.length; k++) {\n  rotSel.push(ROTATING[(dayIndex + k) % ROTATING.length]);\n}\nconst activeCorridors = new Set([...ALWAYS, ...rotSel]);\nconst selected = STATIC.filter(s => activeCorridors.has(s.corridor));\n\nconst dyn = [];\nfor (const it of $input.all()) {\n  const j = it.json || {};\n  const raw = j.text || j.output || (j.response && j.response.text) || '';\n  if (!raw) continue;\n  try {\n    const arr = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim());\n    if (Array.isArray(arr)) {\n      for (const d of arr) {\n        const qq = (typeof d === 'string') ? d : (d && d.query);\n        if (qq) dyn.push({ q: String(qq).slice(0,160), corridor: (d && d.corridor) || 'discovery', region: (d && d.region) || 'INT' });\n      }\n    }\n  } catch (e) { /* Fallback: nur statische Queries */ }\n}\n\nconst seen = new Set();\nconst merged = [];\nfor (const item of [...selected, ...dyn]) {\n  const key = String(item.q).toLowerCase().trim();\n  if (!key || seen.has(key)) continue;\n  seen.add(key);\n  merged.push(item);\n}\n\nreturn merged.slice(0, MAX_QUERIES).map(x => ({ json: {\n  query: x.q, topic: 'general', time_range: 'week', search_depth: 'basic',\n  max_results: DEFAULT_MAX_RESULTS, corridor: x.corridor, region: x.region\n}}));"
+      },
+      "id": "a7de8276-28b4-47ef-9490-91497d320655",
+      "name": "Tavily Query Pool",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().filter(it => it.json.feed_url && it.json.feed_url !== 'PRUEFEN').map(it => ({ json: {\n feedUrl: it.json.feed_url,\n source_name: it.json.source_name,\n source_type: it.json.source_type,\n corridor: it.json.corridor,\n region: it.json.region,\n trust_score: it.json.trust_score,\n vendor_bias: it.json.vendor_bias\n}}));"
+      },
+      "id": "cdaa0557-c2f1-4270-8887-4bc961c2c207",
+      "name": "Nur PRUEFEN ausschliessen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "news_memory",
+        "returnAll": true
+      },
+      "id": "96a12b4a-5e91-456d-a9ba-b9b67f9310c7",
+      "name": "news_memory Keys laden",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        224
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "content_sources",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "101eb301-f6e9-4024-a6e1-32667d5ac4dc",
+      "name": "RSS Feeds Liste",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "runs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "run_id",
+              "fieldValue": "={{ $json.run_id }}"
+            },
+            {
+              "fieldId": "run_date",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "running"
+            },
+            {
+              "fieldId": "started_at",
+              "fieldValue": "={{ $json.started_at }}"
+            },
+            {
+              "fieldId": "collected",
+              "fieldValue": "={{ 0 }}"
+            },
+            {
+              "fieldId": "triaged",
+              "fieldValue": "={{ 0 }}"
+            },
+            {
+              "fieldId": "scored",
+              "fieldValue": "={{ 0 }}"
+            },
+            {
+              "fieldId": "reported_count",
+              "fieldValue": "={{ 0 }}"
+            }
+          ]
+        }
+      },
+      "id": "eab82a5a-8cfb-4363-9728-999d5d65f043",
+      "name": "runs - Lauf anlegen",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        240
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "runs",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "run_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.run_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "collected",
+              "fieldValue": "={{ $json.collected }}"
+            },
+            {
+              "fieldId": "triaged",
+              "fieldValue": "={{ $json.triaged }}"
+            },
+            {
+              "fieldId": "finished_at",
+              "fieldValue": "={{ $json.finished_at }}"
+            }
+          ]
+        }
+      },
+      "id": "8bc9fa52-f189-48db-8a55-60ada0ecf8da",
+      "name": "runs - Lauf abschliessen",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "news_memory",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "url_hash",
+              "fieldValue": "={{ $json.url_hash }}"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.title }}"
+            },
+            {
+              "fieldId": "title_norm",
+              "fieldValue": "={{ $json.title_norm }}"
+            },
+            {
+              "fieldId": "summary",
+              "fieldValue": "={{ $json.summary }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $json.category }}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "={{ $json.source }}"
+            },
+            {
+              "fieldId": "url",
+              "fieldValue": "={{ $json.url }}"
+            },
+            {
+              "fieldId": "published_at",
+              "fieldValue": "={{ $json.published_at }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "triaged"
+            },
+            {
+              "fieldId": "reported",
+              "fieldValue": "={{ false }}"
+            },
+            {
+              "fieldId": "run_id",
+              "fieldValue": "={{ $('Lauf initialisieren').first().json.run_id }}"
+            },
+            {
+              "fieldId": "first_seen",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldId": "last_seen",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{ $json.score }}"
+            },
+            {
+              "fieldId": "source_type",
+              "fieldValue": "={{ $json.source_type }}"
+            },
+            {
+              "fieldId": "region",
+              "fieldValue": "={{ $json.region }}"
+            },
+            {
+              "fieldId": "trust_score",
+              "fieldValue": "={{ $json.trust_score }}"
+            }
+          ]
+        }
+      },
+      "id": "555e8283-6ffb-48e2-b67d-c9cc21acf318",
+      "name": "In news_memory speichern",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        224
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "news_memory",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "first_seen",
+              "condition": "lt",
+              "keyValue": "={{ $now.minus({ days: 60 }).toISODate() }}"
+            }
+          ]
+        }
+      },
+      "id": "d3b3c160-271c-450c-8845-336c59b2f7f4",
+      "name": "Cleanup news_memory (60 Tage)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        720
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "runs",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "run_date",
+              "condition": "lt",
+              "keyValue": "={{ $now.minus({ days: 180 }).toISODate() }}"
+            }
+          ]
+        }
+      },
+      "id": "7cf3d071-054f-4e96-b10f-3a64ada8460d",
+      "name": "Cleanup runs (180 Tage)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        976
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "function toIso(d){ if(!d) return null; const t = Date.parse(d); return isNaN(t) ? null : new Date(t).toISOString(); }\nfunction hostOf(u){ const m = String(u||'').match(/^https?:\\/\\/([^\\/?#]+)/i); return m ? m[1].toLowerCase().replace(/^www\\./,'') : ''; }\nfunction pathOf(u){ const m = String(u||'').match(/^https?:\\/\\/[^\\/?#]+([^?#]*)/i); return m ? m[1].toLowerCase() : ''; }\n\n// ------------------------------------------------------------\n// Blocklist: Wettbewerber, Beratungen, Verkaufsseiten, Social/UGC\n// und Listicle-Farmen fliegen hier raus, BEVOR sie in die Triage\n// und damit in die Datenbank gelangen.\n// ------------------------------------------------------------\nconst rules = $('Blocklist lesen').all().map(i => i.json).filter(r => r && r.pattern);\nconst domains     = rules.filter(r => r.match_type === 'domain').map(r => String(r.pattern).toLowerCase());\nconst paths       = rules.filter(r => r.match_type === 'url_path').map(r => String(r.pattern).toLowerCase());\nconst titleKw     = rules.filter(r => r.match_type === 'title_keyword').map(r => String(r.pattern).toLowerCase());\nconst vendorTitle = rules.filter(r => r.match_type === 'vendor_title').map(r => String(r.pattern).toLowerCase());\n\n// Kuratierte Quellen (RSS aus content_sources) sind von der\n// Verkaufstitel-Heuristik ausgenommen - dort ist 'Software' im Titel\n// ein normales Fachthema, kein Verkaufssignal.\nconst CURATED = ['news','authority','research','vendor'];\n\nfunction blockReason(item){\n  const url = item.url, title = item.title, st = String(item.source_type||'');\n  const h = hostOf(url), p = pathOf(url), t = String(title||'').toLowerCase();\n  if (!h) return 'keine URL';\n  for (const d of domains){ if (h === d || h.endsWith('.' + d)) return 'Domain gesperrt: ' + d; }\n  if (/\\.(app|ai|io)$/.test(h) && CURATED.indexOf(st) < 0) {\n    for (const k of vendorTitle){ if (t.indexOf(k) >= 0) return 'Produktdomain + Verkaufstitel: ' + h; }\n  }\n  for (const s of paths){ if (p.indexOf(s) >= 0) return 'Verkaufsseite: ' + s; }\n  for (const k of titleKw){ if (t.indexOf(k) >= 0) return 'Listicle-Muster: ' + k; }\n  if (CURATED.indexOf(st) < 0) {\n    for (const k of vendorTitle){ if (t.indexOf(k) >= 0) return 'Verkaufstitel bei nicht-kuratierter Quelle: ' + k; }\n  }\n  return '';\n}\n\nconst existing = $('news_memory Keys laden').all();\nconst seenHash = new Set();\nconst seenTitle = new Set();\nfor (const it of existing) {\n  const j = it.json || {};\n  if (j.url_hash) seenHash.add(String(j.url_hash));\n  if (j.title_norm) seenTitle.add(String(j.title_norm));\n}\n\nconst out = [];\nconst blockedLog = [];\nfor (const it of $('Normalisieren und Hash').all()) {\n  const j = Object.assign({}, it.json);\n  const uh = String(j.url_hash || '');\n  const tn = String(j.title_norm || '');\n  if (!uh) continue;\n  const reason = blockReason(j);\n  if (reason) { blockedLog.push(hostOf(j.url) + ' -> ' + reason); continue; }\n  if (seenHash.has(uh)) continue;\n  if (tn && seenTitle.has(tn)) continue;\n  seenHash.add(uh);\n  if (tn) seenTitle.add(tn);\n  j.published_at = toIso(j.published_at);\n  out.push({ json: j });\n}\nif (out.length) { out[0].json.blocked_log = blockedLog.slice(0,40).join(' | '); out[0].json.blocked_count = blockedLog.length; }\nreturn out;"
+      },
+      "id": "dad036ff-bd58-4fbe-98ce-82d05017c1ad",
+      "name": "Dedup gegen news_memory",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "content_blocklist",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "996f066c-22eb-429c-9207-2ad5498bb74c",
+      "name": "Blocklist lesen",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        224
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": true
+    }
+  ],
+  "nodeGroups": [],
+  "activeVersion": {
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 6 * * 1,3,5"
+              }
+            ]
+          }
+        },
+        "id": "80e4dfb7-a03f-4bb7-b57f-dbec46380a63",
+        "name": "Trigger Mo/Mi/Fr 06 Uhr",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -1280,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://hn.algolia.com/api/v1/search_by_date",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "tags",
+                "value": "story"
+              },
+              {
+                "name": "query",
+                "value": "={{ $json.query }}"
+              },
+              {
+                "name": "hitsPerPage",
+                "value": "={{ $json.hitsPerPage }}"
+              },
+              {
+                "name": "numericFilters",
+                "value": "=created_at_i>{{ $json.since }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f779e7dd-5481-4ff2-8741-0fd5cde356e7",
+        "name": "Hacker News KI",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          112,
+          -352
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "numberInputs": 4
+        },
+        "id": "8bcd3922-da01-4e0b-a5dd-e2cef405c61b",
+        "name": "Quellen zusammenfuehren",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          832,
+          192
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.tavily.com/search",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ query: $json.query, topic: $json.topic, time_range: $json.time_range, search_depth: $json.search_depth, max_results: $json.max_results, include_answer: false, include_raw_content: false }) }}",
+          "options": {}
+        },
+        "id": "1ddcaf2a-5632-4182-8ac5-1fa829a06d2e",
+        "name": "Tavily Suche KI",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          112,
+          -112
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "// new URL() ist im Sandbox dieser Instanz unzuverlaessig -> Regex-Parsing.\nfunction hostOf(u){ const m = String(u||'').match(/^https?:\\/\\/([^\\/?#]+)/i); return m ? m[1].toLowerCase().replace(/^www\\./,'') : ''; }\nfunction pathOf(u){ const m = String(u||'').match(/^https?:\\/\\/[^\\/?#]+([^?#]*)/i); return m ? m[1].toLowerCase() : ''; }\nfunction norm(url){ const h = hostOf(url); const p = pathOf(url); let uh = h ? (h + p) : String(url).toLowerCase().trim(); while(uh.endsWith('/')) uh = uh.slice(0,-1); return uh; }\nfunction tnorm(t){ return String(t).toLowerCase().replace(/[^a-z0-9\\u00e4\\u00f6\\u00fc\\u00df ]/g,' ').replace(/ +/g,' ').trim(); }\nfunction regionOf(host){\n  if (/\\.de$/.test(host)) return 'DE';\n  if (/\\.(at|ch|eu|nl|fr|it|es|be|dk|se|fi|pl|cz)$/.test(host)) return 'EU';\n  return 'INT';\n}\n\nconst out = [];\nfor (const it of $input.all()) {\n  const j = it.json || {};\n\n  if (Array.isArray(j.hits)) {\n    // Hacker News\n    for (const h of j.hits) {\n      const title = h.title || h.story_title;\n      let url = h.url || h.story_url;\n      if (!title) continue;\n      if (!url) url = 'https://news.ycombinator.com/item?id=' + h.objectID;\n      const host = hostOf(url);\n      out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(title).trim(), source: host || 'news.ycombinator.com', provider: 'Hacker News', url: String(url), published_at: h.created_at || null, source_type: 'discovery', region: regionOf(host), trust_score: 4 } });\n    }\n  } else if (Array.isArray(j.results)) {\n    // Tavily\n    for (const r of j.results) {\n      const title = r.title; const url = r.url;\n      if (!title || !url) continue;\n      const host = hostOf(url);\n      out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(r.content || title).slice(0,600), source: host, provider: 'Tavily', url: String(url), published_at: r.published_date || null, source_type: 'search', region: regionOf(host), trust_score: 5 } });\n    }\n  } else if (Array.isArray(j.items)) {\n    // GitHub\n    for (const g of j.items) {\n      const title = g.full_name; const url = g.html_url;\n      if (!title || !url) continue;\n      out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(g.description || title).slice(0,600), source: 'github.com', provider: 'GitHub', url: String(url), published_at: g.pushed_at || null, source_type: 'discovery', region: 'INT', trust_score: 4 } });\n    }\n  } else if (j.title && (j.link || j.id || j.guid)) {\n    // RSS - Metadaten kommen bereits angereichert aus 'RSS Eintraege'\n    const title = j.title; const url = j.link || j.id || j.guid;\n    if (!title || !url) continue;\n    const host = hostOf(url);\n    out.push({ json: { url_hash: norm(url), title: String(title).trim(), title_norm: tnorm(title), summary: String(j.contentSnippet || j.content || title).slice(0,600), source: host || String(j.feed_source_name || 'RSS'), provider: String(j.feed_source_name || 'RSS'), url: String(url), published_at: j.isoDate || j.pubDate || null, source_type: String(j.feed_source_type || 'news'), region: String(j.feed_region || regionOf(host)), trust_score: (j.feed_trust_score != null ? j.feed_trust_score : 6) } });\n  }\n}\nreturn out;"
+        },
+        "id": "dea2ec66-b6a2-464e-9684-39acd2addac5",
+        "name": "Normalisieren und Hash",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          976,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Die Domain MUSS an die Triage gehen. Vorher stand in 'source' fuer alle\n// Tavily-Treffer nur der String 'Tavily' - das Modell konnte Quellenqualitaet\n// gar nicht bewerten, obwohl der Prompt genau das verlangt hat.\nconst items = $input.all().map((it, idx) => ({\n  i: idx,\n  t: it.json.title,\n  d: it.json.source,\n  st: it.json.source_type,\n  reg: it.json.region,\n  sum: String(it.json.summary || '').slice(0, 180)\n}));\nreturn [{ json: { count: items.length, payload: JSON.stringify(items) } }];"
+        },
+        "id": "e62d3776-78cb-4055-b8b3-d60e40974f67",
+        "name": "Kandidaten buendeln",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1600,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "cachedResultName": "gpt-4o-mini",
+            "mode": "list",
+            "value": "gpt-4o-mini"
+          },
+          "builtInTools": {},
+          "options": {
+            "temperature": 0.1
+          }
+        },
+        "id": "b78d2c5c-58f7-455c-9195-4aa2838ab800",
+        "name": "Triage Modell (gpt-4o-mini)",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          1776,
+          400
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Bewerte die folgenden Meldungen aus Sicht eines KMU-Entscheiders im DACH-/EU-Raum (Handwerk, Fertigung, Engineering, Bueroorganisation).\n\nFelder: i = Index, t = Titel, d = Domain, st = Quellentyp, reg = Region, sum = Kurzfassung.\n\nGib NUR ein JSON-Array zurueck, exakt ein Objekt pro Eingabe, im Format [{\"i\":<index>,\"score\":<0-10>,\"category\":\"automation|regulation|sme|handcraft|manufacturing|engineering|ai_models|comparison\"}]. Keine Prosa, kein Markdown.\n\nEingaben:\n{{ $json.payload }}",
+          "messages": {
+            "messageValues": [
+              {
+                "message": "Du bist der Triage-Filter fuer KAPA Digital, einen Anbieter fuer KI-Automatisierung und Prozessberatung bei Handwerksbetrieben, kleinen Fertigern, Ingenieurbueros und in der Bueroorganisation kleiner Unternehmen im DACH-/EU-Raum. Zielgruppe sind Geschaeftsfuehrer und Entscheider in Betrieben mit 5 bis 100 Mitarbeitern, nicht KI-Forscher und nicht Konzerne.\n\nDu bekommst Titel, Domain, Quellentyp und Kurzfassung. Die Domain ist ein zentrales Bewertungssignal.\n\nZWINGEND SCORE 0:\n- Verkaufs-, Leistungs- oder Loesungsseiten von Dienstleistern, Beratungen, Agenturen, Systemhaeusern und Softwareanbietern. Erkennbar an Titeln wie 'AI Automation Services', 'KI-Loesungen fuer...', 'Solutions & Services', 'Leitfaden' auf einer Anbieterdomain.\n- SEO-Listicles und Tool-Vergleiche ('Top 10', 'Best AI Tools', '5 Best...', 'Full breakdown').\n- Reine Werbung, Pressemitteilungen ohne Sachgehalt, Kursangebote, Webinar-Anmeldungen.\n- Reine Forschungspapiere, Benchmark-Wettrennen, Modell-Parameterzahlen ohne Anwendungsbezug.\n- Konzern- und Enterprise-Meldungen ohne Uebertragbarkeit auf kleine Betriebe.\n\nScore 1-4: Rauschen, Clickbait, fuer die Zielgruppe nicht umsetzbar.\nScore 5-6: grenzwertig, nur mit erkennbarem Praxisbezug.\nScore 7-8: konkret relevant - ein nutzbares Werkzeug, ein beschriebener Anwendungsfall aus einem realen Betrieb, eine regulatorische Pflicht (EU AI Act, BSI, NIS-2), ein Funktions- oder Preisupdate eines Anbieters, den die Zielgruppe tatsaechlich einsetzt.\nScore 9-10: direkt handlungsrelevant, mit konkretem Bezug zu Handwerk, Fertigung, Engineering oder Bueroorganisation.\n\nBevorzuge redaktionelle Quellen, Behoerden, Fachmedien und Forschungseinrichtungen gegenueber Anbieterdomains. Antworte ausschliesslich mit gueltigem JSON."
+              }
+            ]
+          },
+          "batching": {}
+        },
+        "id": "4b35e65a-72a5-4bed-944c-22d39b48de98",
+        "name": "Triage (0-10)",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          1776,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "let raw = ($json && $json.text) ? $json.text : (($json && $json.output) ? $json.output : (($json && $json.response && $json.response.text) ? $json.response.text : ''));\nlet arr = [];\ntry { arr = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim()); } catch (e) { arr = []; }\nconst scoreMap = {};\nfor (const o of arr) { if (o && o.i !== undefined) scoreMap[o.i] = o; }\n\nconst cands = $('Kandidaten buendeln').first().json;\nlet items = [];\ntry { items = JSON.parse(cands.payload); } catch (e) { items = []; }\nconst orig = $('Dedup gegen news_memory').all();\n\n// KAPA-Kernthemen werden hochgewichtet, Modell- und Vergleichsrauschen abgewertet.\nconst PRIO = { handcraft: 2, manufacturing: 2, engineering: 2, sme: 1, automation: 1, regulation: 0, ai_models: -1, comparison: -2 };\nconst MIN_SCORE = 7;\n\nconst out = [];\nitems.forEach((c, idx) => {\n  const r = (scoreMap[c.i] !== undefined) ? scoreMap[c.i] : scoreMap[idx];\n  const rawScore = (r && typeof r.score === 'number') ? r.score : 0;\n  const category = (r && r.category) ? r.category : '';\n  const adj = PRIO[category] !== undefined ? PRIO[category] : 0;\n  const eff = Math.max(0, Math.min(10, rawScore + adj));\n  if (eff < MIN_SCORE) return;\n  const base = orig[idx] ? orig[idx].json : {};\n  out.push({ json: Object.assign({}, base, {\n    score: eff,\n    category: category,\n    score_reason: 'roh ' + rawScore + ' | Korridor ' + (category||'-') + ' ' + (adj>=0?'+':'') + adj + ' | effektiv ' + eff\n  }) });\n});\nreturn out;"
+        },
+        "id": "78fa8887-8632-4d85-b6b3-93c4489666b1",
+        "name": "Score anwenden",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2128,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "a1",
+                "name": "run_id",
+                "type": "string",
+                "value": "={{ $now.toFormat('yyyyLLdd-HHmmss') }}"
+              },
+              {
+                "id": "a2",
+                "name": "started_at",
+                "type": "string",
+                "value": "={{ $now.toISO() }}"
+              },
+              {
+                "id": "a3",
+                "name": "since_ts",
+                "type": "number",
+                "value": "={{ Math.floor($now.minus({ hours: 72 }).toSeconds()) }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "e5ab2127-ab8e-416a-96bc-077abeb3b731",
+        "name": "Lauf initialisieren",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -1024,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const run_id = $('Lauf initialisieren').first().json.run_id;\nconst collected = $('Normalisieren und Hash').all().length;\nconst triaged = $('Score anwenden').all().length;\nreturn [{ json: { run_id, collected, triaged, finished_at: $now.toISO() } }];"
+        },
+        "id": "cb2b4d25-1fcb-4501-b5ae-8817cb257855",
+        "name": "Lauf zaehlen",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2576,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://api.github.com/search/repositories",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "q",
+                "value": "={{ $json.q }}"
+              },
+              {
+                "name": "sort",
+                "value": "stars"
+              },
+              {
+                "name": "order",
+                "value": "desc"
+              },
+              {
+                "name": "per_page",
+                "value": "10"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "User-Agent",
+                "value": "kapa-daily"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "90be6680-843d-4824-8dec-f140d4219155",
+        "name": "GitHub Repo-Suche",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          112,
+          240
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "url": "={{ $json.feedUrl }}",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "text"
+              }
+            },
+            "timeout": 10000
+          }
+        },
+        "id": "a2222222-2222-4222-8222-222222222222",
+        "name": "RSS abrufen",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          112,
+          464
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "options": {
+            "explicitArray": false,
+            "mergeAttrs": true,
+            "normalize": true,
+            "trim": true
+          }
+        },
+        "id": "a3333333-3333-4333-8333-333333333333",
+        "name": "RSS XML lesen",
+        "type": "n8n-nodes-base.xml",
+        "typeVersion": 1,
+        "position": [
+          320,
+          464
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "function txt(v){ if(v==null) return ''; if(typeof v==='string') return v.trim(); if(typeof v==='object' && typeof v._==='string') return v._.trim(); return String(v).trim(); }\nfunction pickLink(l){ if(l==null) return ''; if(typeof l==='string') return l.trim(); if(Array.isArray(l)){ const alt = l.find(x=>x&&x.rel==='alternate') || l.find(x=>x&&x.href) || l[0]; return pickLink(alt); } if(typeof l==='object'){ if(l.href) return String(l.href).trim(); if(l._) return String(l._).trim(); } return ''; }\n\nconst MAX_PER_FEED = 30;\nconst MAX_AGE_DAYS = 10;\nconst now = Date.now();\n\n// Feed-Metadaten kommen ueber den Index, NICHT ueber itemMatching().\n// itemMatching() liefert auf dieser Instanz null, dadurch landeten BSI (authority/10)\n// und Fraunhofer (research/9) bisher als 'vendor' mit Default-Trust in news_memory.\nconst feeds = $('Nur PRUEFEN ausschliessen').all().map(i => i.json);\n\nconst items = $input.all();\nconst out = [];\nfor (let idx = 0; idx < items.length; idx++) {\n  const j = items[idx].json || {};\n  const meta = feeds[idx] || {};\n  let channelTitle = meta.source_name || 'RSS';\n  let entries = [];\n  if (j.rss && j.rss.channel){\n    const ch = j.rss.channel;\n    if (!meta.source_name) channelTitle = txt(ch.title) || 'RSS';\n    let its = ch.item || []; if(!Array.isArray(its)) its=[its];\n    entries = its.map(e => ({ title: txt(e.title), link: pickLink(e.link), contentSnippet: txt(e.description || e.summary), isoDate: txt(e.pubDate || e.published || e.updated) || null }));\n  } else if (j.feed){\n    const fe = j.feed;\n    if (!meta.source_name) channelTitle = txt(fe.title) || 'RSS';\n    let its = fe.entry || []; if(!Array.isArray(its)) its=[its];\n    entries = its.map(e => ({ title: txt(e.title), link: pickLink(e.link), contentSnippet: txt(e.summary || e.content), isoDate: txt(e.updated || e.published) || null }));\n  }\n  entries = entries.filter(e => e.title && e.link);\n  entries = entries.filter(e => { if(!e.isoDate) return true; const t = Date.parse(e.isoDate); if(isNaN(t)) return true; return (now - t) <= MAX_AGE_DAYS*86400000; });\n  entries = entries.slice(0, MAX_PER_FEED);\n  for (const en of entries){\n    out.push({ json: Object.assign({}, en, {\n      creator: channelTitle,\n      feed_source_name: channelTitle,\n      feed_source_type: meta.source_type || 'news',\n      feed_corridor: meta.corridor || '',\n      feed_region: meta.region || 'INT',\n      feed_trust_score: (meta.trust_score != null ? meta.trust_score : 6),\n      feed_vendor_bias: !!meta.vendor_bias\n    }) });\n  }\n}\nreturn out;"
+        },
+        "id": "a4444444-4444-4444-8444-444444444444",
+        "name": "RSS Eintraege",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          496,
+          464
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Das Suchfenster steht zentral in 'Lauf initialisieren' als since_ts (Sekunden).\nconst since = $('Lauf initialisieren').first().json.since_ts;\nconst queries = ['AI automation','n8n','Power Automate','AI agent','LLM enterprise'];\nreturn queries.map(q => ({ json: { query: q, hitsPerPage: 20, since } }));"
+        },
+        "id": "99ea5c3d-c94c-498f-8cc1-60e41861ad0e",
+        "name": "HN Query Pool",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -112,
+          -352
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Das Suchfenster steht zentral in 'Lauf initialisieren' als since_ts (Sekunden).\n// GitHub erwartet ein Datum, deshalb die Umrechnung auf yyyy-mm-dd.\nconst since = new Date($('Lauf initialisieren').first().json.since_ts * 1000).toISOString().slice(0,10);\nconst queries = [\n 'AI agent',\n 'workflow automation AI',\n 'document automation AI',\n 'manufacturing AI',\n 'engineering AI',\n 'business process automation',\n 'n8n community AI',\n 'local LLM business automation'\n];\nreturn queries.map(q => ({ json: { q: q + ' pushed:>' + since, corridor: 'discovery', region: 'INT' } }));"
+        },
+        "id": "d4accb11-072c-449b-b0a3-60210711b087",
+        "name": "GitHub Query Pool",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -112,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "cachedResultName": "gpt-4o-mini",
+            "mode": "list",
+            "value": "gpt-4o-mini"
+          },
+          "builtInTools": {},
+          "options": {
+            "temperature": 0.4
+          }
+        },
+        "id": "41ecc00c-99e6-41b6-a914-e4a43f4ccc09",
+        "name": "Query Modell (gpt-4o-mini)",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          -464,
+          80
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Erzeuge exakt 3 NEUE Tavily-Suchanfragen fuer die tagesaktuelle Recherche von KAPA Digital.\nZielgruppe: Handwerksbetriebe, kleine Fertiger, Ingenieurbueros und die Bueroorganisation kleiner Unternehmen im DACH-Raum (5 bis 100 Mitarbeiter).\n\nVorgaben:\n- Fokus auf Entwicklungen der letzten 24-72 Stunden.\n- mindestens 2 Queries auf Deutsch mit DACH-Bezug.\n- mindestens 1 Query nach einem konkreten Arbeitsschritt oder Dokument (z.B. Aufmass, Pruefprotokoll, Stueckliste, Rechnungseingang, Zeichnungsfreigabe).\n- KEINE Queries, die Anbieter-, Agentur- oder Beratungsseiten anziehen. Vermeide Formulierungen wie 'AI automation services', 'KI-Loesungen fuer', 'best tools', 'Leitfaden', 'Anbieter', 'Vergleich'.\n- KEINE rein akademische Forschung, KEINE Benchmark-Forschung.\n- KEINE Redundanz zu Standard-Queries wie 'EU AI Act', 'n8n new features', 'ChatGPT business update'.\n\nGib NUR ein JSON-Array zurueck, exakt im Format:\n[{\"query\":\"...\",\"corridor\":\"sme|automation|manufacturing|engineering|handcraft|regulation|ai_models|comparison|discovery\",\"region\":\"DE|EU|INT\"}]\nKeine Prosa, kein Markdown.",
+          "messages": {
+            "messageValues": [
+              {
+                "message": "Du generierst praezise, praxisnahe Web-Suchanfragen fuer die Unternehmens-Recherche. Du zielst auf redaktionelle Berichte, Fachmedien, Behoerden und echte Praxisberichte, nicht auf Anbieter-Marketing. Du antwortest ausschliesslich mit gueltigem JSON."
+              }
+            ]
+          },
+          "batching": {}
+        },
+        "id": "b0b6b0c3-e215-4b4d-b17f-bfc35aa39b84",
+        "name": "Dynamic Query Gen",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          -464,
+          -112
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const MAX_QUERIES = 26;      // harte Obergrenze Tavily-Calls pro Lauf (Kosten)\nconst ROTATE_PER_RUN = 2;\nconst DEFAULT_MAX_RESULTS = 5;\n\n// KAPA-Kernthemen laufen taeglich. Modell- und Vergleichsrauschen rotiert nur.\nconst ALWAYS = ['handcraft','manufacturing','engineering','sme'];\nconst ROTATING = ['automation','regulation','ai_models','comparison'];\n\n// Entfernt wurden generische Kommerz-Keywords wie 'AI automation use case small\n// medium business' oder 'business process automation AI use case'. Genau dafuer\n// ranken Wettbewerber-Landingpages - sie waren die Hauptquelle der Fehltreffer.\nconst STATIC = [\n { q:'Handwerk Digitalisierung Aufmass Software', corridor:'handcraft', region:'DE' },\n { q:'Handwerksbetrieb Angebotserstellung digital', corridor:'handcraft', region:'DE' },\n { q:'Baustellendokumentation Handwerk App Erfahrung', corridor:'handcraft', region:'DE' },\n { q:'Handwerk Auftragsabwicklung Software Praxis', corridor:'handcraft', region:'DE' },\n { q:'AI field service documentation skilled trades', corridor:'handcraft', region:'INT' },\n { q:'Fertigung Pruefprotokoll digitalisieren', corridor:'manufacturing', region:'DE' },\n { q:'Lohnfertigung Auftragsabwicklung Digitalisierung', corridor:'manufacturing', region:'DE' },\n { q:'KI Qualitaetssicherung Produktion Mittelstand', corridor:'manufacturing', region:'DE' },\n { q:'Maschinendaten Rueckmeldung ERP Fertigung', corridor:'manufacturing', region:'DE' },\n { q:'AI visual inspection manufacturing small factory', corridor:'manufacturing', region:'INT' },\n { q:'CAD Stueckliste automatisch ERP Uebergabe', corridor:'engineering', region:'DE' },\n { q:'PDM PLM Einfuehrung Mittelstand Erfahrung', corridor:'engineering', region:'DE' },\n { q:'Ingenieurbuero Projektabwicklung Digitalisierung', corridor:'engineering', region:'DE' },\n { q:'Zeichnungsfreigabe Revisionsstand Prozess', corridor:'engineering', region:'DE' },\n { q:'AI CAD engineering automation workflow', corridor:'engineering', region:'INT' },\n { q:'Rechnungseingang automatisieren Mittelstand', corridor:'sme', region:'DE' },\n { q:'Belegerkennung Dokumentenerfassung KMU', corridor:'sme', region:'DE' },\n { q:'KMU Prozessautomatisierung Erfahrungsbericht', corridor:'sme', region:'DE' },\n { q:'Angebotsnachverfolgung kleine Unternehmen Prozess', corridor:'sme', region:'DE' },\n { q:'n8n new features', corridor:'automation', region:'INT' },\n { q:'n8n AI automation', corridor:'automation', region:'INT' },\n { q:'Power Automate new features', corridor:'automation', region:'INT' },\n { q:'workflow automation software business', corridor:'automation', region:'INT' },\n { q:'EU AI Act Unternehmen', corridor:'regulation', region:'EU' },\n { q:'AI Act Mittelstand Deutschland', corridor:'regulation', region:'DE' },\n { q:'BSI kuenstliche Intelligenz Unternehmen', corridor:'regulation', region:'DE' },\n { q:'NIS-2 Umsetzung Mittelstand', corridor:'regulation', region:'DE' },\n { q:'ChatGPT business update', corridor:'ai_models', region:'INT' },\n { q:'Claude business update', corridor:'ai_models', region:'INT' },\n { q:'Mistral AI business', corridor:'ai_models', region:'EU' },\n { q:'Microsoft Copilot business update', corridor:'ai_models', region:'INT' },\n { q:'AI model price performance comparison', corridor:'comparison', region:'INT' }\n];\n\nconst dayIndex = Math.floor(Date.now() / 86400000);\nconst rotSel = [];\nfor (let k = 0; k < ROTATE_PER_RUN && k < ROTATING.length; k++) {\n  rotSel.push(ROTATING[(dayIndex + k) % ROTATING.length]);\n}\nconst activeCorridors = new Set([...ALWAYS, ...rotSel]);\nconst selected = STATIC.filter(s => activeCorridors.has(s.corridor));\n\nconst dyn = [];\nfor (const it of $input.all()) {\n  const j = it.json || {};\n  const raw = j.text || j.output || (j.response && j.response.text) || '';\n  if (!raw) continue;\n  try {\n    const arr = JSON.parse(String(raw).replace(/```json/g,'').replace(/```/g,'').trim());\n    if (Array.isArray(arr)) {\n      for (const d of arr) {\n        const qq = (typeof d === 'string') ? d : (d && d.query);\n        if (qq) dyn.push({ q: String(qq).slice(0,160), corridor: (d && d.corridor) || 'discovery', region: (d && d.region) || 'INT' });\n      }\n    }\n  } catch (e) { /* Fallback: nur statische Queries */ }\n}\n\nconst seen = new Set();\nconst merged = [];\nfor (const item of [...selected, ...dyn]) {\n  const key = String(item.q).toLowerCase().trim();\n  if (!key || seen.has(key)) continue;\n  seen.add(key);\n  merged.push(item);\n}\n\nreturn merged.slice(0, MAX_QUERIES).map(x => ({ json: {\n  query: x.q, topic: 'general', time_range: 'week', search_depth: 'basic',\n  max_results: DEFAULT_MAX_RESULTS, corridor: x.corridor, region: x.region\n}}));"
+        },
+        "id": "a7de8276-28b4-47ef-9490-91497d320655",
+        "name": "Tavily Query Pool",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -112,
+          -112
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.all().filter(it => it.json.feed_url && it.json.feed_url !== 'PRUEFEN').map(it => ({ json: {\n feedUrl: it.json.feed_url,\n source_name: it.json.source_name,\n source_type: it.json.source_type,\n corridor: it.json.corridor,\n region: it.json.region,\n trust_score: it.json.trust_score,\n vendor_bias: it.json.vendor_bias\n}}));"
+        },
+        "id": "cdaa0557-c2f1-4270-8887-4bc961c2c207",
+        "name": "Nur PRUEFEN ausschliessen",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -96,
+          464
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "news_memory",
+          "returnAll": true
+        },
+        "id": "96a12b4a-5e91-456d-a9ba-b9b67f9310c7",
+        "name": "news_memory Keys laden",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1296,
+          224
+        ],
+        "alwaysOutputData": true,
+        "executeOnce": true
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "content_sources",
+          "returnAll": true,
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "active",
+                "condition": "eq",
+                "keyValue": "true"
+              }
+            ]
+          }
+        },
+        "id": "101eb301-f6e9-4024-a6e1-32667d5ac4dc",
+        "name": "RSS Feeds Liste",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -448,
+          464
+        ]
+      },
+      {
+        "parameters": {
+          "tableId": "runs",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "run_id",
+                "fieldValue": "={{ $json.run_id }}"
+              },
+              {
+                "fieldId": "run_date",
+                "fieldValue": "={{ $now.toISO() }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "running"
+              },
+              {
+                "fieldId": "started_at",
+                "fieldValue": "={{ $json.started_at }}"
+              },
+              {
+                "fieldId": "collected",
+                "fieldValue": "={{ 0 }}"
+              },
+              {
+                "fieldId": "triaged",
+                "fieldValue": "={{ 0 }}"
+              },
+              {
+                "fieldId": "scored",
+                "fieldValue": "={{ 0 }}"
+              },
+              {
+                "fieldId": "reported_count",
+                "fieldValue": "={{ 0 }}"
+              }
+            ]
+          }
+        },
+        "id": "eab82a5a-8cfb-4363-9728-999d5d65f043",
+        "name": "runs - Lauf anlegen",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -816,
+          240
+        ],
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "runs",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "run_id",
+                "condition": "eq",
+                "keyValue": "={{ $json.run_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "collected",
+                "fieldValue": "={{ $json.collected }}"
+              },
+              {
+                "fieldId": "triaged",
+                "fieldValue": "={{ $json.triaged }}"
+              },
+              {
+                "fieldId": "finished_at",
+                "fieldValue": "={{ $json.finished_at }}"
+              }
+            ]
+          }
+        },
+        "id": "8bc9fa52-f189-48db-8a55-60ada0ecf8da",
+        "name": "runs - Lauf abschliessen",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2784,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "tableId": "news_memory",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "url_hash",
+                "fieldValue": "={{ $json.url_hash }}"
+              },
+              {
+                "fieldId": "title",
+                "fieldValue": "={{ $json.title }}"
+              },
+              {
+                "fieldId": "title_norm",
+                "fieldValue": "={{ $json.title_norm }}"
+              },
+              {
+                "fieldId": "summary",
+                "fieldValue": "={{ $json.summary }}"
+              },
+              {
+                "fieldId": "category",
+                "fieldValue": "={{ $json.category }}"
+              },
+              {
+                "fieldId": "source",
+                "fieldValue": "={{ $json.source }}"
+              },
+              {
+                "fieldId": "url",
+                "fieldValue": "={{ $json.url }}"
+              },
+              {
+                "fieldId": "published_at",
+                "fieldValue": "={{ $json.published_at }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "triaged"
+              },
+              {
+                "fieldId": "reported",
+                "fieldValue": "={{ false }}"
+              },
+              {
+                "fieldId": "run_id",
+                "fieldValue": "={{ $('Lauf initialisieren').first().json.run_id }}"
+              },
+              {
+                "fieldId": "first_seen",
+                "fieldValue": "={{ $now.toISO() }}"
+              },
+              {
+                "fieldId": "last_seen",
+                "fieldValue": "={{ $now.toISO() }}"
+              },
+              {
+                "fieldId": "score",
+                "fieldValue": "={{ $json.score }}"
+              },
+              {
+                "fieldId": "source_type",
+                "fieldValue": "={{ $json.source_type }}"
+              },
+              {
+                "fieldId": "region",
+                "fieldValue": "={{ $json.region }}"
+              },
+              {
+                "fieldId": "trust_score",
+                "fieldValue": "={{ $json.trust_score }}"
+              }
+            ]
+          }
+        },
+        "id": "555e8283-6ffb-48e2-b67d-c9cc21acf318",
+        "name": "In news_memory speichern",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2368,
+          224
+        ],
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "tableId": "news_memory",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "first_seen",
+                "condition": "lt",
+                "keyValue": "={{ $now.minus({ days: 60 }).toISODate() }}"
+              }
+            ]
+          }
+        },
+        "id": "d3b3c160-271c-450c-8845-336c59b2f7f4",
+        "name": "Cleanup news_memory (60 Tage)",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -448,
+          720
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "tableId": "runs",
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "run_date",
+                "condition": "lt",
+                "keyValue": "={{ $now.minus({ days: 180 }).toISODate() }}"
+              }
+            ]
+          }
+        },
+        "id": "7cf3d071-054f-4e96-b10f-3a64ada8460d",
+        "name": "Cleanup runs (180 Tage)",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -448,
+          976
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "function toIso(d){ if(!d) return null; const t = Date.parse(d); return isNaN(t) ? null : new Date(t).toISOString(); }\nfunction hostOf(u){ const m = String(u||'').match(/^https?:\\/\\/([^\\/?#]+)/i); return m ? m[1].toLowerCase().replace(/^www\\./,'') : ''; }\nfunction pathOf(u){ const m = String(u||'').match(/^https?:\\/\\/[^\\/?#]+([^?#]*)/i); return m ? m[1].toLowerCase() : ''; }\n\n// ------------------------------------------------------------\n// Blocklist: Wettbewerber, Beratungen, Verkaufsseiten, Social/UGC\n// und Listicle-Farmen fliegen hier raus, BEVOR sie in die Triage\n// und damit in die Datenbank gelangen.\n// ------------------------------------------------------------\nconst rules = $('Blocklist lesen').all().map(i => i.json).filter(r => r && r.pattern);\nconst domains     = rules.filter(r => r.match_type === 'domain').map(r => String(r.pattern).toLowerCase());\nconst paths       = rules.filter(r => r.match_type === 'url_path').map(r => String(r.pattern).toLowerCase());\nconst titleKw     = rules.filter(r => r.match_type === 'title_keyword').map(r => String(r.pattern).toLowerCase());\nconst vendorTitle = rules.filter(r => r.match_type === 'vendor_title').map(r => String(r.pattern).toLowerCase());\n\n// Kuratierte Quellen (RSS aus content_sources) sind von der\n// Verkaufstitel-Heuristik ausgenommen - dort ist 'Software' im Titel\n// ein normales Fachthema, kein Verkaufssignal.\nconst CURATED = ['news','authority','research','vendor'];\n\nfunction blockReason(item){\n  const url = item.url, title = item.title, st = String(item.source_type||'');\n  const h = hostOf(url), p = pathOf(url), t = String(title||'').toLowerCase();\n  if (!h) return 'keine URL';\n  for (const d of domains){ if (h === d || h.endsWith('.' + d)) return 'Domain gesperrt: ' + d; }\n  if (/\\.(app|ai|io)$/.test(h) && CURATED.indexOf(st) < 0) {\n    for (const k of vendorTitle){ if (t.indexOf(k) >= 0) return 'Produktdomain + Verkaufstitel: ' + h; }\n  }\n  for (const s of paths){ if (p.indexOf(s) >= 0) return 'Verkaufsseite: ' + s; }\n  for (const k of titleKw){ if (t.indexOf(k) >= 0) return 'Listicle-Muster: ' + k; }\n  if (CURATED.indexOf(st) < 0) {\n    for (const k of vendorTitle){ if (t.indexOf(k) >= 0) return 'Verkaufstitel bei nicht-kuratierter Quelle: ' + k; }\n  }\n  return '';\n}\n\nconst existing = $('news_memory Keys laden').all();\nconst seenHash = new Set();\nconst seenTitle = new Set();\nfor (const it of existing) {\n  const j = it.json || {};\n  if (j.url_hash) seenHash.add(String(j.url_hash));\n  if (j.title_norm) seenTitle.add(String(j.title_norm));\n}\n\nconst out = [];\nconst blockedLog = [];\nfor (const it of $('Normalisieren und Hash').all()) {\n  const j = Object.assign({}, it.json);\n  const uh = String(j.url_hash || '');\n  const tn = String(j.title_norm || '');\n  if (!uh) continue;\n  const reason = blockReason(j);\n  if (reason) { blockedLog.push(hostOf(j.url) + ' -> ' + reason); continue; }\n  if (seenHash.has(uh)) continue;\n  if (tn && seenTitle.has(tn)) continue;\n  seenHash.add(uh);\n  if (tn) seenTitle.add(tn);\n  j.published_at = toIso(j.published_at);\n  out.push({ json: j });\n}\nif (out.length) { out[0].json.blocked_log = blockedLog.slice(0,40).join(' | '); out[0].json.blocked_count = blockedLog.length; }\nreturn out;"
+        },
+        "id": "dad036ff-bd58-4fbe-98ce-82d05017c1ad",
+        "name": "Dedup gegen news_memory",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1440,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "content_blocklist",
+          "returnAll": true,
+          "matchType": "allFilters",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "active",
+                "condition": "eq",
+                "keyValue": "true"
+              }
+            ]
+          }
+        },
+        "id": "996f066c-22eb-429c-9207-2ad5498bb74c",
+        "name": "Blocklist lesen",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1136,
+          224
+        ],
+        "alwaysOutputData": true,
+        "executeOnce": true
+      }
+    ],
+    "connections": {
+      "Hacker News KI": {
+        "main": [
+          [
+            {
+              "node": "Quellen zusammenfuehren",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Quellen zusammenfuehren": {
+        "main": [
+          [
+            {
+              "node": "Normalisieren und Hash",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tavily Suche KI": {
+        "main": [
+          [
+            {
+              "node": "Quellen zusammenfuehren",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Kandidaten buendeln": {
+        "main": [
+          [
+            {
+              "node": "Triage (0-10)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Triage (0-10)": {
+        "main": [
+          [
+            {
+              "node": "Score anwenden",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Triage Modell (gpt-4o-mini)": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Triage (0-10)",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lauf initialisieren": {
+        "main": [
+          [
+            {
+              "node": "runs - Lauf anlegen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GitHub Repo-Suche": {
+        "main": [
+          [
+            {
+              "node": "Quellen zusammenfuehren",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "RSS abrufen": {
+        "main": [
+          [
+            {
+              "node": "RSS XML lesen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS XML lesen": {
+        "main": [
+          [
+            {
+              "node": "RSS Eintraege",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Eintraege": {
+        "main": [
+          [
+            {
+              "node": "Quellen zusammenfuehren",
+              "type": "main",
+              "index": 3
+            }
+          ]
+        ]
+      },
+      "HN Query Pool": {
+        "main": [
+          [
+            {
+              "node": "Hacker News KI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GitHub Query Pool": {
+        "main": [
+          [
+            {
+              "node": "GitHub Repo-Suche",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dynamic Query Gen": {
+        "main": [
+          [
+            {
+              "node": "Tavily Query Pool",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tavily Query Pool": {
+        "main": [
+          [
+            {
+              "node": "Tavily Suche KI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Query Modell (gpt-4o-mini)": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Dynamic Query Gen",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Nur PRUEFEN ausschliessen": {
+        "main": [
+          [
+            {
+              "node": "RSS abrufen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Feeds Liste": {
+        "main": [
+          [
+            {
+              "node": "Nur PRUEFEN ausschliessen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dedup gegen news_memory": {
+        "main": [
+          [
+            {
+              "node": "Kandidaten buendeln",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Score anwenden": {
+        "main": [
+          [
+            {
+              "node": "In news_memory speichern",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "In news_memory speichern": {
+        "main": [
+          [
+            {
+              "node": "Lauf zaehlen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lauf zaehlen": {
+        "main": [
+          [
+            {
+              "node": "runs - Lauf abschliessen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "news_memory Keys laden": {
+        "main": [
+          [
+            {
+              "node": "Dedup gegen news_memory",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "runs - Lauf anlegen": {
+        "main": [
+          [
+            {
+              "node": "HN Query Pool",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Dynamic Query Gen",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "GitHub Query Pool",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "RSS Feeds Liste",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Cleanup news_memory (60 Tage)",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Cleanup runs (180 Tage)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalisieren und Hash": {
+        "main": [
+          [
+            {
+              "node": "Blocklist lesen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Blocklist lesen": {
+        "main": [
+          [
+            {
+              "node": "news_memory Keys laden",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trigger Mo/Mi/Fr 06 Uhr": {
+        "main": [
+          [
+            {
+              "node": "Lauf initialisieren",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": []
+  },
+  "tags": [],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "parentFolderId": null,
+  "description": "WF-1 Stufe 1 (erweitert): Schedule -> Hacker News + Tavily -> Merge -> Normalisieren/Hash -> Dedup gegen news_memory -> Insert. Ersetzt WF-1a. Naechste Schritte: GitHub/RSS + OpenAI-Triage.",
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
+}
