@@ -23,17 +23,18 @@ Beides schreibt in Supabase und braucht Freigabe.
 
 ## ProzessHub nach SharePoint
 
-### Voller Durchlauf
-Bisher wurden nur einzelne Bereiche gespiegelt und wieder entfernt. Für den echten Bestand: `bereichFilter` in `Config` leeren, laufen lassen, Ergebnis prüfen. Danach `Naechtlicher Lauf 02 Uhr` aktivieren und den Flow publizieren.
-
 ### PDF-Layout beurteilen
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.
 
 ### Dienstkonto statt persönlichem Zugang
 Der Flow schreibt unter `Sebastian.Linges`. Ändert sich das Passwort oder verlässt die Person das Unternehmen, bricht die Spiegelung. Sauberer wäre ein Dienstkonto mit Zugriff auf die Site *Qualitätsmanagement und Prozessbeschreibungen*.
 
-### Workflow-Export ins Repo
-`flows/prozesshub-sharepoint/` enthält die README, aber kein `workflow.json`. Nachziehen, sobald der Flow publiziert ist.
+### Ordner „Unternehmensweite Prozesse" ohne Kürzel
+Am 29.08. um 18:31 angelegt, mit vier Seiten unter dem Kürzel `UWP`. Der Ordner heißt aber nur *Unternehmensweite Prozesse* — ohne das Kürzel im Namen, das alle 17 anderen tragen.
+
+Der Flow ordnet Seiten über das Kürzel im Ordnertitel zu und findet für `UWP` nichts. Die vier Seiten werden übersprungen und in der Zusammenfassung unter `uebersprungen_bereiche_ohne_ordner` gemeldet.
+
+Zu entscheiden: Ordner in `UWP – Unternehmensweite Prozesse` umbenennen (hält die Konvention, ein Handgriff in Confluence) — oder der Flow soll solche Ordner anders behandeln. Die Umbenennung wäre die saubere Lösung, sie gehört aber Ihnen, nicht mir.
 
 ### Zwei EK-Ordner in Confluence
 `EK – Einkauf` und `EK - Einkauf` unterscheiden sich nur im Bindestrich. `EK-01` hängt im einen, `EK-02` im anderen. Der Flow meldet die Dublette in `bereichsordner_dubletten` und legt beide zusammen ab — technisch unauffällig, fachlich zu bereinigen.
@@ -69,8 +70,13 @@ Dazu kommt: Die Probleme sind austauschbar formuliert. „Zeitaufwendig und fehl
 
 Zu klären wäre außerdem, ob der Business Scout so weiterlaufen soll. Sein `score` liegt bei allen 35 Einträgen zwischen 7 und 9 — dasselbe Muster, das den `content_score` im Redaktions-Check unbrauchbar macht.
 
-### Aufräumen: `builtInTools`
-Vier Modell-Nodes im Content Studio und je zwei in den KI-Daily-Flows tragen das Feld `builtInTools`, obwohl die Responses-API abgeschaltet ist. n8n ignoriert es, der Validator meldet es bei jedem Update. Rückstand aus der Zeit vor der Umstellung.
+### `builtInTools` — geprüft, nicht lösbar
+
+Vier Modell-Nodes im Content Studio und je zwei in den KI-Daily-Flows tragen das Feld `builtInTools`, obwohl die Responses-API abgeschaltet ist. n8n ignoriert es, der Validator meldet es bei jedem Update.
+
+**Am 29.08. versucht:** Das Feld enthält überall ein leeres Objekt, es war nie etwas konfiguriert. Die Warnung entsteht aber durch das **Vorhandensein** des Feldes, nicht durch seinen Inhalt — und über die MCP-Schnittstelle lässt sich ein Feld nur überschreiben, nicht entfernen. Es zu beseitigen hieße, den kompletten Parameterblock der Modell-Nodes neu zu setzen. Das Risiko an produktiven Modell-Nodes steht in keinem Verhältnis zu einer kosmetischen Warnung.
+
+Bleibt liegen, bis diese Nodes ohnehin angefasst werden.
 
 ### Eigener Repo-Ordner
 Die drei Marketing-Flows haben noch keinen Ordner unter `flows/`. Fällig, sobald an ihnen mehr als punktuell gearbeitet wird.

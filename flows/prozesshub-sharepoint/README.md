@@ -4,7 +4,7 @@ Spiegelt den Confluence-Bereich **ProzessHub** als HTML-Dokumente in eine ShareP
 
 Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spiegel`, kein Bezug zum RAG-Ingest und keine gemeinsame Datenhaltung mit ihm. Eine spätere Erweiterung auf weitere Bereiche mit eigenen Regeln ist vorgesehen.
 
-**Stand: Prototyp, schreibend erprobt.** Lauf 110360 hat den Bereich IT gespiegelt: 16 Prozessdokumente in sechs Gruppenordnern, 186 KB. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
+**Stand: produktiv.** Lauf 110370 hat den gesamten Bereich gespiegelt: 234 Seiten erkannt, 157 Prozessdokumente abgelegt, 1,7 MB, 16,9 Sekunden. Der Nachtlauf um 02:00 ist aktiv, `bereichFilter` ist leer.
 
 ## Aufbau
 
@@ -71,6 +71,20 @@ Ordner- und Dateinamen laufen durch `sicherName()`: Die in SharePoint verbotenen
 Belegt in Lauf 110323: Derselbe Bereich ein zweites Mal gelaufen ergab neunmal `nichts`, keine Neuaufbereitung.
 
 **`neuAufbauen` in `Config`** erzwingt das Neuschreiben aller Seiten, auch wenn sich der Inhalt nicht geändert hat. Der `content_hash` bildet nämlich nur die Confluence-Seite ab, nicht die Aufbereitung — ohne diesen Schalter bliebe eine Änderung am Template unsichtbar. Nach Gebrauch wieder auf `false` setzen, sonst schreibt jeder Lauf alles neu.
+
+## Bereiche ohne Ordner
+
+Ein Kürzel ohne passenden Ordner auf der H1-Ebene **hält den Lauf nicht an.** Die betroffenen Seiten werden übersprungen und in der Zusammenfassung gemeldet:
+
+```
+uebersprungen_bereiche_ohne_ordner: ["UWP"]
+uebersprungen_seiten: 4
+ordner_ohne_kuerzel_im_namen: ["Unternehmensweite Prozesse"]
+```
+
+Das war zuerst anders gebaut — ein fehlender Ordner brach den ganzen Lauf ab. Der erste vollständige Durchlauf zeigte, warum das falsch ist: Ein einziger neu angelegter Bereich hätte die Spiegelung aller übrigen 15 blockiert.
+
+Abgebrochen wird nur noch, wenn **keine einzige** Seite einen Zielpfad hat — dann stimmt etwas Grundsätzliches nicht.
 
 ## Löschsicherung
 
@@ -185,7 +199,6 @@ Das Konto **RWG.Automate hat keine Confluence-Lizenz** und bekommt auf jeden Con
 
 ## Offene Punkte
 
-- **Der Export fehlt.** Er wird nachgezogen, sobald der Flow publiziert ist; bis dahin ändert sich der Aufbau noch mit dem SharePoint-Teil.
 - **Zwei Ordner mit Kürzel `EK`** in Confluence, die sich nur im Bindestrich unterscheiden: `EK – Einkauf` und `EK - Einkauf`. `EK-01` hängt im einen, `EK-02` im anderen. Der Flow meldet das in `bereichsordner_dubletten`, in SharePoint landen beide im selben Ordner. Fachlich zu klären.
 - **Bilder und BPMN-Diagramme** werden nicht mitgespiegelt. Der ProzessHub hat eine eigene Orientierungsseite zu BPMN-Standards, die Diagramme sind also gewollt und zahlreich.
 - **Kein Logo im Kopf.** Bisher steht dort nur der Schriftzug.
