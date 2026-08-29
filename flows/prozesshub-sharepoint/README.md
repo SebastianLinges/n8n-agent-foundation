@@ -4,7 +4,7 @@ Spiegelt den Confluence-Bereich **ProzessHub** als HTML-Dokumente in eine ShareP
 
 Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spiegel`, kein Bezug zum RAG-Ingest und keine gemeinsame Datenhaltung mit ihm. Eine spätere Erweiterung auf weitere Bereiche mit eigenen Regeln ist vorgesehen.
 
-**Stand: Prototyp, schreibend erprobt.** Lauf 110354 hat die MKT-Dokumente nach Korrektur der Panel-Behandlung neu geschrieben. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
+**Stand: Prototyp, schreibend erprobt.** Lauf 110357 hat die MKT-Dokumente nach allen Korrekturen neu geschrieben. Der Nachttrigger ist noch deaktiviert, und `bereichFilter` steht auf einem einzelnen Bereich.
 
 ## Aufbau
 
@@ -108,6 +108,8 @@ Der ProzessHub mischt zwei Formate, und beide brauchen eigene Behandlung:
   <ac:adf-fallback>...derselbe Text mit Inline-Styles...</ac:adf-fallback>
 </ac:adf-extension>
 ```
+
+**Umlaute stehen als Entities da**, nicht als Zeichen: `<h1>&Auml;nderungshistorie</h1>`, `Qualit&auml;tsziele`. Zwei Fallen folgen daraus. Ein Regex, der nach `Ä` sucht, findet nichts. Und wer den Text für das Inhaltsverzeichnis ein zweites Mal maskiert, macht aus `&auml;` ein sichtbares `&amp;auml;`. Der Verzeichnistext wird deshalb unverändert übernommen — er ist bereits gültiges HTML.
 
 Wer hier nur die Tags abräumt, bekommt drei Fehler auf einmal: das Wort `note` erscheint als Text, der Absatz steht zweimal da, und die Inline-Styles des Fallbacks überschreiben die eigene Gestaltung. Die Aufbereitung ersetzt deshalb den **ganzen Block** durch den Inhalt von `adf-content` und verwirft Attribut und Fallback. Anschließend fliegen alle verbliebenen `style`-Angaben raus.
 
