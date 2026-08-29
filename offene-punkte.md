@@ -50,6 +50,13 @@ Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberst
 
 Was bleibt: Der Power-Automate-Flow selbst liegt ausserhalb von n8n und muss dort entfernt werden. Er ist am Ziel erkennbar: `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`. Solange er laeuft, schickt er ins Leere - der Webhook nimmt nichts mehr an.
 
+### Unvollstaendige Eintraege nach Abbruch
+Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Am 30.08. sind so aus 6 solchen Eintraegen 15 geworden, als mein Testlauf nach fuenf Minuten abgeschnitten wurde.
+
+Der Abgleich erkennt sie jetzt: Ein Dokument ohne Chunk mit Index 0 gilt als unvollstaendig und wird neu eingelesen. Solche Eintraege kommen in der Warteschlange **zuerst**, weil sie sonst dauerhaft einen Platz im Bestand blockieren.
+
+Sauberer waere, den Eintrag erst nach den Chunks zu schreiben. Das ist ein Umbau an der Verarbeitung und bleibt offen - die Nachpruefung im Abgleich faengt den Fall zuverlaessig ab.
+
 ### Erstbefuellung: 490 Dateien fehlen
 Der erste Abgleich (Lauf 110501) zeigt: Von 499 verwertbaren Dateien in Shared Documents stehen erst 9 unter einer Graph-Kennung in der Wissensbasis. Die uebrigen 490 fehlen - Power Automate hatte nur PDF und Excel geschickt, Word und PowerPoint nie.
 
