@@ -26,6 +26,10 @@ Die beiden KI-Daily-Flows gehören zusammen und müssen **auf denselben Wochenta
 
 Der Teams-Agent ruft zwei weitere Subflows: `RWG Sub - Identity & Audience Resolver` (`B2kmRuBHRbJx8HBI`) und `RWG Sub – Teams Image Read` (`omHDN0g9Lusb6H87`). Beide sind auf der n8n-Leinwand dokumentiert und im README des Teams-Agenten eingeordnet; einen eigenen Ordner bekommen sie erst, wenn dort mehr als der Export abzulegen ist.
 
+## Offene Punkte
+
+Was ansteht und was zum Abarbeiten fehlt, steht in [offene-punkte.md](offene-punkte.md). Erledigtes wird dort geloescht, nicht abgehakt - der Verlauf liegt in `tests/laufprotokoll.csv` und in der Git-Historie.
+
 ## Arbeitsweise
 
 1. Ist-Stand direkt aus n8n lesen (`search_workflows`, `get_workflow_details`, `search_executions`).
