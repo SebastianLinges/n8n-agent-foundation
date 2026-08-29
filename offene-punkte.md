@@ -23,6 +23,14 @@ Beides schreibt in Supabase und braucht Freigabe.
 
 ## ProzessHub nach SharePoint
 
+### Scharfschalten
+Der Flow ist belegt funktionsfaehig (Lauf 110370: 234 Seiten erkannt, 157 Dokumente abgelegt, 16,9 Sekunden), aber **stillgelegt**: Nachttrigger deaktiviert, Flow unpubliziert, Testdaten aus SharePoint entfernt.
+
+Zum Scharfschalten zwei Handgriffe: `Naechtlicher Lauf 02 Uhr` aktivieren, Flow publizieren. Vorher sollte der Ordner `Unternehmensweite Prozesse` das Kuerzel `UWP` bekommen haben, sonst bleiben dessen vier Seiten weiter aussen vor.
+
+### Fehlender GF-Ordner nachpruefen
+Lauf 110370 meldete `GF` unter den verarbeiteten Bereichen, in der Bibliothek stand danach aber kein Ordner `GF - Unternehmenssteuerung - Geschaeftsfuehrung`. Der Bereich hat genau eine Prozessseite. Beim naechsten vollen Lauf pruefen, ob sie ankommt - moeglicherweise ist eine Datei still verlorengegangen.
+
 ### PDF-Layout beurteilen
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.
 
