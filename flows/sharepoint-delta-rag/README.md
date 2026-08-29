@@ -2,7 +2,7 @@
 
 Zuleitungsflow (`bvmSDgOm1T5ciKqk`). Er holt die Änderungen aus einer SharePoint-Bibliothek und übergibt jedes Dokument an [RAG - SharePoint Ingest](https://n8n.srv1307521.hstgr.cloud/workflow/BBhGCRsQ8pdNSxTi). Er ersetzt den Power-Automate-Webhook.
 
-Takt: stündlich (`0 * * * *`) — **der Trigger ist deaktiviert**, solange nicht jeder Dateityp einzeln belegt ist.
+Takt: **stündlich** (`0 * * * *`) — seit dem 30.08.2026 scharf.
 
 ## Der Zustandsanker
 
@@ -98,12 +98,31 @@ Data Table `sharepoint_delta` (`RbdhNeubkrmgZkOC`), eine Zeile je Bibliothek: `d
 
 Bei PowerPoint zeigt sich der Vorteil der PDF-Wandlung am deutlichsten: Die Folien werden gerendert, und Mistral erfasst nicht nur den Text, sondern beschreibt auch die 20 enthaltenen Bilder. Ein direkter `pptx`-Weg hätte das nicht geliefert.
 
-### Zum Scharfschalten
+## Übergang von Power Automate
 
-1. `verarbeiten`, `ingestAufrufen` und `zustandSchreiben` auf `true`
-2. Trigger `Stuendlich` aktivieren, Flow publizieren
+Beide Wege vergeben **unterschiedliche Kennungen** für dieselbe Datei: Power Automate schreibt `RWGID-197270985-221`, der Delta-Leser die Graph-Item-ID `01SZZYEH...`. Ohne Gegenmaßnahme läge jede Datei zweimal im Wissensspeicher.
 
-Für eine **Erstbefüllung des Altbestands** zusätzlich `ankerIgnorieren: true` — sonst sieht der Flow nur Änderungen, und die 499 vorhandenen Dateien tauchen nie auf. Vorher die Doubletten-Frage klären.
+`Altbestand aufloesen` sucht deshalb nach jedem Einlesen, ob dieselbe Datei bereits unter einer fremden Kennung liegt, und entfernt die Altfassung. Die Reihenfolge ist wichtig: **erst neu einlesen, dann alt entfernen** — sonst entstünde zwischendurch eine Lücke.
+
+Gesucht wird über den **Dateinamen**, nicht über den Pfad: Power Automate schreibt ihn anders, ein Abgleich wäre unzuverlässig. Entfernt wird nur bei **genau einem** fremden Treffer. Gibt es mehrere Dateien gleichen Namens in verschiedenen Ordnern, bleibt alles stehen — dann lässt sich nicht sicher sagen, welche gemeint ist.
+
+So wandert der Altbestand nach und nach über, ohne dass 259 Dokumente auf einmal neu durch die OCR müssen.
+
+Belegt mit Lauf 110469: Zwei Ingest-Läufe, der zweite entfernte `RWGID-197270985-221` mit `DONE_DELETED`, die Graph-Fassung blieb.
+
+## Wird sauber aktualisiert?
+
+Ja, geprüft mit Lauf 110466 über den gesamten Bestand:
+
+```
+8 598 Chunks über 261 Dokumente
+doppelter chunk_index:  0
+Lücken im Textblock:    0
+```
+
+Der Upsert auf `source_id,chunk_index` verhindert Doppelung, `Delete Stale SharePoint Chunks` räumt auf, wenn ein Dokument beim Neueinlesen kürzer wird.
+
+**Fallstrick bei der Prüfung:** PostgREST liefert höchstens 1 000 Zeilen je Anfrage — ein `limit` im Querystring hebt das nicht auf. Ohne Seitenabruf meldet die Prüfung Lücken, die keine sind.
 
 
 ## Ein Fallstrick, der zweimal zuschlug

@@ -45,30 +45,29 @@ Sebastian entscheidet, ob sie bleiben. Der Aufraeumflow ist archiviert, laesst s
 Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Freigabe.
 
 
-### Doubletten beim Umschalten - vor dem Produktivgang klaeren
-**Power Automate und der Delta-Leser vergeben unterschiedliche doc_ids fuer dieselbe Datei.** Belegt mit Lauf 110451: Die Testdatei stand zweimal im RAG - einmal mit Graph-Item-ID (`01SZZYEH...`), einmal mit der Kennung von Power Automate (`RWGID-197270985-1845`).
+### Power-Automate-Flow abschalten
+**Der Delta-Leser laeuft seit 30.08. stuendlich und scharf.** Der Power-Automate-Flow, der auf den n8n-Webhook `8e16e07b-d272-4147-a2a2-80694afd9007` schreibt, ist damit ueberfluessig und sollte entfernt werden.
 
-Solange beide Wege laufen, entstehen bei jeder Aenderung Doubletten. Und beim Umschalten wuerden die 259 Altdokumente ein zweites Mal angelegt, weil der Delta-Leser sie nicht wiedererkennt.
+Solange beide laufen, verarbeitet jede Aenderung zweimal - unnoetige OCR-Kosten. Doubletten entstehen dabei nicht mehr: Der Uebergangsmechanismus im Delta-Leser entfernt die Power-Automate-Fassung nach dem Einlesen.
 
-Drei Wege stehen offen:
+Der Webhook im Ingest kann bestehen bleiben; ohne Absender ruft ihn niemand mehr auf. Er ist der Rueckweg, falls doch umgeschaltet werden muss.
 
-- Power Automate abschalten und den Altbestand einmal leeren, dann mit `ankerIgnorieren` neu einlesen. Sauber, aber die 499 Dateien laufen einmal komplett durch.
-- Den Altbestand stehen lassen und nur Neues ueber den Delta-Leser einlesen. Dann bleiben Altdokumente ohne Aktualisierung liegen.
-- Eine Zuordnung zwischen beiden Kennungen bauen. Aufwendig und nur sinnvoll, wenn der Altbestand gross ist.
-
-Mein Vorschlag ist der erste Weg.
+Von den 259 Altdokumenten sind zwei bereits uebernommen. Die uebrigen wandern mit ihrer naechsten Aenderung ueber. Wer den Bestand sofort vereinheitlichen will, setzt einmalig `ankerIgnorieren: true` - das liest alle 499 Dateien neu ein und kostet entsprechend OCR.
 
 
-### Delta-Leser scharfschalten
-Der Flow steht (`bvmSDgOm1T5ciKqk`) und **alle vorhandenen Dateitypen sind einzeln belegt**: pdf, docx, pptx, txt, xls, xlsx. Fuer csv und xlsm liegt keine Datei in der Bibliothek.
+### Tabellendaten abfragbar machen
+Die Hoffnung war, spaeter nach Umsaetzen oder Kennzahlen fragen zu koennen und aus Tabellen eine Antwort zu bekommen. **Das leistet Vektorsuche nicht.** Sie findet aehnliche Texte, sie rechnet nicht.
 
-Ebenfalls belegt: Mehrblatt-Erkennung mit Unterscheidung Tabelle/Notiz, Loeschzweig, Zustandsanker, inkrementeller Betrieb.
+Was heute geht: Punktabfragen. Der Ingest macht jede Tabellenzeile selbsttragend - `### Zeile 47 / - Blatt: Januar / - Standort: ... / - Betrag: ...`. Eine Frage nach einem benannten Standort oder Vorgang findet ihre Zeile.
 
-Zum Scharfschalten: drei Schalter in der Config auf true, Trigger aktivieren, publizieren. Vorher die Doubletten-Frage entscheiden.
+Was nicht geht: Aggregationen. `Wie hoch war der Gesamtumsatz` oder `welcher Kunde war am staerksten` verlangt, alle Zeilen zu sehen und zu rechnen. Die Suche liefert aber nur die aehnlichsten Treffer - bei 5000 Zeilen vielleicht zwanzig.
 
-Der Webhook von Power Automate bleibt bis dahin unberuehrt - beide Wege stoeren sich nicht, erzeugen aber Doubletten.
+Dafuer braeuchte es einen zweiten Weg: Tabellendaten strukturiert ablegen und dem Agenten ein Werkzeug geben, das zaehlen und summieren kann - so wie es der Jira-Agent mit `RWG Sub - Jira Query` bereits hat. Eigenes Vorhaben, kein Nachbessern am RAG.
 
-**Export ins Repo fehlt noch**: `flows/sharepoint-delta-rag/workflow.json`.
+Zu klaeren waere zuerst: Welche Tabellen sind ueberhaupt gemeint, und wie stabil ist ihre Struktur? Die Sichtung vom 30.08. zeigt, dass viele Excel-Blaetter gar keine Tabellen sind, sondern Formulare und Notizen.
+
+### Sechs Dokumente ohne Chunks
+Der Bestand zaehlt 267 Dokumente, aber nur 261 haben Chunks (Lauf 110466). Sechs stehen also in `sharepoint_documents`, ohne im Wissensspeicher auffindbar zu sein. Vermutlich Dateien, bei denen die Extraktion leer blieb. Nicht dringend, aber unsauber.
 
 
 ## Content Studio, weitere Themen
