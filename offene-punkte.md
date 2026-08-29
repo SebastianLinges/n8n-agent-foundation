@@ -52,24 +52,18 @@ Betroffen sind alle Typen, die ueber die OCR-Strecke laufen: pdf, docx, doc, ppt
 
 Sobald das Guthaben steht: `aktiveTypen` in der Config des Delta-Lesers auf `[pdf]` setzen, `verarbeiten` und `ingestAufrufen` auf true, Lauf pruefen. Danach `docx`, dann `pptx`.
 
-### Excel liest nur das erste Blatt
-Der Extract-Node kennt `sheetName` fuer genau ein Blatt, keine Option fuer alle. Die Workbook-API von Graph liefert die Blattnamen (belegt mit Lauf 110400), der Umbau steht aus.
-
-Zwei Wege stehen offen: eine Blattschleife im Ingest, oder der Delta-Leser liefert je Blatt einen eigenen Aufruf mit CSV-Inhalt. Der zweite Weg kaeme ohne Umbau am produktiven Ingest aus und wuerde jedes Blatt zu einem eigenen Dokument machen - fuer die Wissenssuche eher ein Vorteil.
 
 ### Delta-Leser scharfschalten
-Der Flow steht (`iWTELblNOt46LhhF`), belegt fuer txt, xlsx und xls. Zum Produktivgang fehlen: die blockierten Typen, der Mehrblatt-Umbau, das Fortschreiben des Zustandsankers (Node ist noch nicht verdrahtet) und der Abgleich gegen den Bestand.
+Der Flow steht (`bvmSDgOm1T5ciKqk`) und ist fuer txt, xls und xlsx belegt. Die Mehrblatt-Erkennung laeuft ueber die Workbook-API - eine Mappe mit zwoelf Blaettern und 1930 Zeilen landete als ein Dokument mit 35077 Woertern im RAG (Lauf 110430). Loeschungen werden erkannt und weitergegeben, der Zustandsanker ist belegt (110436/110437).
+
+Zum Produktivgang fehlen:
+
+- **pdf, docx, pptx** - ausgesetzt bis 01.09., siehe Mistral-Punkt. Danach `ankerIgnorieren` auf true setzen, sonst sieht der Flow die unveraenderten PDFs nicht.
+- **Loeschzweig ungeprueft** - der Weg ist gebaut, aber es gab in den Testlaeufen keine echte Loeschung im Delta. Faellt beim ersten Lauf nach einer echten Loeschung an.
+- **Webhook abschalten** - erst wenn ein voller Zyklus ueber den Delta-Leser belegt ist. Der Power-Automate-Flow laeuft bis dahin unveraendert weiter, beide Wege stoeren sich nicht.
+- **Export ins Repo** - `flows/sharepoint-delta-rag/workflow.json` fehlt noch. Faellt beim naechsten Arbeitsschritt am Flow an, dann in einem Zug.
 
 csv und xlsm liessen sich nicht pruefen - in der Bibliothek liegt keine einzige solche Datei.
-
-
-### Am Ingest-Flow zu verbessern
-- **Excel liest nur das erste Blatt.** Die Extract-Nodes laufen ohne Blattangabe. Eine Arbeitsmappe mit zwoelf Registern liefert eines, ohne Fehlermeldung.
-- **Metadaten haengen am Webhook.** Bereich, Autor, Version, Schlagworte und Vertraulichkeit kommen aus dem Power-Automate-Text. Beim Umbau muessen sie aus Graph geholt werden.
-- **Textstuecke kennen ihr Kapitel nicht.** Jeder Chunk traegt den Dateinamen, aber nicht die Ueberschrift. Mistral liefert sie als Markdown mit.
-- Alle 259 Dokumente tragen `audience = public`. Ob das so bleibt, ist eine fachliche Frage.
-
-Nicht zu aendern: Chunking und Tabellenaufbereitung sind sorgfaeltig gebaut - Absatzgrenzen, harter Split bei Ueberlaenge, Overlap auf Wortgrenze, Tabellenzeilen mit Spaltennamen.
 
 
 ## Content Studio, weitere Themen

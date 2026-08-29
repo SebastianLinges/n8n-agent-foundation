@@ -21,7 +21,7 @@ flows/<flow-name>/
 | KI Daily - Collect [WF-1] | `flows/ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
 | KI Daily - Analyze & Deliver [WF-2] | `flows/ki-daily-analyze/` | `objM2PQrcTpEzik7` |
 | KAPA Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |
-| SharePoint Delta nach RAG | `flows/sharepoint-delta-rag/` | `iWTELblNOt46LhhF` |
+| SharePoint Delta nach RAG | `flows/sharepoint-delta-rag/` | `bvmSDgOm1T5ciKqk` |
 | RWG ProzessHub nach SharePoint | `flows/prozesshub-sharepoint/` | `Muss6GBGPuG9fjE2` |
 
 Die beiden KI-Daily-Flows gehören zusammen und müssen **auf denselben Wochentagen laufen** — die Kopplung trägt über Zustände in Supabase, nicht über ein Datum. Wer den Cron des einen ändert, muss den anderen mitändern. Die Begründung steht in beiden Flow-READMEs.
