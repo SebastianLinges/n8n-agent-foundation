@@ -133,19 +133,24 @@ Das Cyan trägt **keinen Text**: 3,68 : 1 gegen geforderte 4,5 : 1. Es steht des
 
 Verweise auf Seiten, die mitgespiegelt werden, zeigen als relativer Pfad auf die Zieldatei. Verweise auf nicht gespiegelte Confluence-Seiten werden zu Text mit Erklärungstitel — sie sollen niemanden in eine Anmeldemaske schicken. Externe Links bleiben unangetastet.
 
-## PDF statt oder neben HTML
+## PDF neben HTML
 
-Geprüft und belegt: **Microsoft Graph konvertiert HTML beim Abruf nach PDF.** Ein `GET` auf die abgelegte Datei mit `?format=pdf` liefert ein gültiges PDF — im Test wurden aus einer kleinen HTML-Probe 38.369 Bytes.
+**Microsoft Graph konvertiert HTML beim Abruf nach PDF** — kein Renderer, kein zusätzlicher Container, kein externer Dienst. Der Schalter `pdfErzeugen` in `Config` steuert es:
 
-Es braucht also **keinen Renderer, keinen zusätzlichen Container und keinen externen Dienst**. Der Weg wäre ein weiterer Node hinter `Datei schreiben`: die eben abgelegte Datei als PDF abrufen und daneben ablegen.
+`Datei schreiben` → `PDF gewuenscht` → `Als PDF abrufen` → `PDF ablegen` → `Bestand fortschreiben`
 
-Drei Dinge sind dabei zu bedenken:
+Steht der Schalter auf `false`, führt der IF-Node direkt zu `Bestand fortschreiben`, und es entsteht nur HTML. Das PDF liegt neben der HTML-Datei, gleicher Name mit anderer Endung.
 
-- **Ein zusätzlicher Aufruf je Seite.** Bei 157 Prozessseiten verdoppelt sich die Zahl der Graph-Aufrufe, die Laufzeit steigt entsprechend.
-- **PDFs sind deutlich größer.** Die Testprobe war als HTML wenige Kilobyte groß, als PDF 37,5 KB.
-- **Das Layout ist ungeprüft.** Die Konvertierung nutzt den Renderer von SharePoint. Ob die `@media print`-Regeln des Templates dabei greifen, wurde nicht geprüft — das ließe sich nur am fertigen PDF beurteilen.
+Zwei Messwerte aus Lauf 110365 an derselben Seite:
 
-Solange HTML genügt, bleibt es dabei: eine Datei, ein Aufruf, in SharePoint durchsuchbar.
+| Format | Größe |
+|---|---|
+| HTML | 19.026 Bytes |
+| PDF | **173.325 Bytes** |
+
+Das PDF ist rund **neunmal so groß**. Bei 157 Prozessseiten stehen grob 27 MB gegen 3 MB, und es fällt ein zusätzlicher Graph-Aufruf je Seite an.
+
+Das Layout der Konvertierung entsteht im Renderer von SharePoint. Ob die `@media print`-Regeln des Templates dabei greifen, ist offen und lässt sich nur am fertigen PDF beurteilen.
 
 ## Datenhaltung
 
