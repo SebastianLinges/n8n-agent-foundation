@@ -75,6 +75,10 @@ Beide Wege vergaben unterschiedliche Kennungen für dieselbe Datei. `Aufgaben be
 
 Der Power-Automate-Flow selbst liegt außerhalb von n8n und muss dort entfernt werden — erkennbar am Ziel `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`.
 
+## Zeitzone
+
+Der n8n-Server läuft auf **UTC**. Ohne ausdrückliche Angabe würde `30 3 * * *` also um 05:30 Berliner Zeit feuern, nicht um 03:30. Der Flow trägt deshalb `timezone: Europe/Berlin` in den Einstellungen — die Cron-Zeiten sind damit Ortszeit.
+
 ## Zustandsspeicher
 
 Data Table `sharepoint_delta` (`RbdhNeubkrmgZkOC`), eine Zeile je Bibliothek. Der Anker rückt **nur vor, wenn tatsächlich verarbeitet wurde** — ein Trockenlauf lässt ihn stehen, sonst gingen ungelesene Änderungen verloren.
