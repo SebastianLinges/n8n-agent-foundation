@@ -45,14 +45,17 @@ Sebastian entscheidet, ob sie bleiben. Der Aufraeumflow ist archiviert, laesst s
 Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Freigabe.
 
 
-### Power-Automate-Flow abschalten
-**Der Delta-Leser laeuft seit 30.08. stuendlich und scharf.** Der Power-Automate-Flow, der auf den n8n-Webhook `8e16e07b-d272-4147-a2a2-80694afd9007` schreibt, ist damit ueberfluessig und sollte entfernt werden.
+### Power-Automate-Flow entfernen
+**Der Ingest holt sich seine Aenderungen seit dem 30.08. selbst.** Webhook und Delta-Leser-Eingang sind deaktiviert, der getrennte Delta-Leser ist archiviert.
 
-Solange beide laufen, verarbeitet jede Aenderung zweimal - unnoetige OCR-Kosten. Doubletten entstehen dabei nicht mehr: Der Uebergangsmechanismus im Delta-Leser entfernt die Power-Automate-Fassung nach dem Einlesen.
+Was bleibt: Der Power-Automate-Flow selbst liegt ausserhalb von n8n und muss dort entfernt werden. Er ist am Ziel erkennbar: `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`. Solange er laeuft, schickt er ins Leere - der Webhook nimmt nichts mehr an.
 
-Der Webhook im Ingest kann bestehen bleiben; ohne Absender ruft ihn niemand mehr auf. Er ist der Rueckweg, falls doch umgeschaltet werden muss.
+### Erstbefuellung: 490 Dateien fehlen
+Der erste Abgleich (Lauf 110501) zeigt: Von 499 verwertbaren Dateien in Shared Documents stehen erst 9 unter einer Graph-Kennung in der Wissensbasis. Die uebrigen 490 fehlen - Power Automate hatte nur PDF und Excel geschickt, Word und PowerPoint nie.
 
-Von den 259 Altdokumenten sind zwei bereits uebernommen. Die uebrigen wandern mit ihrer naechsten Aenderung ueber. Wer den Bestand sofort vereinheitlichen will, setzt einmalig `ankerIgnorieren: true` - das liest alle 499 Dateien neu ein und kostet entsprechend OCR.
+Bei `maxJeLauf: 20` holt der naechtliche Abgleich das in rund 25 Tagen auf. Fuer eine schnellere Erstbefuellung den Wert voruebergehend erhoehen - etwa auf 100, dann sind es fuenf Naechte. Zu bedenken: Jede Datei kostet einen OCR-Durchlauf bei Mistral.
+
+Die 247 Dokumente mit Power-Automate-Kennung bleiben dabei unangetastet, bis ihre Datei erneut eingelesen wird - dann entfernt der Uebergangsmechanismus die Altfassung.
 
 
 ### Tabellendaten abfragbar machen
