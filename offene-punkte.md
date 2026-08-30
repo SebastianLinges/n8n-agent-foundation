@@ -53,7 +53,9 @@ Gemessen in Lauf `110888`. `Aufgaben bestimmen` meldete `zu_loeschen: 5`, abgear
 
 **Behoben und publiziert.** `alwaysOutputData` steht jetzt auf den drei DELETE-Nodes des Loeschzweigs - `Delete All SharePoint Chunks`, `Delete SharePoint Source` und `Delete SharePoint Storage Object`. Damit gibt jeder von ihnen auch ohne Treffer ein Item aus und die Schleife laeuft weiter. Die beiden GET-Nodes desselben Zweigs trugen die Einstellung schon vorher; `Delete Workflow Summary` faengt den Leerfall bereits ab und meldet dann `deleted_chunk_count: 0`. Die Ziel-URLs beziehen die `doc_id` aus `Build Delete Context` und nicht aus `$json` - ein eingefuegtes Leer-Item kann keinen falschen DELETE ausloesen.
 
-**Dieselbe Falle steckt im Einlese-Zweig**, dort nicht angefasst: `Delete Stale SharePoint Chunks` (DELETE) vor `Plan SharePoint Storage Cleanup` und `Touch Unchanged Source` (PATCH) vor `No Change Summary`. Beide koennen bei leerem Ergebnis denselben Abbruch ausloesen.
+**Der Einlese-Zweig ist ebenso abgesichert - als unveroeffentlichter Entwurf.** `alwaysOutputData` steht dort jetzt auf `Delete Stale SharePoint Chunks` (DELETE) und `Touch Unchanged Source` (PATCH). Geprueft wurde vorher, dass die nachgelagerten Code-Nodes `Plan SharePoint Storage Cleanup` und `No Change Summary` ausschliesslich aus benannten Vorgaengern lesen und nie aus `$input` oder `$json` - ein Leer-Item kann dort nichts verfaelschen.
+
+**Ein dritter Kandidat bleibt offen:** `Delete Stale SharePoint Image` (DELETE) fuehrt auf den Aggregate-Node `Collect Storage Delete Results`. Anders als bei einem Code-Node ist ein eingefuegtes Leer-Item dort nicht folgenlos - die Aggregation zaehlte dann eins statt null. Vor einer Aenderung ist zu klaeren, was diese Zahl weiterverwendet.
 
 ### 14 SharePoint-Dokumente ohne Chunks - Ursache geklaert
 14 Eintraege in `sharepoint_documents` tragen keinen einzigen Chunk. Gemessen ueber `metadata->>'doc_id'` und ueber die Spalte `source_ref` - beide Wege ergeben dieselben 14. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden. Keine Zwillingszeile traegt die fehlenden Chunks, `ingestion_errors` ist leer.
