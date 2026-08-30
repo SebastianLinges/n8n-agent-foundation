@@ -1,0 +1,1956 @@
+{
+ "rls": [
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "agent_conversation_memory",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "agent_jira_create_requests",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "agent_requests",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "agent_ticket_dialogs",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "confluence_pages",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "document_chunks",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "documentation_findings",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "documentation_review_state",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "ingestion_errors",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "jira_agent_events",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "jira_tickets",
+   "pruefung": null,
+   "bedingung": null
+  },
+  {
+   "regel": null,
+   "befehl": null,
+   "rls_an": true,
+   "tabelle": "sharepoint_documents",
+   "pruefung": null,
+   "bedingung": null
+  }
+ ],
+ "indizes": [
+  {
+   "name": "agent_conversation_memory_pkey",
+   "tabelle": "agent_conversation_memory",
+   "definition": "CREATE UNIQUE INDEX agent_conversation_memory_pkey ON public.agent_conversation_memory USING btree (id)"
+  },
+  {
+   "name": "ix_acm_agent_conv",
+   "tabelle": "agent_conversation_memory",
+   "definition": "CREATE INDEX ix_acm_agent_conv ON public.agent_conversation_memory USING btree (agent_key, conversation_id, created_at DESC)"
+  },
+  {
+   "name": "agent_jira_create_requests_pkey",
+   "tabelle": "agent_jira_create_requests",
+   "definition": "CREATE UNIQUE INDEX agent_jira_create_requests_pkey ON public.agent_jira_create_requests USING btree (request_hash)"
+  },
+  {
+   "name": "ix_agent_jira_create_requests_status",
+   "tabelle": "agent_jira_create_requests",
+   "definition": "CREATE INDEX ix_agent_jira_create_requests_status ON public.agent_jira_create_requests USING btree (status, updated_at DESC)"
+  },
+  {
+   "name": "agent_requests_pkey",
+   "tabelle": "agent_requests",
+   "definition": "CREATE UNIQUE INDEX agent_requests_pkey ON public.agent_requests USING btree (id)"
+  },
+  {
+   "name": "agent_requests_teams_message_id_key",
+   "tabelle": "agent_requests",
+   "definition": "CREATE UNIQUE INDEX agent_requests_teams_message_id_key ON public.agent_requests USING btree (teams_message_id)"
+  },
+  {
+   "name": "ix_agent_requests_cat",
+   "tabelle": "agent_requests",
+   "definition": "CREATE INDEX ix_agent_requests_cat ON public.agent_requests USING btree (guardrail_category, created_at DESC)"
+  },
+  {
+   "name": "ix_agent_requests_conv",
+   "tabelle": "agent_requests",
+   "definition": "CREATE INDEX ix_agent_requests_conv ON public.agent_requests USING btree (conversation_id, created_at DESC)"
+  },
+  {
+   "name": "ix_agent_requests_status",
+   "tabelle": "agent_requests",
+   "definition": "CREATE INDEX ix_agent_requests_status ON public.agent_requests USING btree (processing_status, created_at DESC)"
+  },
+  {
+   "name": "uq_agent_requests_message",
+   "tabelle": "agent_requests",
+   "definition": "CREATE UNIQUE INDEX uq_agent_requests_message ON public.agent_requests USING btree (teams_message_id)"
+  },
+  {
+   "name": "agent_ticket_dialogs_pkey",
+   "tabelle": "agent_ticket_dialogs",
+   "definition": "CREATE UNIQUE INDEX agent_ticket_dialogs_pkey ON public.agent_ticket_dialogs USING btree (id)"
+  },
+  {
+   "name": "ix_agent_ticket_dialogs_conversation",
+   "tabelle": "agent_ticket_dialogs",
+   "definition": "CREATE INDEX ix_agent_ticket_dialogs_conversation ON public.agent_ticket_dialogs USING btree (agent_key, conversation_id, updated_at DESC)"
+  },
+  {
+   "name": "uq_agent_ticket_dialogs_active",
+   "tabelle": "agent_ticket_dialogs",
+   "definition": "CREATE UNIQUE INDEX uq_agent_ticket_dialogs_active ON public.agent_ticket_dialogs USING btree (agent_key, conversation_id) WHERE (status = ANY (ARRAY['collecting'::text, 'awaiting_confirmation'::text, 'creating'::text]))"
+  },
+  {
+   "name": "confluence_pages_page_id_key",
+   "tabelle": "confluence_pages",
+   "definition": "CREATE UNIQUE INDEX confluence_pages_page_id_key ON public.confluence_pages USING btree (page_id)"
+  },
+  {
+   "name": "confluence_pages_pkey",
+   "tabelle": "confluence_pages",
+   "definition": "CREATE UNIQUE INDEX confluence_pages_pkey ON public.confluence_pages USING btree (id)"
+  },
+  {
+   "name": "idx_confluence_pages_space",
+   "tabelle": "confluence_pages",
+   "definition": "CREATE INDEX idx_confluence_pages_space ON public.confluence_pages USING btree (space_key)"
+  },
+  {
+   "name": "ix_jira_agent_confluence_fts",
+   "tabelle": "confluence_pages",
+   "definition": "CREATE INDEX ix_jira_agent_confluence_fts ON public.confluence_pages USING gin (to_tsvector('german'::regconfig, ((COALESCE(title, ''::text) || ' '::text) || COALESCE(content_text, ''::text))))"
+  },
+  {
+   "name": "document_chunks_pkey",
+   "tabelle": "document_chunks",
+   "definition": "CREATE UNIQUE INDEX document_chunks_pkey ON public.document_chunks USING btree (id)"
+  },
+  {
+   "name": "idx_document_chunks_bild_lookup",
+   "tabelle": "document_chunks",
+   "definition": "CREATE INDEX idx_document_chunks_bild_lookup ON public.document_chunks USING btree (source_id) WHERE ((metadata ->> 'chunk_type'::text) = 'image_attachment'::text)"
+  },
+  {
+   "name": "ix_chunks_audience",
+   "tabelle": "document_chunks",
+   "definition": "CREATE INDEX ix_chunks_audience ON public.document_chunks USING btree (audience)"
+  },
+  {
+   "name": "ix_chunks_embedding",
+   "tabelle": "document_chunks",
+   "definition": "CREATE INDEX ix_chunks_embedding ON public.document_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+  },
+  {
+   "name": "ix_chunks_source_id",
+   "tabelle": "document_chunks",
+   "definition": "CREATE INDEX ix_chunks_source_id ON public.document_chunks USING btree (source_id)"
+  },
+  {
+   "name": "ix_chunks_source_ref",
+   "tabelle": "document_chunks",
+   "definition": "CREATE INDEX ix_chunks_source_ref ON public.document_chunks USING btree (source_ref)"
+  },
+  {
+   "name": "ix_chunks_source_type",
+   "tabelle": "document_chunks",
+   "definition": "CREATE INDEX ix_chunks_source_type ON public.document_chunks USING btree (source_type)"
+  },
+  {
+   "name": "ix_chunks_text_fts",
+   "tabelle": "document_chunks",
+   "definition": "CREATE INDEX ix_chunks_text_fts ON public.document_chunks USING gin (to_tsvector('german'::regconfig, chunk_text))"
+  },
+  {
+   "name": "unique_chunk_per_source",
+   "tabelle": "document_chunks",
+   "definition": "CREATE UNIQUE INDEX unique_chunk_per_source ON public.document_chunks USING btree (source_id, chunk_index)"
+  },
+  {
+   "name": "documentation_findings_finding_hash_key",
+   "tabelle": "documentation_findings",
+   "definition": "CREATE UNIQUE INDEX documentation_findings_finding_hash_key ON public.documentation_findings USING btree (finding_hash)"
+  },
+  {
+   "name": "documentation_findings_pkey",
+   "tabelle": "documentation_findings",
+   "definition": "CREATE UNIQUE INDEX documentation_findings_pkey ON public.documentation_findings USING btree (id)"
+  },
+  {
+   "name": "idx_documentation_findings_status",
+   "tabelle": "documentation_findings",
+   "definition": "CREATE INDEX idx_documentation_findings_status ON public.documentation_findings USING btree (status)"
+  },
+  {
+   "name": "idx_documentation_findings_topic",
+   "tabelle": "documentation_findings",
+   "definition": "CREATE INDEX idx_documentation_findings_topic ON public.documentation_findings USING btree (topic)"
+  },
+  {
+   "name": "idx_documentation_findings_type",
+   "tabelle": "documentation_findings",
+   "definition": "CREATE INDEX idx_documentation_findings_type ON public.documentation_findings USING btree (finding_type)"
+  },
+  {
+   "name": "documentation_review_state_pkey",
+   "tabelle": "documentation_review_state",
+   "definition": "CREATE UNIQUE INDEX documentation_review_state_pkey ON public.documentation_review_state USING btree (id)"
+  },
+  {
+   "name": "documentation_review_state_source_type_source_id_key",
+   "tabelle": "documentation_review_state",
+   "definition": "CREATE UNIQUE INDEX documentation_review_state_source_type_source_id_key ON public.documentation_review_state USING btree (source_type, source_id)"
+  },
+  {
+   "name": "idx_documentation_review_state_last_seen",
+   "tabelle": "documentation_review_state",
+   "definition": "CREATE INDEX idx_documentation_review_state_last_seen ON public.documentation_review_state USING btree (last_seen_updated_at)"
+  },
+  {
+   "name": "idx_documentation_review_state_status",
+   "tabelle": "documentation_review_state",
+   "definition": "CREATE INDEX idx_documentation_review_state_status ON public.documentation_review_state USING btree (review_status)"
+  },
+  {
+   "name": "idx_documentation_review_state_topic",
+   "tabelle": "documentation_review_state",
+   "definition": "CREATE INDEX idx_documentation_review_state_topic ON public.documentation_review_state USING btree (topic)"
+  },
+  {
+   "name": "ingestion_errors_pkey",
+   "tabelle": "ingestion_errors",
+   "definition": "CREATE UNIQUE INDEX ingestion_errors_pkey ON public.ingestion_errors USING btree (id)"
+  },
+  {
+   "name": "ix_errors_retry",
+   "tabelle": "ingestion_errors",
+   "definition": "CREATE INDEX ix_errors_retry ON public.ingestion_errors USING btree (next_retry_at) WHERE ((resolved_at IS NULL) AND (retry_count < max_retries))"
+  },
+  {
+   "name": "ix_errors_unresolved",
+   "tabelle": "ingestion_errors",
+   "definition": "CREATE INDEX ix_errors_unresolved ON public.ingestion_errors USING btree (source_type, created_at DESC) WHERE (resolved_at IS NULL)"
+  },
+  {
+   "name": "jira_agent_events_event_key_uidx",
+   "tabelle": "jira_agent_events",
+   "definition": "CREATE UNIQUE INDEX jira_agent_events_event_key_uidx ON public.jira_agent_events USING btree (event_key)"
+  },
+  {
+   "name": "jira_agent_events_pkey",
+   "tabelle": "jira_agent_events",
+   "definition": "CREATE UNIQUE INDEX jira_agent_events_pkey ON public.jira_agent_events USING btree (id)"
+  },
+  {
+   "name": "jira_agent_events_status_claimed_idx",
+   "tabelle": "jira_agent_events",
+   "definition": "CREATE INDEX jira_agent_events_status_claimed_idx ON public.jira_agent_events USING btree (status, claimed_at)"
+  },
+  {
+   "name": "ix_jira_agent_tickets_fts",
+   "tabelle": "jira_tickets",
+   "definition": "CREATE INDEX ix_jira_agent_tickets_fts ON public.jira_tickets USING gin (to_tsvector('german'::regconfig, ((((COALESCE(summary, ''::text) || ' '::text) || COALESCE(description, ''::text)) || ' '::text) || COALESCE(resolution, ''::text))))"
+  },
+  {
+   "name": "ix_jira_status",
+   "tabelle": "jira_tickets",
+   "definition": "CREATE INDEX ix_jira_status ON public.jira_tickets USING btree (status)"
+  },
+  {
+   "name": "ix_jira_updated",
+   "tabelle": "jira_tickets",
+   "definition": "CREATE INDEX ix_jira_updated ON public.jira_tickets USING btree (jira_updated_at DESC NULLS LAST)"
+  },
+  {
+   "name": "jira_tickets_pkey",
+   "tabelle": "jira_tickets",
+   "definition": "CREATE UNIQUE INDEX jira_tickets_pkey ON public.jira_tickets USING btree (id)"
+  },
+  {
+   "name": "jira_tickets_ticket_key_key",
+   "tabelle": "jira_tickets",
+   "definition": "CREATE UNIQUE INDEX jira_tickets_ticket_key_key ON public.jira_tickets USING btree (ticket_key)"
+  },
+  {
+   "name": "sharepoint_documents_doc_id_key",
+   "tabelle": "sharepoint_documents",
+   "definition": "CREATE UNIQUE INDEX sharepoint_documents_doc_id_key ON public.sharepoint_documents USING btree (doc_id)"
+  },
+  {
+   "name": "sharepoint_documents_pkey",
+   "tabelle": "sharepoint_documents",
+   "definition": "CREATE UNIQUE INDEX sharepoint_documents_pkey ON public.sharepoint_documents USING btree (id)"
+  }
+ ],
+ "spalten": [
+  {
+   "pos": 1,
+   "typ": "bigint",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "agent_conversation_memory",
+   "vorgabe": null
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "conversation_id",
+   "nullbar": false,
+   "tabelle": "agent_conversation_memory",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "role",
+   "nullbar": false,
+   "tabelle": "agent_conversation_memory",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "content",
+   "nullbar": false,
+   "tabelle": "agent_conversation_memory",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "agent_conversation_memory",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "agent_key",
+   "nullbar": false,
+   "tabelle": "agent_conversation_memory",
+   "vorgabe": null
+  },
+  {
+   "pos": 1,
+   "typ": "text",
+   "spalte": "request_hash",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "request_id",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "status",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "ticket_key",
+   "nullbar": true,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "ticket_id",
+   "nullbar": true,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "summary",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": "''::text"
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "requested_by_email",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": "''::text"
+  },
+  {
+   "pos": 8,
+   "typ": "text",
+   "spalte": "requested_by_name",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": "''::text"
+  },
+  {
+   "pos": 9,
+   "typ": "text",
+   "spalte": "last_error",
+   "nullbar": true,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 10,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 11,
+   "typ": "timestamp with time zone",
+   "spalte": "updated_at",
+   "nullbar": false,
+   "tabelle": "agent_jira_create_requests",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "agent_requests",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "conversation_id",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "teams_message_id",
+   "nullbar": false,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "user_id",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "display_name",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "request_type",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "guardrail_category",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "text",
+   "spalte": "guardrail_action",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 9,
+   "typ": "text[]",
+   "spalte": "audience_context",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 10,
+   "typ": "text",
+   "spalte": "processing_status",
+   "nullbar": false,
+   "tabelle": "agent_requests",
+   "vorgabe": "'claimed'::text"
+  },
+  {
+   "pos": 11,
+   "typ": "boolean",
+   "spalte": "is_duplicate",
+   "nullbar": false,
+   "tabelle": "agent_requests",
+   "vorgabe": "false"
+  },
+  {
+   "pos": 12,
+   "typ": "boolean",
+   "spalte": "is_error",
+   "nullbar": false,
+   "tabelle": "agent_requests",
+   "vorgabe": "false"
+  },
+  {
+   "pos": 13,
+   "typ": "text",
+   "spalte": "error_message",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 14,
+   "typ": "text[]",
+   "spalte": "retrieved_source_refs",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 15,
+   "typ": "integer",
+   "spalte": "processing_ms",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 16,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "agent_requests",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 17,
+   "typ": "timestamp with time zone",
+   "spalte": "completed_at",
+   "nullbar": true,
+   "tabelle": "agent_requests",
+   "vorgabe": null
+  },
+  {
+   "pos": 1,
+   "typ": "bigint",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": null
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "agent_key",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "conversation_id",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "user_id",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "status",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": "'collecting'::text"
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "requested_by_email",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": "''::text"
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "requested_by_name",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": "''::text"
+  },
+  {
+   "pos": 8,
+   "typ": "jsonb",
+   "spalte": "draft",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": "'{}'::jsonb"
+  },
+  {
+   "pos": 9,
+   "typ": "text[]",
+   "spalte": "missing_fields",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": "'{}'::text[]"
+  },
+  {
+   "pos": 10,
+   "typ": "text",
+   "spalte": "source_message_id",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": null
+  },
+  {
+   "pos": 11,
+   "typ": "text",
+   "spalte": "jira_ticket_key",
+   "nullbar": true,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": null
+  },
+  {
+   "pos": 12,
+   "typ": "text",
+   "spalte": "last_error",
+   "nullbar": true,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": null
+  },
+  {
+   "pos": 13,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 14,
+   "typ": "timestamp with time zone",
+   "spalte": "updated_at",
+   "nullbar": false,
+   "tabelle": "agent_ticket_dialogs",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "page_id",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "title",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "space_key",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "page_url",
+   "nullbar": true,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "content_text",
+   "nullbar": true,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "content_hash",
+   "nullbar": true,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "integer",
+   "spalte": "version_number",
+   "nullbar": true,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 9,
+   "typ": "text[]",
+   "spalte": "labels",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": "'{}'::text[]"
+  },
+  {
+   "pos": 10,
+   "typ": "timestamp with time zone",
+   "spalte": "confluence_created_at",
+   "nullbar": true,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 11,
+   "typ": "timestamp with time zone",
+   "spalte": "confluence_modified_at",
+   "nullbar": true,
+   "tabelle": "confluence_pages",
+   "vorgabe": null
+  },
+  {
+   "pos": 12,
+   "typ": "timestamp with time zone",
+   "spalte": "ingested_at",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 13,
+   "typ": "timestamp with time zone",
+   "spalte": "last_ingested_at",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 14,
+   "typ": "integer",
+   "spalte": "ingestion_version",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": "1"
+  },
+  {
+   "pos": 15,
+   "typ": "text",
+   "spalte": "audience",
+   "nullbar": false,
+   "tabelle": "confluence_pages",
+   "vorgabe": "'public'::text"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "source_type",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "uuid",
+   "spalte": "source_id",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "source_ref",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "integer",
+   "spalte": "chunk_index",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "chunk_text",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": null
+  },
+  {
+   "pos": 7,
+   "typ": "integer",
+   "spalte": "token_count",
+   "nullbar": true,
+   "tabelle": "document_chunks",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "vector(1536)",
+   "spalte": "embedding",
+   "nullbar": true,
+   "tabelle": "document_chunks",
+   "vorgabe": null
+  },
+  {
+   "pos": 9,
+   "typ": "jsonb",
+   "spalte": "metadata",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": "'{}'::jsonb"
+  },
+  {
+   "pos": 10,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 11,
+   "typ": "text",
+   "spalte": "audience",
+   "nullbar": false,
+   "tabelle": "document_chunks",
+   "vorgabe": "'public'::text"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "topic",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "finding_type",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "priority",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "'medium'::text"
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "confidence",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "'unclear'::text"
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "status",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "'open'::text"
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "source_a_type",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "text",
+   "spalte": "source_a_id",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 9,
+   "typ": "text",
+   "spalte": "source_a_url",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 10,
+   "typ": "text",
+   "spalte": "source_a_statement",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 11,
+   "typ": "text",
+   "spalte": "source_b_type",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 12,
+   "typ": "text",
+   "spalte": "source_b_id",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 13,
+   "typ": "text",
+   "spalte": "source_b_url",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 14,
+   "typ": "text",
+   "spalte": "source_b_statement",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 15,
+   "typ": "text",
+   "spalte": "deviation",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 16,
+   "typ": "text",
+   "spalte": "recommendation",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 17,
+   "typ": "text",
+   "spalte": "closure_reason",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 18,
+   "typ": "timestamp with time zone",
+   "spalte": "first_detected_at",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 19,
+   "typ": "timestamp with time zone",
+   "spalte": "last_detected_at",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 20,
+   "typ": "timestamp with time zone",
+   "spalte": "resolved_at",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 21,
+   "typ": "text",
+   "spalte": "finding_hash",
+   "nullbar": true,
+   "tabelle": "documentation_findings",
+   "vorgabe": null
+  },
+  {
+   "pos": 22,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 23,
+   "typ": "timestamp with time zone",
+   "spalte": "updated_at",
+   "nullbar": false,
+   "tabelle": "documentation_findings",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "source_type",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "source_id",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "source_url",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "title",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "topic",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 7,
+   "typ": "timestamp with time zone",
+   "spalte": "last_seen_updated_at",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "timestamp with time zone",
+   "spalte": "last_checked_at",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 9,
+   "typ": "text",
+   "spalte": "review_status",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": "'pending'::text"
+  },
+  {
+   "pos": 10,
+   "typ": "text",
+   "spalte": "confidence",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 11,
+   "typ": "jsonb",
+   "spalte": "related_sources",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": "'[]'::jsonb"
+  },
+  {
+   "pos": 12,
+   "typ": "text",
+   "spalte": "finding_hash",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 13,
+   "typ": "text",
+   "spalte": "next_review_reason",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 14,
+   "typ": "text",
+   "spalte": "notes",
+   "nullbar": true,
+   "tabelle": "documentation_review_state",
+   "vorgabe": null
+  },
+  {
+   "pos": 15,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 16,
+   "typ": "timestamp with time zone",
+   "spalte": "updated_at",
+   "nullbar": false,
+   "tabelle": "documentation_review_state",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "ingestion_errors",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "source_type",
+   "nullbar": false,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "source_ref",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "workflow_step",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "error_type",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "error_message",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 7,
+   "typ": "jsonb",
+   "spalte": "error_detail",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "integer",
+   "spalte": "retry_count",
+   "nullbar": false,
+   "tabelle": "ingestion_errors",
+   "vorgabe": "0"
+  },
+  {
+   "pos": 9,
+   "typ": "integer",
+   "spalte": "max_retries",
+   "nullbar": false,
+   "tabelle": "ingestion_errors",
+   "vorgabe": "3"
+  },
+  {
+   "pos": 10,
+   "typ": "timestamp with time zone",
+   "spalte": "next_retry_at",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 11,
+   "typ": "timestamp with time zone",
+   "spalte": "resolved_at",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 12,
+   "typ": "text",
+   "spalte": "resolved_by",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 13,
+   "typ": "jsonb",
+   "spalte": "raw_payload",
+   "nullbar": true,
+   "tabelle": "ingestion_errors",
+   "vorgabe": null
+  },
+  {
+   "pos": 14,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "ingestion_errors",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "event_key",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "issue_id",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "issue_key",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "event_type",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "status",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": "'processing'::text"
+  },
+  {
+   "pos": 8,
+   "typ": "timestamp with time zone",
+   "spalte": "claimed_at",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 9,
+   "typ": "timestamp with time zone",
+   "spalte": "completed_at",
+   "nullbar": true,
+   "tabelle": "jira_agent_events",
+   "vorgabe": null
+  },
+  {
+   "pos": 10,
+   "typ": "integer",
+   "spalte": "attempt_count",
+   "nullbar": false,
+   "tabelle": "jira_agent_events",
+   "vorgabe": "1"
+  },
+  {
+   "pos": 11,
+   "typ": "text",
+   "spalte": "last_error",
+   "nullbar": true,
+   "tabelle": "jira_agent_events",
+   "vorgabe": null
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "ticket_key",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "ticket_id",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "summary",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "description",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "status",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "resolution",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "text",
+   "spalte": "priority",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 9,
+   "typ": "text",
+   "spalte": "issue_type",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 10,
+   "typ": "text",
+   "spalte": "assignee_name",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 11,
+   "typ": "text",
+   "spalte": "assignee_email",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 12,
+   "typ": "text",
+   "spalte": "reporter_name",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 13,
+   "typ": "text",
+   "spalte": "reporter_email",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 14,
+   "typ": "jsonb",
+   "spalte": "comments",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "'[]'::jsonb"
+  },
+  {
+   "pos": 15,
+   "typ": "text",
+   "spalte": "parent_key",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 16,
+   "typ": "jsonb",
+   "spalte": "linked_tickets",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "'[]'::jsonb"
+  },
+  {
+   "pos": 17,
+   "typ": "text[]",
+   "spalte": "labels",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "'{}'::text[]"
+  },
+  {
+   "pos": 18,
+   "typ": "text[]",
+   "spalte": "components",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "'{}'::text[]"
+  },
+  {
+   "pos": 19,
+   "typ": "text[]",
+   "spalte": "fix_versions",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "'{}'::text[]"
+  },
+  {
+   "pos": 20,
+   "typ": "text",
+   "spalte": "sprint",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 21,
+   "typ": "numeric",
+   "spalte": "story_points",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 22,
+   "typ": "text",
+   "spalte": "epic_link",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 23,
+   "typ": "timestamp with time zone",
+   "spalte": "jira_created_at",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 24,
+   "typ": "timestamp with time zone",
+   "spalte": "jira_updated_at",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 25,
+   "typ": "timestamp with time zone",
+   "spalte": "jira_resolved_at",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 26,
+   "typ": "date",
+   "spalte": "jira_due_date",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 27,
+   "typ": "timestamp with time zone",
+   "spalte": "ingested_at",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 28,
+   "typ": "timestamp with time zone",
+   "spalte": "last_ingested_at",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 29,
+   "typ": "integer",
+   "spalte": "ingestion_version",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "1"
+  },
+  {
+   "pos": 30,
+   "typ": "jsonb",
+   "spalte": "raw_payload",
+   "nullbar": true,
+   "tabelle": "jira_tickets",
+   "vorgabe": null
+  },
+  {
+   "pos": 31,
+   "typ": "text",
+   "spalte": "audience",
+   "nullbar": false,
+   "tabelle": "jira_tickets",
+   "vorgabe": "'public'::text"
+  },
+  {
+   "pos": 1,
+   "typ": "uuid",
+   "spalte": "id",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "gen_random_uuid()"
+  },
+  {
+   "pos": 2,
+   "typ": "text",
+   "spalte": "doc_id",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 3,
+   "typ": "text",
+   "spalte": "drive_id",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 4,
+   "typ": "text",
+   "spalte": "site_id",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 5,
+   "typ": "text",
+   "spalte": "site_url",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 6,
+   "typ": "text",
+   "spalte": "file_path",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 7,
+   "typ": "text",
+   "spalte": "file_name",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 8,
+   "typ": "text",
+   "spalte": "file_extension",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 9,
+   "typ": "text",
+   "spalte": "sharepoint_url",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 10,
+   "typ": "text",
+   "spalte": "content_text",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 11,
+   "typ": "text",
+   "spalte": "content_hash",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 12,
+   "typ": "integer",
+   "spalte": "word_count",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 13,
+   "typ": "jsonb",
+   "spalte": "images",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "'[]'::jsonb"
+  },
+  {
+   "pos": 14,
+   "typ": "jsonb",
+   "spalte": "links",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "'[]'::jsonb"
+  },
+  {
+   "pos": 15,
+   "typ": "text",
+   "spalte": "author_name",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 16,
+   "typ": "text",
+   "spalte": "author_email",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 17,
+   "typ": "text",
+   "spalte": "last_modified_by",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 18,
+   "typ": "timestamp with time zone",
+   "spalte": "created_at_sp",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 19,
+   "typ": "timestamp with time zone",
+   "spalte": "last_modified_sp",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 20,
+   "typ": "text",
+   "spalte": "document_version",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 21,
+   "typ": "text",
+   "spalte": "content_type",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 22,
+   "typ": "text[]",
+   "spalte": "tags",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "'{}'::text[]"
+  },
+  {
+   "pos": 23,
+   "typ": "text",
+   "spalte": "department",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 24,
+   "typ": "text",
+   "spalte": "language",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "'de'::text"
+  },
+  {
+   "pos": 25,
+   "typ": "text",
+   "spalte": "sensitivity_label",
+   "nullbar": true,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": null
+  },
+  {
+   "pos": 26,
+   "typ": "timestamp with time zone",
+   "spalte": "ingested_at",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 27,
+   "typ": "timestamp with time zone",
+   "spalte": "last_ingested_at",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "now()"
+  },
+  {
+   "pos": 28,
+   "typ": "integer",
+   "spalte": "ingestion_count",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "1"
+  },
+  {
+   "pos": 29,
+   "typ": "text",
+   "spalte": "audience",
+   "nullbar": false,
+   "tabelle": "sharepoint_documents",
+   "vorgabe": "'public'::text"
+  }
+ ],
+ "funktionen": [
+  {
+   "name": "funktion_jira_ticket_lesen",
+   "quelltext": "CREATE OR REPLACE FUNCTION public.funktion_jira_ticket_lesen(p_ticket_key text, p_audiences text[])\n RETURNS TABLE(ticket_key text, summary text, status text, resolution text, priority text, issue_type text, assignee_name text, jira_updated_at timestamp with time zone, description text, audience text)\n LANGUAGE plpgsql\n STABLE\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nDECLARE\n  v_allowed constant text[] := ARRAY['public','it_internal'];\nBEGIN\n  IF p_audiences IS NULL OR array_length(p_audiences,1) IS NULL THEN\n    RAISE EXCEPTION 'funktion_jira_ticket_lesen: p_audiences ist Pflicht';\n  END IF;\n  IF EXISTS (SELECT 1 FROM unnest(p_audiences) a WHERE a <> ALL (v_allowed)) THEN\n    RAISE EXCEPTION 'funktion_jira_ticket_lesen: unzulaessiger audience-Wert';\n  END IF;\n  IF p_ticket_key IS NULL OR btrim(p_ticket_key) = '' THEN\n    RAISE EXCEPTION 'funktion_jira_ticket_lesen: p_ticket_key ist Pflicht';\n  END IF;\n\n  RETURN QUERY\n  SELECT t.ticket_key, t.summary, t.status, t.resolution, t.priority,\n         t.issue_type, t.assignee_name, t.jira_updated_at,\n         left(COALESCE(t.description,''), 1500),\n         t.audience\n  FROM public.jira_tickets t\n  WHERE upper(t.ticket_key) = upper(btrim(p_ticket_key))\n    AND t.audience = ANY (p_audiences)\n  LIMIT 1;\nEND;\n$function$\n"
+  },
+  {
+   "name": "funktion_match_document_chunks",
+   "quelltext": "CREATE OR REPLACE FUNCTION public.funktion_match_document_chunks(query_embedding vector, match_count integer DEFAULT 20, filter jsonb DEFAULT '{}'::jsonb)\n RETURNS TABLE(id uuid, content text, metadata jsonb, similarity double precision)\n LANGUAGE plpgsql\n STABLE\n SET search_path TO 'pg_catalog', 'public', 'extensions'\nAS $function$\nDECLARE\n    v_match_count integer := LEAST(GREATEST(COALESCE(match_count, 20), 1), 50);\n    v_filter jsonb := COALESCE(filter, '{}'::jsonb);\nBEGIN\n    PERFORM set_config('hnsw.iterative_scan', 'strict_order', true);\n    PERFORM set_config('hnsw.ef_search', '120', true);\n\n    RETURN QUERY\n    WITH prepared AS (\n        SELECT\n            dc.id,\n            dc.chunk_text AS content,\n            COALESCE(dc.metadata, '{}'::jsonb)\n                || jsonb_build_object(\n                    'source_type', dc.source_type,\n                    'source_ref', dc.source_ref,\n                    'audience', dc.audience,\n                    'chunk_type', COALESCE(dc.metadata->>'chunk_type', 'content'),\n                    'title', COALESCE(\n                        NULLIF(dc.metadata->>'title', ''),\n                        NULLIF(dc.metadata->>'file_name', ''),\n                        dc.source_ref\n                    ),\n                    'url', COALESCE(\n                        NULLIF(dc.metadata->>'url', ''),\n                        NULLIF(dc.metadata->>'sharepoint_url', '')\n                    )\n                ) AS metadata,\n            1 - (dc.embedding <=> query_embedding) AS similarity,\n            dc.embedding <=> query_embedding AS distance\n        FROM public.document_chunks AS dc\n        WHERE dc.embedding IS NOT NULL\n          AND dc.audience IN ('public', 'it_internal')\n          AND COALESCE(dc.metadata->>'chunk_type', 'content') <> 'header'\n    )\n    SELECT\n        p.id,\n        p.content,\n        p.metadata,\n        p.similarity\n    FROM prepared AS p\n    WHERE v_filter = '{}'::jsonb\n       OR p.metadata @> v_filter\n    ORDER BY p.distance\n    LIMIT v_match_count;\nEND;\n$function$\n"
+  },
+  {
+   "name": "funktion_rag_suche_chunks",
+   "quelltext": "CREATE OR REPLACE FUNCTION public.funktion_rag_suche_chunks(p_query_embedding vector, p_audiences text[], p_match_count integer DEFAULT 8, p_source_types text[] DEFAULT NULL::text[], p_min_similarity double precision DEFAULT 0.30)\n RETURNS TABLE(chunk_id uuid, chunk_text text, source_type text, source_ref text, title text, audience text, source_updated_at timestamp with time zone, similarity double precision)\n LANGUAGE plpgsql\n STABLE\n SET search_path TO 'pg_catalog', 'public', 'extensions'\nAS $function$\nDECLARE\n  v_allowed constant text[] := ARRAY['public','it_internal'];\nBEGIN\n  IF p_audiences IS NULL OR array_length(p_audiences, 1) IS NULL THEN\n    RAISE EXCEPTION 'funktion_rag_suche_chunks: p_audiences ist Pflicht und darf nicht leer sein';\n  END IF;\n\n  IF EXISTS (SELECT 1 FROM unnest(p_audiences) a WHERE a <> ALL (v_allowed)) THEN\n    RAISE EXCEPTION 'funktion_rag_suche_chunks: unzulaessiger audience-Wert';\n  END IF;\n\n  IF p_match_count IS NULL OR p_match_count < 1 OR p_match_count > 30 THEN\n    RAISE EXCEPTION 'funktion_rag_suche_chunks: p_match_count muss zwischen 1 und 30 liegen';\n  END IF;\n\n  PERFORM set_config('hnsw.iterative_scan', 'strict_order', true);\n\n  RETURN QUERY\n  SELECT\n    c.id,\n    c.chunk_text,\n    c.source_type,\n    c.source_ref,\n    COALESCE(NULLIF(c.metadata->>'title',''),\n             NULLIF(c.metadata->>'file_name',''),\n             c.source_ref)                                   AS title,\n    c.audience,\n    NULLIF(c.metadata->>'source_updated_at','')::timestamptz AS source_updated_at,\n    1 - (c.embedding <=> p_query_embedding)                  AS similarity\n  FROM public.document_chunks c\n  WHERE c.audience = ANY (p_audiences)\n    AND (p_source_types IS NULL OR c.source_type = ANY (p_source_types))\n    AND 1 - (c.embedding <=> p_query_embedding) >= p_min_similarity\n  ORDER BY c.embedding <=> p_query_embedding\n  LIMIT p_match_count;\nEND;\n$function$\n"
+  },
+  {
+   "name": "jira_agent_collect_context",
+   "quelltext": "CREATE OR REPLACE FUNCTION public.jira_agent_collect_context(p_query_text text, p_query_embedding_text text, p_current_ticket_key text DEFAULT NULL::text, p_rag_count integer DEFAULT 12, p_public_rag_count integer DEFAULT 6, p_table_count integer DEFAULT 5)\n RETURNS jsonb\n LANGUAGE sql\n STABLE\n SET search_path TO 'pg_catalog', 'public', 'extensions'\nAS $function$\nwith params as (\n  select\n    coalesce(nullif(trim(p_query_text), ''), 'IT Support') as q,\n    p_query_embedding_text::extensions.vector(1536) as emb,\n    greatest(1, least(coalesce(p_rag_count, 12), 25)) as rag_limit,\n    greatest(1, least(coalesce(p_public_rag_count, 6), 15)) as public_limit,\n    greatest(1, least(coalesce(p_table_count, 5), 10)) as table_limit\n),\n-- OR-verknuepfte tsquery aus den Lexemen des Ticket-Textes\ntsq as (\n  select coalesce(\n    nullif(\n      array_to_string(\n        array(\n          select quote_literal(l.lexeme)\n          from unnest(to_tsvector('german'::regconfig, (select q from params))) as l\n          where length(l.lexeme) > 2\n          limit 40\n        ),\n        ' | '\n      ),\n      ''\n    ),\n    quote_literal('support')\n  ) as raw\n),\nquery_ts as (\n  select to_tsquery('german'::regconfig, (select raw from tsq)) as tq\n),\n-- ---------- RAG (alle Audiences) ----------\nrag_vector as (\n  select dc.id,\n         row_number() over (order by dc.embedding operator(extensions.<=>) p.emb) as rank_v,\n         (1 - (dc.embedding operator(extensions.<=>) p.emb))::float as vector_sim\n  from public.document_chunks dc\n  cross join params p\n  where dc.embedding is not null\n  order by dc.embedding operator(extensions.<=>) p.emb\n  limit (select rag_limit * 3 from params)\n),\nrag_text as (\n  select dc.id,\n         row_number() over (\n           order by ts_rank_cd(to_tsvector('german'::regconfig, dc.chunk_text), (select tq from query_ts)) desc\n         ) as rank_t,\n         ts_rank_cd(to_tsvector('german'::regconfig, dc.chunk_text), (select tq from query_ts))::float as text_rank\n  from public.document_chunks dc\n  where to_tsvector('german'::regconfig, dc.chunk_text) @@ (select tq from query_ts)\n  order by text_rank desc\n  limit (select rag_limit * 3 from params)\n),\nrag_combined as (\n  select coalesce(v.id, t.id) as id,\n         (coalesce(1.0 / (60 + v.rank_v), 0.0) + coalesce(1.0 / (60 + t.rank_t), 0.0))::float as rrf_score,\n         coalesce(v.vector_sim, 0)::float as vector_sim,\n         coalesce(t.text_rank, 0)::float as text_rank\n  from rag_vector v\n  full outer join rag_text t on t.id = v.id\n),\nrag_final as (\n  select dc.source_type, dc.source_ref, dc.audience,\n         left(dc.chunk_text, 5000) as chunk_text,\n         dc.metadata, rc.rrf_score, rc.vector_sim, rc.text_rank\n  from rag_combined rc\n  join public.document_chunks dc on dc.id = rc.id\n  order by rc.rrf_score desc\n  limit (select rag_limit from params)\n),\n-- ---------- RAG nur audience = 'public' ----------\npub_vector as (\n  select dc.id,\n         row_number() over (order by dc.embedding operator(extensions.<=>) p.emb) as rank_v,\n         (1 - (dc.embedding operator(extensions.<=>) p.emb))::float as vector_sim\n  from public.document_chunks dc\n  cross join params p\n  where dc.embedding is not null\n    and dc.audience = 'public'\n  order by dc.embedding operator(extensions.<=>) p.emb\n  limit (select public_limit * 3 from params)\n),\npub_text as (\n  select dc.id,\n         row_number() over (\n           order by ts_rank_cd(to_tsvector('german'::regconfig, dc.chunk_text), (select tq from query_ts)) desc\n         ) as rank_t,\n         ts_rank_cd(to_tsvector('german'::regconfig, dc.chunk_text), (select tq from query_ts))::float as text_rank\n  from public.document_chunks dc\n  where dc.audience = 'public'\n    and to_tsvector('german'::regconfig, dc.chunk_text) @@ (select tq from query_ts)\n  order by text_rank desc\n  limit (select public_limit * 3 from params)\n),\npub_combined as (\n  select coalesce(v.id, t.id) as id,\n         (coalesce(1.0 / (60 + v.rank_v), 0.0) + coalesce(1.0 / (60 + t.rank_t), 0.0))::float as rrf_score,\n         coalesce(v.vector_sim, 0)::float as vector_sim\n  from pub_vector v\n  full outer join pub_text t on t.id = v.id\n),\npub_final as (\n  select dc.source_type, dc.source_ref, dc.audience,\n         left(dc.chunk_text, 3000) as chunk_text,\n         pc.rrf_score, pc.vector_sim\n  from pub_combined pc\n  join public.document_chunks dc on dc.id = pc.id\n  where dc.audience = 'public'\n  order by pc.rrf_score desc\n  limit (select public_limit from params)\n),\n-- ---------- Direkte Tabellentreffer ----------\njira_ranked as (\n  select jt.ticket_key, jt.summary, jt.audience,\n         left(coalesce(jt.description, ''), 4000) as description,\n         jt.status, jt.resolution, jt.priority, jt.issue_type,\n         left(coalesce(jt.comments::text, ''), 4000) as comments,\n         ts_rank_cd(\n           to_tsvector('german'::regconfig,\n             coalesce(jt.summary,'') || ' ' || coalesce(jt.description,'') || ' ' ||\n             coalesce(jt.resolution,'') || ' ' || coalesce(jt.comments::text,'')),\n           (select tq from query_ts)\n         )::float as score\n  from public.jira_tickets jt\n  where (p_current_ticket_key is null or jt.ticket_key <> p_current_ticket_key)\n    and to_tsvector('german'::regconfig,\n          coalesce(jt.summary,'') || ' ' || coalesce(jt.description,'') || ' ' ||\n          coalesce(jt.resolution,'') || ' ' || coalesce(jt.comments::text,''))\n        @@ (select tq from query_ts)\n  order by score desc\n  limit (select table_limit from params)\n),\nconfluence_ranked as (\n  select cp.page_id, cp.title, cp.space_key, cp.page_url, cp.labels, cp.audience,\n         left(coalesce(cp.content_text, ''), 4000) as content_text,\n         ts_rank_cd(\n           to_tsvector('german'::regconfig, coalesce(cp.title,'') || ' ' || coalesce(cp.content_text,'')),\n           (select tq from query_ts)\n         )::float as score\n  from public.confluence_pages cp\n  where to_tsvector('german'::regconfig, coalesce(cp.title,'') || ' ' || coalesce(cp.content_text,''))\n        @@ (select tq from query_ts)\n  order by score desc\n  limit (select table_limit from params)\n),\nsharepoint_ranked as (\n  select sp.doc_id, sp.file_name, sp.file_path, sp.sharepoint_url,\n         sp.department, sp.content_type, sp.sensitivity_label, sp.tags, sp.audience,\n         left(coalesce(sp.content_text, ''), 4000) as content_text,\n         ts_rank_cd(\n           to_tsvector('german'::regconfig,\n             coalesce(sp.file_name,'') || ' ' || coalesce(sp.content_text,'') || ' ' ||\n             coalesce(sp.department,'') || ' ' || coalesce(sp.tags::text,'')),\n           (select tq from query_ts)\n         )::float as score\n  from public.sharepoint_documents sp\n  where to_tsvector('german'::regconfig,\n          coalesce(sp.file_name,'') || ' ' || coalesce(sp.content_text,'') || ' ' ||\n          coalesce(sp.department,'') || ' ' || coalesce(sp.tags::text,''))\n        @@ (select tq from query_ts)\n  order by score desc\n  limit (select table_limit from params)\n)\nselect jsonb_build_object(\n  'query', (select q from params),\n  'rag', coalesce((select jsonb_agg(jsonb_build_object(\n      'source_type', source_type, 'source_ref', source_ref, 'audience', audience,\n      'chunk_text', chunk_text, 'metadata', metadata,\n      'rrf_score', rrf_score, 'vector_sim', vector_sim, 'text_rank', text_rank\n    ) order by rrf_score desc) from rag_final), '[]'::jsonb),\n  'public_rag', coalesce((select jsonb_agg(jsonb_build_object(\n      'source_type', source_type, 'source_ref', source_ref, 'audience', audience,\n      'chunk_text', chunk_text, 'rrf_score', rrf_score, 'vector_sim', vector_sim\n    ) order by rrf_score desc) from pub_final), '[]'::jsonb),\n  'jira', coalesce((select jsonb_agg(jsonb_build_object(\n      'ticket_key', ticket_key, 'summary', summary, 'audience', audience,\n      'description', description, 'status', status, 'resolution', resolution,\n      'priority', priority, 'issue_type', issue_type, 'comments', comments, 'score', score\n    ) order by score desc) from jira_ranked), '[]'::jsonb),\n  'confluence', coalesce((select jsonb_agg(jsonb_build_object(\n      'page_id', page_id, 'title', title, 'space_key', space_key, 'page_url', page_url,\n      'labels', labels, 'audience', audience, 'content_text', content_text, 'score', score\n    ) order by score desc) from confluence_ranked), '[]'::jsonb),\n  'sharepoint', coalesce((select jsonb_agg(jsonb_build_object(\n      'doc_id', doc_id, 'file_name', file_name, 'file_path', file_path,\n      'sharepoint_url', sharepoint_url, 'department', department, 'content_type', content_type,\n      'sensitivity_label', sensitivity_label, 'tags', tags, 'audience', audience,\n      'content_text', content_text, 'score', score\n    ) order by score desc) from sharepoint_ranked), '[]'::jsonb)\n);\n$function$\n"
+  },
+  {
+   "name": "match_documents",
+   "quelltext": "CREATE OR REPLACE FUNCTION public.match_documents(query_embedding vector, match_count integer DEFAULT NULL::integer, filter jsonb DEFAULT '{}'::jsonb)\n RETURNS TABLE(id bigint, content text, metadata jsonb, similarity double precision)\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public', 'extensions'\nAS $function$\r\n#variable_conflict use_column\r\nbegin\r\n  return query\r\n  select\r\n    d.id,\r\n    d.content,\r\n    d.metadata,\r\n    1 - (d.embedding <=> query_embedding) as similarity\r\n  from public.documents d\r\n  where d.metadata @> filter\r\n  order by d.embedding <=> query_embedding\r\n  limit match_count;\r\nend;\r\n$function$\n"
+  }
+ ],
+ "fremdschluessel": null
+}

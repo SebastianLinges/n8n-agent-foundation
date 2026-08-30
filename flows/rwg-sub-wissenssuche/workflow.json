@@ -2,12 +2,6 @@
   "id": "GD256mxClPHHbngI",
   "name": "RWG Sub - Wissenssuche",
   "active": true,
-  "isArchived": false,
-  "versionId": "98594cfc-fd43-4528-b883-03b56920b5ae",
-  "activeVersionId": "98594cfc-fd43-4528-b883-03b56920b5ae",
-  "triggerCount": 0,
-  "createdAt": "2026-08-20T09:10:20.716Z",
-  "updatedAt": "2026-08-28T14:04:19.311Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -260,31 +254,5 @@
     }
   ],
   "nodeGroups": [],
-  "tags": [],
-  "meta": {
-    "aiBuilderAssisted": true,
-    "builderVariant": "mcp"
-  },
-  "parentFolderId": null,
-  "description": "Audience-gefilterte semantische Wissenssuche als Agent-Tool. Hybrid aus Vektorsuche und deutscher Volltextsuche mit RRF-Fusion, danach Cohere rerank-v3.5. audienceCsv kommt aus dem Parent-Kontext, nie vom Modell; ungueltige oder leere Werte liefern null T",
-  "scopes": [
-    "execution:reveal",
-    "workflow:create",
-    "workflow:delete",
-    "workflow:disableRedaction",
-    "workflow:enableRedaction",
-    "workflow:execute",
-    "workflow:execute-chat",
-    "workflow:export",
-    "workflow:import",
-    "workflow:list",
-    "workflow:move",
-    "workflow:publish",
-    "workflow:read",
-    "workflow:share",
-    "workflow:unpublish",
-    "workflow:unshare",
-    "workflow:update"
-  ],
-  "canExecute": true
+  "description": "Audience-gefilterte semantische Wissenssuche als Agent-Tool. Hybrid aus Vektorsuche und deutscher Volltextsuche mit RRF-Fusion, danach Cohere rerank-v3.5. audienceCsv kommt aus dem Parent-Kontext, nie vom Modell; ungueltige oder leere Werte liefern null T"
 }

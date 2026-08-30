@@ -32,6 +32,8 @@ Sebastian Linges, Geschäftsführer KAPA Digital, arbeitet für RWG Rheinland eG
 - **In Schleifen liefert `$('Node').all()` nur den letzten Durchlauf.** Der zweite Parameter ist der Durchlaufindex.
 - **Ein Subworkflow bekommt alle Items auf einmal.** Liest er mit `$input.first()`, verarbeitet er nur das erste.
 - **PostgREST liefert höchstens 1000 Zeilen je Anfrage.** Ein `limit` im Querystring hebt das nicht auf.
+- **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** In einer Schleife über viele Dokumente reißt ein einzelner Netzabbruch alles Übrige mit — auch das, was noch gar nicht dran war. Wiederholung allein hilft nicht.
+- **n8n legt bei HTTP-Fehlern das komplette Request-Objekt in den Ausführungsdaten ab**, samt `apikey`- und `Authorization`-Kopfzeile im Klartext. Wer Ausführungen sehen darf, sieht die Schlüssel.
 
 ---
 
@@ -48,11 +50,14 @@ Ein Flow für alles — er holt seine Änderungen selbst, verarbeitet sie und sc
 
 Alle Dateitypen sind einzeln belegt: pdf, docx, pptx, txt, xls, xlsx. Word und PowerPoint laufen über die PDF-Wandlung von Graph durch dieselbe OCR-Strecke — bei PowerPoint erfasst Mistral dabei auch die Folienbilder. Arbeitsmappen laufen über die Workbook-API, Blatt für Blatt, mit Unterscheidung Tabelle/Notiz.
 
-**Als Erstes am Morgen:** Der Abgleich vom 30.08. um 03:30 war der erste echte Erstbefüllungslauf mit 30 Dateien. Die Laufbilanz zeigt, ob er sauber durchlief.
+**Stand der Erstbefüllung:** Der Abgleich feuert belegt zur Ortszeit. Acht Word-Dateien laufen in zwei Minuten durch. Ein Netzabbruch beim Bild-Upload einer bildreichen Groß-PDF hat den ersten Lauf abgebrochen — der Bildzweig ist seither ausfalltolerant, ein einzelnes verlorenes Bild beendet den Lauf nicht mehr. Neun Dokumente stehen ohne Chunks in der Wissensbasis, acht davon bildreiche Regaletiketten-PDFs; die Chunkprüfung des Abgleichs stellt sie selbsttätig wieder ein.
 
 ## Offene Themen
 
 Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
+
+**Zuerst: Die RWG-Datenbank zieht um**
+Supabase `zjabiweaihsezjjeycko` ist vollgelaufen und verschwindet. Alles nach `zckaxkpycyyxaymmkmvu`. Erst Strukturen und Ablagen anlegen, dann die Flows umstellen, dann die Daten migrieren. **Die KAPA-Digital-Verbindung ist nicht betroffen.** Betroffen sind Ingest, Wissenssuche und Jira-Agent.
 
 **Wartet auf Sebastian**
 - Power-Automate-Flow entfernen (liegt außerhalb von n8n, Ziel `.../webhook/8e16e07b-...`)
@@ -75,9 +80,9 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 | `README.md` | Flow-Übersicht mit n8n-IDs |
 | `offene-punkte.md` | Was ansteht und was fehlt |
 | `ideen.md` | Was noch keine Aufgabe ist |
-| `tests/laufprotokoll.csv` | 160 Läufe mit Execution-ID und Befund |
+| `tests/laufprotokoll.csv` | jeder Lauf mit Execution-ID und Befund |
 | `flows/*/README.md` | je Flow: Aufbau, Entscheidungen, Fallstricke |
 
 ## Erster Schritt
 
-Hol dir den Stand aus dem Repo und aus n8n, statt dich auf diese Zusammenfassung zu verlassen. Sieh zuerst nach, wie der Abgleich um 03:30 gelaufen ist.
+Hol dir den Stand aus dem Repo und aus n8n, statt dich auf diese Zusammenfassung zu verlassen. Sieh zuerst nach, wie der letzte nächtliche Abgleich gelaufen ist — Ausführungen des Flows `BBhGCRsQ8pdNSxTi`, der Lauf um 01:30 UTC ist der Abgleich. Bei einem Fehler steht die Ursache nicht im Lauf selbst (er ist zu groß zum Abrufen), sondern in der Ausführung des Fehler-Workflows `pMGm0LaxRTldvPKEkmkzC`.

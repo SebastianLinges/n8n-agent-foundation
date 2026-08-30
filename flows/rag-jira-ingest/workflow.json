@@ -1,0 +1,2982 @@
+{
+  "id": "ESVtaoyTfaP3jm2G",
+  "name": "RAG-JIRA-Ingest",
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "saveExecutionProgress": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 600,
+    "timeSavedPerExecution": 15,
+    "saveManualExecutions": true
+  },
+  "connections": {
+    "Jira Trigger": {
+      "main": [
+        [
+          {
+            "node": "IF Issue Deleted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Issue Deleted": {
+      "main": [
+        [
+          {
+            "node": "Build Delete Context",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basisparameter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Delete Context": {
+      "main": [
+        [
+          {
+            "node": "IF Deleted Issue Is SSD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Deleted Issue Is SSD": {
+      "main": [
+        [
+          {
+            "node": "List Deleted Ticket Storage Objects",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skipped Deleted Non SSD Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Deleted Ticket Storage Objects": {
+      "main": [
+        [
+          {
+            "node": "Build Deleted Ticket Storage Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Deleted Ticket Storage Plan": {
+      "main": [
+        [
+          {
+            "node": "IF Deleted Ticket Has Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Deleted Ticket Has Storage": {
+      "main": [
+        [
+          {
+            "node": "Delete Deleted Ticket Storage Objects",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete Deleted Ticket Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Deleted Ticket Storage Objects": {
+      "main": [
+        [
+          {
+            "node": "Delete Deleted Ticket Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Deleted Ticket Chunks": {
+      "main": [
+        [
+          {
+            "node": "Delete Deleted Jira Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basisparameter": {
+      "main": [
+        [
+          {
+            "node": "Filter Nur SSD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Nur SSD": {
+      "main": [
+        [
+          {
+            "node": "Get Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Issue": {
+      "main": [
+        [
+          {
+            "node": "Filter Automated Ticket Creator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Vorgang nicht mehr vorhanden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Automated Ticket Creator": {
+      "main": [
+        [
+          {
+            "node": "Get Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Comments": {
+      "main": [
+        [
+          {
+            "node": "Normalize Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Issue": {
+      "main": [
+        [
+          {
+            "node": "Get Existing Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Ticket": {
+      "main": [
+        [
+          {
+            "node": "Decide Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Event": {
+      "main": [
+        [
+          {
+            "node": "IF Event Is Current",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Event Is Current": {
+      "main": [
+        [
+          {
+            "node": "Build Ticket Upsert Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stale Event Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Ticket Upsert Row": {
+      "main": [
+        [
+          {
+            "node": "Ensure Jira Ticket Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Jira Ticket Exists": {
+      "main": [
+        [
+          {
+            "node": "Conditional Update Jira Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conditional Update Jira Ticket": {
+      "main": [
+        [
+          {
+            "node": "Get Ticket Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Ticket Row": {
+      "main": [
+        [
+          {
+            "node": "Guard Ticket Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guard Ticket Version": {
+      "main": [
+        [
+          {
+            "node": "IF Ticket Version Current",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Ticket Version Current": {
+      "main": [
+        [
+          {
+            "node": "Create Text Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Superseded Ticket Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Text Chunks": {
+      "main": [
+        [
+          {
+            "node": "Prepare Text Embedding Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Text Embedding Batch": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Embedding Text Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embedding Text Batch": {
+      "main": [
+        [
+          {
+            "node": "Build Text Chunk Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Text Chunk Rows": {
+      "main": [
+        [
+          {
+            "node": "Build Image Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Image Plan": {
+      "main": [
+        [
+          {
+            "node": "Build RAG Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build RAG Payload": {
+      "main": [
+        [
+          {
+            "node": "Get Ticket Before Chunk Write",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Ticket Before Chunk Write": {
+      "main": [
+        [
+          {
+            "node": "Guard Chunk Write",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guard Chunk Write": {
+      "main": [
+        [
+          {
+            "node": "IF Chunk Write Current",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Chunk Write Current": {
+      "main": [
+        [
+          {
+            "node": "Bulk Upsert Text Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Superseded Chunk Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Upsert Text Chunks": {
+      "main": [
+        [
+          {
+            "node": "IF Ticket Resolved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Ticket Resolved": {
+      "main": [
+        [
+          {
+            "node": "Lade Solution-Chunk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Has Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Solution Prompt": {
+      "main": [
+        [
+          {
+            "node": "Extract Solution With OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Solution With OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Build Solution Chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Solution Chunk": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Embedding Solution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embedding Solution": {
+      "main": [
+        [
+          {
+            "node": "Build Solution Upsert Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Solution Upsert Row": {
+      "main": [
+        [
+          {
+            "node": "Upsert Solution Chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Solution Chunk": {
+      "main": [
+        [
+          {
+            "node": "IF Has Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Has Images": {
+      "main": [
+        [
+          {
+            "node": "Lade Bildchunk-Bestand",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Cleanup Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Deleted Jira Ticket": {
+      "main": [
+        [
+          {
+            "node": "Deleted Ticket Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand Images": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Cleanup Request": {
+      "main": [
+        [
+          {
+            "node": "Delete Stale Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image From Jira": {
+      "main": [
+        [
+          {
+            "node": "Resize Standard JPEG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Standard JPEG": {
+      "main": [
+        [
+          {
+            "node": "Check Standard Image Size",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Standard Image Size": {
+      "main": [
+        [
+          {
+            "node": "IF Standard Too Large",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Standard Too Large": {
+      "main": [
+        [
+          {
+            "node": "Resize Compact JPEG",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finalize Image Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Compact JPEG": {
+      "main": [
+        [
+          {
+            "node": "Check Compact Image Size",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Compact Image Size": {
+      "main": [
+        [
+          {
+            "node": "IF Compact Too Large",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Compact Too Large": {
+      "main": [
+        [
+          {
+            "node": "Resize Fallback JPEG",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finalize Image Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Fallback JPEG": {
+      "main": [
+        [
+          {
+            "node": "Finalize Image Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize Image Binary": {
+      "main": [
+        [
+          {
+            "node": "Upload Image To Supabase Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Images": {
+      "main": [
+        [
+          {
+            "node": "Build Cleanup Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Bild Neu Analysieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image To Supabase Storage": {
+      "main": [
+        [
+          {
+            "node": "Analyze Image With OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Image With OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Build Vision Image Chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Vision Image Chunk": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Embedding Image Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embedding Image Analysis": {
+      "main": [
+        [
+          {
+            "node": "Build Image Upsert Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Image Upsert Row": {
+      "main": [
+        [
+          {
+            "node": "Upsert Image Chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Image Chunk": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Stale Chunks": {
+      "main": [
+        [
+          {
+            "node": "List Ticket Storage Objects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Ticket Storage Objects": {
+      "main": [
+        [
+          {
+            "node": "Plan Storage Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Storage Cleanup": {
+      "main": [
+        [
+          {
+            "node": "IF Has Obsolete Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Has Obsolete Storage": {
+      "main": [
+        [
+          {
+            "node": "Delete Obsolete Storage Objects",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Workflow Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Obsolete Storage Objects": {
+      "main": [
+        [
+          {
+            "node": "Workflow Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lade Bildchunk-Bestand": {
+      "main": [
+        [
+          {
+            "node": "Liste Storage-Objekte Bildcache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Liste Storage-Objekte Bildcache": {
+      "main": [
+        [
+          {
+            "node": "Expand Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Bild Neu Analysieren": {
+      "main": [
+        [
+          {
+            "node": "Download Image From Jira",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Bildkontext Geaendert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Bildkontext Geaendert": {
+      "main": [
+        [
+          {
+            "node": "Patch Bildchunk Kontext",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patch Bildchunk Kontext": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lade Solution-Chunk": {
+      "main": [
+        [
+          {
+            "node": "Solution-Cache Abgleich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solution-Cache Abgleich": {
+      "main": [
+        [
+          {
+            "node": "IF Loesung Neu Extrahieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Loesung Neu Extrahieren": {
+      "main": [
+        [
+          {
+            "node": "Build Solution Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Loesungskontext Geaendert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Loesungskontext Geaendert": {
+      "main": [
+        [
+          {
+            "node": "Patch Solution Kontext",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Has Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patch Solution Kontext": {
+      "main": [
+        [
+          {
+            "node": "IF Has Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "jira:issue_created",
+          "jira:issue_updated",
+          "comment_updated",
+          "comment_deleted",
+          "comment_created",
+          "jira:issue_deleted"
+        ],
+        "additionalFields": {}
+      },
+      "id": "ed237187-cd4e-40a3-8524-6c948a0ea974",
+      "name": "Jira Trigger",
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -8416,
+        1216
+      ],
+      "webhookId": "5763a985-4aea-42dd-aa17-ee4526c63d37"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.webhookEvent }}",
+              "rightValue": "jira:issue_deleted",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "46e28eb5-1e02-4f5f-ac63-663b1196461a"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b14234e3-f7ee-4635-b5fe-953e8271f8db",
+      "name": "IF Issue Deleted",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -7968,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $input.first()?.json || {};\nconst issue = payload.issue || {};\n\nconst issue_key = String(issue.key || '')\n  .trim()\n  .toUpperCase();\n\nconst issue_id = String(issue.id || '');\n\nif (!issue_key) {\n  throw new Error('DELETED_JIRA_ISSUE_KEY_MISSING');\n}\n\nconst project_key = String(\n  issue.fields?.project?.key ||\n  issue_key.split('-')[0] ||\n  ''\n)\n  .trim()\n  .toUpperCase();\n\nconst eventTimestamp = Number(payload.timestamp);\n\nconst deleted_at = Number.isFinite(eventTimestamp)\n  ? new Date(eventTimestamp).toISOString()\n  : new Date().toISOString();\n\nreturn [{\n  json: {\n    issue_key,\n    issue_id,\n    project_key,\n    event_type:\n      payload.webhookEvent || 'jira:issue_deleted',\n    deleted_at,\n    storage_prefix: `JIRA/${issue_key}`,\n  }\n}];"
+      },
+      "id": "7378c6c0-72b5-4f1f-b930-df683c41ce57",
+      "name": "Build Delete Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -7648,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.project_key }}",
+              "rightValue": "SSD",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "91c4cd0e-1636-453e-ab64-fe8b95a088d0",
+      "name": "IF Deleted Issue Is SSD",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -7408,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/list/rag",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { prefix: $('Build Delete Context').first().json.storage_prefix, limit: 1000, offset: 0, sortBy: { column: 'name', order: 'asc' } } }}",
+        "options": {}
+      },
+      "id": "320ab8c5-e4ad-49f0-9cf4-6f2cc29d72d2",
+      "name": "List Deleted Ticket Storage Objects",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -7168,
+        624
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const context = $('Build Delete Context').first().json;\nconst prefix = context.storage_prefix;\n\nconst objects = [];\n\nfor (const item of $input.all()) {\n  const value = item.json;\n\n  if (Array.isArray(value)) {\n    objects.push(...value);\n  } else if (Array.isArray(value?.data)) {\n    objects.push(...value.data);\n  } else if (value?.name) {\n    objects.push(value);\n  }\n}\n\nconst storage_paths = [...new Set(\n  objects\n    .filter((object) => object?.name && object?.id)\n    .map((object) => {\n      const name = String(object.name);\n\n      return name.startsWith(prefix + '/')\n        ? name\n        : `${prefix}/${name}`;\n    })\n)]\n  .sort((a, b) => a.localeCompare(b));\n\nreturn [{\n  json: {\n    ...context,\n    storage_paths,\n    has_storage: storage_paths.length > 0,\n    storage_object_count: storage_paths.length,\n  }\n}];"
+      },
+      "id": "2c43c74d-96dd-45f5-a53f-3ce986ccb347",
+      "name": "Build Deleted Ticket Storage Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6928,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.has_storage }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "299b35b6-eb8d-44fb-b70b-5fb2e18c7cb8",
+      "name": "IF Deleted Ticket Has Storage",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6688,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { prefixes: $json.storage_paths } }}",
+        "options": {}
+      },
+      "id": "22fe9b9a-770e-4433-88b7-b002446a0406",
+      "name": "Delete Deleted Ticket Storage Objects",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6448,
+        528
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "source_type",
+              "value": "eq.jira"
+            },
+            {
+              "name": "source_ref",
+              "value": "={{ 'eq.' + $('Build Delete Context').first().json.issue_key }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "788e2697-d195-480c-aaaf-6f486432c5d2",
+      "name": "Delete Deleted Ticket Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6160,
+        640
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const context = $('Build Delete Context').first().json;\n\nreturn [{\n  json: {\n    ok: true,\n    mode: 'skipped_deleted_non_ssd_issue',\n    issue_key: context.issue_key,\n    issue_id: context.issue_id,\n    project_key: context.project_key,\n    event_type: context.event_type,\n    finished_at: new Date().toISOString(),\n  }\n}];"
+      },
+      "id": "cb9d91a2-34c6-44c8-a487-1a40b96b809b",
+      "name": "Skipped Deleted Non SSD Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -7168,
+        816
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "issue_key",
+              "type": "string",
+              "value": "={{ $json.issue.key }}"
+            },
+            {
+              "id": "a2",
+              "name": "project_key",
+              "type": "string",
+              "value": "={{ $json.issue.fields.project.key }}"
+            },
+            {
+              "id": "a3",
+              "name": "issue_id",
+              "type": "string",
+              "value": "={{ $json.issue.id }}"
+            },
+            {
+              "id": "a4",
+              "name": "event_type",
+              "type": "string",
+              "value": "={{ $json.webhookEvent || $json.issue_event_type_name || 'unknown' }}"
+            },
+            {
+              "id": "a5",
+              "name": "is_automation",
+              "type": "boolean",
+              "value": "={{ (() => { const AUTO_IDS = ['712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9','712020:2c41da01-c990-498c-814a-aa04c2a3db9f','60242eda988758006893fa52']; const AUTO_TOKENS = ['rwg_automate','rwg.automate','managed.monitoring','defender-noreply']; const f = $json.issue?.fields || {}; const ppl = [f.creator, f.reporter].filter(Boolean); const ids = ppl.map(p => String(p.accountId || '')).filter(Boolean); const text = ppl.map(p => [p.emailAddress, p.displayName].filter(Boolean).join(' ')).join(' ').toLowerCase(); const sum = String(f.summary || ''); if (ids.some(id => AUTO_IDS.includes(id))) return true; if (AUTO_TOKENS.some(t => text.includes(t))) return true; if (/^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]/i.test(sum)) return true; if (/^(automatische antwort|autoreply|undeliverable|unzustellbar|read:|gelesen:|abwesenheitsnotiz)/i.test(sum)) return true; if (/(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|siem|new vulnerabilities notification)/i.test(sum)) return true; return false; })() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b4b4d5d-ae29-40bc-b2e0-261e94dfd355",
+      "name": "Basisparameter",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -7680,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c-proj",
+              "leftValue": "={{ $json.project_key }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "SSD"
+            },
+            {
+              "id": "c-auto",
+              "leftValue": "={{ $json.is_automation }}",
+              "operator": {
+                "operation": "false",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "id": "bd1396e1-8c29-46ca-9e55-d5ea0673f891",
+      "name": "Filter Nur SSD",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -7520,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "={{ $('Basisparameter').first().json.issue_key }}",
+        "additionalFields": {}
+      },
+      "id": "439598c8-90ba-4e2d-80cc-34aa0b1a6f88",
+      "name": "Get Issue",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -7344,
+        1216
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c-auto2",
+              "leftValue": "={{ (() => { const AUTO_IDS = ['712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9','712020:2c41da01-c990-498c-814a-aa04c2a3db9f','60242eda988758006893fa52']; const AUTO_TOKENS = ['rwg_automate','rwg.automate','managed.monitoring','defender-noreply','defender']; const f = $json.fields || {}; const ppl = [f.creator, f.reporter].filter(Boolean); const ids = ppl.map(p => String(p.accountId || '')).filter(Boolean); const text = ppl.map(p => [p.emailAddress, p.displayName].filter(Boolean).join(' ')).join(' ').toLowerCase(); const sum = String(f.summary || ''); if (ids.some(id => AUTO_IDS.includes(id))) return true; if (AUTO_TOKENS.some(t => text.includes(t))) return true; if (/^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]/i.test(sum)) return true; if (/(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|siem|new vulnerabilities notification)/i.test(sum)) return true; return false; })() }}",
+              "operator": {
+                "operation": "false",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "id": "7842fe48-69ae-429c-9918-bce2ee98ea5b",
+      "name": "Filter Automated Ticket Creator",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -7152,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "operation": "getAll",
+        "issueKey": "={{ $('Basisparameter').first().json.issue_key }}",
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "603bf3a9-b25b-45dc-aaf3-90237349a670",
+      "name": "Get Comments",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -6944,
+        1216
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\nconst FLOW_VERSION = 'jira-rag-v4';\n\nfunction toText(value) {\n  if (value === null || value === undefined) return '';\n  if (typeof value === 'string') return value;\n  try { return JSON.stringify(value); } catch { return String(value); }\n}\n\nfunction extractText(node) {\n  if (!node) return '';\n  if (typeof node === 'string') return node;\n  if (Array.isArray(node)) return node.map(extractText).join('');\n  if (node.type === 'text') return node.text || '';\n  if (node.type === 'hardBreak') return '\\n';\n  if (node.type === 'mention') return node.attrs?.text || node.attrs?.id || '';\n  if (node.type === 'inlineCard') return node.attrs?.url || '';\n  if (node.type === 'emoji') return node.attrs?.text || node.attrs?.shortName || '';\n  if (node.type === 'status') return node.attrs?.text || '';\n  if (node.type === 'date') return node.attrs?.timestamp || '';\n  const content = extractText(node.content || []);\n  if (node.type === 'paragraph' || node.type === 'heading') return content + '\\n';\n  if (node.type === 'listItem') return '- ' + content.trimEnd() + '\\n';\n  if (node.type === 'bulletList' || node.type === 'orderedList' || node.type === 'blockquote' || node.type === 'codeBlock') return content + '\\n';\n  return content;\n}\n\nfunction normalizeText(value) {\n  let text = typeof value === 'string' ? value : extractText(value);\n  return text\n    .replace(/\\{code(?::[^}]*)?\\}([\\s\\S]*?)\\{code\\}/gi, '$1')\n    .replace(/\\{noformat\\}([\\s\\S]*?)\\{noformat\\}/gi, '$1')\n    .replace(/\\{color[^}]*\\}(.*?)\\{color\\}/gi, '$1')\n    .replace(/!([^|!]+)(?:\\|[^!]*)?!/g, '[Bild: $1]')\n    .replace(/\\[([^|\\]]+)\\|([^\\]]+)\\]/g, '$1 ($2)')\n    .replace(/\\[~([^\\]]+)\\]/g, '@$1')\n    .replace(/<\\/?[^>]+(>|$)/g, ' ')\n    .replace(/\\r\\n/g, '\\n')\n    .replace(/[ \\t]+\\n/g, '\\n')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .replace(/[ \\t]{2,}/g, ' ')\n    .trim();\n}\n\nfunction extractMentionedIssueKeys(value) {\n  const found = toText(value).match(/\\b[A-Z][A-Z0-9_]*-\\d+\\b/g) || [];\n  return [...new Set(found)];\n}\n\nfunction stableStrings(values) {\n  return [...new Set((values || []).filter(Boolean).map((value) => String(value)))].sort((a, b) => a.localeCompare(b));\n}\n\nconst issue = $('Get Issue').first().json || {};\nconst fields = issue.fields || {};\nconst commentItems = $('Get Comments').all();\n\nconst issue_key = String(issue.key || '').trim().toUpperCase();\nconst issue_id = String(issue.id || '');\n\nif (!issue_key) {\n  throw new Error('JIRA_ISSUE_KEY_MISSING');\n}\n\nconst summary = normalizeText(fields.summary || '');\nconst description = normalizeText(fields.description || '');\n\n// ============================================================\n// KOMMENTARE: NACH SICHTBARKEIT GETRENNT, NICHT VERWORFEN\n//\n// jsdPublic === true  -> comments          -> audience des Tickets\n// jsdPublic !== true  -> internal_comments -> audience it_internal\n//\n// Interner Support-Verlauf ist wertvolles Wissen, gehoert aber\n// ausschliesslich der IT. Er wird deshalb eingebettet, jedoch mit\n// eigener audience.\n//\n// FAIL CLOSED: Liefert die Jira-API das Feld jsdPublic ueberhaupt\n// nicht, ist die Sichtbarkeit unbekannt. Dann gelten ALLE Kommentare\n// als intern. Frueher galten sie in diesem Fall als oeffentlich -\n// das war die falsche Richtung.\n// ============================================================\n\nconst commentsRaw = commentItems\n  .map((item) => item.json || {})\n  .filter((comment) => Object.keys(comment).length > 0);\n\nconst jsd_flag_available = commentsRaw.some((comment) =>\n  Object.prototype.hasOwnProperty.call(comment, 'jsdPublic')\n);\n\nconst publicCommentsRaw = jsd_flag_available\n  ? commentsRaw.filter((comment) => comment.jsdPublic === true)\n  : [];\n\nconst internalCommentsRaw = jsd_flag_available\n  ? commentsRaw.filter((comment) => comment.jsdPublic !== true)\n  : commentsRaw;\n\nconst internal_comment_count = internalCommentsRaw.length;\n\nfunction mapComment(comment, isInternal) {\n  return {\n    id: comment.id ? String(comment.id) : null,\n    created_at: comment.created || null,\n    updated_at: comment.updated || null,\n    author_name: comment.author?.displayName || null,\n    author_email: comment.author?.emailAddress || null,\n    body: normalizeText(comment.body),\n    is_internal: isInternal,\n  };\n}\n\nfunction sortComments(list) {\n  return list.sort((a, b) => {\n    const byCreated = String(a.created_at || '').localeCompare(String(b.created_at || ''));\n    if (byCreated !== 0) return byCreated;\n    return String(a.id || '').localeCompare(String(b.id || ''));\n  });\n}\n\nconst comments = sortComments(\n  publicCommentsRaw.map((c) => mapComment(c, false)).filter((c) => c.body)\n);\n\nconst internal_comments = sortComments(\n  internalCommentsRaw.map((c) => mapComment(c, true)).filter((c) => c.body)\n);\n\n// Erwaehnte Tickets nur aus oeffentlichen Quellen ableiten - der Header-Chunk\n// ist oeffentlich und darf keine internen Verweise transportieren.\nlet mentioned_issue_keys = [];\nmentioned_issue_keys.push(...extractMentionedIssueKeys(fields.description));\nfor (const comment of publicCommentsRaw) {\n  mentioned_issue_keys.push(...extractMentionedIssueKeys(comment.body));\n}\nmentioned_issue_keys = [...new Set(mentioned_issue_keys)]\n  .filter((key) => key !== issue_key)\n  .sort((a, b) => a.localeCompare(b));\n\nconst linked_tickets = (fields.issuelinks || [])\n  .map((link) => ({\n    key: link.outwardIssue?.key || link.inwardIssue?.key || null,\n    type: link.type?.outward || link.type?.inward || 'relates to',\n  }))\n  .filter((link) => link.key)\n  .sort((a, b) => `${a.key}|${a.type}`.localeCompare(`${b.key}|${b.type}`));\n\nconst attachments = (Array.isArray(fields.attachment) ? fields.attachment : [])\n  .map((attachment) => ({\n    id: attachment.id ? String(attachment.id) : null,\n    filename: attachment.filename || null,\n    mime_type: attachment.mimeType || null,\n    size: attachment.size ?? null,\n    content_url: attachment.content || null,\n    thumbnail_url: attachment.thumbnail || null,\n  }))\n  .sort((a, b) => String(a.id || a.filename || '').localeCompare(String(b.id || b.filename || '')));\n\n// ============================================================\n// BILDAUSWAHL: NUR RASTERFORMATE\n//\n// FIX 08/2026 (Beleg: Lauf 103489, SSD-8686, Footer E-Rechnung.svg):\n// Die alte Pruefung liess jedes mime image/* durch. image/svg+xml erfuellt\n// das, GraphicsMagick im n8n-Container hat dafuer aber kein Decode-Delegate.\n// Resize Standard JPEG brach mit \"gm identify: No decode delegate\" ab und\n// riss den kompletten Ingest-Lauf mit - inklusive der Cleanup-Kette hinter\n// der Bildschleife. Es wird deshalb auf eine Whitelist rasterbarer Formate\n// umgestellt. Nicht rasterbare Anhaenge bleiben in attachments und damit im\n// Header-Chunk sichtbar, sie werden nur nicht mehr durch die Bildstrecke\n// geschickt.\n// ============================================================\nconst RASTER_MIMES = [\n  'image/png',\n  'image/jpeg',\n  'image/jpg',\n  'image/pjpeg',\n  'image/gif',\n  'image/bmp',\n  'image/x-ms-bmp',\n  'image/tiff',\n  'image/webp',\n];\n\nconst RASTER_EXT = /\\.(png|jpe?g|gif|bmp|webp|tiff?)$/i;\n\nfunction istRasterbar(attachment) {\n  const mime = String(attachment.mime_type || '')\n    .toLowerCase()\n    .split(';')[0]\n    .trim();\n  const filename = String(attachment.filename || '');\n\n  if (mime === 'image/svg+xml' || /\\.svgz?$/i.test(filename)) return false;\n  if (RASTER_MIMES.includes(mime)) return true;\n\n  // Unbekanntes oder generisches mime: Endung entscheidet.\n  return RASTER_EXT.test(filename);\n}\n\nconst bilder = attachments\n  .filter(istRasterbar)\n  .filter((attachment) => attachment.content_url)\n  .map((attachment, index) => ({\n    attachment_id: String(attachment.id || index),\n    filename: attachment.filename || `jira_image_${attachment.id || index}`,\n    mime_type: attachment.mime_type || null,\n    download_url: attachment.content_url,\n    thumbnail_url: attachment.thumbnail_url || null,\n    size: attachment.size ?? null,\n  }));\n\nconst status = fields.status?.name || '';\nconst resolution = fields.resolution?.name || null;\nconst priority = fields.priority?.name || null;\nconst project_key = fields.project?.key || null;\nconst issue_type = fields.issuetype?.name || null;\n\nconst request_type =\n  fields.customfield_10010?.requestType?.name ||\n  fields.customfield_10010?.requestType?.defaultName ||\n  null;\n\nconst created_at = fields.created || null;\nconst updated_at = fields.updated || null;\nconst due_date = fields.duedate || null;\nconst jira_resolved_at = fields.resolutiondate || null;\nconst parent_key = fields.parent?.key || null;\nconst epic_link = fields.customfield_10014 || fields.epic?.key || null;\n\nconst assignee_name = fields.assignee?.displayName || null;\nconst assignee_email = fields.assignee?.emailAddress || null;\nconst reporter_name = fields.reporter?.displayName || null;\nconst reporter_email = fields.reporter?.emailAddress || null;\n\nconst labels = stableStrings(fields.labels);\nconst components = stableStrings((fields.components || []).map((component) => component.name));\nconst fix_versions = stableStrings((fields.fixVersions || []).map((version) => version.name));\n\nconst story_points_raw =\n  fields.customfield_10016 ?? fields.customfield_10028 ?? fields.story_points ?? null;\n\nconst story_points =\n  story_points_raw === null || story_points_raw === undefined || story_points_raw === ''\n    ? null\n    : Number(story_points_raw);\n\nlet sprint = null;\nconst sprintCandidate = fields.customfield_10020 || fields.sprint || null;\nif (Array.isArray(sprintCandidate) && sprintCandidate.length > 0) {\n  sprint = sprintCandidate[sprintCandidate.length - 1]?.name || null;\n} else if (typeof sprintCandidate === 'object' && sprintCandidate?.name) {\n  sprint = sprintCandidate.name;\n} else if (typeof sprintCandidate === 'string') {\n  sprint = sprintCandidate;\n}\n\nconst agent_url = fields.customfield_10010?._links?.agent || null;\nconst portal_url = fields.customfield_10010?._links?.web || null;\nconst kategorie = request_type || issue_type || project_key;\n\n// content_hash ueber summary + description + ALLE Kommentare, damit auch eine\n// Aenderung an einem internen Kommentar eine Neu-Einbettung ausloest.\nconst hash_source = JSON.stringify({\n  summary,\n  description,\n  comments: [...comments, ...internal_comments].map((comment) => ({\n    id: comment.id,\n    created_at: comment.created_at,\n    updated_at: comment.updated_at,\n    author_name: comment.author_name,\n    is_internal: comment.is_internal,\n    body: comment.body,\n  })),\n});\n\nconst content_hash = crypto.createHash('sha256').update(hash_source, 'utf8').digest('hex');\n\n// Beim Backfill-Einstieg ist der Trigger-Knoten nicht gelaufen. Ein Cross-Branch-Zugriff\n// darauf bricht die Ausfuehrung ab, deshalb abgesichert lesen.\nlet rohEreignis = {};\ntry { rohEreignis = $('Jira Trigger').first().json ?? {}; } catch (e) { rohEreignis = {}; }\nconst ereignisTyp =\n  $('Basisparameter').first().json.event_type ||\n  rohEreignis.webhookEvent ||\n  'unknown';\n\nreturn [{\n  json: {\n    flow_version: FLOW_VERSION,\n    issue_key,\n    issue_id,\n    summary,\n    description,\n    status,\n    resolution,\n    priority,\n    project_key,\n    issue_type,\n    request_type,\n    created_at,\n    updated_at,\n    due_date,\n    jira_resolved_at,\n    parent_key,\n    epic_link,\n    assignee_name,\n    assignee_email,\n    reporter_name,\n    reporter_email,\n    labels,\n    components,\n    fix_versions,\n    sprint,\n    story_points: Number.isFinite(story_points) ? story_points : null,\n    agent_url,\n    portal_url,\n    kategorie,\n    mentioned_issue_keys,\n    linked_tickets,\n    comments,\n    internal_comments,\n    attachments,\n    bilder,\n    has_images: bilder.length > 0,\n    image_count: bilder.length,\n    jsd_flag_available,\n    internal_comment_count,\n    content_hash,\n    event_type: ereignisTyp,\n    raw_payload: rohEreignis,\n    normalized_at: new Date().toISOString(),\n  }\n}];\n"
+      },
+      "id": "05879e53-f0cb-42f1-b634-f679451b6e16",
+      "name": "Normalize Issue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6752,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "jira_tickets",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticket_key",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalize Issue').first().json.issue_key }}"
+            }
+          ]
+        }
+      },
+      "id": "4097d01c-2775-4ecb-a749-6e396d0fe0a5",
+      "name": "Get Existing Ticket",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -6512,
+        1216
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst candidate = $input.first()?.json || {};\n\nconst existing =\n  candidate &&\n  typeof candidate === 'object' &&\n  !Array.isArray(candidate) &&\n  candidate.ticket_key\n    ? candidate\n    : null;\n\nfunction timestamp(value) {\n  const parsed = Date.parse(value || '');\n  return Number.isFinite(parsed) ? parsed : null;\n}\n\nconst incomingTs = timestamp(n.updated_at);\nconst existingTs = timestamp(existing?.jira_updated_at);\n\nconst stale_event =\n  existingTs !== null &&\n  incomingTs !== null &&\n  existingTs > incomingTs;\n\nreturn [{\n  json: {\n    accept_event: !stale_event,\n    stale_event,\n    existing_ticket: existing || {},\n    incoming_updated_at: n.updated_at,\n    existing_updated_at: existing?.jira_updated_at || null,\n  }\n}];"
+      },
+      "id": "7ee6a00e-30f0-4fc5-914e-36e8ee4366c4",
+      "name": "Decide Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6272,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.accept_event }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "584eef37-b49b-4bc4-91a1-0299a63ca704",
+      "name": "IF Event Is Current",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6032,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst existing = $('Decide Event').first().json.existing_ticket || {};\nconst now = new Date().toISOString();\n\n// audience wird bewusst NICHT geschrieben:\n// die Spalte jira_tickets.audience ist die Berechtigungsquelle und\n// darf durch die Ingestion nicht ueberschrieben werden.\n\nreturn [{\n  json: {\n    ticket_key: n.issue_key,\n    ticket_id: n.issue_id,\n    summary: n.summary,\n    description: n.description,\n    status: n.status,\n    resolution: n.resolution,\n    priority: n.priority,\n    issue_type: n.issue_type,\n    assignee_name: n.assignee_name,\n    assignee_email: n.assignee_email,\n    reporter_name: n.reporter_name,\n    reporter_email: n.reporter_email,\n    comments: n.comments || [],\n    parent_key: n.parent_key,\n    linked_tickets: n.linked_tickets || [],\n    labels: n.labels || [],\n    components: n.components || [],\n    fix_versions: n.fix_versions || [],\n    sprint: n.sprint,\n    story_points: n.story_points,\n    epic_link: n.epic_link,\n    jira_created_at: n.created_at,\n    jira_updated_at: n.updated_at,\n    jira_resolved_at: n.jira_resolved_at,\n    jira_due_date: n.due_date,\n    ingested_at: existing.ingested_at || now,\n    last_ingested_at: now,\n    ingestion_version: Number(existing.ingestion_version || 0) + 1,\n    raw_payload: n.raw_payload,\n  }\n}];"
+      },
+      "id": "ced458c1-da0a-452c-b67f-0ac6dd7910a8",
+      "name": "Build Ticket Upsert Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5792,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/jira_tickets?on_conflict=ticket_key",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=ignore-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Build Ticket Upsert Row').first().json }}",
+        "options": {}
+      },
+      "id": "68ce0a98-4d66-4721-a56d-b7c82d60ee74",
+      "name": "Ensure Jira Ticket Exists",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5552,
+        1168
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/jira_tickets",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "ticket_key",
+              "value": "={{ 'eq.' + $('Normalize Issue').first().json.issue_key }}"
+            },
+            {
+              "name": "or",
+              "value": "={{ '(jira_updated_at.is.null,jira_updated_at.lte.\"' + $('Normalize Issue').first().json.updated_at + '\")' }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Build Ticket Upsert Row').first().json }}",
+        "options": {}
+      },
+      "id": "b11d4bfa-b5eb-4432-a67c-c34d2235ac5d",
+      "name": "Conditional Update Jira Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5312,
+        1168
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "jira_tickets",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticket_key",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalize Issue').first().json.issue_key }}"
+            }
+          ]
+        }
+      },
+      "id": "e1059cc1-1577-45c6-aa18-401a3be516dc",
+      "name": "Get Ticket Row",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -5072,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst row = $input.first()?.json || {};\n\nfunction timestamp(value) {\n  const parsed = Date.parse(value || '');\n  return Number.isFinite(parsed) ? parsed : null;\n}\n\nconst incomingTs = timestamp(n.updated_at);\nconst currentTs = timestamp(row.jira_updated_at);\n\nconst current =\n  incomingTs !== null &&\n  currentTs !== null &&\n  incomingTs === currentTs;\n\nreturn [{\n  json: {\n    current,\n    current_ticket: row,\n    incoming_updated_at: n.updated_at,\n    current_updated_at: row.jira_updated_at || null,\n  }\n}];"
+      },
+      "id": "13684407-2406-4da7-bc85-dd112d3f81a5",
+      "name": "Guard Ticket Version",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4832,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.current }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e0c67894-a495-433a-8c40-6dad003ab8ef",
+      "name": "IF Ticket Version Current",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4592,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const CHUNK_SIZE = 1800;\nconst OVERLAP = 200;\nconst FLOW_VERSION = 'jira-rag-v4';\nconst NOISE_FILTER = 'v1';\nconst MIN_SUBSTANZ = 40;\nconst ALLOWED_CHUNK_TYPES = ['header', 'content', 'comment', 'solution', 'image_attachment'];\nconst JIRA_BASE = 'https://rwg-r.atlassian.net';\n\nconst AGENT_AUTHORS = ['rwg.automate', 'rwg automate', 'rwg_automate'];\nconst AGENT_BODY_MARKERS = [\n  '[rwg-jira-agent',\n  'automatisch durch den rwg it-assistenten generiert',\n  'agenten-ersteinschaetzung',\n  'dein rwg assistent',\n];\n\nconst row = $('Get Ticket Row').first().json;\nconst n = $('Normalize Issue').first().json;\n\nif (!row?.id) {\n  throw new Error('MISSING_JIRA_TICKET_SOURCE_ID');\n}\n\nconst AUDIENCE =\n  typeof row.audience === 'string' && row.audience.trim() ? row.audience.trim() : null;\n\nif (!AUDIENCE) {\n  throw new Error('MISSING_TICKET_AUDIENCE: ' + n.issue_key);\n}\n\n// Interner Verlauf ist immer it_internal, unabhaengig von der Ticket-Audience.\nfunction audienceFuer(istIntern) {\n  return istIntern ? 'it_internal' : AUDIENCE;\n}\n\nfunction isAgentComment(comment) {\n  const author = String(comment.author_name || '').toLowerCase();\n  const email = String(comment.author_email || '').toLowerCase();\n  const body = String(comment.body || '').toLowerCase();\n  if (AGENT_AUTHORS.some((a) => author.includes(a) || email.includes(a))) return true;\n  if (body.includes('agenten-erstein')) return true;\n  return AGENT_BODY_MARKERS.some((m) => body.includes(m));\n}\n\n// ============================================================\n// RAUSCHFILTER\n// Jira-Tickets entstehen zu grossen Teilen aus E-Mails. Damit landen\n// Signaturen, Rechtsfusszeilen, Safelinks-Blobs und Zitatverlaeufe in der\n// Wissensbasis und verdraengen echte Inhalte aus den Suchtreffern.\n// Alles, was hier entfernt wird, traegt keine fachliche Information.\n// ============================================================\nconst ABBINDER = /(^|\\n)[ \\t]*(mit freundlichen gr(u|ue|\\u00fc)(ss|\\u00df)en|viele gr(u|ue|\\u00fc)(ss|\\u00df)e|beste gr(u|ue|\\u00fc)(ss|\\u00df)e|liebe gr(u|ue|\\u00fc)(ss|\\u00df)e|freundliche gr(u|ue|\\u00fc)(ss|\\u00df)e|danke und gr(u|ue|\\u00fc)(ss|\\u00df)e|sch(o|oe|\\u00f6)ne gr(u|ue|\\u00fc)(ss|\\u00df)e|mfg|vg)\\b[\\s\\S]*$/i;\n\nconst AUTOREPLY = /(automatic reply|automatische antwort|abwesenheitsnotiz|out of office|bin ich nicht im haus|ihre mail wird nicht weitergeleitet)/i;\n\nfunction bereinige(text) {\n  let t = String(text || '');\n  t = t.replace(/Sie erhalten nicht h(a|ae|\\u00e4)ufig E-Mails von[^\\n]*/gi, ' ');\n  t = t.replace(/Erfahren Sie, warum dies wichtig ist[^\\n]*/gi, ' ');\n  t = t.replace(/https?:\\/\\/\\S*(safelinks\\.protection\\.outlook\\.com|atpscan\\.global\\.hornetsecurity\\.com|aka\\.ms\\/LearnAboutSenderIdentification)\\S*/gi, ' ');\n  t = t.replace(/https?:\\/\\/\\S{180,}/g, ' ');\n  t = t.replace(/Diese E-Mail enth(a|ae|\\u00e4)lt die Referenz-ID[\\s\\S]*$/i, ' ');\n  t = t.replace(/(^|\\n)[ \\t]*\\*?Von:\\*?[ \\t][\\s\\S]*$/i, '\\n');\n  t = t.replace(/(^|\\n)[ \\t]*-{3,}[ \\t]*Urspr(u|ue|\\u00fc)ngliche Nachricht[ \\t]*-{3,}[\\s\\S]*$/i, '\\n');\n  t = t.replace(/RWG Rheinland eG[ \\t]*\\|[\\s\\S]*$/i, ' ');\n  t = t.replace(/(^|\\n)[ \\t]*(Vorstand|Aufsichtsrat|Hauptamtlich)[ \\t]*:[^\\n]*/gi, '$1');\n  t = t.replace(ABBINDER, '$1');\n  t = t.replace(/(^|\\n)[ \\t]*(Telefon|Mobil|Fax|E-Mail|Website|Dienstsitz)[ \\t]*:[^\\n]*/gi, '$1');\n  t = t.replace(/\\+?\\d[\\d \\t()\\/\\\\-]{8,}\\d/g, ' ');\n  t = t.replace(/\\\\{2,}/g, ' ');\n  t = t.replace(/\\|+/g, ' ');\n  t = t.replace(/[ \\t]{2,}/g, ' ');\n  t = t.replace(/\\n{3,}/g, '\\n\\n');\n  return t.trim();\n}\n\n// Zaehlt nur Buchstaben und Ziffern ausserhalb von URLs. Ein Chunk aus\n// Trennzeichen, Links und Leerraum hat damit Substanz 0.\nfunction substanz(text) {\n  return String(text || '')\n    .replace(/https?:\\/\\/\\S+/g, ' ')\n    .replace(/[^\\p{L}\\p{N}]+/gu, '')\n    .length;\n}\n\nfunction istBrauchbar(text) {\n  const clean = String(text || '');\n  if (AUTOREPLY.test(clean)) return false;\n  return substanz(clean) >= MIN_SUBSTANZ;\n}\n\nfunction estimateTokens(text) {\n  return Math.ceil(String(text || '').length / 4);\n}\n\n// ============================================================\n// UTF-16 SICHERHEIT\n// Emojis bestehen aus einem Surrogate-Paar (zwei Code-Units). Faellt eine\n// Schnittkante zwischen beide Haelften, entsteht ein verwaistes Surrogate.\n// Postgres/PostgREST lehnt den kompletten Batch dann mit PGRST102\n// (\"Empty or invalid json\") ab. Zwei Schutzebenen:\n//   1) surrogatSichererIndex - es wird nie mitten durch ein Paar geschnitten\n//   2) entferneEinzelneSurrogate - verwaiste Haelften werden vor dem Schreiben\n//      entfernt, egal woher sie stammen\n// ============================================================\nfunction entferneEinzelneSurrogate(text) {\n  const s = String(text || '');\n  let out = '';\n  for (let i = 0; i < s.length; i++) {\n    const code = s.charCodeAt(i);\n    if (code >= 0xd800 && code <= 0xdbff) {\n      const next = i + 1 < s.length ? s.charCodeAt(i + 1) : 0;\n      if (next >= 0xdc00 && next <= 0xdfff) {\n        out += s[i] + s[i + 1];\n        i++;\n      }\n      continue;\n    }\n    if (code >= 0xdc00 && code <= 0xdfff) continue;\n    out += s[i];\n  }\n  return out;\n}\n\nfunction surrogatSichererIndex(text, index) {\n  if (index <= 0 || index >= text.length) return index;\n  const prev = text.charCodeAt(index - 1);\n  const cur = text.charCodeAt(index);\n  if (prev >= 0xd800 && prev <= 0xdbff && cur >= 0xdc00 && cur <= 0xdfff) return index + 1;\n  return index;\n}\n\nfunction saeubereWerte(wert) {\n  if (typeof wert === 'string') return entferneEinzelneSurrogate(wert);\n  if (Array.isArray(wert)) return wert.map(saeubereWerte);\n  if (wert && typeof wert === 'object') {\n    const out = {};\n    for (const key of Object.keys(wert)) out[key] = saeubereWerte(wert[key]);\n    return out;\n  }\n  return wert;\n}\n\nfunction findBoundary(text, start, idealEnd) {\n  if (idealEnd >= text.length) return text.length;\n  const minimumEnd = Math.min(text.length, start + Math.floor(CHUNK_SIZE * 0.65));\n  const search = text.slice(minimumEnd, idealEnd);\n  const candidates = [\n    search.lastIndexOf('\\n\\n'),\n    search.lastIndexOf('\\n'),\n    search.lastIndexOf('. '),\n    search.lastIndexOf('; '),\n    search.lastIndexOf(', '),\n    search.lastIndexOf(' '),\n  ].filter((index) => index >= 0);\n  if (!candidates.length) return idealEnd;\n  return minimumEnd + Math.max(...candidates) + 1;\n}\n\nfunction splitText(text, maxChars = CHUNK_SIZE, overlap = OVERLAP) {\n  const normalized = String(text || '').trim();\n  if (!normalized) return [];\n  const parts = [];\n  let start = 0;\n  while (start < normalized.length) {\n    const idealEnd = Math.min(start + maxChars, normalized.length);\n    const end = surrogatSichererIndex(normalized, findBoundary(normalized, start, idealEnd));\n    const part = normalized.slice(start, end).trim();\n    if (part) parts.push(part);\n    if (end >= normalized.length) break;\n    const nextStart = surrogatSichererIndex(normalized, Math.max(0, end - overlap));\n    start = nextStart <= start ? end : nextStart;\n  }\n  return parts;\n}\n\nconst publicComments = (n.comments || []).filter((c) => !isAgentComment(c));\nconst internalComments = (n.internal_comments || []).filter((c) => !isAgentComment(c));\nconst agentCommentCount =\n  ((n.comments || []).length + (n.internal_comments || []).length) -\n  (publicComments.length + internalComments.length);\n\nconst attachments = n.attachments || [];\nconst isResolved = Boolean(n.jira_resolved_at) || Boolean(n.resolution);\n\nconst baseMetadata = {\n  source_type: 'jira',\n  source_ref: n.issue_key,\n  title: n.summary,\n  url: `${JIRA_BASE}/browse/${n.issue_key}`,\n  updated_at: n.updated_at,\n  content_hash: n.content_hash,\n  rag_flow_version: FLOW_VERSION,\n  noise_filter: NOISE_FILTER,\n  audience: AUDIENCE,\n  ticket_key: n.issue_key,\n  summary: n.summary,\n  status: n.status,\n  resolution: n.resolution,\n  is_resolved: isResolved,\n  priority: n.priority,\n  issue_type: n.issue_type,\n  project_key: n.project_key,\n  request_type: n.request_type,\n  labels: n.labels || [],\n  components: n.components || [],\n  created_at: n.created_at,\n  resolved_at: n.jira_resolved_at,\n};\n\nconst sourceId = row.id;\nlet chunkIndex = 0;\nconst chunks = [];\nlet verworfen = 0;\n\nfunction pushChunk(text, metadata, audience) {\n  const clean = entferneEinzelneSurrogate(text).trim();\n  if (!clean) return;\n\n  const chunkType = metadata?.chunk_type;\n  if (!ALLOWED_CHUNK_TYPES.includes(chunkType)) {\n    throw new Error('INVALID_CHUNK_TYPE: ' + String(chunkType));\n  }\n\n  // Der Header traegt die Ticket-Identitaet und wird nie verworfen.\n  if (chunkType !== 'header' && !istBrauchbar(clean)) {\n    verworfen++;\n    return;\n  }\n\n  const chunkAudience = audience || AUDIENCE;\n\n  chunks.push({\n    source_id: sourceId,\n    source_type: 'jira',\n    source_ref: n.issue_key,\n    audience: chunkAudience,\n    chunk_index: chunkIndex++,\n    chunk_text: clean,\n    token_count: estimateTokens(clean),\n    metadata: saeubereWerte({ ...baseMetadata, ...metadata, audience: chunkAudience }),\n  });\n}\n\n// ---------- HEADER ----------\nconst header = [\n  `[${n.issue_key}] ${n.summary || ''}`.trim(),\n  n.kategorie ? `Kategorie: ${n.kategorie}` : '',\n  n.status ? `Status: ${n.status}` : '',\n  n.resolution ? `Resolution: ${n.resolution}` : '',\n  `Geloest: ${isResolved ? 'ja' : 'nein'}`,\n  n.priority ? `Prioritaet: ${n.priority}` : '',\n  n.issue_type ? `Typ: ${n.issue_type}` : '',\n  n.project_key ? `Projekt: ${n.project_key}` : '',\n  n.request_type ? `Request Type: ${n.request_type}` : '',\n  n.assignee_name ? `Zustaendig: ${n.assignee_name}` : '',\n  n.reporter_name ? `Reporter: ${n.reporter_name}` : '',\n  n.parent_key ? `Parent: ${n.parent_key}` : '',\n  n.epic_link ? `Epic: ${n.epic_link}` : '',\n  (n.labels || []).length ? `Labels: ${n.labels.join(', ')}` : '',\n  (n.components || []).length ? `Komponenten: ${n.components.join(', ')}` : '',\n  (n.linked_tickets || []).length\n    ? `Verknuepfte Tickets: ${n.linked_tickets.map((l) => `${l.key} (${l.type})`).join(', ')}`\n    : '',\n  (n.mentioned_issue_keys || []).length\n    ? `Erwaehnte Tickets: ${n.mentioned_issue_keys.join(', ')}`\n    : '',\n  attachments.length\n    ? `Anhaenge: ${attachments.map((a) => a.filename || 'unbekannt').join(', ')}`\n    : '',\n  n.created_at ? `Created: ${n.created_at}` : '',\n  n.updated_at ? `Updated: ${n.updated_at}` : '',\n  n.jira_resolved_at ? `Resolved: ${n.jira_resolved_at}` : '',\n  `URL: ${JIRA_BASE}/browse/${n.issue_key}`,\n]\n  .filter(Boolean)\n  .join('\\n');\n\npushChunk(header, {\n  chunk_type: 'header',\n  attachment_count: attachments.length,\n  comment_count: publicComments.length,\n  internal_comment_count: internalComments.length,\n  agent_comment_count: agentCommentCount,\n  jsd_flag_available: n.jsd_flag_available === true,\n});\n\n// ---------- BESCHREIBUNG ----------\nconst beschreibung = bereinige(n.description || '');\nif (beschreibung && istBrauchbar(beschreibung)) {\n  const descriptionParts = splitText(`Beschreibung:\\n${beschreibung}`, CHUNK_SIZE, OVERLAP);\n  for (let index = 0; index < descriptionParts.length; index++) {\n    pushChunk(descriptionParts[index], {\n      chunk_type: 'content',\n      content_origin: 'description',\n      part: index + 1,\n    });\n  }\n} else if (n.description) {\n  verworfen++;\n}\n\n// ---------- KOMMENTARE ----------\nfunction kommentarChunks(comment, istIntern) {\n  const body = bereinige(comment.body || '');\n  if (!body || !istBrauchbar(body)) {\n    verworfen++;\n    return;\n  }\n\n  const prefix =\n    [\n      `Kommentar von ${comment.author_name || 'Unbekannt'}`,\n      istIntern ? 'intern' : '',\n      comment.created_at ? `Datum: ${comment.created_at}` : '',\n      comment.updated_at && comment.updated_at !== comment.created_at\n        ? `Aktualisiert: ${comment.updated_at}`\n        : '',\n    ]\n      .filter(Boolean)\n      .join(' | ') + ':\\n';\n\n  const availableChars = Math.max(600, CHUNK_SIZE - prefix.length - 60);\n  const parts = splitText(body, availableChars, OVERLAP);\n\n  for (let partNo = 0; partNo < parts.length; partNo++) {\n    const text =\n      prefix + (parts.length > 1 ? `(Teil ${partNo + 1}/${parts.length})\\n` : '') + parts[partNo];\n\n    pushChunk(\n      text,\n      {\n        chunk_type: 'comment',\n        comment_id: comment.id,\n        comment_author: comment.author_name,\n        comment_date: comment.created_at,\n        is_internal_comment: istIntern,\n        part: partNo + 1,\n      },\n      audienceFuer(istIntern)\n    );\n  }\n}\n\nfor (const comment of publicComments) kommentarChunks(comment, false);\nfor (const comment of internalComments) kommentarChunks(comment, true);\n\nif (!chunks.length) {\n  throw new Error('NO_TEXT_CHUNKS_CREATED');\n}\n\n// Der Zaehler gehoert in die Metadaten des Headers, nicht in die Chunk-Zeile:\n// document_chunks hat keine Spalte dafuer.\nchunks[0].metadata.verworfene_chunks = verworfen;\n\nreturn chunks.map((chunk) => ({ json: chunk }));"
+      },
+      "id": "85c430ab-e8bd-4038-8f5e-1d6c79933545",
+      "name": "Create Text Chunks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4352,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const chunks = $input.all().map((item) => item.json);\n\nif (!chunks.length) {\n  throw new Error('TEXT_CHUNK_BATCH_EMPTY');\n}\n\nreturn [{\n  json: {\n    chunks,\n    inputs: chunks.map((chunk) => chunk.chunk_text),\n  }\n}];"
+      },
+      "id": "4de50932-e86a-4ba7-a573-eeae687ebd5a",
+      "name": "Prepare Text Embedding Batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4112,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: 'text-embedding-3-small', input: $json.inputs } }}",
+        "options": {}
+      },
+      "id": "6493ea4e-2d78-4504-a281-43c5865fdd8b",
+      "name": "OpenAI Embedding Text Batch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3872,
+        1152
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const batch = $('Prepare Text Embedding Batch').first().json;\nconst response = $input.first().json || {};\n\nconst chunks = batch.chunks || [];\nconst data =\n  response.data ||\n  response.body?.data ||\n  [];\n\nif (!Array.isArray(data)) {\n  throw new Error('TEXT_EMBEDDING_RESPONSE_DATA_MISSING');\n}\n\nif (data.length !== chunks.length) {\n  throw new Error(\n    `TEXT_EMBEDDING_COUNT_MISMATCH: expected=${chunks.length}, actual=${data.length}`\n  );\n}\n\nconst embeddingByIndex = new Map();\n\nfor (const entry of data) {\n  if (\n    Number.isInteger(entry?.index) &&\n    Array.isArray(entry?.embedding)\n  ) {\n    embeddingByIndex.set(entry.index, entry.embedding);\n  }\n}\n\nconst rows = chunks.map((chunk, index) => {\n  const embedding =\n    embeddingByIndex.get(index) ||\n    data[index]?.embedding ||\n    null;\n\n  if (!Array.isArray(embedding)) {\n    throw new Error(`TEXT_EMBEDDING_MISSING_AT_INDEX_${index}`);\n  }\n\n  if (embedding.length !== 1536) {\n    throw new Error(\n      `TEXT_EMBEDDING_DIMENSION_MISMATCH_AT_${index}: ${embedding.length}`\n    );\n  }\n\n  return {\n    ...chunk,\n    embedding: '[' + embedding.join(',') + ']',\n  };\n});\n\nreturn [{\n  json: {\n    rows,\n    text_chunk_count: rows.length,\n  }\n}];"
+      },
+      "id": "4a1100c7-13c2-4b8f-a785-db5174c74d3b",
+      "name": "Build Text Chunk Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3632,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst ticketRow = $('Get Ticket Row').first().json;\n\nif (!ticketRow?.id) {\n  throw new Error('MISSING_TICKET_ID_FOR_IMAGES');\n}\n\nconst AUDIENCE =\n  typeof ticketRow.audience === 'string' && ticketRow.audience.trim()\n    ? ticketRow.audience.trim()\n    : null;\n\nif (!AUDIENCE) {\n  throw new Error('MISSING_TICKET_AUDIENCE: ' + n.issue_key);\n}\n\n// ============================================================\n// AUDIENCE JE BILD STATT PAUSCHAL JE TICKET\n//\n// Bisher erbte JEDER Bildchunk die Ticket-Audience. Bilder aus\n// internen Kommentaren waren dadurch fuer den Fachbereich sichtbar.\n// Messung 23.08.2026: 1362 Bildchunks aus 673 Tickets, davon 192\n// Tickets mit E-Mail-Adressen und 100 Chunks mit Rufnummern im\n// OCR-Text - alle public.\n//\n// WARUM AUTOR + ZEIT UND KEIN ID-JOIN\n// Jira liefert am Anhang keine Kommentar-Referenz. Die Media-IDs im\n// Kommentartext sind Media-Services-UUIDs, die Attachment-IDs sind\n// numerisch - ein Join ueber IDs ist nicht moeglich (geprueft an\n// SSD-7932 und SSD-5878, null Uebereinstimmungen).\n// Belastbar ist der Schreibvorgang: Anhang und Kommentar entstehen\n// gemeinsam. Messung an denselben Tickets: 39 von 42 Anhaengen\n// eindeutig zuordenbar, Abstand durchgehend 0-1 Sekunden. Das\n// Fenster ist deshalb eng - es soll denselben Schreibvorgang\n// erfassen, nicht raten.\n//\n// Rohdaten kommen bewusst aus Get Issue und Get Comments statt aus\n// Normalize Issue: dort werden Autor und Zeitstempel der Anhaenge\n// nicht mitgefuehrt. Beide Nodes liegen im selben Pfad und laufen\n// immer, bevor dieser Node ausgefuehrt wird.\n//\n// FAIL CLOSED: Herabstufen ist erlaubt, Heraufstufen nie. Ein Bild\n// kann nie oeffentlicher werden als sein Ticket.\n// ============================================================\nconst HERKUNFT_FENSTER_MS = 60000;\n\nconst rohIssue = $('Get Issue').first().json || {};\nconst rohFields = rohIssue.fields || {};\nconst reporterId = rohFields.reporter?.accountId || null;\n\nconst rohKommentare = $('Get Comments').all()\n  .map((eintrag) => eintrag.json || {})\n  .filter((kommentar) => Object.keys(kommentar).length > 0);\n\n// Gleiche Fail-Closed-Logik wie in Normalize Issue: fehlt das Flag\n// vollstaendig, gilt die Sichtbarkeit als unbekannt und damit intern.\nconst jsdFlagVerfuegbar = rohKommentare.some((kommentar) =>\n  Object.prototype.hasOwnProperty.call(kommentar, 'jsdPublic')\n);\n\nconst anhangNachId = new Map();\nfor (const anhang of (Array.isArray(rohFields.attachment) ? rohFields.attachment : [])) {\n  if (anhang && anhang.id !== undefined && anhang.id !== null) {\n    anhangNachId.set(String(anhang.id), anhang);\n  }\n}\n\nfunction ermittleHerkunft(attachmentId) {\n  const anhang = anhangNachId.get(String(attachmentId));\n  const autorId = anhang?.author?.accountId || null;\n  const zeit = Date.parse(anhang?.created || '');\n\n  if (autorId && !Number.isNaN(zeit)) {\n    let treffer = null;\n    for (const kommentar of rohKommentare) {\n      if ((kommentar.author?.accountId || null) !== autorId) continue;\n      const kommentarZeit = Date.parse(kommentar.created || '');\n      if (Number.isNaN(kommentarZeit)) continue;\n      const abstand = Math.abs(kommentarZeit - zeit);\n      if (abstand > HERKUNFT_FENSTER_MS) continue;\n      if (!treffer || abstand < treffer.abstand) {\n        treffer = { abstand, kommentar };\n      }\n    }\n    if (treffer) {\n      const istOeffentlich = jsdFlagVerfuegbar\n        ? treffer.kommentar.jsdPublic === true\n        : false;\n      return {\n        herkunft: 'kommentar',\n        quell_kommentar_id: treffer.kommentar.id ? String(treffer.kommentar.id) : null,\n        jsd_public: istOeffentlich,\n        herkunft_abstand_ms: treffer.abstand,\n        audience: istOeffentlich ? AUDIENCE : 'it_internal',\n      };\n    }\n  }\n\n  // Kein Kommentartreffer, aber der Reporter hat den Anhang erzeugt:\n  // dann kam er mit der Anfrage selbst und ist fuer ihn sichtbar.\n  if (autorId && reporterId && autorId === reporterId) {\n    return {\n      herkunft: 'anfrage',\n      quell_kommentar_id: null,\n      jsd_public: true,\n      herkunft_abstand_ms: null,\n      audience: AUDIENCE,\n    };\n  }\n\n  return {\n    herkunft: 'unbekannt',\n    quell_kommentar_id: null,\n    jsd_public: false,\n    herkunft_abstand_ms: null,\n    audience: 'it_internal',\n  };\n}\n\nconst IMAGE_INDEX_BASE = 100000;\nconst VISION_MODEL = 'gpt-4.1-mini-2025-04-14';\n\nfunction cleanBaseName(filename, fallback) {\n  const value = String(filename || fallback || 'jira_image')\n    .replace(/\\.[^.]+$/, '')\n    .replace(/[^a-zA-Z0-9._-]/g, '_')\n    .replace(/_+/g, '_')\n    .replace(/^_+|_+$/g, '');\n\n  return (value || fallback || 'jira_image').slice(0, 120);\n}\n\nconst images = (n.bilder || []).map((image, index) => {\n  const attachmentId = String(image.attachment_id || index);\n  const baseName = cleanBaseName(\n    image.filename,\n    `jira_image_${attachmentId}`\n  );\n\n  const storage_key =\n    `JIRA/${n.issue_key}/${attachmentId}_${baseName}.jpg`;\n\n  const herkunft = ermittleHerkunft(attachmentId);\n\n  return {\n    source_id: ticketRow.id,\n    issue_key: n.issue_key,\n    audience: herkunft.audience,\n    herkunft: herkunft.herkunft,\n    quell_kommentar_id: herkunft.quell_kommentar_id,\n    jsd_public: herkunft.jsd_public,\n    attachmentId,\n    download_url: image.download_url,\n    thumbnail_url: image.thumbnail_url || null,\n    original_filename:\n      image.filename || `jira_image_${attachmentId}`,\n    original_mime_type:\n      image.mime_type || 'application/octet-stream',\n    original_size: image.size ?? null,\n    storage_key,\n    image_chunk_index: IMAGE_INDEX_BASE + index,\n    vision_model: VISION_MODEL,\n  };\n});\n\nreturn [{\n  json: {\n    images,\n    image_count: images.length,\n    bilder_it_internal: images.filter((bild) => bild.audience === 'it_internal').length,\n    bilder_herkunft_unbekannt: images.filter((bild) => bild.herkunft === 'unbekannt').length,\n    jsd_flag_verfuegbar: jsdFlagVerfuegbar,\n    expected_storage_keys: images.map((image) => image.storage_key),\n    expected_image_chunk_indices: images.map(\n      (image) => image.image_chunk_index\n    ),\n    vision_model: VISION_MODEL,\n  }\n}];"
+      },
+      "id": "91e92855-7a7a-43e7-a770-bde8da7180a1",
+      "name": "Build Image Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3392,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('Build Text Chunk Rows').first().json;\nconst image = $('Build Image Plan').first().json;\nconst n = $('Normalize Issue').first().json;\nconst ticket = $('Get Ticket Row').first().json;\n\nconst SOLUTION_CHUNK_INDEX = 90000;\n\nconst isResolved =\n  Boolean(n.jira_resolved_at) ||\n  Boolean(n.resolution);\n\nconst expected_chunk_indices = [\n  ...(text.rows || []).map((row) => Number(row.chunk_index)),\n  ...(isResolved ? [SOLUTION_CHUNK_INDEX] : []),\n  ...(image.expected_image_chunk_indices || []).map(Number),\n]\n  .filter((value) => Number.isInteger(value))\n  .sort((a, b) => a - b);\n\nreturn [{\n  json: {\n    source_id: ticket.id,\n    source_ref: n.issue_key,\n    content_hash: n.content_hash,\n    flow_version: n.flow_version,\n    incoming_updated_at: n.updated_at,\n\n    text_rows: text.rows || [],\n    text_chunk_count: text.text_chunk_count || 0,\n\n    images: image.images || [],\n    image_count: image.image_count || 0,\n    expected_storage_keys:\n      image.expected_storage_keys || [],\n\n    expected_chunk_indices:\n      [...new Set(expected_chunk_indices)],\n\n    is_resolved: isResolved,\n    solution_chunk_index:\n      isResolved ? SOLUTION_CHUNK_INDEX : null,\n\n    vision_model: image.vision_model,\n  }\n}];"
+      },
+      "id": "4789f04b-7b2b-4dfd-832d-56717d81dcc4",
+      "name": "Build RAG Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3152,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "jira_tickets",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticket_key",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalize Issue').first().json.issue_key }}"
+            }
+          ]
+        }
+      },
+      "id": "f64703bb-c7e1-469e-87cb-e00d517885cd",
+      "name": "Get Ticket Before Chunk Write",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2912,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst row = $input.first()?.json || {};\n\nfunction timestamp(value) {\n  const parsed = Date.parse(value || '');\n  return Number.isFinite(parsed) ? parsed : null;\n}\n\nconst incomingTs = timestamp(n.updated_at);\nconst currentTs = timestamp(row.jira_updated_at);\n\nreturn [{\n  json: {\n    allowed:\n      incomingTs !== null &&\n      currentTs !== null &&\n      incomingTs === currentTs,\n    incoming_updated_at: n.updated_at,\n    current_updated_at: row.jira_updated_at || null,\n  }\n}];"
+      },
+      "id": "e9c5f596-1d1c-47e0-9ed5-1525c1db3592",
+      "name": "Guard Chunk Write",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2672,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.allowed }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e03e75e7-b292-4cf2-a824-199ebce2b192",
+      "name": "IF Chunk Write Current",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2432,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?on_conflict=source_id,chunk_index",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Build RAG Payload').first().json.text_rows }}",
+        "options": {}
+      },
+      "id": "54631658-926e-4e2b-ba9b-f03207a30a58",
+      "name": "Bulk Upsert Text Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2192,
+        1136
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Build RAG Payload').first().json.is_resolved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "09d82f41-f625-4036-84bd-2ae645bed3fb",
+      "name": "IF Ticket Resolved",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1888,
+        1136
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\n\nconst AGENT_AUTHORS = [\n  'rwg.automate',\n  'rwg automate',\n  'rwg_automate',\n];\n\nconst AGENT_BODY_MARKERS = [\n  '[rwg-jira-agent',\n  'automatisch durch den rwg it-assistenten generiert',\n  'agenten-ersteinschätzung',\n  'agenten-ersteinschaetzung',\n  'dein rwg assistent',\n];\n\nfunction isAgentComment(comment) {\n  const author = String(comment.author_name || '').toLowerCase();\n  const email = String(comment.author_email || '').toLowerCase();\n  const body = String(comment.body || '').toLowerCase();\n\n  if (\n    AGENT_AUTHORS.some(\n      (value) =>\n        author.includes(value) ||\n        email.includes(value)\n    )\n  ) {\n    return true;\n  }\n\n  return AGENT_BODY_MARKERS.some((value) =>\n    body.includes(value)\n  );\n}\n\nconst humanComments = (n.comments || [])\n  .filter((comment) => !isAgentComment(comment));\n\nconst commentText = humanComments\n  .map((comment) => [\n    `[KOMMENTAR-ID ${comment.id || 'unbekannt'}]`,\n    `Autor: ${comment.author_name || 'Unbekannt'}`,\n    `Datum: ${comment.created_at || 'unbekannt'}`,\n    comment.updated_at &&\n    comment.updated_at !== comment.created_at\n      ? `Aktualisiert: ${comment.updated_at}`\n      : '',\n    `Text:\\n${comment.body || ''}`,\n  ].filter(Boolean).join('\\n'))\n  .join('\\n\\n---\\n\\n');\n\nconst context = [\n  `Ticket: ${n.issue_key}`,\n  `Titel: ${n.summary || ''}`,\n  `Status: ${n.status || ''}`,\n  `Resolution: ${n.resolution || ''}`,\n  `Gelöst am: ${n.jira_resolved_at || ''}`,\n  '',\n  'BESCHREIBUNG:',\n  n.description || 'Keine Beschreibung vorhanden.',\n  '',\n  'ÖFFENTLICHE MENSCHLICHE KOMMENTARE:',\n  commentText || 'Keine menschlichen Kommentare vorhanden.',\n].join('\\n');\n\nconst prompt = `Du extrahierst aus einem bereits gelösten internen Jira-IT-Ticket eine wiederverwendbare technische Lösung für eine Wissenssuche (RAG).\n\nREGELN:\n- Verwende ausschließlich Fakten aus dem bereitgestellten Ticket.\n- Erfinde keine Ursache, keine technische Erklärung und keinen Lösungsschritt.\n- Trenne Problem, Ursache, Lösung und Ergebnis.\n- Wenn die Ursache nicht ausdrücklich dokumentiert ist, schreibe exakt: Nicht explizit dokumentiert.\n- Wenn keine konkrete Lösung oder Maßnahme dokumentiert ist, schreibe exakt: Nicht explizit dokumentiert.\n- Ein reines \"erledigt\", \"geschlossen\" oder \"funktioniert wieder\" ist allein keine technische Lösung.\n- Nutze den zeitlichen Verlauf der Kommentare, um Maßnahme und Ergebnis auseinanderzuhalten.\n- Entferne Grußformeln, Signaturen, Telefonnummern, E-Mail-Adressen und nicht technisch notwendige Personennamen.\n- Behalte technische Produktnamen, Systemnamen, Fehlertexte, Fehlercodes, Gerätebezeichnungen und relevante Konfigurationsbegriffe.\n- Formuliere knapp, eindeutig und suchoptimiert.\n- Keine Markdown-Tabelle.\n- Antworte ausschließlich in exakt diesem Format:\n\nPROBLEM:\n<kurze technische Problembeschreibung>\n\nURSACHE:\n<dokumentierte Ursache oder \"Nicht explizit dokumentiert.\">\n\nLÖSUNG:\n<konkrete dokumentierte Maßnahme oder \"Nicht explizit dokumentiert.\">\n\nERGEBNIS:\n<dokumentiertes Ergebnis>\n\nSUCHBEGRIFFE:\n<kommagetrennte technische Suchbegriffe>\n\nTICKETDATEN:\n${context}`;\n\nreturn [{\n  json: {\n    prompt,\n    solution_chunk_index: 90000,\n    human_comment_count: humanComments.length,\n  }\n}];"
+      },
+      "id": "d0068672-b6b9-42d9-b709-0d6739b9fe07",
+      "name": "Build Solution Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: 'gpt-4.1-mini-2025-04-14', store: false, input: [ { role: 'user', content: [ { type: 'input_text', text: $('Build Solution Prompt').first().json.prompt } ] } ] } }}",
+        "options": {}
+      },
+      "id": "95f0d38f-913d-4ee7-8545-c486c07a0ff5",
+      "name": "Extract Solution With OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -992,
+        688
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2500
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst ticket = $('Get Ticket Row').first().json;\nconst promptData = $('Build Solution Prompt').first().json;\nconst response = $input.first().json || {};\n\nif (!ticket?.id) {\n  throw new Error('MISSING_TICKET_ID_FOR_SOLUTION');\n}\n\nconst AUDIENCE =\n  typeof ticket.audience === 'string' && ticket.audience.trim()\n    ? ticket.audience.trim()\n    : null;\n\nif (!AUDIENCE) {\n  throw new Error('MISSING_TICKET_AUDIENCE: ' + n.issue_key);\n}\n\nconst outputText = (response.output || [])\n  .flatMap((output) => output?.content || [])\n  .filter(\n    (content) =>\n      content?.type === 'output_text' &&\n      content?.text\n  )\n  .map((content) => content.text)\n  .join('\\n')\n  .trim();\n\nif (!outputText) {\n  throw new Error(\n    'SOLUTION_OUTPUT_TEXT_MISSING: ' +\n    JSON.stringify(response).slice(0, 2000)\n  );\n}\n\nfunction getSection(name) {\n  const pattern = new RegExp(\n    `${name}:\\\\s*([\\\\s\\\\S]*?)(?=\\\\n[A-ZÄÖÜ_ ]+:|$)`,\n    'i'\n  );\n\n  return (\n    outputText.match(pattern)?.[1] || ''\n  ).trim();\n}\n\nconst solutionText = getSection('LÖSUNG');\n\nconst solution_documented =\n  Boolean(solutionText) &&\n  !/^nicht explizit dokumentiert\\.?$/i.test(\n    solutionText\n  );\n\nconst chunkText = [\n  `[JIRA-LÖSUNG] ${n.issue_key} - ${n.summary || ''}`,\n  `Status: ${n.status || ''}`,\n  `Resolution: ${n.resolution || 'nicht gesetzt'}`,\n  n.jira_resolved_at\n    ? `Gelöst am: ${n.jira_resolved_at}`\n    : '',\n  '',\n  outputText,\n  '',\n  `Quelle: https://rwg-r.atlassian.net/browse/${n.issue_key}`,\n]\n  .filter(Boolean)\n  .join('\\n');\n\nreturn [{\n  json: {\n    source_id: ticket.id,\n    source_type: 'jira',\n    source_ref: n.issue_key,\n    audience: AUDIENCE,\n    chunk_index:\n      Number(promptData.solution_chunk_index) || 90000,\n    chunk_text: chunkText,\n    token_count: Math.ceil(chunkText.length / 4),\n    metadata: {\n      source_type: 'jira',\n      source_ref: n.issue_key,\n      title: n.summary,\n      url:\n        `https://rwg-r.atlassian.net/browse/${n.issue_key}`,\n      updated_at: n.updated_at,\n      content_hash: n.content_hash,\n      rag_flow_version: 'jira-rag-v4',\n      audience: AUDIENCE,\n\n      ticket_key: n.issue_key,\n      summary: n.summary,\n      status: n.status,\n      resolution: n.resolution,\n      is_resolved: true,\n      resolved_at: n.jira_resolved_at,\n\n      chunk_type: 'solution',\n      is_solution: true,\n      solution_documented,\n      human_comment_count:\n        promptData.human_comment_count || 0,\n      solution_model: 'gpt-4.1-mini-2025-04-14',\n\n      loesung_schluessel:\n        $('Solution-Cache Abgleich').first().json.loesung_schluessel,\n      solution_prompt_version:\n        $('Solution-Cache Abgleich').first().json.solution_prompt_version,\n    },\n  }\n}];"
+      },
+      "id": "44c9c4f5-dc69-4764-b75a-62dc0b858df5",
+      "name": "Build Solution Chunk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -816,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: 'text-embedding-3-small', input: $('Build Solution Chunk').first().json.chunk_text } }}",
+        "options": {}
+      },
+      "id": "24997086-e050-4d84-b51d-12b2e0d2afdd",
+      "name": "OpenAI Embedding Solution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -576,
+        688
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = $('Build Solution Chunk').first().json;\nconst response = $input.first().json || {};\n\nconst embedding =\n  response?.data?.[0]?.embedding ??\n  response?.body?.data?.[0]?.embedding ??\n  response?.embedding ??\n  null;\n\nif (!Array.isArray(embedding)) {\n  throw new Error('SOLUTION_EMBEDDING_MISSING');\n}\n\nif (embedding.length !== 1536) {\n  throw new Error(\n    'SOLUTION_EMBEDDING_DIMENSION_MISMATCH: ' +\n    embedding.length\n  );\n}\n\nreturn [{\n  json: {\n    ...source,\n    embedding: '[' + embedding.join(',') + ']',\n  }\n}];"
+      },
+      "id": "0bc58156-ce3b-49bf-ba5a-096102062ec3",
+      "name": "Build Solution Upsert Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?on_conflict=source_id,chunk_index",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Build Solution Upsert Row').first().json }}",
+        "options": {}
+      },
+      "id": "b43e23cf-b982-4cd7-a77b-547b737c4641",
+      "name": "Upsert Solution Chunk",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -96,
+        688
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Build RAG Payload').first().json.image_count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "47e9f797-c003-48c6-99ae-1d0c3e17e517",
+      "name": "IF Has Images",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        1136
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst guard = $('Guard Chunk Write').first().json;\n\nreturn [{\n  json: {\n    ok: true,\n    mode: 'skipped_superseded_before_chunk_write',\n    issue_key: n.issue_key,\n    incoming_updated_at: guard.incoming_updated_at,\n    current_updated_at: guard.current_updated_at,\n    finished_at: new Date().toISOString(),\n  }\n}];"
+      },
+      "id": "07128338-1336-4abb-8d7b-e16ed6cba45e",
+      "name": "Superseded Chunk Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        1376
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst guard = $('Guard Ticket Version').first().json;\n\nreturn [{\n  json: {\n    ok: true,\n    mode: 'skipped_superseded_ticket',\n    issue_key: n.issue_key,\n    incoming_updated_at: guard.incoming_updated_at,\n    current_updated_at: guard.current_updated_at,\n    finished_at: new Date().toISOString(),\n  }\n}];"
+      },
+      "id": "83b44193-85e5-41ce-9b31-4f861807bdfc",
+      "name": "Superseded Ticket Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4352,
+        1392
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst d = $('Decide Event').first().json;\n\nreturn [{\n  json: {\n    ok: true,\n    mode: 'skipped_stale_event',\n    issue_key: n.issue_key,\n    incoming_updated_at: d.incoming_updated_at,\n    existing_updated_at: d.existing_updated_at,\n    finished_at: new Date().toISOString(),\n  }\n}];"
+      },
+      "id": "3460adf5-d059-4ef4-a111-e9c3370b06bb",
+      "name": "Stale Event Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5792,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/jira_tickets",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "ticket_key",
+              "value": "={{ 'eq.' + $('Build Delete Context').first().json.issue_key }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "71dfe4d4-3a47-46d7-a55b-269b73530f8d",
+      "name": "Delete Deleted Jira Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5952,
+        640
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const context = $('Build Delete Context').first().json;\nconst storagePlan = $('Build Deleted Ticket Storage Plan').first().json;\n\nreturn [{\n  json: {\n    ok: true,\n    mode: 'jira_issue_deleted_cleanup',\n    issue_key: context.issue_key,\n    issue_id: context.issue_id,\n    project_key: context.project_key,\n    storage_deleted_count:\n      storagePlan.storage_object_count || 0,\n    chunks_deleted: true,\n    ticket_deleted: true,\n    deleted_at: context.deleted_at,\n    finished_at: new Date().toISOString(),\n  }\n}];"
+      },
+      "id": "1cf7b467-294f-4ade-8829-279972eed265",
+      "name": "Deleted Ticket Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5728,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// EXPAND IMAGES + BILD-CACHE-ABGLEICH\n//\n// Fan-out je Bild wie bisher, zusaetzlich die Entscheidung, ob das\n// Bild neu analysiert werden muss.\n//\n// WARUM KEIN BYTE-HASH\n// Ein Hash ueber die Bildbytes setzt den Download voraus - also genau\n// den Schritt, den wir sparen wollen. Jira-Anhaenge sind unveraenderlich:\n// wird eine Datei ersetzt, entsteht ein neuer Anhang mit neuer ID.\n// Gleiche attachment_id bedeutet gleiche Bytes. Der Schluessel wird\n// deshalb aus Metadaten gebildet, die der Trigger ohnehin liefert.\n//\n// WAS UEBERNOMMEN WIRD UND WAS NIE\n// Uebernommen: Analysetext, Embedding, Storage-Objekt - alles haengt\n// ausschliesslich am Bild.\n// Nie uebernommen: audience, Ticketzustand. Die audience wird in\n// Build Image Plan je Lauf neu aus dem Autor/Zeit-Fenster gegen die\n// Kommentare bestimmt. Ein nachtraeglich intern gestellter Kommentar\n// muss durchschlagen, ohne dass die Vision erneut laeuft.\n//\n// FAIL CLOSED: Jede Unsicherheit fuehrt zur Neuanalyse, nie zur\n// Uebernahme.\n// ============================================================\nconst crypto = require('crypto');\n\nconst VISION_PROMPT_VERSION = 'v1';\n\nconst payload = $('Build RAG Payload').first().json;\nconst n = $('Normalize Issue').first().json;\nconst images = payload.images || [];\n\nif (!images.length) {\n  return [];\n}\n\nfunction analyseSchluessel(attachmentId, visionModel) {\n  return crypto\n    .createHash('sha256')\n    .update(\n      [String(attachmentId), String(visionModel), VISION_PROMPT_VERSION].join('|'),\n      'utf8'\n    )\n    .digest('hex');\n}\n\n// Stabile Serialisierung fuer den Delta-Vergleich: Schluesselreihenfolge\n// darf das Ergebnis nicht beeinflussen.\nfunction stabil(value) {\n  if (value === null || typeof value !== 'object') return JSON.stringify(value);\n  if (Array.isArray(value)) return '[' + value.map(stabil).join(',') + ']';\n  return (\n    '{' +\n    Object.keys(value)\n      .sort()\n      .map((key) => JSON.stringify(key) + ':' + stabil(value[key]))\n      .join(',') +\n    '}'\n  );\n}\n\n// ---------- Bestand aus document_chunks ----------\nlet bestandItems = [];\ntry {\n  bestandItems = $('Lade Bildchunk-Bestand').all();\n} catch (fehler) {\n  bestandItems = [];\n}\n\nconst bestandNachAttachment = new Map();\nfor (const item of bestandItems) {\n  const row = item.json || {};\n  const meta = row.metadata || {};\n  if (meta.chunk_type !== 'image_attachment') continue;\n  const attachmentId = meta.attachment_id ? String(meta.attachment_id) : null;\n  if (!attachmentId) continue;\n  bestandNachAttachment.set(attachmentId, {\n    chunk_index: Number(row.chunk_index),\n    audience: row.audience || null,\n    metadata: meta,\n  });\n}\n\n// ---------- Bestand im Storage ----------\n// Gleiche Normalisierung wie in Plan Storage Cleanup: die Liste liefert\n// Namen relativ zum Prefix.\nconst prefix = `JIRA/${n.issue_key}`;\n\nlet storageItems = [];\ntry {\n  storageItems = $('Liste Storage-Objekte Bildcache').all();\n} catch (fehler) {\n  storageItems = [];\n}\n\nconst storageObjekte = [];\nfor (const item of storageItems) {\n  const value = item.json;\n  if (Array.isArray(value)) {\n    storageObjekte.push(...value);\n  } else if (Array.isArray(value?.data)) {\n    storageObjekte.push(...value.data);\n  } else if (value?.name) {\n    storageObjekte.push(value);\n  }\n}\n\nconst vorhandeneKeys = new Set(\n  storageObjekte\n    .filter((objekt) => objekt?.name && objekt?.id)\n    .map((objekt) => {\n      const name = String(objekt.name);\n      return name.startsWith(prefix + '/') ? name : `${prefix}/${name}`;\n    })\n);\n\n// ---------- Entscheidung je Bild ----------\nconst isResolved = Boolean(n.jira_resolved_at) || Boolean(n.resolution);\n\nconst ergebnis = images.map((image) => {\n  const attachmentId = String(image.attachmentId);\n  const schluessel = analyseSchluessel(attachmentId, image.vision_model);\n  const bestand = bestandNachAttachment.get(attachmentId) || null;\n\n  let aktion = 'analyse';\n  let cache_grund = 'kein_chunk';\n  let patch_body = null;\n\n  if (bestand) {\n    if (!bestand.metadata.analyse_schluessel) {\n      // Chunk stammt aus der Zeit vor dem Cache. Kein Fehler, nur noch nie\n      // mit Schluessel geschrieben - beim naechsten Lauf greift der Cache.\n      cache_grund = 'kein_schluessel';\n    } else if (bestand.metadata.analyse_schluessel !== schluessel) {\n      // Echte Abweichung: Modell oder Promptstand hat sich geaendert.\n      cache_grund = 'schluessel_abweichung';\n    } else if (bestand.chunk_index !== Number(image.image_chunk_index)) {\n      // Positionsindex verschoben (geloeschter Anhang). Ein PATCH wuerde den\n      // falschen Datensatz treffen, deshalb Neuanalyse statt Verschiebung.\n      cache_grund = 'index_drift';\n    } else if (!vorhandeneKeys.has(image.storage_key)) {\n      // Chunk vorhanden, Bild im Storage nicht - der Chunk verweist per\n      // related_image_url darauf. Ein toter Link waere schlimmer als ein\n      // zusaetzlicher Vision-Aufruf.\n      cache_grund = 'storage_fehlt';\n    } else {\n      // Treffer. Analyse und Embedding bleiben unberuehrt, nur der Kontext\n      // wird aktualisiert - und auch das nur, wenn er sich geaendert hat.\n      const neueMetadata = {\n        ...bestand.metadata,\n        source_type: 'jira',\n        source_ref: n.issue_key,\n        title: n.summary,\n        url: `https://rwg-r.atlassian.net/browse/${n.issue_key}`,\n        updated_at: n.updated_at,\n        content_hash: n.content_hash,\n        rag_flow_version: 'jira-rag-v4',\n        audience: image.audience,\n        ticket_key: n.issue_key,\n        summary: n.summary,\n        status: n.status,\n        resolution: n.resolution,\n        is_resolved: isResolved,\n        priority: n.priority,\n        issue_type: n.issue_type,\n        project_key: n.project_key,\n        analyse_schluessel: schluessel,\n        vision_prompt_version: VISION_PROMPT_VERSION,\n      };\n\n      const unveraendert =\n        bestand.audience === image.audience &&\n        stabil(neueMetadata) === stabil(bestand.metadata);\n\n      if (unveraendert) {\n        aktion = 'keine';\n        cache_grund = 'treffer_ohne_delta';\n      } else {\n        aktion = 'patch';\n        cache_grund = 'treffer';\n        patch_body = {\n          audience: image.audience,\n          metadata: neueMetadata,\n        };\n      }\n    }\n  }\n\n  return {\n    ...image,\n    analyse_schluessel: schluessel,\n    vision_prompt_version: VISION_PROMPT_VERSION,\n    aktion,\n    cache_grund,\n    patch_body,\n  };\n});\n\nconst treffer = ergebnis.filter((bild) => bild.aktion !== 'analyse').length;\n\nreturn ergebnis.map((bild, index) => ({\n  json: {\n    ...bild,\n    bilder_gesamt: ergebnis.length,\n    bilder_cache_treffer: treffer,\n    bilder_cache_neu: ergebnis.length - treffer,\n    vision_aufrufe_gespart: treffer,\n    ist_erstes_bild: index === 0,\n  },\n}));\n"
+      },
+      "id": "8c387ffe-6feb-475b-a84a-7cb270ec74c0",
+      "name": "Expand Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $('Build RAG Payload').first().json;\n\nif (!payload.source_id) {\n  throw new Error('CLEANUP_SOURCE_ID_MISSING');\n}\n\nif (!(payload.expected_chunk_indices || []).length) {\n  throw new Error('CLEANUP_EXPECTED_CHUNK_INDICES_EMPTY');\n}\n\nreturn [{\n  json: {\n    source_id: payload.source_id,\n    source_ref: payload.source_ref,\n    expected_indices_csv:\n      payload.expected_chunk_indices.join(','),\n    expected_chunk_count:\n      payload.expected_chunk_indices.length,\n  }\n}];"
+      },
+      "id": "031dbf8e-f93f-4d8b-9bb9-e802fa5de4ac",
+      "name": "Build Cleanup Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1776,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.download_url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "f2192628-0b63-463f-ab33-cf43669e4290",
+      "name": "Download Image From Jira",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2336,
+        48
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 1600,
+        "height": 1600,
+        "options": {
+          "destinationKey": "data",
+          "format": "jpeg",
+          "quality": 90
+        }
+      },
+      "id": "5c1ad7a6-4426-41ae-8f79-69b5d4f31283",
+      "name": "Resize Standard JPEG",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        48
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n\nreturn [{\n  json: {\n    ...$('Loop Over Images').item.json,\n    fileSizeBytes: buffer.length,\n  },\n  binary: $input.first().binary,\n}];"
+      },
+      "id": "8d9554a8-d562-4b0d-80da-8e73cf9908b1",
+      "name": "Check Standard Image Size",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3072,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.fileSizeBytes }}",
+              "rightValue": "={{ 500 * 1024 }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4acae45c-1ed6-41fe-84ec-45be181bdac9",
+      "name": "IF Standard Too Large",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3424,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 1200,
+        "height": 1200,
+        "options": {
+          "destinationKey": "data",
+          "format": "jpeg",
+          "quality": 80
+        }
+      },
+      "id": "090778a1-9a6e-41d6-b6f3-30fe5eadb5f7",
+      "name": "Resize Compact JPEG",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        3664,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n\nreturn [{\n  json: {\n    ...$('Loop Over Images').item.json,\n    fileSizeBytes: buffer.length,\n  },\n  binary: $input.first().binary,\n}];"
+      },
+      "id": "5b36720f-acf9-4d9d-99b7-cf9c0c891c9f",
+      "name": "Check Compact Image Size",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3904,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.fileSizeBytes }}",
+              "rightValue": "={{ 500 * 1024 }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "de9977ce-44d0-4681-8605-d14cd52b73f1",
+      "name": "IF Compact Too Large",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4144,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 900,
+        "height": 900,
+        "options": {
+          "destinationKey": "data",
+          "format": "jpeg",
+          "quality": 70
+        }
+      },
+      "id": "29df7c47-2165-433e-a570-f5dfce31ea4b",
+      "name": "Resize Fallback JPEG",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        4464,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = $('Loop Over Images').item.json;\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n\nif (buffer.length > 512000) {\n  throw new Error(\n    `IMAGE_STILL_TOO_LARGE: ${source.issue_key}/${source.attachmentId} = ${buffer.length} bytes`\n  );\n}\n\nreturn [{\n  json: {\n    ...source,\n    final_file_size: buffer.length,\n    final_mime_type: 'image/jpeg',\n    image_data_url:\n      'data:image/jpeg;base64,' + buffer.toString('base64'),\n  },\n  binary: $input.first().binary,\n}];"
+      },
+      "id": "304f67b4-c2e8-4787-93fc-19d48758a1b5",
+      "name": "Finalize Image Binary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4704,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "80c7fe29-0a43-483b-9700-734cac1ddadc",
+      "name": "Loop Over Images",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        960,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag/{{$json.storage_key}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "image/jpeg"
+            },
+            {
+              "name": "x-upsert",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "7a5f6b2d-0049-4b6f-824f-aaaa25b5149a",
+      "name": "Upload Image To Supabase Storage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4912,
+        48
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: 'gpt-4.1-mini-2025-04-14', store: false, input: [ { role: 'user', content: [ { type: 'input_text', text: \"Analysiere dieses Bild als Anhang eines internen Jira-IT-Tickets für eine technische Wissenssuche (RAG).\\n\\nRegeln:\\n- Beschreibe ausschließlich Inhalte, die im Bild visuell erkennbar sind.\\n- Transkribiere sichtbaren Text so exakt wie möglich.\\n- Extrahiere sichtbare Fehlercodes, Produkt- und Systemnamen, URLs, Hostnamen, IP-Adressen, Benutzer-, Geräte- und Dateinamen.\\n- Ordne den technischen Kontext nur ein, wenn er aus dem Bild ableitbar ist.\\n- Erfinde keine Ursache und keine Lösung.\\n- Markiere unsichere Lesungen ausdrücklich als unsicher.\\n- Ergänze oder errate keine verdeckten sensiblen Werte.\\n\\nAntworte ausschließlich mit diesen Abschnitten:\\nBILDINHALT:\\nERKANNTER TEXT:\\nTECHNISCHE HINWEISE:\" }, { type: 'input_image', image_url: $('Finalize Image Binary').item.json.image_data_url, detail: 'high' } ] } ] } }}",
+        "options": {}
+      },
+      "id": "d4c602cf-ab80-482e-8944-4b999ce68fbe",
+      "name": "Analyze Image With OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5104,
+        48
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2500
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst image = $('Finalize Image Binary').item.json;\nconst response = $input.first().json || {};\n\nconst outputText = (response.output || [])\n  .flatMap((output) => output?.content || [])\n  .filter(\n    (content) =>\n      content?.type === 'output_text' &&\n      content?.text\n  )\n  .map((content) => content.text)\n  .join('\\n')\n  .trim();\n\nif (!outputText) {\n  throw new Error(\n    'VISION_OUTPUT_TEXT_MISSING: ' +\n    JSON.stringify(response).slice(0, 2000)\n  );\n}\n\nconst supabaseUrl =\n  'https://zckaxkpycyyxaymmkmvu.supabase.co';\n\nconst publicUrl =\n  `${supabaseUrl}/storage/v1/object/public/rag/${image.storage_key}`;\n\nconst chunkText = [\n  `Bildanhang: ${image.original_filename}`,\n  `Attachment-ID: ${image.attachmentId}`,\n  `MIME: ${image.final_mime_type}`,\n  `Größe nach Normalisierung: ${image.final_file_size} bytes`,\n  `Öffentliche URL: ${publicUrl}`,\n  '',\n  'VISUELLE ANALYSE:',\n  outputText,\n].join('\\n');\n\nconst isResolved = Boolean(n.jira_resolved_at) || Boolean(n.resolution);\n\nconst AUDIENCE =\n  typeof image.audience === 'string' && image.audience.trim()\n    ? image.audience.trim()\n    : null;\n\nif (!AUDIENCE) {\n  throw new Error('MISSING_TICKET_AUDIENCE: ' + n.issue_key);\n}\n\n// Ohne analyse_schluessel wuerde der Chunk beim naechsten Lauf erneut als\n// Fehltreffer gelten und wieder durch die Vision laufen.\nif (!image.analyse_schluessel) {\n  throw new Error('ANALYSE_SCHLUESSEL_MISSING: ' + n.issue_key + '/' + image.attachmentId);\n}\n\nreturn [{\n  json: {\n    source_id: image.source_id,\n    source_type: 'jira',\n    source_ref: n.issue_key,\n    audience: AUDIENCE,\n    chunk_index: image.image_chunk_index,\n    chunk_text: chunkText,\n    token_count: Math.ceil(chunkText.length / 4),\n    metadata: {\n      source_type: 'jira',\n      source_ref: n.issue_key,\n      title: n.summary,\n      url: `https://rwg-r.atlassian.net/browse/${n.issue_key}`,\n      updated_at: n.updated_at,\n      content_hash: n.content_hash,\n      rag_flow_version: 'jira-rag-v4',\n      audience: AUDIENCE,\n\n      ticket_key: n.issue_key,\n      summary: n.summary,\n      status: n.status,\n      resolution: n.resolution,\n      is_resolved: isResolved,\n      priority: n.priority,\n      issue_type: n.issue_type,\n      project_key: n.project_key,\n\n      chunk_type: 'image_attachment',\n      attachment_id: image.attachmentId,\n      file_name: image.original_filename,\n      related_image_url: publicUrl,\n      storage_bucket: 'rag',\n      storage_path: image.storage_key,\n      original_mime_type: image.original_mime_type,\n      normalized_mime_type: image.final_mime_type,\n      normalized_size_bytes: image.final_file_size,\n      vision_model: image.vision_model,\n\n      analyse_schluessel: image.analyse_schluessel,\n      vision_prompt_version: image.vision_prompt_version,\n    },\n  }\n}];\n"
+      },
+      "id": "aaa152fc-d693-4c49-87a2-b1962e7fcfe7",
+      "name": "Build Vision Image Chunk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5344,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: 'text-embedding-3-small', input: $('Build Vision Image Chunk').item.json.chunk_text } }}",
+        "options": {}
+      },
+      "id": "df673c2b-9571-4241-8843-b8159a359fd7",
+      "name": "OpenAI Embedding Image Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5632,
+        48
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = $('Build Vision Image Chunk').item.json;\nconst response = $input.first().json || {};\n\nconst embedding =\n  response?.data?.[0]?.embedding ??\n  response?.body?.data?.[0]?.embedding ??\n  response?.embedding ??\n  null;\n\nif (!Array.isArray(embedding)) {\n  throw new Error('IMAGE_ANALYSIS_EMBEDDING_MISSING');\n}\n\nif (embedding.length !== 1536) {\n  throw new Error(\n    'IMAGE_ANALYSIS_EMBEDDING_DIMENSION_MISMATCH: ' +\n    embedding.length\n  );\n}\n\nreturn [{\n  json: {\n    ...source,\n    embedding: '[' + embedding.join(',') + ']',\n  }\n}];"
+      },
+      "id": "335066e8-bedd-4426-88f7-debae26c361e",
+      "name": "Build Image Upsert Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5872,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?on_conflict=source_id,chunk_index",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Build Image Upsert Row').item.json }}",
+        "options": {}
+      },
+      "id": "882127db-7379-4caa-8b4d-27c8a1c195c8",
+      "name": "Upsert Image Chunk",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6112,
+        48
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_id=eq.{{$json.source_id}}&chunk_index=not.in.({{$json.expected_indices_csv}})",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e9b2f11-c3ab-43b5-8d54-0ee77b4304e0",
+      "name": "Delete Stale Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2016,
+        1168
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/list/rag",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { prefix: 'JIRA/' + $('Normalize Issue').first().json.issue_key, limit: 1000, offset: 0, sortBy: { column: 'name', order: 'asc' } } }}",
+        "options": {}
+      },
+      "id": "bf650b41-fb50-44a7-9924-431eb1e9e914",
+      "name": "List Ticket Storage Objects",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2256,
+        1168
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst payload = $('Build RAG Payload').first().json;\n\nconst prefix = `JIRA/${n.issue_key}`;\nconst expected = new Set(\n  payload.expected_storage_keys || []\n);\n\nconst objects = [];\n\nfor (const item of $input.all()) {\n  const value = item.json;\n\n  if (Array.isArray(value)) {\n    objects.push(...value);\n  } else if (Array.isArray(value?.data)) {\n    objects.push(...value.data);\n  } else if (value?.name) {\n    objects.push(value);\n  }\n}\n\nconst listedPaths = objects\n  .filter((object) => object?.name && object?.id)\n  .map((object) => {\n    const name = String(object.name);\n\n    return name.startsWith(prefix + '/')\n      ? name\n      : `${prefix}/${name}`;\n  });\n\nconst obsolete_paths = [...new Set(listedPaths)]\n  .filter((path) => !expected.has(path))\n  .sort((a, b) => a.localeCompare(b));\n\nreturn [{\n  json: {\n    obsolete_paths,\n    has_obsolete: obsolete_paths.length > 0,\n    storage_deleted_count: obsolete_paths.length,\n    listed_object_count: listedPaths.length,\n    expected_object_count: expected.size,\n  }\n}];"
+      },
+      "id": "0425ca9e-27e6-4ab7-83e4-dd1a785f3fe3",
+      "name": "Plan Storage Cleanup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2496,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.has_obsolete }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "640541a7-8042-45ee-9b56-e2a5d33ae9d3",
+      "name": "IF Has Obsolete Storage",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2736,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { prefixes: $json.obsolete_paths } }}",
+        "options": {}
+      },
+      "id": "687aff7c-f550-496b-b493-2912abcfd46a",
+      "name": "Delete Obsolete Storage Objects",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2960,
+        1024
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Normalize Issue').first().json;\nconst payload = $('Build RAG Payload').first().json;\nconst ticket = $('Get Ticket Row').first().json;\nconst cleanup = $('Plan Storage Cleanup').first().json;\n\n// Expand Images laeuft nur, wenn das Ticket Bilder hat. Ein Cross-Branch-Zugriff\n// auf einen nicht gelaufenen Node bricht die Ausfuehrung ab, deshalb abgesichert.\nlet bildCache = {};\ntry {\n  bildCache = $('Expand Images').first().json || {};\n} catch (fehler) {\n  bildCache = {};\n}\n\nlet cache_gruende = {};\ntry {\n  for (const item of $('Expand Images').all()) {\n    const grund = item.json?.cache_grund || 'unbekannt';\n    cache_gruende[grund] = (cache_gruende[grund] || 0) + 1;\n  }\n} catch (fehler) {\n  cache_gruende = {};\n}\n\nreturn [{\n  json: {\n    ok: true,\n    mode: 'full_rag_rebuild',\n    issue_key: n.issue_key,\n    audience: ticket.audience,\n    ingestion_version: ticket.ingestion_version,\n    text_chunk_count: payload.text_chunk_count,\n    image_count: payload.image_count,\n    expected_chunk_count:\n      payload.expected_chunk_indices.length,\n    storage_deleted_count:\n      cleanup.storage_deleted_count || 0,\n    embedding_model: 'text-embedding-3-small',\n    embedding_dimensions: 1536,\n    vision_model: payload.vision_model,\n\n    bilder_gesamt: bildCache.bilder_gesamt ?? 0,\n    bilder_cache_treffer: bildCache.bilder_cache_treffer ?? 0,\n    bilder_cache_neu: bildCache.bilder_cache_neu ?? 0,\n    vision_aufrufe_gespart: bildCache.vision_aufrufe_gespart ?? 0,\n    vision_prompt_version: bildCache.vision_prompt_version ?? null,\n    cache_gruende,\n\n    content_hash: payload.content_hash,\n    flow_version: payload.flow_version,\n    finished_at: new Date().toISOString(),\n  },\n}];\n"
+      },
+      "id": "cfaa1d94-71ff-4933-a041-71d86974a361",
+      "name": "Workflow Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3216,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## SSD Jira → Supabase RAG\n\nBestehende Supabase-Struktur bleibt unverändert.\n\n- schreibt direkt in `jira_tickets`\n- schreibt direkt in `document_chunks`\n- `source_id`, `source_type`, `source_ref` bleiben kompatibel\n- Text-Chunks: Index ab 0\n- Lösungs-Chunk: Index 90000\n- Bild-Chunks: Index ab 100000\n- Bildinhalte werden per OpenAI Vision analysiert\n- erst Upsert neuer Chunks, danach Löschen veralteter Chunks\n- Storage-Key enthält Jira Attachment-ID\n- kein Klartext-Service-Role-Key im Workflow\n\n### Metadaten-Pflichtkern je Chunk\nsource_type, source_ref, title, url, chunk_type,\nupdated_at, content_hash, rag_flow_version, audience\n\n### chunk_type-Vokabular\nheader | content | comment | solution | image_attachment\n\n### audience\nWird 1:1 aus `jira_tickets.audience` übernommen und in Spalte\nUND metadata geschrieben. Keine Ableitung, kein Default.\nFehlt der Wert, bricht der Lauf ab.\n\n### Agenten-Kommentare\nKommentare des Assistenten werden weder gechunkt noch\nin den Lösungs-Prompt gegeben.",
+        "height": 880,
+        "width": 624
+      },
+      "id": "1423b0a1-f43d-46eb-b0af-e7c6bacb989f",
+      "name": "Sticky Note 87bccea6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -9104,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Schutz vor veralteten Jira-Events\n\n`jira_updated_at` wird vor Ticket-Update und nochmals vor Chunk-Schreiben geprüft.\n\nDie PATCH-Abfrage schreibt nur, wenn die gespeicherte Jira-Version nicht neuer ist. Zwei parallele Ausführungen derselben Jira-Version schreiben identische Daten und bleiben idempotent über `(source_id, chunk_index)`.",
+        "height": 224,
+        "width": 1280,
+        "color": 5
+      },
+      "id": "802b3d90-4ff4-4c97-bc6e-78f4832de548",
+      "name": "Sticky Note 5520d04e",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3312,
+        816
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ereignisse zu Vorgaengen, die es in Jira nicht mehr gibt.\n//\n// Wird ein Ticket geloescht, schickt Jira fuer jeden Kommentar noch ein\n// comment_deleted hinterher. Bis n8n das abarbeitet, ist der Vorgang weg und\n// Get Issue antwortet mit 404. Frueher brach der Lauf hier ab und loeste den\n// Fehler-Workflow aus. Datenschaden gab es nie - der Abbruch lag vor jedem\n// Schreibschritt. Der Alarm hat aber echte Fehler verdeckt.\n//\n// Aufraeumen von Chunks, Storage und Ticketzeile macht der\n// jira:issue_deleted-Zweig. Hier wird ausschliesslich protokolliert.\n//\n// WICHTIG: nur 404 wird toleriert. Jeder andere Fehler (Auth, 5xx, Timeout)\n// wird erneut geworfen und meldet sich wie bisher.\n//\n// FIX 08/2026 (Beleg: Lauf 103049, Loeschen von SSD-8990): Get Issue legt den\n// Fehler auf dem Fehlerausgang als flachen String ab, nicht als Objekt -\n// json.error war \"The resource you are requesting could not be found\".\n// fehler.httpCode und fehler.message waren dadurch immer undefined. Die\n// 404-Pruefung konnte nie greifen, und jede geworfene Meldung lautete\n// \"kein Fehlertext\" - auch bei Auth-, 5xx- und Timeout-Fehlern, die dadurch\n// ohne jede Diagnose im Alarm landeten. Der Fehler wird jetzt in beiden\n// Formen gelesen; fehlt der Statuscode, wird 404 am Wortlaut erkannt.\n\nconst roh = $input.first()?.json?.error;\nconst obj = (roh && typeof roh === 'object') ? roh : {};\nconst text = typeof roh === 'string'\n  ? roh\n  : String(obj.message ?? obj.description ?? '');\n\nconst status = String(obj.httpCode ?? obj.status ?? obj.statusCode ?? '')\n  || (/\\b404\\b|could not be found|does not exist|not found/i.test(text) ? '404' : '');\n\nif (status !== '404') {\n  throw new Error(\n    'GET_ISSUE_FEHLER_' + (status || 'UNBEKANNT') + ': ' +\n    (text || 'kein Fehlertext')\n  );\n}\n\n// Basisparameter liegt im selben Pfad und ist sicher gelaufen,\n// wird aber trotzdem abgesichert gelesen.\nlet basis = {};\ntry { basis = $('Basisparameter').first().json ?? {}; } catch (e) { basis = {}; }\n\nreturn [{ json: {\n  ok: true,\n  mode: 'skipped_issue_not_found',\n  issue_key: basis.issue_key ?? null,\n  issue_id: basis.issue_id ?? null,\n  event_type: basis.event_type ?? null,\n  http_status: 404,\n  grund: 'Get Issue lieferte 404 - Vorgang existiert nicht mehr oder ist fuer die Jira-Credential nicht sichtbar.',\n  finished_at: new Date().toISOString(),\n} }];"
+      },
+      "id": "de3a627d-f2f6-4c61-8e54-680b3d378bf9",
+      "name": "Vorgang nicht mehr vorhanden",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -7152,
+        1472
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_id=eq.{{ $('Build RAG Payload').first().json.source_id }}&metadata->>chunk_type=eq.image_attachment&select=chunk_index,audience,metadata",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "options": {}
+      },
+      "id": "deebdf00-302f-4522-8c83-30600fd6a931",
+      "name": "Lade Bildchunk-Bestand",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        384,
+        528
+      ],
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput",
+      "notes": "Bestehende Bildchunks des Tickets. Ohne Treffer leer - deshalb alwaysOutputData."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/list/rag",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { prefix: 'JIRA/' + $('Normalize Issue').first().json.issue_key, limit: 1000, offset: 0, sortBy: { column: 'name', order: 'asc' } } }}",
+        "options": {}
+      },
+      "id": "1c7671e7-19af-4ec3-b944-9542b7587179",
+      "name": "Liste Storage-Objekte Bildcache",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        576,
+        528
+      ],
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput",
+      "notes": "Existenznachweis fuer das Bild im Storage. Fehlt das Objekt, gilt der Cache als Fehltreffer."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.aktion }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "analyse"
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "id": "56ebd081-4c30-4321-88ee-ddf6819ee355",
+      "name": "IF Bild Neu Analysieren",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1424,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.aktion }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "patch"
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "id": "a7cadb59-a3cc-4ada-84c2-d1003d2ad2e1",
+      "name": "IF Bildkontext Geaendert",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1792,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_id=eq.{{ $json.source_id }}&chunk_index=eq.{{ $json.image_chunk_index }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.patch_body }}",
+        "options": {}
+      },
+      "id": "1fb9967e-1fb1-4bf9-9b63-cdab6bd79d8a",
+      "name": "Patch Bildchunk Kontext",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2096,
+        496
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notes": "Aktualisiert nur audience und metadata. chunk_text und embedding bleiben unberuehrt."
+    },
+    {
+      "parameters": {
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_id=eq.{{ $('Build RAG Payload').first().json.source_id }}&chunk_index=eq.{{ $('Build RAG Payload').first().json.solution_chunk_index }}&select=chunk_index,audience,metadata",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "options": {}
+      },
+      "id": "44a11156-41c8-445a-bcde-62060af69aa9",
+      "name": "Lade Solution-Chunk",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1744,
+        960
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "notes": "Bestehender Loesungschunk. Ohne Treffer leer - deshalb alwaysOutputData."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// SOLUTION-CACHE-ABGLEICH\n//\n// Die Loesungsextraktion ist ein LLM-Aufruf plus Embedding je Lauf.\n// Sie haengt ausschliesslich an Inhalten, die der content_hash abdeckt\n// (summary, description, Kommentare) - plus den Statusfeldern, die im\n// Chunktext ausgeschrieben stehen (Status, Resolution, Geloest am).\n//\n// Aendert sich keines davon, ist der erzeugte Text byteidentisch. Dann\n// koennen Extraktion und Embedding entfallen und es bleibt hoechstens\n// ein Metadaten-PATCH.\n//\n// FAIL CLOSED: Jede Unsicherheit fuehrt zur Neuextraktion.\n// ============================================================\nconst crypto = require('crypto');\n\nconst SOLUTION_PROMPT_VERSION = 'v1';\nconst SOLUTION_MODEL = 'gpt-4.1-mini-2025-04-14';\n\nconst n = $('Normalize Issue').first().json;\nconst payload = $('Build RAG Payload').first().json;\nconst ticket = $('Get Ticket Row').first().json;\n\nconst chunkIndex = Number(payload.solution_chunk_index) || 90000;\n\nconst AUDIENCE =\n  typeof ticket.audience === 'string' && ticket.audience.trim()\n    ? ticket.audience.trim()\n    : null;\n\nif (!AUDIENCE) {\n  throw new Error('MISSING_TICKET_AUDIENCE: ' + n.issue_key);\n}\n\n// Der Schluessel deckt alles ab, was in den Chunktext einfliesst.\n// content_hash traegt summary, description und saemtliche Kommentare;\n// Status, Resolution und Loesungsdatum stehen zusaetzlich woertlich im\n// Text und muessen deshalb einzeln mit hinein.\nconst loesungSchluessel = crypto\n  .createHash('sha256')\n  .update(\n    [\n      String(n.content_hash || ''),\n      String(n.status || ''),\n      String(n.resolution || ''),\n      String(n.jira_resolved_at || ''),\n      SOLUTION_MODEL,\n      SOLUTION_PROMPT_VERSION,\n    ].join('|'),\n    'utf8'\n  )\n  .digest('hex');\n\nfunction stabil(value) {\n  if (value === null || typeof value !== 'object') return JSON.stringify(value);\n  if (Array.isArray(value)) return '[' + value.map(stabil).join(',') + ']';\n  return (\n    '{' +\n    Object.keys(value)\n      .sort()\n      .map((key) => JSON.stringify(key) + ':' + stabil(value[key]))\n      .join(',') +\n    '}'\n  );\n}\n\nlet bestandItems = [];\ntry {\n  bestandItems = $('Lade Solution-Chunk').all();\n} catch (fehler) {\n  bestandItems = [];\n}\n\nlet bestand = null;\nfor (const item of bestandItems) {\n  const row = item.json || {};\n  const meta = row.metadata || {};\n  if (meta.chunk_type !== 'solution') continue;\n  if (Number(row.chunk_index) !== chunkIndex) continue;\n  bestand = { audience: row.audience || null, metadata: meta };\n  break;\n}\n\nlet aktion = 'analyse';\nlet cache_grund = 'kein_chunk';\nlet patch_body = null;\n\nif (bestand) {\n  if (!bestand.metadata.loesung_schluessel) {\n    cache_grund = 'kein_schluessel';\n  } else if (bestand.metadata.loesung_schluessel !== loesungSchluessel) {\n    cache_grund = 'schluessel_abweichung';\n  } else {\n    const neueMetadata = {\n      ...bestand.metadata,\n      source_type: 'jira',\n      source_ref: n.issue_key,\n      title: n.summary,\n      url: `https://rwg-r.atlassian.net/browse/${n.issue_key}`,\n      updated_at: n.updated_at,\n      content_hash: n.content_hash,\n      rag_flow_version: 'jira-rag-v4',\n      audience: AUDIENCE,\n      ticket_key: n.issue_key,\n      summary: n.summary,\n      status: n.status,\n      resolution: n.resolution,\n      is_resolved: true,\n      resolved_at: n.jira_resolved_at,\n      loesung_schluessel: loesungSchluessel,\n      solution_prompt_version: SOLUTION_PROMPT_VERSION,\n    };\n\n    const unveraendert =\n      bestand.audience === AUDIENCE &&\n      stabil(neueMetadata) === stabil(bestand.metadata);\n\n    if (unveraendert) {\n      aktion = 'keine';\n      cache_grund = 'treffer_ohne_delta';\n    } else {\n      aktion = 'patch';\n      cache_grund = 'treffer';\n      patch_body = {\n        audience: AUDIENCE,\n        metadata: neueMetadata,\n      };\n    }\n  }\n}\n\nreturn [{\n  json: {\n    source_id: ticket.id,\n    issue_key: n.issue_key,\n    chunk_index: chunkIndex,\n    loesung_schluessel: loesungSchluessel,\n    solution_prompt_version: SOLUTION_PROMPT_VERSION,\n    aktion,\n    cache_grund,\n    patch_body,\n    loesung_llm_gespart: aktion === 'analyse' ? 0 : 1,\n  },\n}];\n"
+      },
+      "id": "ef96de38-8915-4d53-9064-a6068d21b0a7",
+      "name": "Solution-Cache Abgleich",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1616,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.aktion }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "analyse"
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "id": "86d74956-ac94-422a-bc79-afd71cdaf796",
+      "name": "IF Loesung Neu Extrahieren",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1424,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.aktion }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "patch"
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "id": "18e176d5-0fca-4c3e-85f2-ae41db2399e8",
+      "name": "IF Loesungskontext Geaendert",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1200,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_id=eq.{{ $json.source_id }}&chunk_index=eq.{{ $json.chunk_index }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.patch_body }}",
+        "options": {}
+      },
+      "id": "6c08e620-ccd3-4fb9-8f3a-82f5907ff7eb",
+      "name": "Patch Solution Kontext",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -976,
+        976
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notes": "Aktualisiert nur audience und metadata. chunk_text und embedding bleiben unberuehrt."
+    }
+  ],
+  "nodeGroups": [],
+  "description": "Jira SSD -> Supabase RAG Ingest. Metadaten-Pflichtkern je Chunk, chunk_type-Vokabular header|content|comment|solution|image_attachment, audience 1:1 aus jira_tickets.audience in Spalte und metadata."
+}

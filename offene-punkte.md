@@ -2,6 +2,19 @@
 
 Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes wird gelöscht, nicht abgehakt — der Verlauf steht in `tests/laufprotokoll.csv` und in der Git-Historie.
 
+## Umzug der RWG-Datenbank
+
+**Der Umzug ist vollzogen.** Alle Daten, Bilder und Flows liegen im Projekt `zckaxkpycyyxaymmkmvu` (RWG Rheinland eG / RAG). Abnahme und Vorgehen stehen in [migration/README.md](migration/README.md).
+
+Was noch offen ist:
+
+- **Das alte Projekt `zjabiweaihsezjjeycko` loeschen.** Alles ist umgezogen und geprueft: null Verweise auf das alte Projekt, null Bildpfade ohne echtes Objekt. Vor dem Loeschen dennoch ein bis zwei Tage Betrieb abwarten.
+- **Funktionen aufraeumen.** Fuenf Funktionen kamen unveraendert mit. Welche davon wirklich aufgerufen wird, ist nur fuer `funktion_match_document_chunks` belegt. Nomenklatur vereinheitlichen, Ungenutztes entfernen — erst nach ein paar Tagen Betrieb.
+- **Fuenf Tabellen ohne bekannten Schreiber:** `documentation_findings`, `documentation_review_state`, `agent_ticket_dialogs`, `agent_jira_create_requests`, `confluence_pages` wird vom Confluence-Ingest gefuellt, die uebrigen vier haben keinen Flow im Repo. Klaeren, dann entfernen oder dokumentieren.
+- **`RWG_Reporter_BC` ist nicht ueber MCP erreichbar** und blieb daher ungeprueft. Inaktiv, kann also nicht laufen — vor einer Aktivierung pruefen.
+- **Eine Funktion war im Zielprojekt schon vorhanden**, bevor etwas uebertragen wurde. Herkunft ungeklaert.
+
+
 ## Zuerst
 
 ### Beitragsprüfung im Content Studio testen
@@ -51,7 +64,7 @@ Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberst
 Was bleibt: Der Power-Automate-Flow selbst liegt ausserhalb von n8n und muss dort entfernt werden. Er ist am Ziel erkennbar: `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`. Solange er laeuft, schickt er ins Leere - der Webhook nimmt nichts mehr an.
 
 ### Dokumenteintrag vor den Chunks - Reihenfolge im Ingest
-Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: 15 solcher Eintraege, neun davon durch einen abgebrochenen Testlauf entstanden.
+Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: neun solcher Eintraege (Lauf 110771), acht davon bildreiche Regaletiketten-PDFs.
 
 **Abgefangen ist es**: Der Abgleich erkennt sie ueber den fehlenden Kopfsatz (`chunk_index = 0`) und liest sie neu ein - mit Vorrang, weil sie sonst dauerhaft einen Platz blockieren.
 
@@ -65,7 +78,7 @@ Der naechtliche Abgleich holt jetzt **30 je Nacht** nach - gut zwei Wochen bis z
 
 Die 247 Dokumente mit Power-Automate-Kennung bleiben unangetastet, bis ihre Datei erneut eingelesen wird - dann entfernt der Uebergangsmechanismus die Altfassung.
 
-**Erster echter Abgleich: 30.08. um 03:30.** Ergebnis am Morgen in der Laufbilanz nachsehen.
+**Der Abgleich feuert belegt zur Ortszeit.** Acht Word-Dateien laufen in zwei Minuten durch. Was den Durchsatz jetzt bestimmt, sind die bildreichen Gross-PDFs: Sie kosten Minuten und haben den ersten Lauf an einem Netzabbruch beim Bild-Upload abgebrochen. Der Bildzweig ist seither ausfalltolerant.
 
 
 ### Tabellendaten abfragbar machen

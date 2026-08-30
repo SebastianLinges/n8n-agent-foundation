@@ -1286,7 +1286,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const config = {\n  flowVersion: 'sharepoint-rag-v4.2-image-chunkfix',\n  embeddingModel: 'text-embedding-3-small',\n  embeddingDimensions: 1536,\n  chunkSize: 1600,\n  chunkOverlap: 200,\n  embeddingBatchSize: 50,\n  mistralModel: 'mistral-ocr-latest',\n  storageBucket: 'rag',\n  storagePublicBase: 'https://zjabiweaihsezjjeycko.supabase.co/storage/v1/object/public/rag/',\n  defaultAudience: 'public',\n  minBodyLength: 20,\n  // Basis fuer die Dokument-URL.\n  // Power Automate schickt nur den Pfad ab Bibliotheksebene, nie die Site.\n  // Ohne diese Konstante bleibt sharepoint_url leer und ein Treffer ist\n  // fuer den Anwender nicht anklickbar.\n  sharePointSiteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet'\n};\n\nreturn $input.all().map(item => ({\n  json: { ...item.json, _config: config },\n  binary: item.binary\n}));\n"
+        "jsCode": "const config = {\n  flowVersion: 'sharepoint-rag-v4.2-image-chunkfix',\n  embeddingModel: 'text-embedding-3-small',\n  embeddingDimensions: 1536,\n  chunkSize: 1600,\n  chunkOverlap: 200,\n  embeddingBatchSize: 50,\n  mistralModel: 'mistral-ocr-latest',\n  storageBucket: 'rag',\n  storagePublicBase: 'https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/public/rag/',\n  defaultAudience: 'public',\n  minBodyLength: 20,\n  // Basis fuer die Dokument-URL.\n  // Power Automate schickt nur den Pfad ab Bibliotheksebene, nie die Site.\n  // Ohne diese Konstante bleibt sharepoint_url leer und ein Treffer ist\n  // fuer den Anwender nicht anklickbar.\n  sharePointSiteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet'\n};\n\nreturn $input.all().map(item => ({\n  json: { ...item.json, _config: config },\n  binary: item.binary\n}));\n"
       },
       "id": "f41e4b49-faf8-4ac2-8977-535e77cc75bb",
       "name": "Config",
@@ -1358,7 +1358,7 @@
     },
     {
       "parameters": {
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}&select=id,doc_id,file_name,file_path,sharepoint_url,images,content_hash,ingestion_count,last_ingested_at",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}&select=id,doc_id,file_name,file_path,sharepoint_url,images,content_hash,ingestion_count,last_ingested_at",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -1387,7 +1387,7 @@
     },
     {
       "parameters": {
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_ref=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}&chunk_index=gte.100000&select=chunk_index,metadata",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_ref=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}&chunk_index=gte.100000&select=chunk_index,metadata",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -1463,7 +1463,7 @@
     {
       "parameters": {
         "method": "DELETE",
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/storage/v1/object/rag/{{ $json.storage_path_encoded }}",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag/{{ $json.storage_path_encoded }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "options": {}
@@ -1496,7 +1496,7 @@
     {
       "parameters": {
         "method": "DELETE",
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_ref=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_ref=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2051,7 +2051,7 @@
     {
       "parameters": {
         "method": "DELETE",
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2093,7 +2093,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://zjabiweaihsezjjeycko.supabase.co/rest/v1/ingestion_errors",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/ingestion_errors",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2156,7 +2156,7 @@
     },
     {
       "parameters": {
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Normalize SharePoint Input').first().json.doc_id) }}&select=id,doc_id,content_hash,images,links,word_count,content_type,audience,ingestion_count,ingested_at,last_ingested_at",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Normalize SharePoint Input').first().json.doc_id) }}&select=id,doc_id,content_hash,images,links,word_count,content_type,audience,ingestion_count,ingested_at,last_ingested_at",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2198,7 +2198,7 @@
     },
     {
       "parameters": {
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_id=eq.{{ $('Normalize Source State').first().json.source_id_lookup }}&select=id,metadata,audience&order=chunk_index.asc&limit=1",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_id=eq.{{ $('Normalize Source State').first().json.source_id_lookup }}&select=id,metadata,audience&order=chunk_index.asc&limit=1",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2287,7 +2287,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://zjabiweaihsezjjeycko.supabase.co/rest/v1/sharepoint_documents?on_conflict=doc_id",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?on_conflict=doc_id",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2335,7 +2335,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const ctx = $('Build Source Context').first().json;\nconst rawImages = Array.isArray(ctx.raw_images) ? ctx.raw_images : [];\n\nfunction safeName(value) {\n  return String(value || 'image')\n    .replace(/[^a-zA-Z0-9._-]/g, '_')\n    .replace(/_+/g, '_')\n    .replace(/^_+|_+$/g, '')\n    .slice(0, 100) || 'image';\n}\nfunction extForMime(mime) {\n  const map = {\n    'image/png':'png',\n    'image/jpeg':'jpg',\n    'image/jpg':'jpg',\n    'image/webp':'webp',\n    'image/avif':'avif',\n    'image/gif':'gif',\n    'image/bmp':'bmp',\n    'image/tiff':'tif'\n  };\n  return map[String(mime || '').toLowerCase()] || 'png';\n}\n\nconst safeDoc = safeName(ctx.doc_id);\nconst hashPrefix = String(ctx.hash || '').slice(0, 16) || 'nohash';\nconst publicBase = ctx._config?.storagePublicBase || 'https://zjabiweaihsezjjeycko.supabase.co/storage/v1/object/public/rag/';\n\nconst images = rawImages.map((img, index) => {\n  const imageId = safeName(img.mistral_image_id || ('image-' + (index + 1)));\n  const extension = extForMime(img.image_mime);\n  const pageIndex = Number.isInteger(img.page_index) ? img.page_index : 0;\n  const storage_key = 'SHAREPOINT/' + safeDoc + '/' + hashPrefix + '/p' + pageIndex + '_' + String(index).padStart(4, '0') + '_' + imageId + '.' + extension;\n\n  return {\n    source_id: ctx.source_id,\n    source_ref: ctx.source_ref,\n    image_index: index,\n    image_chunk_index: 100000 + index,\n    page_index: pageIndex,\n    mistral_image_id: img.mistral_image_id || imageId,\n    image_base64_clean: img.image_base64_clean,\n    image_mime: img.image_mime || 'image/png',\n    annotation: img.annotation || {},\n    annotation_text: img.annotation_text || 'Keine belastbare Bildbeschreibung vorhanden.',\n    origin: img.origin || 'mistral_bbox',\n    storage_key,\n    image_file_name: storage_key.split('/').pop(),\n    public_url: publicBase + storage_key\n  };\n});\n\nreturn [{\n  json: {\n    has_images: images.length > 0,\n    image_count: images.length,\n    images\n  }\n}];"
+        "jsCode": "const ctx = $('Build Source Context').first().json;\nconst rawImages = Array.isArray(ctx.raw_images) ? ctx.raw_images : [];\n\nfunction safeName(value) {\n  return String(value || 'image')\n    .replace(/[^a-zA-Z0-9._-]/g, '_')\n    .replace(/_+/g, '_')\n    .replace(/^_+|_+$/g, '')\n    .slice(0, 100) || 'image';\n}\nfunction extForMime(mime) {\n  const map = {\n    'image/png':'png',\n    'image/jpeg':'jpg',\n    'image/jpg':'jpg',\n    'image/webp':'webp',\n    'image/avif':'avif',\n    'image/gif':'gif',\n    'image/bmp':'bmp',\n    'image/tiff':'tif'\n  };\n  return map[String(mime || '').toLowerCase()] || 'png';\n}\n\nconst safeDoc = safeName(ctx.doc_id);\nconst hashPrefix = String(ctx.hash || '').slice(0, 16) || 'nohash';\nconst publicBase = ctx._config?.storagePublicBase || 'https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/public/rag/';\n\nconst images = rawImages.map((img, index) => {\n  const imageId = safeName(img.mistral_image_id || ('image-' + (index + 1)));\n  const extension = extForMime(img.image_mime);\n  const pageIndex = Number.isInteger(img.page_index) ? img.page_index : 0;\n  const storage_key = 'SHAREPOINT/' + safeDoc + '/' + hashPrefix + '/p' + pageIndex + '_' + String(index).padStart(4, '0') + '_' + imageId + '.' + extension;\n\n  return {\n    source_id: ctx.source_id,\n    source_ref: ctx.source_ref,\n    image_index: index,\n    image_chunk_index: 100000 + index,\n    page_index: pageIndex,\n    mistral_image_id: img.mistral_image_id || imageId,\n    image_base64_clean: img.image_base64_clean,\n    image_mime: img.image_mime || 'image/png',\n    annotation: img.annotation || {},\n    annotation_text: img.annotation_text || 'Keine belastbare Bildbeschreibung vorhanden.',\n    origin: img.origin || 'mistral_bbox',\n    storage_key,\n    image_file_name: storage_key.split('/').pop(),\n    public_url: publicBase + storage_key\n  };\n});\n\nreturn [{\n  json: {\n    has_images: images.length > 0,\n    image_count: images.length,\n    images\n  }\n}];"
       },
       "id": "e17f504f-b2a2-4cf3-8426-ea0486c72ed8",
       "name": "Build Image Upload Plan",
@@ -2426,7 +2426,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/storage/v1/object/rag/{{ $json.storage_key }}",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag/{{ $json.storage_key }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2456,12 +2456,13 @@
         -64
       ],
       "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "jsCode": "const plan = $('Restore Image Metadata').all().map(item => item.json);\n\nreturn $input.all().map((item, index) => {\n  const image = plan[index] || {};\n  const upload = item.json || {};\n\n  return {\n    json: {\n      image_name: image.image_file_name,\n      storage_path: image.storage_key,\n      public_url: image.public_url,\n      annotation: image.annotation || {},\n      annotation_text: image.annotation_text,\n      image_mime: image.image_mime,\n      page_index: image.page_index,\n      mistral_image_id: image.mistral_image_id,\n      image_index: image.image_index,\n      origin: image.origin,\n      upload_key: upload.Key || upload.key || image.storage_key\n    }\n  };\n});"
+        "jsCode": "const plan = $('Restore Image Metadata').all().map(item => item.json);\n\n// ============================================================\n// GESCHEITERTE UPLOADS AUSSORTIEREN\n// Der Upload-Node laeuft bei Fehler weiter, statt den ganzen Lauf zu\n// beenden - ein Netzabbruch bei einem einzelnen Bild hat sonst den\n// naechtlichen Abgleich mitgerissen. Er legt fuer das gescheiterte Bild\n// eine Zeile mit `error` in den Ausgang. Die wird hier verworfen, sonst\n// stuende im Chunk ein Speicherpfad, unter dem nichts liegt.\n// Erst abbilden, dann filtern - die Zuordnung ueber den Index bleibt so\n// erhalten.\n// ============================================================\nreturn $input.all().map((item, index) => {\n  const image = plan[index] || {};\n  const upload = item.json || {};\n\n  if (upload.error !== undefined && upload.error !== null) {\n    return null;\n  }\n\n  return {\n    json: {\n      image_name: image.image_file_name,\n      storage_path: image.storage_key,\n      public_url: image.public_url,\n      annotation: image.annotation || {},\n      annotation_text: image.annotation_text,\n      image_mime: image.image_mime,\n      page_index: image.page_index,\n      mistral_image_id: image.mistral_image_id,\n      image_index: image.image_index,\n      origin: image.origin,\n      upload_key: upload.Key || upload.key || image.storage_key\n    }\n  };\n}).filter(entry => entry !== null);\n"
       },
       "id": "78c1cd6c-bd53-44dd-bd34-b7f30f2c712e",
       "name": "Build Uploaded Image Metadata",
@@ -2485,7 +2486,8 @@
       "position": [
         2752,
         -64
-      ]
+      ],
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -2529,7 +2531,7 @@
     {
       "parameters": {
         "method": "PATCH",
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Decide Rebuild Or Skip').first().json.doc_id) }}",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Decide Rebuild Or Skip').first().json.doc_id) }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2617,7 +2619,7 @@
     {
       "parameters": {
         "method": "DELETE",
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_id=eq.{{ $json.source_id }}&chunk_index=not.in.({{ $json.expected_indices_csv }})",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_id=eq.{{ $json.source_id }}&chunk_index=not.in.({{ $json.expected_indices_csv }})",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2692,7 +2694,7 @@
     {
       "parameters": {
         "method": "DELETE",
-        "url": "=https://zjabiweaihsezjjeycko.supabase.co/storage/v1/object/rag/{{ $json.storage_path_encoded }}",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag/{{ $json.storage_path_encoded }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "options": {}
@@ -2787,7 +2789,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://zjabiweaihsezjjeycko.supabase.co/rest/v1/document_chunks?on_conflict=source_id,chunk_index",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?on_conflict=source_id,chunk_index",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -2849,7 +2851,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://zjabiweaihsezjjeycko.supabase.co/rest/v1/sharepoint_documents?on_conflict=doc_id",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?on_conflict=doc_id",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -3009,10 +3011,11 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "55 1 * * *"
+              "expression": "30 3 * * *"
             }
           ]
-        }
+        },
+        "notes": "03:30 Ortszeit - der Flow traegt timezone Europe/Berlin, sonst waere es Serverzeit UTC und damit 05:30. Vergleicht den vollstaendigen SharePoint-Bestand gegen die Wissensbasis und findet, was das Delta nicht finden kann."
       },
       "notes": "Vergleicht den vollstaendigen SharePoint-Bestand gegen die Wissensbasis. Findet, was das Delta verpasst hat: verwaiste Eintraege, nie eingelesene Dateien, uebersehene Aenderungen. Der Vergleich selbst kostet keine OCR - nur was wirklich fehlt wird verarbeitet."
     },
@@ -3109,7 +3112,7 @@
       ],
       "parameters": {
         "method": "GET",
-        "url": "https://zjabiweaihsezjjeycko.supabase.co/rest/v1/sharepoint_documents?select=doc_id,file_name,file_path,last_modified_sp,last_ingested_at,word_count&order=doc_id.asc",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?select=doc_id,file_name,file_path,last_modified_sp,last_ingested_at,word_count&order=doc_id.asc",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,
@@ -3600,7 +3603,7 @@
       ],
       "parameters": {
         "method": "GET",
-        "url": "https://zjabiweaihsezjjeycko.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&chunk_index=eq.0&select=source_ref&order=source_ref.asc",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&chunk_index=eq.0&select=source_ref&order=source_ref.asc",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,

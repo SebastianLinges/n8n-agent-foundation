@@ -1,0 +1,1164 @@
+{
+  "id": "Ham6IDJxbqIydImp",
+  "name": "RAG-Confluence-Ingest",
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 15,
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": false
+  },
+  "connections": {
+    "Manueller Start": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Confluence Seiten laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Naechtlicher Lauf": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confluence Seiten laden": {
+      "main": [
+        [
+          {
+            "node": "Bestehende Seiten laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bestehende Seiten laden": {
+      "main": [
+        [
+          {
+            "node": "Geloeschte Seiten ermitteln",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geloeschte Seiten ermitteln": {
+      "main": [
+        [
+          {
+            "node": "Geloeschte Seiten vorhanden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geloeschte Seiten vorhanden?": {
+      "main": [
+        [
+          {
+            "node": "Chunks geloeschter Seiten loeschen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Seiten normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunks geloeschter Seiten loeschen": {
+      "main": [
+        [
+          {
+            "node": "Geloeschte Confluence-Seiten loeschen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geloeschte Confluence-Seiten loeschen": {
+      "main": [
+        [
+          {
+            "node": "Seiten normalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seiten normalisieren": {
+      "main": [
+        [
+          {
+            "node": "Aenderung pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aenderung pruefen": {
+      "main": [
+        [
+          {
+            "node": "Geaenderte Seiten vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geaenderte Seiten vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Aenderungen vorhanden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aenderungen vorhanden?": {
+      "main": [
+        [
+          {
+            "node": "Seiten provisorisch upserten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zusammenfassung keine Aenderungen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seiten provisorisch upserten": {
+      "main": [
+        [
+          {
+            "node": "Seitenkontext mit Source ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seitenkontext mit Source ID": {
+      "main": [
+        [
+          {
+            "node": "Chunks und Batches bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunks und Batches bauen": {
+      "main": [
+        [
+          {
+            "node": "Embedding Batch Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Erster Batch der Seite?": {
+      "main": [
+        [
+          {
+            "node": "Alte Chunks vor Neuaufbau loeschen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Embedding Batch Kontext herstellen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alte Chunks vor Neuaufbau loeschen": {
+      "main": [
+        [
+          {
+            "node": "Embedding Batch Kontext herstellen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding Batch Kontext herstellen": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Embeddings Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding Batch Loop": {
+      "main": [
+        [
+          {
+            "node": "Zusammenfassung",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Erster Batch der Seite?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings Batch": {
+      "main": [
+        [
+          {
+            "node": "Bulk Insert Payload bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Insert Payload bauen": {
+      "main": [
+        [
+          {
+            "node": "Bulk Insert document_chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Insert document_chunks": {
+      "main": [
+        [
+          {
+            "node": "Batch Ergebnis bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Batch Ergebnis bauen": {
+      "main": [
+        [
+          {
+            "node": "Letzter Batch der Seite?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Letzter Batch der Seite?": {
+      "main": [
+        [
+          {
+            "node": "Finalisierung bauen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "STATUS Batch verarbeitet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalisierung bauen": {
+      "main": [
+        [
+          {
+            "node": "Confluence Seite finalisieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confluence Seite finalisieren": {
+      "main": [
+        [
+          {
+            "node": "STATUS Seite fertig",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STATUS Seite fertig": {
+      "main": [
+        [
+          {
+            "node": "Embedding Batch Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STATUS Batch verarbeitet": {
+      "main": [
+        [
+          {
+            "node": "Embedding Batch Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aufruf aus Steuerung": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "363af69d-b3bb-4f93-867c-7a7a69f2e711",
+      "name": "Manueller Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        4272,
+        3680
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "space",
+              "name": "spaceKey",
+              "type": "string",
+              "value": "={{ String($json.spaceKey || 'DokuHub').trim() }}"
+            },
+            {
+              "id": "limit",
+              "name": "pageLimit",
+              "type": "number",
+              "value": 100
+            },
+            {
+              "id": "embeddingBatchSize",
+              "name": "embeddingBatchSize",
+              "type": "number",
+              "value": 50
+            },
+            {
+              "id": "chunkSize",
+              "name": "chunkSize",
+              "type": "number",
+              "value": 1600
+            },
+            {
+              "id": "chunkOverlap",
+              "name": "chunkOverlap",
+              "type": "number",
+              "value": 200
+            },
+            {
+              "id": "embeddingModel",
+              "name": "embeddingModel",
+              "type": "string",
+              "value": "text-embedding-3-small"
+            },
+            {
+              "id": "embeddingDimensions",
+              "name": "embeddingDimensions",
+              "type": "number",
+              "value": 1536
+            },
+            {
+              "id": "deleteSafetyMaxPercent",
+              "name": "deleteSafetyMaxPercent",
+              "type": "number",
+              "value": 35
+            },
+            {
+              "id": "deleteSafetyMinExisting",
+              "name": "deleteSafetyMinExisting",
+              "type": "number",
+              "value": 20
+            },
+            {
+              "id": "newPageAudience",
+              "name": "newPageAudience",
+              "type": "string",
+              "value": "={{ ['public','it_internal'].includes($json.newPageAudience) ? $json.newPageAudience : 'it_internal' }}"
+            },
+            {
+              "id": "ragFlowVersion",
+              "name": "ragFlowVersion",
+              "type": "string",
+              "value": "confluence-rag-v5.1-cleanparser"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "f8431730-4220-4fd3-a60e-e93d5b726e7b",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4496,
+        3856
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "6361bd68-2a49-4670-9664-c30657521611",
+      "name": "Naechtlicher Lauf",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        4272,
+        4032
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://rwg-r.atlassian.net/wiki/rest/api/content?spaceKey={{ $json.spaceKey }}&type=page&status=current&expand=body.storage,version,history,metadata.labels&limit={{ $json.pageLimit }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{ \"https://rwg-r.atlassian.net/wiki\" + $response.body._links.next }}",
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body._links.next }}",
+              "limitPagesFetched": true,
+              "maxRequests": 30
+            }
+          }
+        }
+      },
+      "id": "7dbc08bc-d59f-4e98-9726-c28363f62f39",
+      "name": "Confluence Seiten laden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4704,
+        3856
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/confluence_pages?select=id,page_id,title,space_key,audience,content_hash,ingestion_version,ingested_at,last_ingested_at&space_key=eq.{{ $('Config').first().json.spaceKey }}&limit=5000",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8101052b-b6df-4915-b06c-b824e58d1fba",
+      "name": "Bestehende Seiten laden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5152,
+        3856
+      ],
+      "executeOnce": true,
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawResponses = $('Confluence Seiten laden').all();\nconst existingItems = $('Bestehende Seiten laden').all();\nconst cfg = $('Config').first().json;\nconst spaceKey = String(cfg.spaceKey || '');\nconst maxDeletePercent = Number(cfg.deleteSafetyMaxPercent ?? 35);\nconst minExistingForPercentGuard = Number(cfg.deleteSafetyMinExisting ?? 20);\n\nconst currentIds = new Set();\nfor (const item of rawResponses) {\n  const r = item.json || {};\n  if (Array.isArray(r.results)) {\n    for (const p of r.results) {\n      if (p?.id) currentIds.add(String(p.id));\n    }\n  } else if (r.id) {\n    currentIds.add(String(r.id));\n  }\n}\n\nconst existingRows = [];\nfor (const item of existingItems) {\n  const value = item.json;\n  const rows = Array.isArray(value) ? value : [value];\n  for (const row of rows) {\n    if (!row?.id || !row?.page_id) continue;\n    if (spaceKey && String(row.space_key || '') !== spaceKey) continue;\n    existingRows.push(row);\n  }\n}\n\nif (existingRows.length > 0 && currentIds.size === 0) {\n  throw new Error(\n    'DELETE_GUARD_CURRENT_CONFLUENCE_EMPTY: Supabase hat ' +\n    existingRows.length + ' Seiten im Space ' + spaceKey +\n    ', der aktuelle Confluence-Abruf aber 0. Keine Loeschung ausgefuehrt.'\n  );\n}\n\nconst deletedPages = existingRows\n  .filter(row => !currentIds.has(String(row.page_id)))\n  .map(row => ({\n    source_id: String(row.id),\n    page_id: String(row.page_id),\n    title: row.title || 'Ohne Titel',\n    space_key: row.space_key || spaceKey\n  }));\n\nconst deletePercent = existingRows.length > 0\n  ? (deletedPages.length / existingRows.length) * 100\n  : 0;\n\nif (\n  existingRows.length >= minExistingForPercentGuard &&\n  deletedPages.length > 0 &&\n  deletePercent > maxDeletePercent\n) {\n  throw new Error(\n    'DELETE_GUARD_TOO_MANY_MISSING_PAGES: ' +\n    deletedPages.length + ' von ' + existingRows.length +\n    ' Seiten fehlen (' + deletePercent.toFixed(1) + '%). ' +\n    'Grenze=' + maxDeletePercent + '%. Keine Loeschung ausgefuehrt.'\n  );\n}\n\nreturn [{\n  json: {\n    has_deleted_pages: deletedPages.length > 0,\n    deleted_count: deletedPages.length,\n    deleted_pages: deletedPages,\n    deleted_source_ids: deletedPages.map(p => p.source_id),\n    deleted_page_ids: deletedPages.map(p => p.page_id),\n    confluence_pages_current: currentIds.size,\n    supabase_pages_existing: existingRows.length,\n    delete_percent: Math.round(deletePercent * 10) / 10,\n    space_key: spaceKey\n  }\n}];"
+      },
+      "id": "5a1e6de0-6f8f-4d76-91ee-f5e08f80a87a",
+      "name": "Geloeschte Seiten ermitteln",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5520,
+        3328
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "hasDeletedPages",
+              "leftValue": "={{ $json.has_deleted_pages }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "506b6af3-6e56-49fe-b562-a74aa36627b7",
+      "name": "Geloeschte Seiten vorhanden?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5760,
+        3328
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.confluence&source_id=in.({{ $json.deleted_source_ids.join(',') }})",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cfb26358-dc06-4413-954c-70b7e914d959",
+      "name": "Chunks geloeschter Seiten loeschen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6000,
+        3312
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/confluence_pages?id=in.({{ $('Geloeschte Seiten ermitteln').first().json.deleted_source_ids.join(',') }})&space_key=eq.{{ $('Config').first().json.spaceKey }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "710b7ccf-5fe0-4eea-8eb9-97d6247026ce",
+      "name": "Geloeschte Confluence-Seiten loeschen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6256,
+        3312
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst responses = $('Confluence Seiten laden').all();\nconst spaceKey = $('Config').first().json.spaceKey;\nconst BASE = 'https://rwg-r.atlassian.net/wiki';\n\nconst pages = [];\n\nfor (const item of responses) {\n  const response = item.json || {};\n\n  if (Array.isArray(response.results)) {\n    for (const page of response.results) {\n      pages.push(page);\n    }\n  } else if (response.id && response.title) {\n    pages.push(response);\n  }\n}\n\nconst ENTS = {\n  nbsp: ' ',\n  amp: '&',\n  lt: '<',\n  gt: '>',\n  quot: '\"',\n  apos: \"'\",\n  auml: 'ä',\n  ouml: 'ö',\n  uuml: 'ü',\n  Auml: 'Ä',\n  Ouml: 'Ö',\n  Uuml: 'Ü',\n  szlig: 'ß',\n  agrave: 'à',\n  aacute: 'á',\n  eacute: 'é',\n  egrave: 'è',\n  iacute: 'í',\n  oacute: 'ó',\n  uacute: 'ú',\n  ccedil: 'ç',\n  ntilde: 'ñ',\n  Eacute: 'É',\n  Egrave: 'È',\n  ndash: '–',\n  mdash: '—',\n  hellip: '…',\n  bull: '•',\n  middot: '·',\n  rarr: '→',\n  larr: '←',\n  uarr: '↑',\n  darr: '↓',\n  harr: '↔',\n  bdquo: '„',\n  ldquo: '“',\n  rdquo: '”',\n  lsquo: '‚',\n  rsquo: '’',\n  sbquo: '‚',\n  laquo: '«',\n  raquo: '»',\n  lsaquo: '‹',\n  rsaquo: '›',\n  euro: '€',\n  pound: '£',\n  yen: '¥',\n  cent: '¢',\n  deg: '°',\n  sup1: '¹',\n  sup2: '²',\n  sup3: '³',\n  frac12: '½',\n  frac14: '¼',\n  frac34: '¾',\n  copy: '©',\n  reg: '®',\n  trade: '™',\n  sect: '§',\n  para: '¶',\n  times: '×',\n  divide: '÷',\n  plusmn: '±',\n  ne: '≠',\n  le: '≤',\n  ge: '≥',\n  micro: 'µ',\n  permil: '‰',\n  dagger: '†',\n  hearts: '♥'\n};\n\nfunction decodeEntities(input) {\n  let text = String(input ?? '');\n\n  text = text.replace(/&#(\\d+);/g, (match, decimalValue) => {\n    const code = parseInt(decimalValue, 10);\n\n    return Number.isFinite(code)\n      ? String.fromCodePoint(code)\n      : match;\n  });\n\n  text = text.replace(/&#[xX]([0-9a-fA-F]+);/g, (match, hexValue) => {\n    const code = parseInt(hexValue, 16);\n\n    return Number.isFinite(code)\n      ? String.fromCodePoint(code)\n      : match;\n  });\n\n  text = text.replace(\n    /&([a-zA-Z][a-zA-Z0-9]*);/g,\n    (match, name) => {\n      return Object.prototype.hasOwnProperty.call(ENTS, name)\n        ? ENTS[name]\n        : match;\n    }\n  );\n\n  return text;\n}\n\nfunction extractAttribute(tag, attributeName) {\n  const escapedName = attributeName.replace(\n    /[.*+?^${}()|[\\]\\\\]/g,\n    '\\\\$&'\n  );\n\n  const match = String(tag).match(\n    new RegExp(\n      escapedName + '\\\\s*=\\\\s*([\"\\'])(.*?)\\\\1',\n      'i'\n    )\n  );\n\n  return match\n    ? decodeEntities(match[2])\n    : '';\n}\n\nfunction unwrapConfluenceStorage(storage) {\n  let text = String(storage ?? '');\n\n  // Kommentare, JavaScript und CSS vollständig entfernen.\n  text = text.replace(/<!--[\\s\\S]*?-->/g, ' ');\n  text = text.replace(\n    /<(script|style)\\b[^>]*>[\\s\\S]*?<\\/\\1>/gi,\n    ' '\n  );\n\n  /*\n   * Inhalt von Confluence-Codeblöcken erhalten.\n   *\n   * Wichtig:\n   * Die CDATA-Inhalte sind der eigentliche Code.\n   * Die umgebenden Makroparameter wie language, theme,\n   * linenumbers, width oder collapse dürfen nicht in den\n   * RAG-Text gelangen.\n   */\n  text = text.replace(\n    /<ac:plain-text-body\\b[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*<\\/ac:plain-text-body>/gi,\n    '\\n$1\\n'\n  );\n\n  text = text.replace(\n    /<ac:plain-text-link-body\\b[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*<\\/ac:plain-text-link-body>/gi,\n    '$1'\n  );\n\n  /*\n   * Rich-Text-Inhalt erhalten.\n   * Es wird nur der Confluence-Wrapper entfernt.\n   */\n  text = text.replace(\n    /<\\/?ac:rich-text-body\\b[^>]*>/gi,\n    '\\n'\n  );\n\n  /*\n   * Confluence-Makroparameter vollständig entfernen.\n   *\n   * Genau aus diesen Parametern entstanden bisher Texte wie:\n   *\n   * none\n   * text wide 760 true\n   * wide 760\n   */\n  text = text.replace(\n    /<ac:parameter\\b[^>]*>[\\s\\S]*?<\\/ac:parameter>/gi,\n    ' '\n  );\n\n  text = text.replace(\n    /<ac:placeholder\\b[^>]*>[\\s\\S]*?<\\/ac:placeholder>/gi,\n    ' '\n  );\n\n  text = text.replace(\n    /<ac:adf-extension\\b[^>]*>[\\s\\S]*?<\\/ac:adf-extension>/gi,\n    ' '\n  );\n\n  /*\n   * Anhänge als verständliche Textreferenz erhalten.\n   */\n  text = text.replace(\n    /<ri:attachment\\b[^>]*\\/?>/gi,\n    tag => {\n      const filename = extractAttribute(tag, 'ri:filename');\n\n      return filename\n        ? ` [Anhang: ${filename}] `\n        : ' ';\n    }\n  );\n\n  /*\n   * Verlinkte Confluence-Seiten mit ihrem Titel erhalten.\n   */\n  text = text.replace(\n    /<ri:page\\b[^>]*\\/?>/gi,\n    tag => {\n      const title = extractAttribute(\n        tag,\n        'ri:content-title'\n      );\n\n      return title\n        ? ` ${title} `\n        : ' ';\n    }\n  );\n\n  /*\n   * URLs aus Confluence-Ressourcen erhalten.\n   */\n  text = text.replace(\n    /<ri:url\\b[^>]*\\/?>/gi,\n    tag => {\n      const value = extractAttribute(\n        tag,\n        'ri:value'\n      );\n\n      return value\n        ? ` ${value} `\n        : ' ';\n    }\n  );\n\n  /*\n   * Alle übrigen ac:- und ri:-Elemente entfernen.\n   * Sie enthalten keine eigenständigen fachlichen Inhalte.\n   */\n  text = text.replace(\n    /<\\/?(?:ac|ri):[^>]+>/gi,\n    ' '\n  );\n\n  return text;\n}\n\nfunction dedupeAdjacentBlocks(input) {\n  const blocks = String(input ?? '')\n    .split(/\\n{2,}/)\n    .map(block => block.trim())\n    .filter(Boolean);\n\n  const output = [];\n  let previousKey = null;\n\n  for (const block of blocks) {\n    const key = block\n      .replace(/\\s+/g, ' ')\n      .trim()\n      .toLocaleLowerCase('de-DE');\n\n    // Direkt aufeinanderfolgende identische Textblöcke entfernen.\n    if (key && key === previousKey) {\n      continue;\n    }\n\n    output.push(block);\n    previousKey = key;\n  }\n\n  return output.join('\\n\\n');\n}\n\nfunction cleanParserArtifacts(input) {\n  let text = String(input ?? '');\n\n  /*\n   * Bekannte Confluence-Layoutartefakte entfernen:\n   *\n   * text wide 760 true\n   * wide 760\n   * wide 880 false\n   */\n  text = text.replace(\n    /\\b(?:text\\s+)?wide\\s+\\d+(?:\\s+(?:true|false))?\\b/gi,\n    ' '\n  );\n\n  /*\n   * Führende Platzhalter entfernen:\n   *\n   * none Dokumentation\n   * null Dokumentation\n   * undefined Dokumentation\n   */\n  text = text.replace(\n    /^\\s*(?:none|null|undefined)\\s+(?=\\S)/i,\n    ''\n  );\n\n  text = text.replace(\n    /(^|\\n)\\s*(?:none|null|undefined)\\s+(?=\\S)/gi,\n    '$1'\n  );\n\n  /*\n   * Confluence-UI-Texte entfernen.\n   */\n  text = text.replace(\n    /(^|\\n)\\s*(?:Weitere Zeilen anzeigen|Show more lines)\\s*(?=\\n|$)/gi,\n    '$1'\n  );\n\n  /*\n   * Einzelne Markdown-Codeblockreste entfernen.\n   */\n  text = text.replace(\n    /(^|\\n)\\s*``+\\s*(?=\\n|$)/g,\n    '$1'\n  );\n\n  /*\n   * Unsichtbare Unicode-Zeichen entfernen.\n   */\n  text = text\n    .replace(/[\\u200B-\\u200D\\u2060\\uFEFF]/g, '')\n    .replace(/[\\u00A0\\u202F]/g, ' ')\n    .replace(/\\r\\n?/g, '\\n');\n\n  /*\n   * Leerzeichen und Zeilenumbrüche vereinheitlichen.\n   */\n  text = text\n    .replace(/[ \\t]+\\n/g, '\\n')\n    .replace(/[ \\t]{2,}/g, ' ')\n    .replace(/\\n[ \\t]+/g, '\\n')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n\n  return dedupeAdjacentBlocks(text);\n}\n\nfunction htmlToText(storage) {\n  if (!storage) {\n    return '';\n  }\n\n  let text = unwrapConfluenceStorage(storage);\n\n  /*\n   * Tabellen lesbar machen.\n   */\n  text = text.replace(\n    /<\\/(td|th)>/gi,\n    '\\t'\n  );\n\n  text = text.replace(\n    /<\\/tr>/gi,\n    '\\n'\n  );\n\n  /*\n   * Blockelemente in Zeilenumbrüche umwandeln.\n   */\n  text = text.replace(\n    /<\\/(p|div|h[1-6]|blockquote|pre|table|ul|ol)>/gi,\n    '\\n'\n  );\n\n  text = text.replace(\n    /<li\\b[^>]*>/gi,\n    '- '\n  );\n\n  text = text.replace(\n    /<\\/li>/gi,\n    '\\n'\n  );\n\n  text = text.replace(\n    /<br\\s*\\/?>/gi,\n    '\\n'\n  );\n\n  /*\n   * Verbleibende HTML-Tags entfernen.\n   */\n  text = text.replace(\n    /<[^>]+>/g,\n    ' '\n  );\n\n  /*\n   * Confluence liefert Inhalte teilweise mehrfach escaped.\n   */\n  text = decodeEntities(text);\n  text = decodeEntities(text);\n\n  return cleanParserArtifacts(text);\n}\n\nfunction assertCleanContent(pageId, title, contentText) {\n  const checks = [\n    {\n      code: 'WIDE_LAYOUT_ARTIFACT',\n      regex: /\\b(?:text\\s+)?wide\\s+\\d+(?:\\s+(?:true|false))?\\b/i\n    },\n    {\n      code: 'LEADING_NONE_ARTIFACT',\n      regex: /^\\s*(?:none|null|undefined)\\b/i\n    },\n    {\n      code: 'CONFLUENCE_PARAMETER_ARTIFACT',\n      regex: /<\\/?ac:(?:parameter|plain-text-body|rich-text-body|structured-macro)\\b/i\n    }\n  ];\n\n  for (const check of checks) {\n    if (check.regex.test(contentText)) {\n      throw new Error(\n        'CONFLUENCE_TEXT_CLEANUP_FAILED: ' +\n        check.code +\n        ', page_id=' +\n        pageId +\n        ', title=' +\n        title\n      );\n    }\n  }\n}\n\nconst seen = new Set();\nconst output = [];\n\nfor (const page of pages) {\n  const pageId = String(page.id);\n\n  if (seen.has(pageId)) {\n    continue;\n  }\n\n  seen.add(pageId);\n\n  const title = cleanParserArtifacts(\n    decodeEntities(page.title || 'Ohne Titel')\n  );\n\n  const contentText = htmlToText(\n    page.body?.storage?.value || ''\n  );\n\n  const webui = page._links?.webui || '';\n\n  const labels = (\n    page.metadata?.labels?.results || []\n  )\n    .map(label =>\n      cleanParserArtifacts(\n        decodeEntities(label?.name || '')\n      )\n    )\n    .filter(Boolean);\n\n  /*\n   * Sicherheitsprüfung:\n   * Fehlerhafte Texte dürfen nicht weiter zum Chunking gelangen.\n   */\n  assertCleanContent(\n    pageId,\n    title,\n    contentText\n  );\n\n  /*\n   * Der Hash muss aus dem bereinigten Text entstehen.\n   *\n   * Dadurch werden bereits importierte Seiten als geändert\n   * erkannt und mit bereinigten Chunks neu aufgebaut.\n   */\n  const contentHash = crypto\n    .createHash('sha256')\n    .update(\n      title + '\\n' + contentText,\n      'utf8'\n    )\n    .digest('hex');\n\n  output.push({\n    json: {\n      page_id: pageId,\n      title,\n      space_key: spaceKey,\n      page_url: webui\n        ? BASE + webui\n        : BASE,\n      content_text: contentText,\n      content_hash: contentHash,\n      version_number: page.version?.number ?? null,\n      labels,\n      confluence_created_at:\n        page.history?.createdDate ?? null,\n      confluence_modified_at:\n        page.version?.when ?? null,\n      parser_version:\n        'confluence-storage-clean-v1',\n      content_is_empty:\n        contentText.length === 0\n    }\n  });\n}\n\nif (output.length === 0) {\n  return [\n    {\n      json: {\n        _no_confluence_pages: true,\n        space_key: spaceKey\n      }\n    }\n  ];\n}\n\nreturn output;"
+      },
+      "id": "d645ce12-f00e-4cec-9a59-cf530d349465",
+      "name": "Seiten normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4928,
+        3856
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const neuAlle = $('Seiten normalisieren')\n  .all()\n  .filter(i => i.json && i.json.page_id);\nconst bestehendeItems = $('Bestehende Seiten laden').all();\n\nconst bekannt = new Map();\nfor (const it of bestehendeItems) {\n  const value = it.json;\n  const rows = Array.isArray(value) ? value : [value];\n  for (const r of rows) {\n    if (r && r.page_id) {\n      bekannt.set(String(r.page_id), r);\n    }\n  }\n}\n\nif (neuAlle.length === 0) {\n  return [{ json: { _no_confluence_pages: true } }];\n}\n\nconst out = [];\nfor (const it of neuAlle) {\n  const neu = it.json;\n  const existing = bekannt.get(String(neu.page_id)) || null;\n  const unchanged = !!existing && existing.content_hash === neu.content_hash;\n\n  out.push({\n    json: {\n      ...neu,\n      unchanged,\n      existing_id: existing?.id ?? null,\n      existing_content_hash: existing?.content_hash ?? null,\n      existing_audience: existing?.audience ?? null,\n      existing_ingested_at: existing?.ingested_at ?? null,\n      existing_last_ingested_at: existing?.last_ingested_at ?? null,\n      existing_ingestion_version: existing?.ingestion_version ?? 0\n    }\n  });\n}\n\nreturn out;"
+      },
+      "id": "61ecb02a-87fd-43e5-92ec-0227ca99130b",
+      "name": "Aenderung pruefen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5536,
+        3856
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const alle = $input.all().filter(i => i.json && i.json.page_id);\nconst geaendert = alle.filter(i => i.json.unchanged === false);\nconst unveraendert = alle.length - geaendert.length;\n\nconst stats = {\n  seiten_gesamt: alle.length,\n  seiten_geaendert: geaendert.length,\n  seiten_unveraendert: unveraendert\n};\n\nif (geaendert.length === 0) {\n  return [{\n    json: {\n      ...stats,\n      no_changes: true,\n      status: 'NO_CHANGES',\n      message: alle.length === 0\n        ? 'Keine aktuellen Confluence-Seiten gefunden.'\n        : 'Keine geaenderten Confluence-Seiten gefunden.'\n    }\n  }];\n}\n\nreturn geaendert.map((it, index) => ({\n  json: {\n    ...it.json,\n    ...stats,\n    no_changes: false,\n    page_position: index + 1,\n    changed_total: geaendert.length\n  }\n}));"
+      },
+      "id": "df5fada8-3266-408f-a041-6357331c0a03",
+      "name": "Geaenderte Seiten vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5744,
+        3856
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "hasChanges",
+              "leftValue": "={{ $json.no_changes }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cd15fa91-6099-4b39-bca3-638c627fd5e7",
+      "name": "Aenderungen vorhanden?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6016,
+        3856
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/confluence_pages?on_conflict=page_id",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ page_id: $json.page_id, title: $json.title, space_key: $json.space_key, audience: ($json.existing_audience ?? $(\"Config\").first().json.newPageAudience), content_hash: $json.existing_content_hash ?? null, ingested_at: $json.existing_ingested_at ?? new Date().toISOString(), last_ingested_at: $json.existing_last_ingested_at ?? new Date().toISOString(), ingestion_version: $json.existing_ingestion_version ?? 0 }) }}",
+        "options": {}
+      },
+      "id": "be31df67-2123-4343-b4dc-fc42f970c002",
+      "name": "Seiten provisorisch upserten",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6320,
+        3792
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "jsCode": "const changedPages = $('Geaenderte Seiten vorbereiten')\n  .all()\n  .map(i => i.json)\n  .filter(p => p.no_changes === false);\n\nconst sourceRows = [];\nfor (const it of $input.all()) {\n  const value = it.json;\n  if (Array.isArray(value)) sourceRows.push(...value);\n  else if (value) sourceRows.push(value);\n}\n\nconst ALLOWED_AUDIENCES = ['public', 'it_internal'];\n\nconst out = [];\nfor (const source of sourceRows) {\n  const page = changedPages.find(p => String(p.page_id) === String(source.page_id));\n  if (!page) {\n    throw new Error('PAGE_CONTEXT_NOT_FOUND_FOR_SOURCE: ' + String(source.page_id));\n  }\n  if (!source.id) {\n    throw new Error('SOURCE_ID_MISSING_FOR_PAGE: ' + String(source.page_id));\n  }\n\n  const dbAudience = source.audience;\n  if (!ALLOWED_AUDIENCES.includes(dbAudience)) {\n    throw new Error('AUDIENCE_INVALID_OR_MISSING_FROM_DB: page=' + String(source.page_id) + ', value=' + String(dbAudience));\n  }\n\n  out.push({\n    json: {\n      ...page,\n      source_id: source.id,\n      page_audience: dbAudience\n    }\n  });\n}\n\nif (out.length !== changedPages.length) {\n  throw new Error('SOURCE_PAGE_COUNT_MISMATCH: sources=' + out.length + ', pages=' + changedPages.length);\n}\n\nreturn out;"
+      },
+      "id": "2cf43e75-a605-4a31-8bb7-ee625cbe68c6",
+      "name": "Seitenkontext mit Source ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6608,
+        3792
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Config').first().json;\n\nconst CHUNK_SIZE = Number(\n  cfg.chunkSize || 1600\n);\n\nconst OVERLAP = Number(\n  cfg.chunkOverlap || 200\n);\n\nconst BATCH_SIZE = Number(\n  cfg.embeddingBatchSize || 50\n);\n\nconst FLOW_VERSION = String(\n  cfg.ragFlowVersion ?? ''\n).trim();\n\nconst ALLOWED_AUDIENCES = [\n  'public',\n  'it_internal'\n];\n\nconst ALLOWED_CHUNK_TYPES = [\n  'header',\n  'content'\n];\n\nconst REQUIRED_META = [\n  'source_type',\n  'source_ref',\n  'title',\n  'url',\n  'chunk_type',\n  'updated_at',\n  'content_hash',\n  'rag_flow_version',\n  'audience'\n];\n\nif (!FLOW_VERSION) {\n  throw new Error(\n    'CONFIG_RAG_FLOW_VERSION_MISSING: ' +\n    'Config.ragFlowVersion ist leer.'\n  );\n}\n\nif (\n  !Number.isInteger(BATCH_SIZE) ||\n  BATCH_SIZE < 1 ||\n  BATCH_SIZE > 2048\n) {\n  throw new Error(\n    'INVALID_EMBEDDING_BATCH_SIZE: ' +\n    BATCH_SIZE\n  );\n}\n\nif (\n  !Number.isInteger(CHUNK_SIZE) ||\n  CHUNK_SIZE < 200\n) {\n  throw new Error(\n    'INVALID_CHUNK_SIZE: ' +\n    CHUNK_SIZE\n  );\n}\n\nif (\n  !Number.isInteger(OVERLAP) ||\n  OVERLAP < 0 ||\n  OVERLAP >= CHUNK_SIZE\n) {\n  throw new Error(\n    'INVALID_CHUNK_OVERLAP: ' +\n    OVERLAP\n  );\n}\n\nfunction estimateTokens(text) {\n  return Math.ceil(\n    String(text || '').length / 4\n  );\n}\n\nfunction assertNoParserArtifacts(\n  text,\n  pageId,\n  title\n) {\n  const checks = [\n    {\n      code: 'WIDE_LAYOUT_ARTIFACT',\n      regex:\n        /\\b(?:text\\s+)?wide\\s+\\d+(?:\\s+(?:true|false))?\\b/i\n    },\n    {\n      code: 'LEADING_NONE_ARTIFACT',\n      regex:\n        /^\\s*(?:none|null|undefined)\\b/i\n    },\n    {\n      code: 'CONFLUENCE_PARAMETER_ARTIFACT',\n      regex:\n        /<\\/?ac:(?:parameter|plain-text-body|rich-text-body|structured-macro)\\b/i\n    },\n    {\n      code: 'SHOW_MORE_LINES_ARTIFACT',\n      regex:\n        /(^|\\n)\\s*(?:Weitere Zeilen anzeigen|Show more lines)\\s*(?=\\n|$)/i\n    }\n  ];\n\n  for (const check of checks) {\n    if (check.regex.test(text)) {\n      throw new Error(\n        'CHUNK_BUILD_BLOCKED_BY_PARSER_ARTIFACT: ' +\n        check.code +\n        ', page=' +\n        pageId +\n        ', title=' +\n        title\n      );\n    }\n  }\n}\n\nfunction hardSplit(\n  input,\n  size,\n  overlap\n) {\n  const text = String(input || '');\n  const parts = [];\n\n  let start = 0;\n\n  while (start < text.length) {\n    const idealEnd = Math.min(\n      start + size,\n      text.length\n    );\n\n    let end = idealEnd;\n\n    if (end < text.length) {\n      const window = text.slice(\n        start,\n        idealEnd\n      );\n\n      const minimumPosition =\n        Math.floor(size * 0.6);\n\n      const candidates = [\n        window.lastIndexOf('\\n'),\n        window.lastIndexOf('. '),\n        window.lastIndexOf('! '),\n        window.lastIndexOf('? '),\n        window.lastIndexOf('; '),\n        window.lastIndexOf(', '),\n        window.lastIndexOf(' ')\n      ].filter(\n        position =>\n          position > minimumPosition\n      );\n\n      if (candidates.length > 0) {\n        end =\n          start +\n          Math.max(...candidates) +\n          1;\n      }\n    }\n\n    const piece = text\n      .slice(start, end)\n      .trim();\n\n    if (piece) {\n      parts.push(piece);\n    }\n\n    if (end >= text.length) {\n      break;\n    }\n\n    start = Math.max(\n      start + 1,\n      end - overlap\n    );\n  }\n\n  return parts;\n}\n\nfunction splitToChunks(\n  input,\n  chunkSize,\n  overlap\n) {\n  const normalized = String(\n    input || ''\n  ).trim();\n\n  if (!normalized) {\n    return [];\n  }\n\n  const size = Math.max(\n    200,\n    Number(chunkSize) || 1600\n  );\n\n  const overlapSize = Math.min(\n    Math.max(\n      0,\n      Number(overlap) || 0\n    ),\n    Math.floor(size / 2)\n  );\n\n  const pieces = [];\n\n  /*\n   * Primär anhand von Absätzen aufteilen.\n   */\n  for (\n    const rawParagraph of\n    normalized.split(/\\n\\n+/)\n  ) {\n    const paragraph =\n      rawParagraph.trim();\n\n    if (!paragraph) {\n      continue;\n    }\n\n    if (paragraph.length > size) {\n      pieces.push(\n        ...hardSplit(\n          paragraph,\n          size,\n          overlapSize\n        )\n      );\n    } else {\n      pieces.push(paragraph);\n    }\n  }\n\n  const chunks = [];\n  let current = '';\n\n  for (const piece of pieces) {\n    if (!current) {\n      current = piece;\n      continue;\n    }\n\n    const combined =\n      current +\n      '\\n\\n' +\n      piece;\n\n    if (combined.length <= size) {\n      current = combined;\n      continue;\n    }\n\n    chunks.push(\n      current.trim()\n    );\n\n    const tail =\n      overlapSize > 0\n        ? current.slice(-overlapSize)\n        : '';\n\n    const seeded =\n      tail\n        ? tail + '\\n\\n' + piece\n        : piece;\n\n    current =\n      seeded.length > size\n        ? piece\n        : seeded;\n  }\n\n  if (current.trim()) {\n    chunks.push(\n      current.trim()\n    );\n  }\n\n  /*\n   * Zusätzliche Absicherung gegen zu lange Chunks.\n   */\n  const result = [];\n\n  for (const chunk of chunks) {\n    if (chunk.length > size * 1.2) {\n      result.push(\n        ...hardSplit(\n          chunk,\n          size,\n          overlapSize\n        )\n      );\n    } else {\n      result.push(chunk);\n    }\n  }\n\n  return result.filter(Boolean);\n}\n\nconst allBatches = [];\n\nfor (const item of $input.all()) {\n  const source = item.json;\n\n  if (!source.source_id) {\n    throw new Error(\n      'MISSING_SOURCE_ID: ' +\n      String(source.page_id)\n    );\n  }\n\n  if (!source.page_id) {\n    throw new Error(\n      'MISSING_PAGE_ID_FOR_SOURCE_REF'\n    );\n  }\n\n  const pageAudience =\n    source.page_audience;\n\n  if (\n    !ALLOWED_AUDIENCES.includes(\n      pageAudience\n    )\n  ) {\n    throw new Error(\n      'AUDIENCE_INVALID_FOR_PAGE: ' +\n      String(source.page_id) +\n      ', value=' +\n      String(pageAudience)\n    );\n  }\n\n  const sourceRef =\n    String(source.page_id);\n\n  const cleanedContent =\n    String(\n      source.content_text || ''\n    ).trim();\n\n  /*\n   * Zweite Sicherheitsebene:\n   *\n   * Auch wenn im Normalisierungs-Node ein Fehler entsteht,\n   * dürfen keine verunreinigten Texte eingebettet werden.\n   */\n  assertNoParserArtifacts(\n    cleanedContent,\n    sourceRef,\n    String(source.title || '')\n  );\n\n  const baseMetadata = {\n    source_type: 'confluence',\n    source_ref: sourceRef,\n    title: source.title,\n    url: source.page_url,\n    updated_at:\n      source.confluence_modified_at ||\n      null,\n    content_hash:\n      source.content_hash,\n    rag_flow_version:\n      FLOW_VERSION,\n    parser_version:\n      source.parser_version ||\n      'unknown',\n    audience:\n      pageAudience,\n    page_id:\n      sourceRef,\n    page_url:\n      source.page_url,\n    space_key:\n      source.space_key,\n    version_number:\n      source.version_number ?? null,\n    labels:\n      source.labels || [],\n    created_at:\n      source.confluence_created_at ||\n      null\n  };\n\n  const chunks = [];\n  let chunkIndex = 0;\n\n  /*\n   * Header-Chunk.\n   *\n   * Er sorgt dafür, dass Titel und URL auch bei einer\n   * allgemeineren Vektorsuche gefunden werden.\n   */\n  const headerParts = [];\n\n  headerParts.push(\n    '[CONFLUENCE] ' +\n    source.title\n  );\n\n  headerParts.push(\n    'Space: ' +\n    source.space_key\n  );\n\n  if (\n    Array.isArray(source.labels) &&\n    source.labels.length > 0\n  ) {\n    headerParts.push(\n      'Labels: ' +\n      source.labels.join(', ')\n    );\n  }\n\n  headerParts.push(\n    'URL: ' +\n    source.page_url\n  );\n\n  const header =\n    headerParts.join('\\n');\n\n  chunks.push({\n    source_id:\n      source.source_id,\n    source_type:\n      'confluence',\n    source_ref:\n      sourceRef,\n    audience:\n      pageAudience,\n    chunk_index:\n      chunkIndex++,\n    chunk_text:\n      header,\n    token_count:\n      estimateTokens(header),\n    metadata: {\n      ...baseMetadata,\n      chunk_type: 'header'\n    }\n  });\n\n  /*\n   * Inhalts-Chunks.\n   *\n   * Bei tatsächlich leeren Confluence-Strukturseiten bleibt\n   * ausschließlich der Header-Chunk bestehen.\n   */\n  const contentParts =\n    splitToChunks(\n      cleanedContent,\n      CHUNK_SIZE,\n      OVERLAP\n    );\n\n  for (\n    const contentPart of contentParts\n  ) {\n    const chunkText =\n      source.title +\n      '\\n\\n' +\n      contentPart;\n\n    /*\n     * Jeden einzelnen finalen Chunk noch einmal prüfen.\n     */\n    assertNoParserArtifacts(\n      chunkText,\n      sourceRef,\n      String(source.title || '')\n    );\n\n    chunks.push({\n      source_id:\n        source.source_id,\n      source_type:\n        'confluence',\n      source_ref:\n        sourceRef,\n      audience:\n        pageAudience,\n      chunk_index:\n        chunkIndex++,\n      chunk_text:\n        chunkText,\n      token_count:\n        estimateTokens(chunkText),\n      metadata: {\n        ...baseMetadata,\n        chunk_type: 'content',\n        chunk_length:\n          chunkText.length\n      }\n    });\n  }\n\n  if (chunks.length === 0) {\n    throw new Error(\n      'NO_CHUNKS_CREATED_FOR_PAGE: ' +\n      source.page_id\n    );\n  }\n\n  /*\n   * Metadaten und Chunk-Indizes validieren.\n   */\n  const seenIndexes =\n    new Set();\n\n  for (const chunk of chunks) {\n    const metadata =\n      chunk.metadata;\n\n    for (\n      const requiredKey of REQUIRED_META\n    ) {\n      if (\n        !(requiredKey in metadata)\n      ) {\n        throw new Error(\n          'METADATA_CORE_FIELD_MISSING: ' +\n          requiredKey +\n          ', page=' +\n          sourceRef\n        );\n      }\n    }\n\n    if (\n      metadata.source_ref !==\n      chunk.source_ref\n    ) {\n      throw new Error(\n        'METADATA_SOURCE_REF_MISMATCH: page=' +\n        sourceRef\n      );\n    }\n\n    if (\n      metadata.audience !==\n      chunk.audience\n    ) {\n      throw new Error(\n        'METADATA_AUDIENCE_MISMATCH: page=' +\n        sourceRef\n      );\n    }\n\n    if (\n      !ALLOWED_CHUNK_TYPES.includes(\n        metadata.chunk_type\n      )\n    ) {\n      throw new Error(\n        'METADATA_CHUNK_TYPE_INVALID: page=' +\n        sourceRef +\n        ', value=' +\n        String(metadata.chunk_type)\n      );\n    }\n\n    if (\n      seenIndexes.has(\n        chunk.chunk_index\n      )\n    ) {\n      throw new Error(\n        'DUPLICATE_CHUNK_INDEX: page=' +\n        sourceRef +\n        ', index=' +\n        chunk.chunk_index\n      );\n    }\n\n    seenIndexes.add(\n      chunk.chunk_index\n    );\n  }\n\n  const pageBatchCount =\n    Math.ceil(\n      chunks.length / BATCH_SIZE\n    );\n\n  for (\n    let batchIndex = 0;\n    batchIndex < pageBatchCount;\n    batchIndex++\n  ) {\n    const batchChunks =\n      chunks.slice(\n        batchIndex * BATCH_SIZE,\n        (batchIndex + 1) *\n          BATCH_SIZE\n      );\n\n    const batchTokenEstimate =\n      batchChunks.reduce(\n        (sum, chunk) =>\n          sum +\n          Number(\n            chunk.token_count || 0\n          ),\n        0\n      );\n\n    if (\n      batchTokenEstimate >\n      250000\n    ) {\n      throw new Error(\n        'EMBEDDING_BATCH_TOKEN_GUARD: page=' +\n        source.page_id +\n        ', batch=' +\n        batchIndex +\n        ', estimated=' +\n        batchTokenEstimate\n      );\n    }\n\n    allBatches.push({\n      json: {\n        ...source,\n        batch_index:\n          batchIndex,\n        batch_count:\n          pageBatchCount,\n        page_chunk_count:\n          chunks.length,\n        chunk_count:\n          batchChunks.length,\n        batch_token_estimate:\n          batchTokenEstimate,\n        chunks:\n          batchChunks\n      }\n    });\n  }\n}\n\n/*\n * Globalen Fortschritt ergänzen.\n */\nfor (\n  let index = 0;\n  index < allBatches.length;\n  index++\n) {\n  allBatches[index].json.batch_position =\n    index + 1;\n\n  allBatches[index].json.batch_total =\n    allBatches.length;\n}\n\nreturn allBatches;"
+      },
+      "id": "b904fece-a2bc-4826-aa3a-0263a472742b",
+      "name": "Chunks und Batches bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6912,
+        3792
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const stats = $('Geaenderte Seiten vorbereiten').first().json;\nconst cleanup = $('Geloeschte Seiten ermitteln').first().json;\nconst cfg = $('Config').first().json;\nconst events = $input.all().map(i => i.json || {});\nconst pageDoneEvents = events.filter(e => e.page_completed === true);\nconst chunksWritten = events.reduce((sum, e) => sum + Number(e.chunks_geschrieben || 0), 0);\nconst batchTotal = events.reduce((max, e) => Math.max(max, Number(e.batches_global || 0)), 0);\n\nreturn [{\n  json: {\n    ok: true,\n    status: 'DONE',\n    rag_flow_version: cfg.ragFlowVersion,\n    confluence_seiten_aktuell: cleanup.confluence_pages_current,\n    seiten_gesamt_verarbeitbar: stats.seiten_gesamt,\n    seiten_verarbeitet: pageDoneEvents.length,\n    seiten_uebersprungen: stats.seiten_unveraendert,\n    seiten_geaendert: stats.seiten_geaendert,\n    seiten_geloescht: cleanup.deleted_count,\n    geloeschte_page_ids: cleanup.deleted_page_ids,\n    batches_verarbeitet: events.length,\n    batches_erwartet: batchTotal,\n    chunks_geschrieben: chunksWritten,\n    embedding_model: cfg.embeddingModel,\n    dimensions: cfg.embeddingDimensions,\n    fertig_um: new Date().toISOString(),\n    message: 'Confluence-Ingest inklusive Loeschabgleich erfolgreich abgeschlossen.'\n  }\n}];"
+      },
+      "id": "0df73ef4-7e0a-4776-8cbe-561af296a5d4",
+      "name": "Zusammenfassung",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7584,
+        3584
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "firstBatch",
+              "leftValue": "={{ $json.batch_index }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f775577b-1d0c-4b49-8d6f-42773a0e01f8",
+      "name": "Erster Batch der Seite?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        7584,
+        3792
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.confluence&source_id=eq.{{ $json.source_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "504ded4c-d51d-4328-8b46-8b0ab13bf491",
+      "name": "Alte Chunks vor Neuaufbau loeschen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7952,
+        3664
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const incoming = $input.first()?.json || {};\nconst loopBatch = $('Embedding Batch Loop').first()?.json || {};\n\nconst batch = Array.isArray(incoming.chunks) ? incoming : loopBatch;\n\nif (!batch || !Array.isArray(batch.chunks)) {\n  throw new Error('EMBEDDING_BATCH_CHUNKS_MISSING: page=' + String(batch?.page_id ?? 'unknown') + ', batch=' + String(batch?.batch_index ?? 'unknown'));\n}\n\nif (batch.chunks.length === 0) {\n  throw new Error('EMBEDDING_BATCH_CHUNKS_EMPTY: page=' + String(batch.page_id ?? 'unknown') + ', batch=' + String(batch.batch_index ?? 'unknown'));\n}\n\nfor (let i = 0; i < batch.chunks.length; i++) {\n  const text = batch.chunks[i]?.chunk_text;\n  if (typeof text !== 'string' || text.trim().length === 0) {\n    throw new Error('EMBEDDING_CHUNK_TEXT_INVALID: page=' + String(batch.page_id ?? 'unknown') + ', batch=' + String(batch.batch_index ?? 'unknown') + ', index=' + i);\n  }\n}\n\nreturn [{ json: batch }];"
+      },
+      "id": "b9005422-3038-4cec-b519-a8a02f1c023c",
+      "name": "Embedding Batch Kontext herstellen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8288,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "5564864d-6cbb-4cbe-b2ec-58535ce1c277",
+      "name": "Embedding Batch Loop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        7360,
+        3792
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $input.first().json;\nconst cleanup = $('Geloeschte Seiten ermitteln').first().json;\nconst cfg = $('Config').first().json;\nconst hadDeletes = Number(cleanup.deleted_count || 0) > 0;\n\nreturn [{\n  json: {\n    ok: true,\n    status: hadDeletes ? 'DONE_CLEANUP_ONLY' : 'DONE_NO_CHANGES',\n    rag_flow_version: cfg.ragFlowVersion,\n    confluence_seiten_aktuell: cleanup.confluence_pages_current,\n    seiten_gesamt_verarbeitbar: s.seiten_gesamt,\n    seiten_verarbeitet: 0,\n    seiten_uebersprungen: s.seiten_unveraendert,\n    seiten_geaendert: 0,\n    seiten_geloescht: cleanup.deleted_count,\n    geloeschte_page_ids: cleanup.deleted_page_ids,\n    batches_verarbeitet: 0,\n    chunks_geschrieben: 0,\n    embedding_model: cfg.embeddingModel,\n    dimensions: cfg.embeddingDimensions,\n    fertig_um: new Date().toISOString(),\n    message: hadDeletes\n      ? 'Keine Inhaltsaenderungen. Geloeschte Confluence-Seiten und deren Chunks wurden entfernt.'\n      : 'Keine geaenderten oder geloeschten Confluence-Seiten. Run sauber beendet.'\n  }\n}];"
+      },
+      "id": "28d29df9-4cf7-4c1c-8d98-9b011ef5f187",
+      "name": "Zusammenfassung keine Aenderungen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6320,
+        4080
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $(\"Config\").first().json.embeddingModel, dimensions: $(\"Config\").first().json.embeddingDimensions, encoding_format: \"float\", input: $json.chunks.map(c => c.chunk_text) }) }}",
+        "options": {}
+      },
+      "id": "5e1f9949-5f75-41de-9516-8bc59f2728aa",
+      "name": "OpenAI Embeddings Batch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8480,
+        3808
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const batch = $('Embedding Batch Loop').first().json;\nconst response = $input.first().json;\nconst dimensions = Number($('Config').first().json.embeddingDimensions || 1536);\n\nconst data = response?.data ?? response?.body?.data ?? null;\nif (!Array.isArray(data)) {\n  throw new Error('EMBEDDING_DATA_MISSING: page=' + batch.page_id + ', batch=' + batch.batch_index);\n}\n\nconst ordered = [...data].sort((a, b) => Number(a.index) - Number(b.index));\nif (ordered.length !== batch.chunks.length) {\n  throw new Error('EMBEDDING_COUNT_MISMATCH: expected=' + batch.chunks.length + ', got=' + ordered.length);\n}\n\nconst rows = batch.chunks.map((chunk, index) => {\n  const embedding = ordered[index]?.embedding;\n  if (!Array.isArray(embedding)) {\n    throw new Error('EMBEDDING_MISSING_AT_INDEX: ' + index);\n  }\n  if (embedding.length !== dimensions) {\n    throw new Error('EMBEDDING_DIMENSION_MISMATCH: expected=' + dimensions + ', got=' + embedding.length);\n  }\n\n  return {\n    source_id: chunk.source_id,\n    source_type: chunk.source_type,\n    source_ref: chunk.source_ref,\n    audience: chunk.audience,\n    chunk_index: chunk.chunk_index,\n    chunk_text: chunk.chunk_text,\n    token_count: chunk.token_count,\n    embedding: '[' + embedding.join(',') + ']',\n    metadata: chunk.metadata\n  };\n});\n\nreturn [{\n  json: {\n    ...batch,\n    bulk_rows: rows\n  }\n}];"
+      },
+      "id": "7352739b-4c82-46ee-abfe-ef7c3fff3f41",
+      "name": "Bulk Insert Payload bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8704,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.bulk_rows) }}",
+        "options": {}
+      },
+      "id": "17492fc9-17d9-453d-b5b5-543e1db3ec7f",
+      "name": "Bulk Insert document_chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8928,
+        3808
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const batch = $('Bulk Insert Payload bauen').first().json;\nconst { bulk_rows, chunks, ...rest } = batch;\n\nreturn [{\n  json: {\n    ...rest,\n    is_last_batch: batch.batch_index === (batch.batch_count - 1),\n    chunks_geschrieben: batch.chunk_count,\n    batch_finished_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "ec12f2db-ba37-473a-a1ea-40e316298fbd",
+      "name": "Batch Ergebnis bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9152,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "lastBatch",
+              "leftValue": "={{ $json.is_last_batch }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "37f64fb3-dac8-4893-8b8c-3f3e6f9adb98",
+      "name": "Letzter Batch der Seite?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        9376,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $('Batch Ergebnis bauen').first().json;\n\nreturn [{\n  json: {\n    source_id: b.source_id,\n    page_id: b.page_id,\n    title: b.title,\n    space_key: b.space_key,\n    page_url: b.page_url,\n    content_text: b.content_text,\n    content_hash: b.content_hash,\n    version_number: b.version_number,\n    labels: b.labels || [],\n    page_audience: b.page_audience,\n    confluence_created_at: b.confluence_created_at,\n    confluence_modified_at: b.confluence_modified_at,\n    ingested_at: b.existing_ingested_at ?? new Date().toISOString(),\n    last_ingested_at: new Date().toISOString(),\n    ingestion_version: Number(b.existing_ingestion_version || 0) + 1,\n    page_position: b.page_position,\n    changed_total: b.changed_total,\n    seiten_gesamt: b.seiten_gesamt,\n    seiten_geaendert: b.seiten_geaendert,\n    seiten_unveraendert: b.seiten_unveraendert,\n    batch_position: b.batch_position,\n    batch_total: b.batch_total,\n    batch_index: b.batch_index,\n    batch_count: b.batch_count,\n    chunks_geschrieben: b.chunks_geschrieben,\n    page_chunk_count: b.page_chunk_count\n  }\n}];"
+      },
+      "id": "639ba3b3-712d-4696-affd-7fa5c8cde41a",
+      "name": "Finalisierung bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9600,
+        3792
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/confluence_pages?id=eq.{{ $json.source_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ page_id: $json.page_id, title: $json.title, space_key: $json.space_key, page_url: $json.page_url, content_text: $json.content_text, content_hash: $json.content_hash, version_number: $json.version_number, labels: $json.labels, confluence_created_at: $json.confluence_created_at, confluence_modified_at: $json.confluence_modified_at, ingested_at: $json.ingested_at, last_ingested_at: $json.last_ingested_at, ingestion_version: $json.ingestion_version }) }}",
+        "options": {}
+      },
+      "id": "e6216c09-01f4-429b-ba0b-72a6ce774759",
+      "name": "Confluence Seite finalisieren",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        9824,
+        3792
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "jsCode": "const p = $('Finalisierung bauen').first().json;\nconst cleanup = $('Geloeschte Seiten ermitteln').first().json;\nconst pageProgress = p.changed_total > 0\n  ? Math.round((p.page_position / p.changed_total) * 1000) / 10\n  : 100;\nconst batchProgress = p.batch_total > 0\n  ? Math.round((p.batch_position / p.batch_total) * 1000) / 10\n  : 100;\n\nreturn [{\n  json: {\n    status: 'RUNNING',\n    event: 'PAGE_DONE',\n    seiten_gesamt: p.seiten_gesamt,\n    confluence_seiten_aktuell: cleanup.confluence_pages_current,\n    seiten_geloescht: cleanup.deleted_count,\n    seiten_geaendert: p.seiten_geaendert,\n    seiten_unveraendert: p.seiten_unveraendert,\n    seiten_verarbeitet: p.page_position,\n    seiten_verbleibend: Math.max(0, p.changed_total - p.page_position),\n    seiten_fortschritt_prozent: pageProgress,\n    aktuelle_seite: p.title,\n    aktuelle_page_id: p.page_id,\n    aktuelle_audience: p.page_audience,\n    seite_position: p.page_position,\n    seiten_zu_verarbeiten: p.changed_total,\n    batch_global: p.batch_position,\n    batches_global: p.batch_total,\n    batch_fortschritt_prozent: batchProgress,\n    chunks_geschrieben: p.chunks_geschrieben,\n    page_chunk_count: p.page_chunk_count,\n    page_completed: true,\n    zeit: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "6b0593ad-3273-4676-bca8-0c7ffb457847",
+      "name": "STATUS Seite fertig",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10048,
+        3792
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.first().json;\nconst cleanup = $('Geloeschte Seiten ermitteln').first().json;\nconst completedPages = Math.max(0, Number(b.page_position || 1) - 1);\nconst batchProgress = b.batch_total > 0\n  ? Math.round((b.batch_position / b.batch_total) * 1000) / 10\n  : 100;\n\nreturn [{\n  json: {\n    status: 'RUNNING',\n    event: 'BATCH_OK',\n    seiten_gesamt: b.seiten_gesamt,\n    confluence_seiten_aktuell: cleanup.confluence_pages_current,\n    seiten_geloescht: cleanup.deleted_count,\n    seiten_geaendert: b.seiten_geaendert,\n    seiten_unveraendert: b.seiten_unveraendert,\n    seiten_verarbeitet: completedPages,\n    seiten_verbleibend: Math.max(0, b.changed_total - completedPages),\n    aktuelle_seite: b.title,\n    aktuelle_page_id: b.page_id,\n    aktuelle_audience: b.page_audience,\n    seite_position: b.page_position,\n    seiten_zu_verarbeiten: b.changed_total,\n    batch_seite: b.batch_index + 1,\n    batches_seite: b.batch_count,\n    batch_global: b.batch_position,\n    batches_global: b.batch_total,\n    batch_fortschritt_prozent: batchProgress,\n    chunks_geschrieben: b.chunks_geschrieben,\n    page_completed: false,\n    zeit: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "421c11a1-676f-43ab-984d-b4a59f6620c0",
+      "name": "STATUS Batch verarbeitet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9616,
+        4000
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Confluence-Ingest DokuHub\n\n**Versionierung:** Die Version steht ausschliesslich im Workflow-Namen und im Config-Feld `ragFlowVersion`. Sonst nirgends. Kein Code-Fallback, keine Versionsnamen in Nodes, keine Versionstabelle und keine Scripte in Supabase. Neue Version: Workflow duplizieren, Namen und `ragFlowVersion` anpassen, sonst nichts.\n\n**audience** ist die einzige Berechtigungsquelle im System und wird ausschliesslich aus `confluence_pages.audience` gelesen.\n- Bestehende Seite: der DB-Wert wird gelesen und beim Upsert unveraendert zurueckgeschrieben.\n- Neue Seite: der Flow schreibt zur Laufzeit `Config.newPageAudience` und ueberschreibt damit den Spalten-Default `public`.\n- `Seitenkontext mit Source ID` liest die audience aus der Upsert-Response (return=representation) und bricht ab, wenn sie fehlt oder ungueltig ist.\n- `Confluence Seite finalisieren` (PATCH) schreibt audience NICHT. Eine manuelle Umklassifizierung in der DB ueberlebt jeden Folgelauf.\n\n**source_ref** = `page_id`, niemals der Titel. Identisch zur Spalte und zu `metadata.source_ref`.\n\n**Metadaten-Pflichtkern**, vor jedem Embedding validiert: source_type, source_ref, title, url, chunk_type, updated_at, content_hash, rag_flow_version, audience. Zusaetzlich geprueft: metadata.source_ref === Spalte source_ref, metadata.audience === Spalte audience, chunk_type in (header, content), keine doppelten chunk_index je Seite.\n\n**Wegen `unique_chunk_per_source (source_id, chunk_index)`:** Alte Chunks werden erst unmittelbar vor dem ersten Embedding-Batch genau dieser Seite geloescht. Scheitert ein Run, betrifft der Datenverlust nur die gerade bearbeitete Seite; ihr alter content_hash bleibt stehen und sie wird im naechsten Lauf automatisch neu gebaut.\n\n**Delete-Sync-Guards:** 0 aktuelle Confluence-Seiten bei vorhandenem Supabase-Bestand => Abbruch. Ab 20 bestehenden Seiten mehr als 35% fehlend => Abbruch.\n\n**Nach dem Import setzen:** executionTimeout = 3600, Save execution progress, Credentials an allen HTTP-Nodes. Keine zwei Runs parallel.",
+        "height": 1268,
+        "width": 812,
+        "color": 4
+      },
+      "id": "f6fada1d-aad9-4738-a276-d48f33834483",
+      "name": "Sticky Note 4d8d6fa3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3264,
+        3136
+      ]
+    },
+    {
+      "id": "24c694ee-c53a-40a4-b3ab-648884ceefed",
+      "name": "Aufruf aus Steuerung",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        4272,
+        3856
+      ],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "spaceKey",
+              "type": "string"
+            },
+            {
+              "name": "newPageAudience",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "notes": "Einstieg fuer RWG Steuerung - Confluence Bereiche. Uebergibt spaceKey und newPageAudience je Bereich."
+    }
+  ],
+  "nodeGroups": [],
+  "description": "Confluence-Ingest DokuHub. Version ausschliesslich im Workflow-Namen und im Config-Feld ragFlowVersion. audience kommt nur aus confluence_pages.audience; neue Seiten werden zur Laufzeit auf Config.newPageAudience gesetzt. source_ref = page_id. Metadaten-P"
+}

@@ -83,6 +83,16 @@ Der n8n-Server läuft auf **UTC**. Ohne ausdrückliche Angabe würde `30 3 * * *
 
 Data Table `sharepoint_delta` (`RbdhNeubkrmgZkOC`), eine Zeile je Bibliothek. Der Anker rückt **nur vor, wenn tatsächlich verarbeitet wurde** — ein Trockenlauf lässt ihn stehen, sonst gingen ungelesene Änderungen verloren.
 
+## Ein gescheitertes Bild beendet den Lauf nicht
+
+Große PDFs bringen hunderte Bilder mit, die einzeln in den Speicher-Bucket wandern. Ein einziger Netzabbruch dabei hat den **gesamten nächtlichen Abgleich** mitgerissen — inklusive aller Dateien, die noch drankommen sollten.
+
+`Upload Extracted Image To Supabase` läuft deshalb bei Fehler weiter, statt abzubrechen, und wiederholt fünfmal im Abstand von fünf Sekunden. `Build Uploaded Image Metadata` sortiert die gescheiterten Zeilen aus — sonst stünde im Chunk ein Speicherpfad, unter dem nichts liegt. Zugeordnet wird über den Index, deshalb wird erst abgebildet und dann gefiltert.
+
+Scheitern **alle** Bilder eines Dokuments, liefert `Collect Uploaded Images` dank `alwaysOutputData` trotzdem ein Item. `Build All SharePoint Chunk Rows` behandelt einen fehlenden Bildsatz als leere Liste — das Dokument bekommt seinen Text und seine Chunks, nur ohne Bilder.
+
+**Der Preis:** Ein verlorenes Bild fällt nicht auf. Es gibt keine Meldung, nur eine kürzere Bildliste am Dokument. Das ist bewusst so — ein durchgelaufener Abgleich mit einem fehlenden Bild ist mehr wert als ein abgebrochener mit vollständigen Bildern.
+
 ## Zwei Fallstricke, die hier zuschlugen
 
 **Der Ingest verarbeitet je Aufruf genau ein Dokument.** Er liest seine Eingabe mit `$input.first()`. Zehn Aufträge in einem Aufruf werden zu einem, der Rest fällt lautlos weg. Deshalb die Schleife mit `batchSize: 1`.

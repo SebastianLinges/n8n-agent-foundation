@@ -2,12 +2,6 @@
   "id": "BWswB3XA8S2gMwoT",
   "name": "RWG Teams Agent",
   "active": true,
-  "isArchived": false,
-  "versionId": "69cc7603-1cec-40ab-ab55-5037f6c1bed7",
-  "activeVersionId": "69cc7603-1cec-40ab-ab55-5037f6c1bed7",
-  "triggerCount": 1,
-  "createdAt": "2026-08-14T23:02:00.796Z",
-  "updatedAt": "2026-08-28T13:03:34.978Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -1491,32 +1485,5 @@
     }
   ],
   "nodeGroups": [],
-  "tags": [],
-  "meta": {
-    "aiBuilderAssisted": true,
-    "builderVariant": "mcp",
-    "templateCredsSetupCompleted": true
-  },
-  "parentFolderId": null,
-  "description": "IT-Assistent im Microsoft-Teams-Chat. Identitaet und Sichtbarkeit aus dem Graph-Profil, sechs Werkzeuge fuer Wissen, Tickets und Herstellerrecherche. Audience-Gate in den Sub-Workflows, nie im Modell. Duplikatschutz ueber Claim, Verlauf je Chat.",
-  "scopes": [
-    "execution:reveal",
-    "workflow:create",
-    "workflow:delete",
-    "workflow:disableRedaction",
-    "workflow:enableRedaction",
-    "workflow:execute",
-    "workflow:execute-chat",
-    "workflow:export",
-    "workflow:import",
-    "workflow:list",
-    "workflow:move",
-    "workflow:publish",
-    "workflow:read",
-    "workflow:share",
-    "workflow:unpublish",
-    "workflow:unshare",
-    "workflow:update"
-  ],
-  "canExecute": true
+  "description": "IT-Assistent im Microsoft-Teams-Chat. Identitaet und Sichtbarkeit aus dem Graph-Profil, sechs Werkzeuge fuer Wissen, Tickets und Herstellerrecherche. Audience-Gate in den Sub-Workflows, nie im Modell. Duplikatschutz ueber Claim, Verlauf je Chat."
 }

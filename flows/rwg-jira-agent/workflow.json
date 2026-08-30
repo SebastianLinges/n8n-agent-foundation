@@ -2,12 +2,6 @@
   "id": "QXCWIsTzDEmfwPwK",
   "name": "RWG_Jira-Agent",
   "active": true,
-  "isArchived": false,
-  "versionId": "9bfeb465-1df5-4396-826a-1e361c1d12d6",
-  "activeVersionId": "9bfeb465-1df5-4396-826a-1e361c1d12d6",
-  "triggerCount": 1,
-  "createdAt": "2026-07-19T13:13:30.872Z",
-  "updatedAt": "2026-08-28T12:59:27.460Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -2429,7 +2423,7 @@
     },
     {
       "parameters": {
-        "content": "## 5 Policy, Feldpflege und Routing\n\nDie Policy bewertet die Ticketlage und liefert vier Betriebssignale: scope, businessImpact, businessProcess, securityRisk. Sie sieht dabei die bisherige Ticketkommunikation und prueft vor jeder Rueckfrage, ob die Antwort bereits im Ticket steht.\n\nDie Ausgabe ist dreifach abgesichert. Das **Policy-Modell** laeuft ueber die Responses-API mit textFormat json_object - ungueltiges JSON ist damit auf API-Ebene ausgeschlossen. Weicht die Struktur ab, befragt **Policy-Schema** per autoFix das Modell mit der Fehlermeldung erneut, statt den Lauf zu beenden. Der Parameter temperature darf hier nicht stehen: Die GPT-5-Generation lehnt ihn ab, und die Policy wird dann gar nicht erst befragt.\n\nScheitert sie trotzdem, fuehren zwei Wege auf **Lauf als fehlgeschlagen vermerken** - der Fehlerausgang der Chain fuer Fehler im Node selbst, und **Policy geliefert?** fuer Fehler in den Sub-Nodes. Der zweite ist der wichtigere: Faellt Modell oder Parser aus, reicht die Chain die Eingangsdaten ohne output-Feld durch, und der Lauf gilt als erfolgreich, obwohl nichts entschieden wurde. Der Vorgang wird auf failed gesetzt und traegt den Fehlertext, damit die Claim-Query ihn erneut beanspruchen kann.\n\n**Feldpflege aufrufen** uebergibt issueKey und die vier Signale an den Subflow RWG_Jira-Feldpflege. Der ist der alleinige Schreiber auf den Jira-Feldern Prioritaet und Support-Level. Weil die Signale mitkommen und ein frisch angelegtes Ticket keine neue Evidenz hat, faellt dort bei der Erstbewertung kein Modellaufruf an. Faellt der Subflow aus, laeuft der Agent weiter, die Felder bleiben unangetastet und der Grund steht in feldpflegeFehler.\n\n**Routing und Prioritaet ableiten** entscheidet das Routing nach SOLVE, ASK, IT_ACTION oder NEEDS_REVIEW, sanitisiert die Rueckfragen und uebernimmt die Prioritaet aus dem Subflow in den Ausgabe-Vertrag. Die Fragenpruefung existiert nur hier, an genau einer Stelle.\n\n**Entscheidung routen** verteilt auf die drei Ausgabewege: Anwenderloesung, Anwenderrueckfrage oder interner IT-Hinweis.",
+        "content": "## 5 Policy, Feldpflege und Routing\n\nDie Policy bewertet die Ticketlage und liefert vier Betriebssignale: scope, businessImpact, businessProcess, securityRisk. Sie sieht dabei die bisherige Ticketkommunikation und prueft vor jeder Rueckfrage, ob die Antwort bereits im Ticket steht.\n\nDie Ausgabe ist dreifach abgesichert. Das **Policy-Modell** laeuft ueber die Responses-API mit textFormat json_schema und strict. Die API erzwingt damit nicht nur gueltiges JSON, sondern die vollstaendige Form samt Wertelisten - fehlende Felder, falsche Typen und unbekannte Enum-Werte sind ausgeschlossen. Zwei Regeln gelten dabei:\n\n- Das Schema muss als JSON-String uebergeben werden. Als Objekt meldet der Node zur Laufzeit \"Failed to parse schema\", und die Policy wird gar nicht erst befragt.\n- Der Strict-Modus kennt kein minItems. Die Mindestlaenge von anliegen steht deshalb nur im Parser, nicht im API-Schema.\n\nDie Wertelisten im Schema sind gegen **Routing und Prioritaet ableiten** abgeglichen und muessen es bleiben: nextAction, selfServiceCategory, scope, businessImpact und businessProcess stehen dort als Whitelist. Weicht das Schema ab, erzwingt die API einen Wert, den das Routing verwirft.\n\nDer Parser **Policy-Schema** prueft danach ein zweites Mal und befragt per autoFix nach, falls doch etwas abweicht. Der Parameter temperature darf am Modell nicht stehen: Die GPT-5-Generation lehnt ihn ab, und die Policy wird dann gar nicht erst befragt.\n\nScheitert sie trotzdem, fuehren zwei Wege auf **Lauf als fehlgeschlagen vermerken** - der Fehlerausgang der Chain fuer Fehler im Node selbst, und **Policy geliefert?** fuer Fehler in den Sub-Nodes. Der zweite ist der wichtigere: Faellt Modell oder Parser aus, reicht die Chain die Eingangsdaten ohne output-Feld durch, und der Lauf gilt als erfolgreich, obwohl nichts entschieden wurde. Der Vorgang wird auf failed gesetzt und traegt den Fehlertext, damit die Claim-Query ihn erneut beanspruchen kann.\n\n**Feldpflege aufrufen** uebergibt issueKey und die vier Signale an den Subflow RWG_Jira-Feldpflege. Der ist der alleinige Schreiber auf den Jira-Feldern Prioritaet und Support-Level. Weil die Signale mitkommen und ein frisch angelegtes Ticket keine neue Evidenz hat, faellt dort bei der Erstbewertung kein Modellaufruf an. Faellt der Subflow aus, laeuft der Agent weiter, die Felder bleiben unangetastet und der Grund steht in feldpflegeFehler.\n\n**Routing und Prioritaet ableiten** entscheidet das Routing nach SOLVE, ASK, IT_ACTION oder NEEDS_REVIEW, sanitisiert die Rueckfragen und uebernimmt die Prioritaet aus dem Subflow in den Ausgabe-Vertrag. Die Fragenpruefung existiert nur hier, an genau einer Stelle.\n\n**Entscheidung routen** verteilt auf die drei Ausgabewege: Anwenderloesung, Anwenderrueckfrage oder interner IT-Hinweis.",
         "height": 1360,
         "width": 2140,
         "color": 6
@@ -2804,32 +2798,5 @@
     }
   ],
   "nodeGroups": [],
-  "tags": [],
-  "meta": {
-    "aiBuilderAssisted": true,
-    "builderVariant": "mcp",
-    "templateCredsSetupCompleted": true
-  },
-  "parentFolderId": null,
-  "description": "Beantwortet neu angelegte SSD-Tickets. Maschinenticket-Filter, Recherchepflicht ueber semantische Suche, Volltextsuche und Herstellerrecherche, Public-Retrieval mit Evidenzschranke, Redundanzpruefung der Rueckfragen. Je Ticket eine Aktion.",
-  "scopes": [
-    "execution:reveal",
-    "workflow:create",
-    "workflow:delete",
-    "workflow:disableRedaction",
-    "workflow:enableRedaction",
-    "workflow:execute",
-    "workflow:execute-chat",
-    "workflow:export",
-    "workflow:import",
-    "workflow:list",
-    "workflow:move",
-    "workflow:publish",
-    "workflow:read",
-    "workflow:share",
-    "workflow:unpublish",
-    "workflow:unshare",
-    "workflow:update"
-  ],
-  "canExecute": true
+  "description": "Beantwortet neu angelegte SSD-Tickets. Maschinenticket-Filter, Recherchepflicht ueber semantische Suche, Volltextsuche und Herstellerrecherche, Public-Retrieval mit Evidenzschranke, Redundanzpruefung der Rueckfragen. Je Ticket eine Aktion."
 }
