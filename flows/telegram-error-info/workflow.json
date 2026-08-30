@@ -1,0 +1,84 @@
+{
+  "id": "pMGm0LaxRTldvPKEkmkzC",
+  "name": "Telegram_Error_Info",
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none"
+  },
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fehler einordnen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fehler einordnen": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "6341837340",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "353c5dea-786e-47c0-9ab4-17f60097c355",
+      "name": "Send a text message",
+      "webhookId": "00c6aa23-90ea-436c-99fb-b3b2950cf1d3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        128,
+        0
+      ],
+      "id": "98038fe5-63f6-4d92-8ec2-c115b3f026ec",
+      "name": "Error Trigger"
+    },
+    {
+      "id": "ea824dd2-3aa8-42ac-a315-4a56700493f0",
+      "name": "Fehler einordnen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Baut aus dem Fehlerobjekt eine kurze, lesbare Meldung.\n//\n// Bewusst NICHT verwendet: error.context, error.stack und\n// error.description. Die tragen bei HTTP-Fehlern den kompletten Request\n// samt apikey und Authorization im Klartext und sprengen jede Nachricht.\n//\n// Die Felder sind je nach Fehlerart verschieden: Bei einem HTTP-Fehler\n// gibt es node, httpCode und name, beim Task-Timeout keines davon.\n// Verlaesslich sind nur message, lastNodeExecuted und url - alles\n// andere wird deshalb abgesichert gelesen.\n\nconst NL = String.fromCharCode(10);\nconst j = $input.first().json || {};\nconst ex = j.execution || {};\nconst wf = j.workflow || {};\nconst err = ex.error || {};\n\nfunction text(v) {\n  return String(v === null || v === undefined ? '' : v).trim();\n}\n\nconst meldung = text(err.message) || 'Keine Meldung uebermittelt';\nconst code = text(err.httpCode);\nconst art = text(err.name);\nconst node = text(err.node && err.node.name);\nconst zuletzt = text(ex.lastNodeExecuted);\nconst m = meldung.toLowerCase();\n\n// --- Einordnung: die spezifischste Regel zuerst ----------------------\nlet kennung = 'DATEN';\n\nif (m.indexOf('task execution timed out') !== -1) {\n  kennung = 'ZEITGRENZE';\n} else if (m.indexOf('credential') !== -1 && m.indexOf('does not exist') !== -1) {\n  kennung = 'ZUGANG';\n} else if (code === '401' || code === '403') {\n  kennung = 'ZUGANG';\n} else if (code === 'ECONNRESET' || code === 'ETIMEDOUT' || code === 'ECONNREFUSED' || code === 'ENOTFOUND' || code === 'EAI_AGAIN' || code === 'EPIPE') {\n  kennung = 'DIENST';\n} else if (Number(code) >= 500) {\n  kennung = 'DIENST';\n} else if (Number(code) >= 400) {\n  kennung = 'ANFRAGE';\n}\n\nconst zeilen = [];\nzeilen.push('[' + kennung + '] ' + (text(wf.name) || 'Unbekannter Workflow'));\nzeilen.push('');\n\nif (node) {\n  zeilen.push('Node:    ' + node);\n} else if (zuletzt) {\n  zeilen.push('Node:    nicht benannt, zuletzt erfolgreich: ' + zuletzt);\n} else {\n  zeilen.push('Node:    nicht benannt');\n}\n\nif (code) {\n  zeilen.push('Code:    ' + code + (art ? ' / ' + art : ''));\n} else if (art) {\n  zeilen.push('Art:     ' + art);\n}\n\n// Auf 300 Zeichen begrenzt - laengere Meldungen tragen keine\n// zusaetzliche Information, nur Stapelspuren.\nzeilen.push('Info:    ' + meldung.slice(0, 300));\n\nif (node && zuletzt && node !== zuletzt) {\n  zeilen.push('Zuletzt: ' + zuletzt);\n}\n\nzeilen.push('Lauf:    ' + text(ex.id) + (ex.mode ? ' (' + text(ex.mode) + ')' : ''));\n\nif (ex.url) {\n  zeilen.push(text(ex.url));\n}\n\nreturn [{\n  json: {\n    kennung: kennung,\n    node: node || zuletzt || '',\n    code: code,\n    workflow: text(wf.name),\n    lauf: text(ex.id),\n    text: zeilen.join(NL)\n  }\n}];"
+      }
+    }
+  ],
+  "nodeGroups": []
+}
