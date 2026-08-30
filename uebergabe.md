@@ -72,19 +72,20 @@ Dazu der Bucket `rag` mit 7 384 Bildern (452 MB). Gelesen wird über `RWG Sub - 
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten. Das ist die einzige terminlich gebundene Aufgabe.
-2. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten.
+1. **Zwei Ingest-Flows publizieren — der Jira-Ingest ist kaputt.** Mit dem gelöschten Supabase-Projekt verschwand dessen Zugang `11jCRVtytAyrsu96`. `RAG-JIRA-Ingest` hing noch daran und scheitert seit dem 30.08., 15:05 bei jedem Webhook. Der Fix liegt als Entwurf auf 21 Nodes bereit; `RAG - SharePoint Ingest` hat dasselbe Problem auf 17 Nodes, dort nur noch nicht sichtbar. **Beides greift erst mit dem Publizieren.** Prüfen, ob Sebastian das inzwischen getan hat — sonst danach fragen.
+2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
+3. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten.
 
 ## Offene Themen
 
 Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
 
 **Wartet auf Sebastian**
-- Power-Automate-Flow des RAG-Ingests entfernen (außerhalb von n8n, Ziel `.../webhook/8e16e07b-…`). Der zweite, `RWG_n8n_Trigg`, ist bereits gelöscht.
-- Vier leere Ordner in Shared Documents: löschen oder behalten?
-- 23 Formatpaare und 5 unklare Doubletten — fachlich zu entscheiden
+- **Die beiden Ingest-Entwürfe publizieren** — solange das nicht geschieht, bleibt der Jira-Ingest kaputt
 - Beitragsprüfung im Content Studio testen (erzeugt echte Artefakte)
-- Use Cases für Handwerk und CAD/PDM: Zuarbeit nötig
+- Handwerks-Use-Cases: der Scout kann sie nicht aus Branchennachrichten erfinden — Quellen ergänzen oder von Hand setzen
+- Drei Tabellen ohne Schreiber (`agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`): wiederbeleben oder entfernen
+- 27 inhaltsgleiche Kopien und 63 namensgleiche in SharePoint — bereinigen oder vom Ingest überspringen lassen
 
 **Das größte offene Vorhaben: Contract Loader zu Ende belegen**
 
@@ -97,11 +98,10 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 **Zum Abarbeiten ab dem 01.09.:** Lauf anstoßen, Extraktion an den beiden liegengebliebenen Dokumenten prüfen, publizieren, danach Export ins Git.
 
 **Technisch offen**
-- Erstbefüllung läuft: rund 458 SharePoint-Dateien fehlen, 30 je Nacht
-- Drei Tabellen ohne bekannten Schreiber: `agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`
+- Erstbefüllung: 472 Dateien nach Dublettenabzug, 30 je Nacht — rund sechzehn Nächte
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
-- Tabellendaten abfragbar machen: Vektorsuche findet, sie rechnet nicht. Eigenes Vorhaben.
+- Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Plan und Kosten stehen in `offene-punkte.md`, nicht unaufgefordert weiterbauen.
 
 ## Was im Repo liegt
 
