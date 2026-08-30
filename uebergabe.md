@@ -48,6 +48,7 @@ Nicht aufwerfen, das ist geklärt:
 - **Der Supabase-MCP-Zugang liest nur.** `execute_sql` scheitert bei jedem Schreibversuch mit `cannot execute DROP TABLE in a read-only transaction`. DDL geht ausschliesslich ueber `apply_migration`.
 - **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern** — auch in Zeichenketten und **in Kommentaren**. Ein `$1` in einem Kommentar bricht die Abfrage mit `out of range`; ein `$` ohne Ziffer wird still verschluckt (ein Zeilenende-Anker in einem regulären Ausdruck verschwand samt Anführungszeichen). Platzhalter zur Laufzeit aus `chr(36)` bauen, Daten immer über `queryReplacement` binden.
 - **Ein Node ohne Ausgabeitems stoppt seinen Zweig.** Ein PostgREST-`DELETE` oder `PATCH` ohne Treffer liefert mit `Prefer: return=representation` ein leeres Array — n8n macht daraus null Items, und alles Nachfolgende läuft nicht mehr. In einer Schleife bleibt der Rest der Aufgaben liegen, und der Lauf gilt trotzdem als erfolgreich. Gegenmittel ist `alwaysOutputData` am betroffenen Node — aber nur, wenn die nachgelagerten Nodes aus **benannten Vorgängern** lesen. Hängt dahinter ein Aggregate-Node oder etwas, das Items zählt, verfälscht das eingefügte Leer-Item die Zahl.
+- **Ein Code-Node darf höchstens 300 Sekunden laufen.** Der Task-Runner bricht ihn dann mit `Task execution timed out after 300 seconds` ab und reisst den ganzen Lauf mit — unabhängig vom Workflow-Timeout. In einer Schleife über viele Dokumente ist das die eigentliche Obergrenze, nicht die Stunde in den Workflow-Einstellungen.
 - **Der Graph-Delta-Abruf liefert Einträge mehrfach.** Ein Item, das sich mehrmals geändert hat, kommt mehrfach zurück. Ungefiltert zählt man die Ordner fast doppelt — gemessen 1 876 gelieferte Zeilen gegen 1 650 verschiedene Item-IDs. Immer über die Item-ID entdoppeln.
 - **Ein abgebrochener Lauf friert den Delta-Anker ein.** Wird der Anker erst am Ende der Schleife geschrieben, schreibt ihn ein vorzeitiger Abbruch nie fort. Der nächste Lauf liest dasselbe Fenster erneut — tagelang, ohne dass etwas auffällt, weil jeder Lauf grün ist.
 - **`queryBatching: single` verfälscht SQL**, wenn mehrere Anweisungen zusammengefasst werden. Immer `independently`.
@@ -76,7 +77,12 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Den Abgleich `110900` auswerten.** Er startete am 30.08. um 18:15 als Testlauf unter Beobachtung und lief beim Sitzungsende gegen 18:40 noch. Der Timeout steht auf einer Stunde, die Frist lief also bis 19:15. Er hat nachweislich gearbeitet: SharePoint-Chunks stiegen währenddessen von 7 267 auf 7 287. **Drei Fragen beantwortet er auf einen Schlag:** ob die sieben bildreichen `.docx` endlich Chunks bekommen, ob der Sperrdatei-Filter greift, und ob er im Timeout endete. Ist er gescheitert, steht die Ursache in der Ausführung des Fehler-Workflows `pMGm0LaxRTldvPKEkmkzC`, nicht in seiner eigenen.
+1. **Der Abgleich vom 30.08. ist gescheitert — die 300-Sekunden-Grenze ist der neue Engpass.** Lauf `110900` startete um 18:15 und starb nach 31 Minuten mit `Task execution timed out after 300 seconds`. Das ist die Grenze des n8n-Task-Runners für **einen einzelnen Code-Node**, nicht der Workflow-Timeout von 3 600 s. Welcher Node es war, ist offen — die Ausführung selbst ist wegen der Bildlast per MCP nicht abrufbar, die Meldung stammt aus Lauf `110911` des Fehler-Workflows.
+
+   **Der Lauf hat vorher gearbeitet und dabei Schaden angerichtet:** Chunks 7 267 → 7 287, Dokumente 266 → 288, 30 Aufgaben angefasst (das ist `maxJeLauf`). Weil der Dokumenteintrag **vor** den Chunks geschrieben wird, blieben 21 neue Einträge ohne Chunks stehen — die Zählung stieg von 14 auf **35**. `ingestion_errors` blieb dabei auf 0.
+
+   **Zu entscheiden:** `maxJeLauf` von 30 senken, damit die Schleife die Grenze nicht reisst — oder den langlaufenden Code-Node finden und teilen. Solange das offen ist, vergrössert jeder Abgleich den Rückstand an unvollständigen Einträgen, statt ihn abzubauen.
+
 2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
 
@@ -105,7 +111,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 
 **Technisch offen**
 - Erstbefüllung: **432** Dateien einzulesen, 30 je Nacht — etwa fünfzehn Nächte
-- **14 Dokumente ohne Chunks.** Ursache geklärt: Der Abgleich vom 30.08. starb beim Bildupload gegen das alte Projekt. Sieben davon sind bildreiche `.docx`, die der nächste erfolgreiche Abgleich nachziehen sollte; sieben sind nie fertiggestellte Regaletiketten-PDFs.
+- **35 Dokumente ohne Chunks**, Tendenz steigend. 14 stammen aus dem Fehllauf vom 29./30.08., 21 kamen am Abend des 30.08. dazu, als der Abgleich an der 300-Sekunden-Grenze starb. Solange die Grenze nicht entschärft ist, wächst die Zahl mit jedem Abgleich.
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
