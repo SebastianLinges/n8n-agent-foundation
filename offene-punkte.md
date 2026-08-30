@@ -26,7 +26,7 @@ Zu belegen: `qa_passed`, die Zahl der Befunde, und dass bei einer Ablehnung **ke
 
 
 ### Contract Loader publizieren - wartet auf Mistral-Token
-**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 25 Nodes statt 36. Aufbau und Entscheidungen: [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
+**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 30 Nodes statt 36. Aufbau und Entscheidungen: [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
 
 Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen, Mistral-Upload, signierte URL, OCR und das Sichern des OCR-Textes. Beide Dokumente vollstaendig gelesen - 46 Seiten mit 20630 Woertern und 1 Seite mit 190 Woertern.
 

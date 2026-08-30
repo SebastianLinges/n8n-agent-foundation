@@ -79,7 +79,7 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 
 **Das größte offene Vorhaben: Contract Loader zu Ende belegen**
 
-`RWG Contract Loader` (`661BDwEditNicEc0`) ist umgebaut: 25 Nodes statt 36, liest aus SharePoint `/IMPORTER/CONTRACT`, schreibt nach `public.vertraege`, legt die Datei nach `DONE` und erzeugt die Excel-Übersicht neu. Aufbau, Entscheidungen und Fallstricke: [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
+`RWG Contract Loader` (`661BDwEditNicEc0`) ist umgebaut: 30 Nodes statt 36, liest aus SharePoint `/IMPORTER/CONTRACT`, schreibt nach `public.vertraege`, legt die Datei nach `DONE` und erzeugt die Excel-Übersicht neu. Aufbau, Entscheidungen und Fallstricke: [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
 
 **Der Umbau ist unveröffentlichter Entwurf.** Die alte Fassung ist noch die aktive.
 
