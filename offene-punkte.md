@@ -8,15 +8,6 @@ Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes
 
 Was daraus offen blieb:
 
-- **Drei Tabellen ohne bekannten Schreiber - Herkunft inzwischen erkennbar.** Sie liegen im Projekt `zckaxkpycyyxaymmkmvu`, Schema `public`:
-
-  | Tabelle | Zeilen | Geschrieben | Was drinsteht |
-  |---|---|---|---|
-  | `agent_ticket_dialogs` | 2 | 15.07.2026 | Dialogstand eines Jira-Ticket-Agenten: `agent_key`, `conversation_id`, `draft`, `missing_fields`, `jira_ticket_key` |
-  | `documentation_findings` | 10 | 13.-16.08.2026 | Abweichungen zwischen Jira und Confluence, etwa `confluence_outdated` oder `jira_maybe_done`, mit Quelle A gegen Quelle B und Empfehlung |
-  | `documentation_review_state` | 17 | 13.-16.08.2026 | Pruefstand je Quelle: wann zuletzt gesehen, wann zuletzt geprueft, `review_status` |
-
-  Erkennbar ein Vorhaben, das Jira und Confluence auf widerspruechliche Dokumentation abgleicht. Es lief an drei Tagen im August und seither nicht mehr - kein Flow der Instanz schreibt dort hinein. Zu entscheiden: wiederbeleben oder entfernen. Bei 29 Zeilen ist der Datenverlust ueberschaubar, die Idee dahinter aber moeglicherweise nicht.
 - **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geaendert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile - semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent, falls es sauber sein soll.
 
 

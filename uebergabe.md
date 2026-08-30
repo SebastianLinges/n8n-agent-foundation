@@ -45,6 +45,7 @@ Nicht aufwerfen, das ist geklärt:
 - **PostgREST liefert höchstens 1000 Zeilen je Anfrage.** Ein `limit` im Querystring hebt das nicht auf.
 - **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** In einer Schleife über viele Dokumente reißt ein einzelner Netzabbruch alles Übrige mit.
 - **n8n legt bei HTTP-Fehlern das komplette Request-Objekt in den Ausführungsdaten ab**, samt `apikey` und `Authorization` im Klartext.
+- **Der Supabase-MCP-Zugang liest nur.** `execute_sql` scheitert bei jedem Schreibversuch mit `cannot execute DROP TABLE in a read-only transaction`. DDL geht ausschliesslich ueber `apply_migration`.
 - **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern** — auch in Zeichenketten und **in Kommentaren**. Ein `$1` in einem Kommentar bricht die Abfrage mit `out of range`; ein `$` ohne Ziffer wird still verschluckt (ein Zeilenende-Anker in einem regulären Ausdruck verschwand samt Anführungszeichen). Platzhalter zur Laufzeit aus `chr(36)` bauen, Daten immer über `queryReplacement` binden.
 - **Ein Node ohne Ausgabeitems stoppt seinen Zweig.** Ein PostgREST-`DELETE` oder `PATCH` ohne Treffer liefert mit `Prefer: return=representation` ein leeres Array — n8n macht daraus null Items, und alles Nachfolgende läuft nicht mehr. In einer Schleife bleibt der Rest der Aufgaben liegen, und der Lauf gilt trotzdem als erfolgreich. Gegenmittel ist `alwaysOutputData` am betroffenen Node — aber nur, wenn die nachgelagerten Nodes aus **benannten Vorgängern** lesen. Hängt dahinter ein Aggregate-Node oder etwas, das Items zählt, verfälscht das eingefügte Leer-Item die Zahl.
 - **Ein abgebrochener Lauf friert den Delta-Anker ein.** Wird der Anker erst am Ende der Schleife geschrieben, schreibt ihn ein vorzeitiger Abbruch nie fort. Der nächste Lauf liest dasselbe Fenster erneut — tagelang, ohne dass etwas auffällt, weil jeder Lauf grün ist.
@@ -85,7 +86,6 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 **Wartet auf Sebastian**
 - Beitragsprüfung im Content Studio testen (erzeugt echte Artefakte)
 - Handwerks-Use-Cases: der Scout kann sie nicht aus Branchennachrichten erfinden — Quellen ergänzen oder von Hand setzen
-- Drei Tabellen ohne Schreiber (`agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`): wiederbeleben oder entfernen
 - 27 inhaltsgleiche Kopien und 63 namensgleiche in SharePoint — bereinigen oder vom Ingest überspringen lassen
 
 **Das größte offene Vorhaben: Contract Loader zu Ende belegen**
@@ -112,6 +112,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 | `migration/` | Umzug: Befund, Abnahme, Struktur der alten Datenbank |
 | `offene-punkte.md` | was ansteht und was fehlt |
 | `ideen.md` | was noch keine Aufgabe ist |
+| `referenz-dokumentationsbefunde.md` | offene Korrekturen an Confluence-Seiten und Jira-Vorgaengen |
 | `tests/laufprotokoll.csv` | jeder Lauf mit Execution-ID und Befund |
 | `flows/*/README.md` | je Flow: Aufbau, Entscheidungen, Fallstricke |
 
