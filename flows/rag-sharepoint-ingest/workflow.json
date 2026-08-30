@@ -1477,7 +1477,10 @@
         -672
       ],
       "onError": "continueRegularOutput",
-      "alwaysOutputData": true
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     },
     {
       "parameters": {
@@ -1694,7 +1697,8 @@
             }
           ]
         },
-        "options": {}
+        "options": {},
+        "notes": "Ist das Mistral-Kontingent erschoepft, wirft die API die Verbindung weg statt einen 403 zu senden. Der Node meldet dann ECONNRESET mit der Meldung The connection to the server was closed unexpectedly - und die drei Wiederholungen laufen alle ins Leere. Das sieht wie ein Netzproblem aus, ist aber eines der Abrechnung. Belegt am 30.08. in Lauf 110988: reproduzierbarer Abbruch nach 35 Sekunden bei einer 490 kB grossen Datei, waehrend das Kontingent laut Mistral zu 100 Prozent aufgebraucht und die API pausiert war."
       },
       "id": "b2bd63a6-ed9b-4094-a7dd-a75684dd2adc",
       "name": "Upload Source To Mistral",
@@ -2712,7 +2716,10 @@
         4544,
         -32
       ],
-      "onError": "continueRegularOutput"
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     },
     {
       "parameters": {
@@ -3048,7 +3055,7 @@
         -40
       ],
       "parameters": {
-        "jsCode": "// ============================================================\n// STEUERUNG DES LAUFS\n//\n//   DELTA - stuendlich, nur was sich seit dem Anker geaendert hat.\n//   ABGLEICH - naechtlich um 03:30 und bei jedem Handstart, voller\n//   Vergleich des SharePoint-Bestands gegen die Wissensbasis.\n// ============================================================\nlet laufart = 'delta';\ntry { if ($('Taeglich (Abgleich)').isExecuted) laufart = 'abgleich'; } catch (e) { laufart = 'delta'; }\n// Der Modus statt des Triggers, weil n8n beim Handstart nicht den\n// Manuellen Start nimmt, sondern den erstbesten Trigger im Flow.\ntry {\n  const modus = String($execution.mode || '');\n  if (modus === 'test' || modus === 'manual') laufart = 'abgleich';\n} catch (e) {}\ntry { if ($('Manueller Start').isExecuted) laufart = 'abgleich'; } catch (e) {}\n\nconst steuerung = {\n  laufart,\n\n  driveId: 'b!C2yhEx592Ei36yvay6U9n6Opn9Rg7v1LnJCWDZ9ZCSJEbUEViC4mS52f5_kGkuq_',\n  driveName: 'Documents (Shared Documents) der Untersite Schulungen',\n  siteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen',\n\n  // Bilder, Videos, Verknuepfungen und Weblinks bleiben aussen vor -\n  // sie machen zwei Drittel der Bibliothek aus, tragen aber keinen\n  // durchsuchbaren Text.\n  aktiveTypen: ['pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'csv', 'xlsx', 'xls', 'xlsm'],\n\n  // Obergrenze je Lauf. Begrenzt wird sie nach oben durch die\n  // 300-Sekunden-Grenze des Task-Runners je Code-Node: Ein Abgleich\n  // ueber 30 Dokumente ist daran gescheitert (Lauf 110900), fuenf\n  // liefen in 2 min 44 s durch (Lauf 110947).\n  maxJeLauf: 5,\n\n  // Namensfilter fuer gezielte Nacharbeit. Im Betrieb leer.\n  nurDatei: '',\n\n  verarbeiten: true,\n  loeschungenMelden: true,\n  zustandSchreiben: true,\n\n  audience: 'public',\n  maxDateiMb: 40,\n  maxZeilenJeBlatt: 5000\n};\n\n// Word und PowerPoint gehen ueber die PDF-Wandlung von Graph in\n// dieselbe OCR-Strecke wie die PDFs.\nsteuerung.ueberPdf = ['docx', 'doc', 'pptx', 'ppt'];\n\n// Arbeitsmappen ueber die Workbook-API, weil der Extract-Node nur ein\n// Blatt kennt und die uebrigen lautlos weglaesst.\nsteuerung.ueberWorkbook = ['xlsx', 'xlsm'];\n\nsteuerung.ankerIgnorieren = laufart === 'abgleich';\n\nreturn [{ json: { _steuerung: steuerung } }];"
+        "jsCode": "// ============================================================\n// STEUERUNG DES LAUFS\n//\n//   DELTA - stuendlich, nur was sich seit dem Anker geaendert hat.\n//   ABGLEICH - naechtlich um 03:30 und bei jedem Handstart, voller\n//   Vergleich des SharePoint-Bestands gegen die Wissensbasis.\n// ============================================================\nlet laufart = 'delta';\ntry { if ($('Taeglich (Abgleich)').isExecuted) laufart = 'abgleich'; } catch (e) { laufart = 'delta'; }\n// Der Modus statt des Triggers, weil n8n beim Handstart nicht den\n// Manuellen Start nimmt, sondern den erstbesten Trigger im Flow.\ntry {\n  const modus = String($execution.mode || '');\n  if (modus === 'test' || modus === 'manual') laufart = 'abgleich';\n} catch (e) {}\ntry { if ($('Manueller Start').isExecuted) laufart = 'abgleich'; } catch (e) {}\n\nconst steuerung = {\n  laufart,\n\n  driveId: 'b!C2yhEx592Ei36yvay6U9n6Opn9Rg7v1LnJCWDZ9ZCSJEbUEViC4mS52f5_kGkuq_',\n  driveName: 'Documents (Shared Documents) der Untersite Schulungen',\n  siteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen',\n\n  // Bilder, Videos, Verknuepfungen und Weblinks bleiben aussen vor -\n  // sie machen zwei Drittel der Bibliothek aus, tragen aber keinen\n  // durchsuchbaren Text.\n  aktiveTypen: ['pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'csv', 'xlsx', 'xls', 'xlsm'],\n\n  // Obergrenze je Lauf. Begrenzt wird sie nach oben durch die\n  // 300-Sekunden-Grenze des Task-Runners je Code-Node.\n  maxJeLauf: 3,\n\n  // Namensfilter fuer gezielte Nacharbeit. Im Betrieb leer.\n  nurDatei: '',\n\n  verarbeiten: true,\n  loeschungenMelden: true,\n  zustandSchreiben: true,\n\n  audience: 'public',\n  maxDateiMb: 40,\n  maxZeilenJeBlatt: 5000\n};\n\n// Word und PowerPoint gehen ueber die PDF-Wandlung von Graph in\n// dieselbe OCR-Strecke wie die PDFs.\nsteuerung.ueberPdf = ['docx', 'doc', 'pptx', 'ppt'];\n\n// Arbeitsmappen ueber die Workbook-API, weil der Extract-Node nur ein\n// Blatt kennt und die uebrigen lautlos weglaesst.\nsteuerung.ueberWorkbook = ['xlsx', 'xlsm'];\n\nsteuerung.ankerIgnorieren = laufart === 'abgleich';\n\nreturn [{ json: { _steuerung: steuerung } }];"
       }
     },
     {
@@ -3349,9 +3356,13 @@
               "outputPropertyName": "data"
             }
           }
-        }
+        },
+        "notes": "Wiederholung als Absicherung gegen Netzabbrueche beim Herunterladen. Nicht die Ursache des Abbruchs vom 30.08. - der lag am pausierten Mistral-Kontingent, siehe Notiz an Upload Source To Mistral."
       },
-      "notes": "Word und PowerPoint kommen mit format=pdf zurueck und laufen dann durch dieselbe OCR-Strecke wie die PDFs. Bei PowerPoint erfasst Mistral dabei auch die Folienbilder."
+      "notes": "Word und PowerPoint kommen mit format=pdf zurueck und laufen dann durch dieselbe OCR-Strecke wie die PDFs. Bei PowerPoint erfasst Mistral dabei auch die Folienbilder.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "id": "448764c9-6a8e-4c21-83fe-237c504d7c1b",
@@ -3398,7 +3409,10 @@
         "genericAuthType": "oAuth2Api",
         "options": {}
       },
-      "notes": "Die Workbook-API liefert alle Blaetter. Der Extract-Node kennt nur sheetName fuer ein einzelnes Blatt und laesst die uebrigen lautlos weg."
+      "notes": "Die Workbook-API liefert alle Blaetter. Der Extract-Node kennt nur sheetName fuer ein einzelnes Blatt und laesst die uebrigen lautlos weg.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     },
     {
       "id": "c3ddaf82-c603-44e6-9620-69572e18bdb7",
@@ -3429,7 +3443,10 @@
         "genericAuthType": "oAuth2Api",
         "options": {}
       },
-      "notes": "usedRange liefert nur den befuellten Bereich. Ein leeres Blatt antwortet mit Fehler, deshalb continueRegularOutput."
+      "notes": "usedRange liefert nur den befuellten Bereich. Ein leeres Blatt antwortet mit Fehler, deshalb continueRegularOutput.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     },
     {
       "id": "f64136d0-4af3-47f0-8ff8-6b87dd14e55b",

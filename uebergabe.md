@@ -79,17 +79,19 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Sechs Regaletiketten-PDFs blockieren den Abgleich.** Der stille Schreibverlust ist behoben und publiziert — die Reparatur ist `options.reset` auf dem Knoten `Embedding Batch Loop`. Belegt in drei sauberen Serienläufen (`110976`, `110977`, `110979`), die je fünf Dokumente heilten. Der Rückstand an Dokumenten ohne Chunks fiel am Abend des 30.08. von **35 auf 6**.
+1. **Das Mistral-Kontingent ist aufgebraucht — Zurücksetzung am 31.08.2026.** Die Abrechnungsmail sagt es wörtlich: 100 Prozent der enthaltenen API-Nutzung erreicht, Zugriff pausiert. **Die pausierte API wirft die Verbindung weg, statt einen 403 zu senden** — der Knoten `Upload Source To Mistral` meldet dann `ECONNRESET` mit *„The connection to the server was closed unexpectedly"*, und die drei Wiederholungen laufen alle ins Leere. Ein Abrechnungsproblem sieht dadurch wie ein Netzabbruch aus.
 
-   **Was übrig ist, ist eine eigene Sorte Problem.** Die sechs verbliebenen sind Regaletiketten-PDFs aus der Power-Automate-Zeit vom 22.08., alle mit `ingestion_count: 0`: 3 640 bis 11 541 Wörter, 29 bis 92 kB Text, **null Bilder** — hunderte Seiten Etiketten, also sehr grosse OCR-Aufträge. Lauf `110980` starb nach 10 min 46 s an einem davon.
+   **Solange das gilt, kann der Ingest keine Datei einlesen, die durch die OCR muss.** Der nächtliche Abgleich läuft, findet Aufgaben und scheitert an der ersten. Das ist erwartet, kein Defekt.
 
-   **Sie blockieren aber nicht dauerhaft.** Lauf `110982` griff danach auf neue Dateien zu und las fünf davon sauber ein — die sechs blieben unangetastet. Warum `110980` an einem von ihnen starb und `110982` sie überspringt, ist offen und gehört als Erstes geklärt. Immerhin: Was ein Lauf vorher schafft, bleibt jetzt erhalten — `110980` heilte zwei Dokumente, bevor er starb.
+   **Was ohne Mistral trotzdem geht:** `.txt`, `.csv` (Textpfad) und `.xlsx` (Workbook-API). Nur PDF, Word und PowerPoint brauchen die OCR.
 
-   **Zu entscheiden:** die sechs gezielt über `nurDatei` einzeln nachfahren, dauerhaft überspringen lassen, oder in Ruhe lassen und den Rückstand weiterlaufen lassen.
+2. **Sechs Altzeilen ohne Chunks sind nicht heilbar, sondern zu löschen.** Es sind Power-Automate-Zeilen mit `RWGID`-Kennung. Der Abgleich ordnet über die Graph-`doc_id` zu und findet keine Entsprechung — er liest die Datei stattdessen als **neue** ein und legt eine zweite Zeile an. Belegt an `16_ber_regaletiketten…`: Die Graph-Fassung hat jetzt 163 Chunks, die Altzeile steht weiter bei null.
 
-   **Die Ursache des Abbruchs ist nicht auslesbar.** Das Fehlerobjekt sprengt die MCP-Verbindung, und der Fehler-Workflow feuert nur bei Produktionsläufen — die Testläufe waren manuell. Ein Produktionslauf würde die Meldung in `pMGm0LaxRTldvPKEkmkzC` hinterlassen.
+   Das widerlegt die Annahme in `offene-punkte.md`, eine über Graph neu eingelesene Datei ersetze ihre Altfassung. Sie stellt sich daneben. Betroffen sind potenziell alle **247** Zeilen, die Lauf `110947` als `rag_nicht_zuordenbar` zählte.
 
-2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
+   **Zu tun, sobald Mistral wieder läuft:** die fünf verbliebenen Regaletiketten einlesen, danach die sechs Altzeilen löschen — aber erst, wenn die jeweilige Graph-Fassung nachweislich Chunks trägt.
+
+3. **Ist der 31.08. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
 
 ## Offene Themen
@@ -111,13 +113,13 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 
 **Der Umbau ist unveröffentlichter Entwurf.** Die alte Fassung ist noch die aktive.
 
-Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist die Extraktion**: Die Mistral-Token sind bis zum **01.09.2026** aufgebraucht, der Chat-Endpunkt antwortet `Forbidden`. Der OCR-Endpunkt läuft weiter.
+Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist die Extraktion**: Die Mistral-Token sind bis zum **31.08.2026** aufgebraucht, der Chat-Endpunkt antwortet `Forbidden`. Der OCR-Endpunkt läuft weiter.
 
 **Zum Abarbeiten ab dem 01.09.:** Lauf anstoßen, Extraktion an den beiden liegengebliebenen Dokumenten prüfen, publizieren, danach Export ins Git. Vier Nodes sind noch ungetestet, alle hinter der Extraktion.
 
 **Technisch offen**
 - Erstbefüllung: **432** Dateien einzulesen, 30 je Nacht — etwa fünfzehn Nächte
-- **6 Dokumente ohne Chunks** — ausschliesslich die Regaletiketten-PDFs, siehe oben. Alle anderen sind geheilt.
+- **6 Altzeilen ohne Chunks** — Power-Automate-Leichen, siehe oben. Nicht heilbar, sondern zu löschen. Alle echten unvollständigen Einträge sind geheilt.
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
