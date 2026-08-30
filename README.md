@@ -41,8 +41,9 @@ Auf der n8n-Leinwand dokumentiert, hier nur eingeordnet:
 | RWG Sub – Teams Image Read | `omHDN0g9Lusb6H87` | liest Bilder aus Teams-Nachrichten | keine |
 | RWG Sub - Jira Issue Create | `SnD6H4tQfX2sGSZgTaJfs` | erstellt Jira-Tickets, Duplikatschutz über `agent_jira_create_requests` | RWG RAG |
 | RWG Wartung - Funktionen pruefen | `h4uVcnxF5jbRUPHZ` | Gesundheitsprüfung der Wissensbasis in einer halben Sekunde | RWG RAG |
+| RWG Wartung - SharePoint Eingang pruefen | `UcEQSxTfn6pshNNI` | liest Bibliotheken und Ordnerinhalt der Site `rwgintranet` | keine |
 | RWG Monitor - Microsoft Graph & Teams | `1OcqfC4wTC9bj0wK` | Erreichbarkeitsprüfung alle 15 Minuten | keine |
-| RWG_Contract_Loader | `661BDwEditNicEc0` | Vertragsdaten | keine |
+| RWG Contract Loader | `661BDwEditNicEc0` | Vertrags-PDF aus SharePoint per Mistral OCR nach `vertraege`, Ablage nach `DONE`, Excel-Übersicht | RWG RAG |
 | Telegram_Error_Info | `pMGm0LaxRTldvPKEkmkzC` | Fehler-Workflow für alle Flows | keine |
 | RWG_Reporter_BC | `v47TYgBcBQr6q04q` | Testaufbau, inaktiv, nicht über MCP erreichbar | ungeprüft |
 

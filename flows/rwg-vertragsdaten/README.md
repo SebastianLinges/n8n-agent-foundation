@@ -1,55 +1,108 @@
-# RWG Vertragsdaten
+# RWG Contract Loader
 
-Neuaufbau des `RWG_Contract_Loader` (`661BDwEditNicEc0`). Der alte Flow läuft über ein Formular und einen Webhook und schreibt in eine n8n-Data-Table. Der neue holt seine Dokumente aus SharePoint, schreibt nach Supabase und legt die verarbeitete Datei in einen Unterordner `Erledigt`.
+`661BDwEditNicEc0` — holt Vertrags-PDF aus SharePoint, liest sie per Mistral OCR, extrahiert 18 Vertragsfelder, schreibt nach `public.vertraege` im Projekt `zckaxkpycyyxaymmkmvu` (RWG Rheinland eG / RAG), legt die verarbeitete Datei nach `DONE` und erzeugt die Excel-Übersicht neu.
 
-**Stand:** Die Zieltabelle ist angelegt. Der Flow selbst wartet auf die SharePoint-Angaben (Site, Bibliothek, Eingangsordner).
+## Wo die Dokumente liegen
 
-## Die Tabelle `vertraege`
+| | Wert |
+|---|---|
+| Site | `https://rwgrheinland.sharepoint.com/sites/rwgintranet` |
+| Bibliothek | „Dokumente", intern `Documents` |
+| Drive-ID | `b!C2yhEx592Ei36yvay6U9n2886_vvW61LokJwBCKhlW_uiHYCBMlCRaEn9mGTdB1m` |
+| Eingang | `/IMPORTER/CONTRACT` |
+| Ablage | `/IMPORTER/CONTRACT/DONE` |
+| Excel | `/IMPORTER/CONTRACT/Vertragsuebersicht.xlsx` |
 
-Liegt im Projekt `zckaxkpycyyxaymmkmvu` (RWG Rheinland eG / RAG). Angelegt am 30.08.2026.
+Der Ablageordner heißt **`DONE`**, nicht `Erledigt`. Er besteht seit dem 08.03.2026 und war bereits gefüllt, als der Neuaufbau begann. Ein zweiter Ordner daneben hätte die Historie geteilt.
 
-### Zwei Entscheidungen, die den Unterschied machen
+Die Ordner-ID wird **nicht** fest hinterlegt, sondern bei jedem Lauf aus dem Verzeichnis gelesen. Wird `DONE` neu angelegt, findet der Flow ihn trotzdem.
 
-**Jedes Feld doppelt: als Klartext und als ausgewerteter Wert.** `laufzeit_ende_text` hält, was im Vertrag steht — auch „bis auf Widerruf" oder „31.12. des Folgejahres". `laufzeit_ende` als `date` wird nur gefüllt, wenn es eindeutig ist. Wer nur typisierte Spalten führt, verliert genau die Fälle, die später Ärger machen; wer nur Text führt, kann nicht nach auslaufenden Verträgen fragen.
+## Ablauf
 
-**Der OCR-Text bleibt gespeichert.** `ocr_text` und `rohdaten` erlauben eine **erneute Auswertung ohne neue OCR**. Wird der Extraktionsprompt später besser — und das wird er, das Ziel ist ja „bestmögliche Erkennung" —, laufen alle Altverträge in Sekunden neu durch, ohne einen Cent für Mistral. Ohne diese beiden Spalten müsste jedes Dokument erneut durch die Erkennung.
+```
+Zeitplan (stündlich) → Steuerung → Eingang lesen → Nur PDF → Je Datei
+                                                                 │
+   ┌─────────────────────────────────────────────────────────────┘
+   ▼
+Datei holen → Hash bilden → Zeile sichern → Datei und Stand vereinen
+                                                        ▼
+                                              Schon abgelegt? ──ja──┐
+                                                        │nein       │
+   Datei zu Mistral → Signierte URL → OCR → OCR-Text sichern        │
+                                              → OCR schreiben       │
+                                              → Extraktionsauftrag  │
+                                              → Vertragsdaten extrahieren
+                                              → Ergebnis auswerten  │
+                                              → Vertragsdaten schreiben
+                                                        ▼           │
+                                              Nach DONE verschieben ◄┘
+                                                        ▼
+                                              Ablage vermerken → nächste Datei
 
-### Aufbau
+nach der letzten Datei:  Liste holen → Als Excel → Excel ablegen
+```
+
+## Die Entscheidungen dahinter
+
+**Jedes Vertragsfeld doppelt: als Klartext und als ausgewerteter Wert.** `laufzeit_ende_text` hält, was im Vertrag steht — auch „bis auf Widerruf" oder „31.12. des Folgejahres". `laufzeit_ende` als `date` wird nur gefüllt, wenn es eindeutig ist. Wer nur typisierte Spalten führt, verliert genau die Fälle, die später Ärger machen; wer nur Text führt, kann nicht nach auslaufenden Verträgen fragen.
+
+**Der OCR-Text bleibt gespeichert.** `ocr_text` und `rohdaten` erlauben eine erneute Auswertung ohne neue OCR. Wird der Extraktionsprompt besser — und das wird er, das Ziel ist „bestmögliche Erkennung" —, laufen alle Altverträge in Sekunden neu durch, ohne einen Cent für Mistral.
+
+**Erst schreiben, dann verschieben.** Bricht der Lauf zwischen OCR und Extraktion ab, liegt die Datei noch im Eingang und der nächste Lauf holt sie erneut. Der Hash verhindert die Dublette, der Status sagt, wie weit sie kam. `abgelegt_am` wird erst gesetzt, wenn die Datei tatsächlich in `DONE` liegt.
+
+**Die Excel wird bei jedem Lauf vollständig neu erzeugt**, nicht zeilenweise fortgeschrieben. Anhängen bedeutet, den Stand an zwei Orten zu führen; nach dem ersten abgebrochenen Lauf weichen sie voneinander ab, und niemand merkt es. Neu erzeugen ist immer deckungsgleich mit der Datenbank. Der Preis: Handeingaben in der Datei überleben einen Lauf nicht. Die Datei ist Ergebnisliste, kein Eingabemedium.
+
+**Der Hash läuft über die Dateibytes**, nicht über eine Base64-Zeichenkette wie im alten Flow. Damit ist er unabhängig davon, auf welchem Weg das Dokument hereinkommt.
+
+## Die Extraktion
+
+`mistral-large-latest`, `temperature: 0`, `response_format: json_object`. Achtzehn Felder, alle als Pflichtsuche benannt:
+
+Definition, Mandant, Vertragsart, Vertragspartner, Lieferantennummer, Vertragsnummer, Laufzeit Beginn, Laufzeit Ende, Intervalle, Verlängerung, Kündigungsfrist, Kündigung zum, Preis Netto, Preis Brutto, Kosten Jährlich, Sparte/Bereich, Standortinfo, **Kostenstelle**.
+
+**Kostenstelle ist neu.** Der alte Flow hatte die Spalte in seiner Data Table und schrieb sie beim Insert — aber der Prompt fragte das Feld nirgends ab. Der Wert war seit jeher leer.
+
+**Mandant und Vertragspartner sind die heikle Stelle.** Der Prompt trennt sie ausdrücklich: Mandant ist die interne Gesellschaft auf RWG-Seite (Kunde, Antragsteller, Leasingnehmer, Besteller), Vertragspartner die externe Gegenseite (Leasinggeber, Vermieter, Dienstleister, Versicherer, Lieferant). Eine Voraberkennung im Code sucht die drei internen Gesellschaften — RWG Rheinland eG, Obst und Gemüse GmbH, Baumarkt GmbH — in der Nähe eines Kundenfelds und gibt den Fund als Hinweis mit. Als Hinweis, nicht als Vorgabe.
+
+## Fallstricke, die hier eingebaut sind
+
+- **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern**, auch in Zeichenketten und Kommentaren. Alle sechs Abfragen enthalten deshalb ausschließlich `$1` und keinen einzigen Kommentar. Sämtliche Daten kommen als **ein** JSON-Parameter herein und werden per `jsonb_to_record` aufgefächert — damit gibt es weder ein Komma-Problem in `queryReplacement` noch Typkonflikte. `queryBatching` steht überall auf `independently`.
+- **Der Postgres-Node reicht keine Binärdaten weiter.** Nach `Zeile sichern` wäre die Datei vor dem Mistral-Upload verloren. `Datei und Stand vereinen` führt Datei und Datenbankstand wieder zusammen.
+- **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** Alle sechs fehleranfälligen Aufrufe haben einen Fehlerausgang: fünf davon schreiben `status = 'fehler'` samt Meldung in die Zeile und gehen zur nächsten Datei.
+- **`Datei holen` ist die eine Ausnahme:** Der Fehlerausgang führt direkt zur nächsten Datei, weil zu diesem Zeitpunkt noch keine Zeile existiert, in die man den Fehler schreiben könnte. Die Datei bleibt im Eingang und wird im nächsten Lauf erneut geholt. Kein Verlust, aber auch kein Eintrag — ein dauerhaft unlesbares Dokument fällt nur dadurch auf, dass es im Eingang liegen bleibt.
+- **Die Zeitzone steht im Workflow** (`Europe/Berlin`). Der Server läuft auf UTC.
+- **`$('Node').first()` statt `.all()`** in der Schleife.
+
+## Grenzen
+
+- **10 Dateien je Lauf** (`maxJeLauf` in `Steuerung`). Bei größerem Nachlauf vorübergehend erhöhen.
+- **Ein Namenskonflikt in `DONE` lässt das Verschieben scheitern.** Graph antwortet mit 409, die Zeile bekommt `status = 'fehler'`, die Datei bleibt im Eingang. Bisher nicht eingetreten.
+- **Große PDF sind teuer und langsam.** Der Zeitausschuss für die OCR steht auf 15 Minuten, der des Workflows auf eine Stunde.
+
+## Zieltabelle `vertraege`
+
+42 Spalten, `UNIQUE (datei_hash)` als Duplikatschutz, `CHECK` auf `status` in `neu`, `ocr`, `extrahiert`, `abgelegt`, `fehler`. Indizes auf `status`, `vertragspartner`, `laufzeit_ende` und `kuendigung_zum` (die beiden letzten nur wo gefüllt), dazu ein deutscher Volltextindex über Partner, Definition und Vertragsart. RLS ist an, ohne Regeln — wie im ganzen Projekt.
 
 | Gruppe | Spalten |
 |---|---|
-| Herkunft | `datei_name`, `datei_hash` (eindeutig, Duplikatschutz), `sharepoint_item_id`, `sharepoint_pfad`, `sharepoint_url` |
-| Verarbeitungsstand | `status` (`neu`, `ocr`, `extrahiert`, `abgelegt`, `fehler`), `fehler_text`, `erkannt_am`, `abgelegt_am` |
-| Vertragsdaten als Klartext | `definition`, `mandant`, `vertragsart`, `vertragspartner`, `lieferantennummer`, `vertragsnummer`, `laufzeit_beginn_text`, `laufzeit_ende_text`, `intervalle`, `verlaengerung`, `kuendigungsfrist`, `kuendigung_zum_text`, `preis_netto_text`, `preis_brutto_text`, `kosten_jaehrlich_text`, `sparte_bereich`, `standortinfo`, `kostenstelle` |
+| Herkunft | `datei_name`, `datei_hash`, `sharepoint_item_id`, `sharepoint_pfad`, `sharepoint_url` |
+| Verarbeitungsstand | `status`, `fehler_text`, `erkannt_am`, `abgelegt_am` |
+| Klartext | `definition`, `mandant`, `vertragsart`, `vertragspartner`, `lieferantennummer`, `vertragsnummer`, `laufzeit_beginn_text`, `laufzeit_ende_text`, `intervalle`, `verlaengerung`, `kuendigungsfrist`, `kuendigung_zum_text`, `preis_netto_text`, `preis_brutto_text`, `kosten_jaehrlich_text`, `sparte_bereich`, `standortinfo`, `kostenstelle` |
 | Ausgewertet | `laufzeit_beginn`, `laufzeit_ende`, `kuendigung_zum` als `date`; `preis_netto`, `preis_brutto`, `kosten_jaehrlich` als `numeric(14,2)` |
-| Nachvollziehbarkeit | `ocr_text`, `rohdaten` (jsonb, unveränderte Modellantwort), `ocr_modell`, `extraktions_modell`, `seiten`, `woerter` |
+| Nachvollziehbarkeit | `ocr_text`, `rohdaten`, `ocr_modell`, `extraktions_modell`, `seiten`, `woerter` |
 
-Indizes auf `status`, `vertragspartner`, `laufzeit_ende` und `kuendigung_zum` (beide nur wo gefüllt), dazu ein deutscher Volltextindex über Partner, Definition und Vertragsart. RLS ist an, ohne Regeln — wie im ganzen Projekt.
+## Zugänge
 
-`abgelegt_am` wird erst gesetzt, wenn die Datei tatsächlich in `Erledigt` liegt. Damit ist ein abgebrochener Lauf erkennbar: Eintrag vorhanden, Datei noch im Eingang.
+| Zweck | Credential |
+|---|---|
+| SharePoint über Microsoft Graph | `mClncgXjqvaJjfm4` — OAuth2 API: Entra-SharePoint-RWG |
+| Mistral OCR und Extraktion | `tv4AxZ1FALgZCIVK` — Mistral Cloud, Sebastian.Linges@rwg-r.de |
+| Datenbank | `awcN6ePCJHieBrzb` — Postgres, Org_RWG Rheinland eG_Project_RAG |
 
-## Der geplante Ablauf
+Es gibt **zwei** Mistral-Zugänge in der Instanz. Die automatische Zuordnung greift daher nicht — sie ist an jedem Node ausdrücklich gesetzt.
 
-```
-Zeitplan → SharePoint-Eingang lesen → Je Datei
-              ↓
-         Hash bilden → schon in vertraege? → ja: überspringen
-              ↓ nein
-         Zeile mit status 'neu' anlegen
-              ↓
-         Mistral OCR  → ocr_text sichern, status 'ocr'
-              ↓
-         Extraktion   → rohdaten + Felder, status 'extrahiert'
-              ↓
-         Datei nach Erledigt verschieben → status 'abgelegt'
-              ↓
-         Excel-Liste fortschreiben
-```
+## Offen
 
-**Reihenfolge ist Absicht:** Erst schreiben, dann verschieben. Bricht der Lauf zwischen OCR und Extraktion ab, liegt die Datei noch im Eingang und der nächste Lauf holt sie erneut — der Hash verhindert die Dublette, der Status sagt, wie weit sie kam.
-
-## Was noch fehlt
-
-- **SharePoint-Angaben:** Site, Bibliothek, Eingangsordner. Kommt von Sebastian.
-- **Excel-Liste:** Ablageort und ob je Zeile angehängt oder die Datei ersetzt wird.
-- **Der alte Flow** `RWG_Contract_Loader` (`661BDwEditNicEc0`) läuft weiter, bis der neue belegt ist. Seine Data Table `CEz5GXpTS7yHhjqS` enthält den Altbestand — ob der übernommen wird, ist offen.
+- **Der Altbestand in `DONE`** (11 Dateien) ist nicht in `vertraege` übernommen. Ein Einmallauf über den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar.
+- **Die alte Data Table `CEz5GXpTS7yHhjqS`** (`RWG Vertraege`) hält den Bestand des Formular- und Webhook-Wegs. Ob er übernommen wird, ist offen.
+- **Der Power-Automate-Flow `RWG_n8n_Trigg`** schickt bis heute Dateien aus demselben Ordner an den Webhook des alten Flows. Mit dem Publizieren dieses Umbaus verliert er sein Ziel und ist zu entfernen.

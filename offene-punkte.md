@@ -8,7 +8,9 @@ Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes
 
 Was noch aussteht:
 
-- **Das alte Projekt `zjabiweaihsezjjeycko` loeschen.** Alles ist geprueft: null Verweise darauf, null Bildpfade ohne Objekt, alle Funktionen liefern Treffer. **Erst nach dem naechtlichen Abgleich um 03:30** — das ist der erste unbeaufsichtigte Lauf gegen das neue Projekt und der einzige Beleg, den nur die Zeit liefert.
+- **Das alte Projekt `zjabiweaihsezjjeycko` loeschen. Alle Bedingungen sind erfuellt, es fehlt nur die Ausfuehrung.** Der Abgleich um 03:30 (Lauf 110522) scheiterte zwar an einem Netzabbruch zu Cloudflare, lag aber **vor** dem Umzug — Trigger 03:30 MESZ, Workflow umgestellt 11:18 MESZ — und lief daher noch gegen die alte Adresse. Die zwoelf Stundenlaeufe danach sind alle bestanden, instanzweit kein einziger Fehlerlauf seit dem Umzug. Die Gesundheitspruefung (Lauf 110825) trifft alle vier Erwartungswerte exakt: 21323 Chunks, 0 ohne Embedding, Bucket 7384 Objekte, 0 Verweise aufs alte Projekt.
+
+  Nebenbefund: n8n hat den **Service-Role-Key des alten Projekts im Klartext** in den Ausfuehrungsdaten abgelegt, in `apikey` und `Authorization`. Mit dem Loeschen des Projekts wird der Schluessel wertlos — ein Grund mehr.
 - **Vier Tabellen ohne bekannten Schreiber:** `agent_ticket_dialogs` (2 Zeilen), `documentation_findings` (10), `documentation_review_state` (17). Dazu `agent_jira_create_requests` — die wird von `RWG Sub - Jira Issue Create` gebraucht und bleibt. Bei den drei uebrigen ist die Herkunft zu klaeren, bevor etwas verschwindet.
 - **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geaendert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile — semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent, falls es sauber sein soll.
 
@@ -21,6 +23,30 @@ Die Prüfung ist publiziert, aber **noch nie gelaufen**. Ein Testlauf erzeugt ec
 Zu prüfen sind zwei Fälle: ein Beitrag, der durchgeht, und einer, der am Antwortblock scheitert. Der zweite lässt sich erzwingen, indem `Lesbarkeit pruefen` vorübergehend eine engere Wortgrenze bekommt — nicht, indem der COPY-Prompt verbogen wird.
 
 Zu belegen: `qa_passed`, die Zahl der Befunde, und dass bei einer Ablehnung **kein** Buffer-Entwurf entsteht, aber eine Telegram-Meldung ankommt.
+
+
+### Contract Loader publizieren - wartet auf Mistral-Token
+**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 25 Nodes statt 36. Aufbau und Entscheidungen: [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
+
+Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen, Mistral-Upload, signierte URL, OCR und das Sichern des OCR-Textes. Beide Dokumente vollstaendig gelesen - 46 Seiten mit 20630 Woertern und 1 Seite mit 190 Woertern.
+
+**Gescheitert ist die Extraktion**: `Forbidden` vom Mistral-Chat-Endpunkt. Ursache ist nicht der Umbau, sondern das Kontingent - die Token des Mistral-Zugangs sind bis zum **01.09.2026** aufgebraucht. Der OCR-Endpunkt desselben Zugangs laeuft weiter, OCR und Chat werden getrennt abgerechnet. Zur Sicherheit gegengeprueft (Lauf 110833): Konto `rwg-r.de` antwortet `Forbidden`, Konto `gmx.de` antwortet `Payment required`.
+
+Der Fehlerweg hat dabei genau so gegriffen wie entworfen: `status = 'fehler'`, Meldung in `fehler_text`, beide Dateien unveraendert im Eingang. Beim naechsten Lauf werden sie erneut geholt, ohne neue OCR-Kosten - `ocr_text` steht ja schon.
+
+**Zum Abarbeiten ab dem 01.09.:** Lauf anstossen, die Extraktion an den beiden Dokumenten pruefen, dann publizieren. Erst nach dem Publizieren geht der Export ins Git.
+
+Noch unbelegt sind vier Nodes, die nur hinter der Extraktion liegen: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die Umwandlungen in `Ergebnis auswerten` sind einzeln gegen Testwerte geprueft, die Spaltenliste des grossen `UPDATE` gegen `information_schema` und `jsonb_to_record`. Ein Lauf ersetzt das nicht.
+
+### Verirrte Excel in DONE
+`Vertragsuebersicht.xlsx` wurde im Lauf 110831 korrekt in den Eingang geschrieben, liegt jetzt aber in `/IMPORTER/CONTRACT/DONE`. Dazwischen lag um 12:28:26 ein Webhook-Lauf des alten Flows (110832) - Power Automate hatte die neue Datei bemerkt. Die naheliegende Erklaerung ist, dass `RWG_n8n_Trigg` sie anschliessend verschoben hat, so wie die elf Altdateien dorthin kamen.
+
+Da der Power-Automate-Flow inzwischen geloescht ist, schreibt der naechste Lauf die Datei wieder in den Eingang. Die Fassung in `DONE` ist dann eine Leiche und kann von Hand weg.
+
+### Altbestand in DONE nachziehen
+Elf Dokumente liegen in `/IMPORTER/CONTRACT/DONE` und stehen nicht in `vertraege`. Ein Einmallauf ueber den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar. Bewusst zurueckgestellt, bis der Eingang belegt ist.
+
+Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`RWG Vertraege`) uebernommen wird.
 
 
 ## ProzessHub nach SharePoint
@@ -60,6 +86,8 @@ Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberst
 **Der Ingest holt sich seine Aenderungen seit dem 30.08. selbst.** Webhook und Delta-Leser-Eingang sind deaktiviert, der getrennte Delta-Leser ist archiviert.
 
 Was bleibt: Der Power-Automate-Flow selbst liegt ausserhalb von n8n und muss dort entfernt werden. Er ist am Ziel erkennbar: `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`. Solange er laeuft, schickt er ins Leere - der Webhook nimmt nichts mehr an.
+
+**Nicht zu verwechseln mit `RWG_n8n_Trigg`.** Das war der zweite Power-Automate-Flow: Er ueberwachte `/IMPORTER/CONTRACT` und fuetterte den Webhook des alten Contract Loaders. Er hat am 30.08. um 12:28 noch gefeuert und ist seither geloescht. Damit ueberwacht nur noch n8n diesen Ordner.
 
 ### Dokumenteintrag vor den Chunks - Reihenfolge im Ingest
 Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: neun solcher Eintraege (Lauf 110771), acht davon bildreiche Regaletiketten-PDFs.

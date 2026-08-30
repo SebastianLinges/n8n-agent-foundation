@@ -61,29 +61,31 @@ Dazu der Bucket `rag` mit 7 384 Bildern (452 MB). Gelesen wird über `RWG Sub - 
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Wie lief der Abgleich um 03:30?** Ausführungen von `BBhGCRsQ8pdNSxTi`, der Lauf um 01:30 UTC ist der Abgleich. Bei einem Fehler steht die Ursache in der Ausführung von `pMGm0LaxRTldvPKEkmkzC`, nicht im Lauf selbst.
-2. **Gesundheitsprüfung laufen lassen** (`h4uVcnxF5jbRUPHZ`).
-3. Erst danach: **das alte Supabase-Projekt `zjabiweaihsezjjeycko` löschen.**
+1. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
+2. **Das alte Supabase-Projekt `zjabiweaihsezjjeycko` löschen.** Beide Vorbedingungen sind erfüllt und belegt (Läufe 110522, 110825); es fehlt nur die Ausführung.
+3. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten.
 
 ## Offene Themen
 
 Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
 
 **Wartet auf Sebastian**
-- Altes Supabase-Projekt löschen (nach der Beobachtungsnacht)
-- Power-Automate-Flow entfernen (außerhalb von n8n, Ziel `.../webhook/8e16e07b-…`)
+- Altes Supabase-Projekt löschen — alle Vorbedingungen sind belegt
+- Power-Automate-Flow des RAG-Ingests entfernen (außerhalb von n8n, Ziel `.../webhook/8e16e07b-…`). Der zweite, `RWG_n8n_Trigg`, ist bereits gelöscht.
 - Vier leere Ordner in Shared Documents: löschen oder behalten?
 - 23 Formatpaare und 5 unklare Doubletten — fachlich zu entscheiden
 - Beitragsprüfung im Content Studio testen (erzeugt echte Artefakte)
 - Use Cases für Handwerk und CAD/PDM: Zuarbeit nötig
 
-**Das größte offene Vorhaben: Contract Loader neu aufsetzen**
+**Das größte offene Vorhaben: Contract Loader zu Ende belegen**
 
-Der alte `RWG_Contract_Loader` (`661BDwEditNicEc0`) läuft über Formular und Webhook und schreibt in eine n8n-Data-Table. Der Neuaufbau soll aus **SharePoint** lesen, nach **Supabase** schreiben und die verarbeitete Datei in einen Unterordner **`Erledigt`** legen. Ergebnisse zusätzlich in eine Excel-Liste. Ziel ist die bestmögliche Erkennung von Vertragsinformationen — Laufzeit, Kundennummern, Kündigungsfristen, Preise.
+`RWG Contract Loader` (`661BDwEditNicEc0`) ist umgebaut: 25 Nodes statt 36, liest aus SharePoint `/IMPORTER/CONTRACT`, schreibt nach `public.vertraege`, legt die Datei nach `DONE` und erzeugt die Excel-Übersicht neu. Aufbau, Entscheidungen und Fallstricke: [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
 
-**Die Zieltabelle `vertraege` steht bereits.** Aufbau und die beiden Entwurfsentscheidungen dahinter stehen in [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
+**Der Umbau ist unveröffentlichter Entwurf.** Die alte Fassung ist noch die aktive.
 
-**Was fehlt:** Site, Bibliothek und Eingangsordner in SharePoint. Die liefert Sebastian. Dazu der Ablageort der Excel-Liste.
+Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist die Extraktion**: Die Mistral-Token sind bis zum **01.09.2026** aufgebraucht, der Chat-Endpunkt antwortet `Forbidden`. Der OCR-Endpunkt läuft weiter.
+
+**Zum Abarbeiten ab dem 01.09.:** Lauf anstoßen, Extraktion an den beiden liegengebliebenen Dokumenten prüfen, publizieren, danach Export ins Git.
 
 **Technisch offen**
 - Erstbefüllung läuft: rund 458 SharePoint-Dateien fehlen, 30 je Nacht
