@@ -55,10 +55,21 @@ Gemessen in Lauf `110888`. `Aufgaben bestimmen` meldete `zu_loeschen: 5`, abgear
 
 **Dieselbe Falle steckt im Einlese-Zweig**, dort nicht angefasst: `Delete Stale SharePoint Chunks` (DELETE) vor `Plan SharePoint Storage Cleanup` und `Touch Unchanged Source` (PATCH) vor `No Change Summary`. Beide koennen bei leerem Ergebnis denselben Abbruch ausloesen.
 
-### 14 SharePoint-Dokumente ohne Chunks
-Der Lauf meldet `rag_dokumente: 266` gegen `rag_mit_chunks: 252`. Die Gegenmessung in der Datenbank ergibt dieselbe Zahl: 14 Eintraege in `sharepoint_documents`, zu denen kein einziger Chunk in `document_chunks` steht. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden.
+### 14 SharePoint-Dokumente ohne Chunks - Ursache geklaert
+14 Eintraege in `sharepoint_documents` tragen keinen einzigen Chunk. Gemessen ueber `metadata->>'doc_id'` und ueber die Spalte `source_ref` - beide Wege ergeben dieselben 14. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden. Keine Zwillingszeile traegt die fehlenden Chunks, `ingestion_errors` ist leer.
 
-Der Delta-Lauf erkennt sie nicht - `unvollstaendig_gefunden` bleibt 0, weil er nur die Items der Delta-Meldung bewertet. Der naechtliche Abgleich soll unvollstaendige Eintraege nachholen; ob er das tut, ist am Lauf um 03:30 zu pruefen.
+**Zwei Gruppen:**
+
+| Gruppe | Anzahl | `ingestion_count` | Merkmal |
+|---|---|---|---|
+| Regaletiketten-PDFs | 7 | 0 | sechs aus der Power-Automate-Zeit (22.08.), eine ueber Graph. `00_lev…` steht unter beiden Herkuenften. Nie fertiggestellt. |
+| `Bereichsuebergreifend ….docx` | 7 | 2 | Text vollstaendig da (4 449 bis 22 460 Zeichen), `content_hash` gesetzt, 4 bis 47 Bilder je Dokument |
+
+**Die Ursache der zweiten Gruppe ist belegt.** Der naechtliche Abgleich `110522` vom 30.08., 01:30 UTC lief 9 min 45 s und scheiterte. Lauf `110524` des Fehler-Workflows nennt den Grund: letzter Node `Upload Extracted Image To Supabase`, `NodeApiError ETIMEDOUT` gegen `zjabiweaihsezjjeycko.supabase.co` - das alte, inzwischen geloeschte Projekt, mit dem alten Zugang. Der Lauf starb beim Bildupload; die sieben bildreichen `.docx` blieben ohne Chunks zurueck.
+
+**Nichts zu tun.** Beide Voraussetzungen haben sich seither geaendert: Der Node zeigt aufs neue Projekt mit gueltigem Zugang und traegt `onError: continueRegularOutput` - ein einzelner Bildfehler reisst den Lauf nicht mehr mit. Der Abgleich um 03:30 ist die erste Probe unter den neuen Bedingungen und sollte die sieben `.docx` nachziehen. Danach zu pruefen, ob die sieben Regaletiketten-PDFs uebrig bleiben.
+
+**Nebenbefund, bekannt und hier bestaetigt:** In den Fehlerdaten von `110522` steht das komplette Request-Objekt samt `apikey` und `Authorization` im Klartext. Der Schluessel gehoert zum geloeschten Projekt und ist damit wertlos.
 
 
 ### Beitragsprüfung im Content Studio testen
