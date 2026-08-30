@@ -1,6 +1,6 @@
 # KI Daily - Analyze & Deliver [WF-2]
 
-Auswertungsflow (`objM2PQrcTpEzik7`). Er nimmt, was [KI Daily - Collect](../ki-daily-collect/README.md) hinterlegt hat, lässt eine Redaktion daraus einen Brief bauen, schickt ihn per Telegram und leitet aus derselben Auswahl zwei Nebenprodukte ab: Geschäfts-Use-Cases und eine Marketing-Idee.
+Auswertungsflow (`objM2PQrcTpEzik7`). Er nimmt, was [KI Daily - Collect](../kapa-ki-daily-collect/README.md) hinterlegt hat, lässt eine Redaktion daraus einen Brief bauen, schickt ihn per Telegram und leitet aus derselben Auswahl zwei Nebenprodukte ab: Geschäfts-Use-Cases und eine Marketing-Idee.
 
 Takt: **Montag, Mittwoch, Freitag 06:20** (`20 6 * * 1,3,5`), zwanzig Minuten nach Collect.
 

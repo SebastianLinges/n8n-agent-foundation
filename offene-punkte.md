@@ -22,6 +22,21 @@ Was daraus offen blieb:
 
 ## Zuerst
 
+### Zwei Ingest-Flows publizieren - Produktionsstoerung
+**Mit der Loeschung des alten Supabase-Projekts ist auch dessen Zugang `11jCRVtytAyrsu96` verschwunden.** Der `RAG-JIRA-Ingest` hing noch daran: Seit 15:05 Uhr scheitert jeder Jira-Webhook mit `Credential with ID "11jCRVtytAyrsu96" does not exist for type "supabaseApi"`. Acht Fehllaeufe, alle gemeldet.
+
+Die Adressen aller Nodes zeigen korrekt aufs neue Projekt - nur die Zugangsbindung war alt. Da die MCP-Schnittstelle Credentials nicht ausliest, liess sich nicht feststellen, welcher Node betroffen war; deshalb wurde der richtige Zugang auf **allen** Supabase-Nodes ausdruecklich gesetzt:
+
+| Flow | Nodes | Stand |
+|---|---|---|
+| `RAG-JIRA-Ingest` (`ESVtaoyTfaP3jm2G`) | 21 | Entwurf, **nicht publiziert** |
+| `RAG - SharePoint Ingest` (`BBhGCRsQ8pdNSxTi`) | 17 | Entwurf, **nicht publiziert** |
+
+**Der Fix greift erst mit dem Publizieren.** Bis dahin laeuft die alte, kaputte Fassung weiter. Beim SharePoint-Ingest ist die Stoerung noch nicht sichtbar, weil die Delta-Laeufe ohne Aenderungen die Supabase-Nodes gar nicht anfassen - der naechtliche Abgleich um 03:30 wuerde aber scheitern.
+
+Im selben Entwurf des SharePoint-Ingests steckt der Filter fuer Office-Sperrdateien.
+
+
 ### Beitragsprüfung im Content Studio testen
 Die Prüfung ist publiziert, aber **noch nie gelaufen**. Ein Testlauf erzeugt echte Artefakte: einen Eintrag in `content_packages`, eine E-Mail und einen Buffer-Entwurf.
 
@@ -31,7 +46,7 @@ Zu belegen: `qa_passed`, die Zahl der Befunde, und dass bei einer Ablehnung **ke
 
 
 ### Contract Loader publizieren - wartet auf Mistral-Token
-**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 30 Nodes statt 36. Aufbau und Entscheidungen: [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
+**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 30 Nodes statt 36. Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
 
 Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen, Mistral-Upload, signierte URL, OCR und das Sichern des OCR-Textes. Beide Dokumente vollstaendig gelesen - 46 Seiten mit 20630 Woertern und 1 Seite mit 190 Woertern.
 
@@ -53,36 +68,12 @@ Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`R
 
 ## ProzessHub nach SharePoint
 
-**Der Flow bleibt bewusst stillgelegt**, bis Sebastian ihn aktiviert. Er ist belegt funktionsfaehig (Lauf 110370). Wie er scharfgeschaltet wird, steht in [flows/prozesshub-sharepoint/README.md](flows/prozesshub-sharepoint/README.md).
+**Der Flow bleibt bewusst stillgelegt**, bis Sebastian ihn aktiviert. Er ist belegt funktionsfaehig (Lauf 110370). Wie er scharfgeschaltet wird, steht in [flows/rwg-prozesshub-sharepoint/README.md](flows/rwg-prozesshub-sharepoint/README.md).
 
 ### PDF-Layout beurteilen
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.
 
-### Zwei EK-Ordner in Confluence
-Beide liegen im Bereich `ProzessHub` und unterscheiden sich nur im Strich:
-
-| Ordner | Zeichen | zuletzt geaendert |
-|---|---|---|
-| [EK – Einkauf](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/folder/438468881) | Gedankenstrich `–` | 15.08.2026 |
-| [EK - Einkauf](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/folder/442531841) | Bindestrich `-` | 17.08.2026 |
-
-Die Prozessseiten selbst fuehren durchgaengig den **Gedankenstrich**: [EK-01 – Lieferantenmanagement](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/438992990), [EK-02 – Beschaffungsabwicklung](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/442400769). Danach ist `EK – Einkauf` der Ordner, der zur Namenskonvention passt.
-
-Die EK-02-Familie wird gerade bearbeitet (zuletzt am 29.08.), die EK-01-Familie steht seit dem 15.08. Der Flow meldet die Dublette und legt beide zusammen ab - technisch unauffaellig, fachlich zu bereinigen.
-
 ## SharePoint Schulungen
-
-### Vier leere Ordner - Entscheidung offen
-Alle vier liegen in der Bibliothek `Schulungen` und sind seit ihrer Anlage leer geblieben. Sie sehen nach vorbereiteter Struktur aus, nicht nach Rest - deshalb wurden sie bei der Bereinigung am 30.08. stehen gelassen.
-
-| Ordner | angelegt |
-|---|---|
-| [Baustoff Prozesse](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Baustoff%20Prozesse) | 16.05.2024 |
-| [Dispo Prozesse](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Dispo%20Prozesse) | 16.05.2024 |
-| [Videos/Gebuchte Belege stornieren](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Videos/Gebuchte%20Belege%20stornieren) | 20.06.2024 |
-| [Baumarkt Prozesse](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Baumarkt%20Prozesse) | 08.05.2025 |
-
-Zwei davon sind seit zwei Jahren leer, einer seit gut einem. Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer.
 
 ### Dokumenteintrag vor den Chunks - Reihenfolge im Ingest
 Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: neun solcher Eintraege (Lauf 110771), acht davon bildreiche Regaletiketten-PDFs.
@@ -169,27 +160,29 @@ Fachlich zu entscheiden bleibt allein, was in SharePoint selbst mehrfach liegt: 
 
 ## Content Studio, weitere Themen
 
-### Use Cases: der Nachschub ist versiegt
-Zwei Stellen: Die Idee entsteht im Marketing Scout (`objM2PQrcTpEzik7`), ausformuliert wird sie im Content Studio (`bBBybznNNCnU2nOJ`). Positionierung auf Buero, Handwerk und CAD-/PDM-Prozesse.
+### Use Cases: Bestand bereinigt, Handwerk bleibt die Luecke
+Zwei Stellen: Die Idee entsteht im Marketing Scout (`objM2PQrcTpEzik7`), ausformuliert wird sie im Content Studio (`bBBybznNNCnU2nOJ`).
 
-**Der Bestand ist nicht alt, er waechst nur nicht mehr.** Alle 50 Eintraege stammen aus einem Fenster vom 10. bis 20.08.2026. Seither: nichts.
+**Der Scout laeuft, verwirft aber alles.** Taeglich um 04:20, zuletzt Lauf 110182: Der Business Scout bekommt 21 Kandidaten und gibt `[]` zurueck. Neun Laeufe in Folge ohne Zugang.
 
-| Saeule | new | used | rework | retired |
+**Das ist kein Fehler, sondern die Regel.** Sein Auftrag endet ausdruecklich mit „Wenn nichts wirklich Konkretes dabei ist, gib [] zurueck. Ein leeres Ergebnis ist besser als ein austauschbarer Use-Case." Die Kandidaten sind Fachpresse - Hochdruckreiniger-Zubehoer, Arbeitgeberpreise, Werkzeugmaschinen-Ruesten. Daraus laesst sich kein konkreter Prozess-Use-Case destillieren, und die Strenge ist genau dafuer gebaut worden.
+
+**Der Bestand wurde bereinigt.** Von 35 Eintraegen mit Status `new` trugen zwoelf Merkmale, an denen der Redaktions-Check scheitert: vier ein Fremdprodukt im Titel (Power Automate, DocuWare, Zapier, n8n), sechs einen generischen Namen wie „Workflow-Automatisierung", neun eine austauschbare Problembeschreibung wie „zeitaufwendig und fehleranfaellig". Sie stehen jetzt auf `rework` statt `new` - nicht geloescht, sondern aus dem Zugriff genommen.
+
+**Stand danach:**
+
+| Saeule | verfuegbar | nachzuarbeiten | verbraucht | ausgemustert |
 |---|---|---|---|---|
-| buero | 17 | 2 | 2 | 8 |
-| engineering | 15 | 1 | - | - |
-| fertigung | 3 | - | - | - |
-| handwerk | - | 2 | - | - |
+| buero | 10 | 9 | 2 | 8 |
+| engineering | 10 | 5 | 1 | 0 |
+| fertigung | 3 | 0 | 0 | 0 |
+| **handwerk** | **0** | 0 | 2 | 0 |
 
-**Die Ursache ist gemessen, nicht vermutet.** Der Scout laeuft taeglich um 04:20 und meldet Erfolg - zuletzt Lauf 110182 am 29.08. In diesem Lauf bekommt der Business Scout **21 Kandidaten** und gibt `[]` zurueck. Der Knoten `use_cases aufbereiten` liefert entsprechend null Items. Neun Laeufe in Folge, kein einziger neuer Use Case.
+Bei drei Beitraegen je Woche reichen 23 saubere Eintraege rund sieben Wochen. Das Studio hungert also nicht.
 
-Das Modell verwirft alle 21, und zwar zu Recht: Die Kandidaten sind Fachpresse - neues Hochdruckreiniger-Zubehoer, Arbeitgeberpreise Rheinland-Pfalz, Ruesten von Werkzeugmaschinen. Darin steckt kein Automatisierungs-Use-Case fuer Buero, Handwerk oder CAD/PDM.
+**Die eine echte Luecke ist handwerk.** Der Dienstagsslot „Werkstatt & Produktion" fuehrt `handwerk,fertigung,engineering` - da handwerk leer ist, greift dort immer die Ersatzsaeule. Und keiner der zehn `engineering`-Eintraege handelt von CAD oder PDM; es geht um Projektkoordination und Bueroarbeit mit dem Etikett „Ingenieurbueros".
 
-**Damit ist es kein Prompt-Problem, sondern ein Quellenproblem.** Die Feeds in `content_sources` liefern Branchennachrichten, gesucht werden aber Prozessgeschichten. Am Prompt zu drehen aendert daran nichts.
-
-**Was der Bestand inhaltlich hergibt** (Sichtung vom 29.08.): Keiner der 15 `engineering`-Eintraege handelt von CAD oder PDM - es geht um Projektkoordination, Compliance, Kundenkommunikation, also Bueroarbeit mit dem Etikett "Ingenieurbueros". Fuenf Eintraege behandeln EU AI Act und KI-Compliance, drei die Belegverarbeitung. Vier Titel nennen Fremdprodukte (Power Automate, DocuWare, Zapier, n8n), die der Redaktions-Check im Beitragstext hart sperrt. Und "zeitaufwendig und fehleranfaellig" steht sechsmal als Problembeschreibung - der Check verlangt aber ein benanntes Dokument oder einen benannten Arbeitsschritt.
-
-**Zu entscheiden:** Quellen erweitern, damit der Scout ueberhaupt passendes Material bekommt - oder Use Cases fuer die drei Saeulen von Hand setzen und den Scout auf das Beobachten von Trends beschraenken.
+**Zu entscheiden:** Der Scout kann Handwerk nicht aus Branchennachrichten erfinden. Entweder Quellen ergaenzen, die Prozessgeschichten statt Produktmeldungen liefern - oder eine Handvoll Handwerks-Use-Cases von Hand setzen und den Scout auf das Beobachten beschraenken.
 
 ### `builtInTools` — geprüft, nicht lösbar
 

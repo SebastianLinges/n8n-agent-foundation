@@ -1,6 +1,6 @@
 # KI Daily - Collect [WF-1]
 
-Sammelflow (`mzSLn4WzFQSv0cuX`) für die KI-Nachrichtenlage. Er trägt Meldungen aus vier Quellen zusammen, wirft Bekanntes und Unerwünschtes raus, lässt den Rest von einem Modell bewerten und legt die Treffer in `news_memory` ab. Er verschickt nichts — das tut der Auswertungsflow [KI Daily - Analyze](../ki-daily-analyze/README.md).
+Sammelflow (`mzSLn4WzFQSv0cuX`) für die KI-Nachrichtenlage. Er trägt Meldungen aus vier Quellen zusammen, wirft Bekanntes und Unerwünschtes raus, lässt den Rest von einem Modell bewerten und legt die Treffer in `news_memory` ab. Er verschickt nichts — das tut der Auswertungsflow [KI Daily - Analyze](../kapa-ki-daily-analyze/README.md).
 
 Takt: **Montag, Mittwoch, Freitag 06:00** (`0 6 * * 1,3,5`).
 

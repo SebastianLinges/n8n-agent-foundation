@@ -98,6 +98,6 @@ Bei Ablehnung entsteht nichts davon außer der Telegram-Meldung.
 
 ## Verhältnis zu den anderen Flows
 
-Die Themen entstehen in [KI Daily - Analyze & Deliver](../ki-daily-analyze/README.md): Der Business Scout schreibt `use_cases`, der Marketing Scout schreibt `marketing_idea`. Das Content Studio verbraucht beides.
+Die Themen entstehen in [KI Daily - Analyze & Deliver](../kapa-ki-daily-analyze/README.md): Der Business Scout schreibt `use_cases`, der Marketing Scout schreibt `marketing_idea`. Das Content Studio verbraucht beides.
 
 Beide Flows laufen versetzt — Analyze Mo/Mi/Fr um 06:20, das Studio Mo/Mi/Do um 08:00. Am Montag und Mittwoch liegt frisches Material vor, am Donnerstag arbeitet das Studio auf dem Bestand.
