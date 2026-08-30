@@ -75,7 +75,7 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Den Abgleich `110900` auswerten.** Er startete am 30.08. um 18:15 als Testlauf unter Beobachtung und lief beim Sitzungsende noch — über 50 Minuten, bei einem Timeout von einer Stunde. Er hat nachweislich gearbeitet: SharePoint-Chunks stiegen währenddessen von 7 267 auf 7 287. **Drei Fragen beantwortet er auf einen Schlag:** ob die sieben bildreichen `.docx` endlich Chunks bekommen, ob der Sperrdatei-Filter greift, und ob er im Timeout endete. Ist er gescheitert, steht die Ursache in der Ausführung des Fehler-Workflows `pMGm0LaxRTldvPKEkmkzC`, nicht in seiner eigenen.
+1. **Den Abgleich `110900` auswerten.** Er startete am 30.08. um 18:15 als Testlauf unter Beobachtung und lief beim Sitzungsende gegen 18:40 noch. Der Timeout steht auf einer Stunde, die Frist lief also bis 19:15. Er hat nachweislich gearbeitet: SharePoint-Chunks stiegen währenddessen von 7 267 auf 7 287. **Drei Fragen beantwortet er auf einen Schlag:** ob die sieben bildreichen `.docx` endlich Chunks bekommen, ob der Sperrdatei-Filter greift, und ob er im Timeout endete. Ist er gescheitert, steht die Ursache in der Ausführung des Fehler-Workflows `pMGm0LaxRTldvPKEkmkzC`, nicht in seiner eigenen.
 2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
 
