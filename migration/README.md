@@ -131,6 +131,33 @@ Umgestellt wird erst, wenn das neue Projekt steht — und Flow für Flow mit ein
 
 **Diese Liste ist nicht vollständig.** Sie stammt aus den Flows im Repo. Die Inventur hat fünf Tabellen gefunden, die dort in keinem Flow vorkommen: `confluence_pages`, `agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`, `agent_jira_create_requests`. Wer sie schreibt, ist offen — entweder Flows außerhalb des Repos oder stillgelegte Strecken. **Vor der Umstellung zu klären**, sonst schreibt nach dem Umzug etwas weiter in die alte Datenbank. Tabellen die am ende nach erneuter Prüfung in keinem flow benötigt wurden können entfernt wreden.
 
+## Was im Zielprojekt entfernt wurde
+
+Nach der Übernahme wurde geprüft, was tatsächlich aufgerufen wird — über **alle 35 Flows der Instanz**, nicht nur die vermuteten. Entfernt (Lauf 110820):
+
+| Entfernt | Grund |
+|---|---|
+| `funktion_rag_suche_chunks` | kein Aufrufer |
+| `funktion_jira_ticket_lesen` | kein Aufrufer |
+| `jira_agent_collect_context` | kein Aufrufer — der Jira-Agent nutzt eigenes SQL |
+| `match_documents` | kein Aufrufer |
+| Ansicht `documents` | diente nur `match_documents` als LangChain-Brücke |
+
+**Wiederherstellbar:** Die vollständigen Definitionen stehen in [inventur-alt-struktur.json](inventur-alt-struktur.json).
+
+Verblieben sind `funktion_match_document_chunks` (vom Jira-Agenten aufgerufen, Probe liefert Treffer) und `rls_auto_enable` — ein Supabase-eigener Trigger, der bei neuen Tabellen RLS einschaltet. Das war die Funktion, die im leeren Zielprojekt schon stand.
+
+### Was bewusst bleibt
+
+| Tabelle | Zeilen | Warum |
+|---|---|---|
+| `agent_jira_create_requests` | 0 | **wird gebraucht** — Duplikatschutz von `RWG Sub - Jira Issue Create`. Der Flow ist inaktiv, seine fünf Postgres-Nodes zeigten noch auf die alte Datenbank und wurden nachträglich umgestellt. |
+| `agent_ticket_dialogs` | 2 | kein Flow gefunden, aber Daten vorhanden. Herkunft klären, bevor etwas verschwindet. |
+| `documentation_findings` | 10 | dito |
+| `documentation_review_state` | 17 | dito |
+
+Tabellen mit Inhalt ohne bekannten Schreiber werden **nicht** gelöscht. Eine Funktion lässt sich aus dem Repo in Sekunden wiederherstellen, 27 Zeilen unbekannter Herkunft nicht.
+
 ## Funktionen: erst übernehmen, dann aufräumen
 
 Sind Tabellen und Dokumentenspeicher überführt, gehören die fünf Funktionen auf den Prüfstand. Beim Anlegen kommen sie zunächst **unverändert** mit — sonst bräche die Umstellung an zwei Baustellen gleichzeitig. Danach ist zu klären, welche überhaupt in Verwendung ist:

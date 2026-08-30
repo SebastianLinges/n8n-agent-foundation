@@ -4,15 +4,13 @@ Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes
 
 ## Umzug der RWG-Datenbank
 
-**Der Umzug ist vollzogen.** Alle Daten, Bilder und Flows liegen im Projekt `zckaxkpycyyxaymmkmvu` (RWG Rheinland eG / RAG). Abnahme und Vorgehen stehen in [migration/README.md](migration/README.md).
+**Vollzogen und abgenommen.** Daten, Bilder und Flows liegen im Projekt `zckaxkpycyyxaymmkmvu` (RWG Rheinland eG / RAG). Vorgehen und Abnahme stehen in [migration/README.md](migration/README.md).
 
-Was noch offen ist:
+Was noch aussteht:
 
-- **Das alte Projekt `zjabiweaihsezjjeycko` loeschen.** Alles ist umgezogen und geprueft: null Verweise auf das alte Projekt, null Bildpfade ohne echtes Objekt. Vor dem Loeschen dennoch ein bis zwei Tage Betrieb abwarten.
-- **Funktionen aufraeumen.** Fuenf Funktionen kamen unveraendert mit. Welche davon wirklich aufgerufen wird, ist nur fuer `funktion_match_document_chunks` belegt. Nomenklatur vereinheitlichen, Ungenutztes entfernen — erst nach ein paar Tagen Betrieb.
-- **Fuenf Tabellen ohne bekannten Schreiber:** `documentation_findings`, `documentation_review_state`, `agent_ticket_dialogs`, `agent_jira_create_requests`, `confluence_pages` wird vom Confluence-Ingest gefuellt, die uebrigen vier haben keinen Flow im Repo. Klaeren, dann entfernen oder dokumentieren.
-- **`RWG_Reporter_BC` ist nicht ueber MCP erreichbar** und blieb daher ungeprueft. Inaktiv, kann also nicht laufen — vor einer Aktivierung pruefen.
-- **Eine Funktion war im Zielprojekt schon vorhanden**, bevor etwas uebertragen wurde. Herkunft ungeklaert.
+- **Das alte Projekt `zjabiweaihsezjjeycko` loeschen.** Alles ist geprueft: null Verweise darauf, null Bildpfade ohne Objekt, alle Funktionen liefern Treffer. **Erst nach dem naechtlichen Abgleich um 03:30** — das ist der erste unbeaufsichtigte Lauf gegen das neue Projekt und der einzige Beleg, den nur die Zeit liefert.
+- **Vier Tabellen ohne bekannten Schreiber:** `agent_ticket_dialogs` (2 Zeilen), `documentation_findings` (10), `documentation_review_state` (17). Dazu `agent_jira_create_requests` — die wird von `RWG Sub - Jira Issue Create` gebraucht und bleibt. Bei den drei uebrigen ist die Herkunft zu klaeren, bevor etwas verschwindet.
+- **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geaendert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile — semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent, falls es sauber sein soll.
 
 
 ## Zuerst

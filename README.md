@@ -11,24 +11,60 @@ flows/<flow-name>/
   *.json / *.sql   Schemata, Abfragen, Hilfsdateien des Flows
 ```
 
+**Namenskonvention:** Alle KAPA-Digital-Flows beginnen mit `KAPA Digital - `. Alles Übrige gehört zur RWG Rheinland. Die Trennung ist nicht kosmetisch — beide Welten hängen an verschiedenen Supabase-Projekten und dürfen nicht vermischt werden.
+
+### Mit eigenem Ordner
+
 | Flow | Ordner | n8n-ID |
 |---|---|---|
-| RWG Jira-Agent | `flows/rwg-jira-agent/` | `QXCWIsTzDEmfwPwK` |
+| RAG - SharePoint Ingest | `flows/rag-sharepoint-ingest/` | `BBhGCRsQ8pdNSxTi` |
+| RAG-Confluence-Ingest | `flows/rag-confluence-ingest/` | `Ham6IDJxbqIydImp` |
+| RAG-JIRA-Ingest | `flows/rag-jira-ingest/` | `ESVtaoyTfaP3jm2G` |
+| RWG Sub - Wissenssuche | `flows/rwg-sub-wissenssuche/` | `GD256mxClPHHbngI` |
+| RWG_Jira-Agent | `flows/rwg-jira-agent/` | `QXCWIsTzDEmfwPwK` |
 | RWG Teams Agent | `flows/rwg-teams-agent/` | `BWswB3XA8S2gMwoT` |
 | RWG Sub - Jira Tickets | `flows/rwg-sub-jira-tickets/` | `HoCch7AkiSroyJBB` |
-| RWG Sub - Wissenssuche | `flows/rwg-sub-wissenssuche/` | `GD256mxClPHHbngI` |
 | RWG_Jira-Feldpflege | `flows/rwg-jira-feldpflege/` | `k4SmnNrz7ASMdFwk` |
-| KI Daily - Collect [WF-1] | `flows/ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
-| KI Daily - Analyze & Deliver [WF-2] | `flows/ki-daily-analyze/` | `objM2PQrcTpEzik7` |
-| KAPA Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |
-| RAG - SharePoint Ingest | `flows/rag-sharepoint-ingest/` | `BBhGCRsQ8pdNSxTi` |
 | RWG ProzessHub nach SharePoint | `flows/prozesshub-sharepoint/` | `Muss6GBGPuG9fjE2` |
+| KAPA Digital - KI Daily - Collect [WF-1] | `flows/ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
+| KAPA Digital - KI Daily - Analyze & Deliver [WF-2] | `flows/ki-daily-analyze/` | `objM2PQrcTpEzik7` |
+| KAPA Digital - Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |
 
-Die beiden KI-Daily-Flows gehören zusammen und müssen **auf denselben Wochentagen laufen** — die Kopplung trägt über Zustände in Supabase, nicht über ein Datum. Wer den Cron des einen ändert, muss den anderen mitändern. Die Begründung steht in beiden Flow-READMEs.
+### Ohne eigenen Ordner
 
-Die drei Marketing-Flows bilden eine Kette: Collect sammelt, Analyze wertet aus und legt Use Cases und Marketing-Ideen ab, das Content Studio verbraucht sie. Das Studio laeuft **einen Tag vor dem Posttag** - der `weekday` in `content_schedule` meint deshalb den Posttag, nicht den Lauftag.
+Auf der n8n-Leinwand dokumentiert, hier nur eingeordnet:
 
-Der Teams-Agent ruft zwei weitere Subflows: `RWG Sub - Identity & Audience Resolver` (`B2kmRuBHRbJx8HBI`) und `RWG Sub – Teams Image Read` (`omHDN0g9Lusb6H87`). Beide sind auf der n8n-Leinwand dokumentiert und im README des Teams-Agenten eingeordnet; einen eigenen Ordner bekommen sie erst, wenn dort mehr als der Export abzulegen ist.
+| Flow | n8n-ID | Was er tut | Datenbank |
+|---|---|---|---|
+| RWG Steuerung - Confluence Bereiche | `MNQGEjBNyaYhkbSy` | ruft den Confluence-Ingest je Bereich auf | keine |
+| RWG Sub - Identity & Audience Resolver | `B2kmRuBHRbJx8HBI` | leitet Rolle und Sichtbarkeit aus dem Graph-Profil ab | keine |
+| RWG Sub – Teams Image Read | `omHDN0g9Lusb6H87` | liest Bilder aus Teams-Nachrichten | keine |
+| RWG Sub - Jira Issue Create | `SnD6H4tQfX2sGSZgTaJfs` | erstellt Jira-Tickets, Duplikatschutz über `agent_jira_create_requests` | RWG RAG |
+| RWG Wartung - Funktionen pruefen | `h4uVcnxF5jbRUPHZ` | Gesundheitsprüfung der Wissensbasis in einer halben Sekunde | RWG RAG |
+| RWG Monitor - Microsoft Graph & Teams | `1OcqfC4wTC9bj0wK` | Erreichbarkeitsprüfung alle 15 Minuten | keine |
+| RWG_Contract_Loader | `661BDwEditNicEc0` | Vertragsdaten | keine |
+| Telegram_Error_Info | `pMGm0LaxRTldvPKEkmkzC` | Fehler-Workflow für alle Flows | keine |
+| RWG_Reporter_BC | `v47TYgBcBQr6q04q` | Testaufbau, inaktiv, nicht über MCP erreichbar | ungeprüft |
+
+Die übrigen KAPA-Digital-Flows (Angebot, Belegeingang, CRM, Event Scout, Lead Intake, Lead Wiedervorlage, Website Assistent) hängen ausschließlich an den KAPA-Projekten `glhqajoxbscriskwzhbr` (Kapa-Core) und `ouccmqkwgdxjnplblnzk` (Marketing).
+
+## Welcher Flow hängt an welcher Datenbank
+
+Die RWG-Wissensbasis liegt im Supabase-Projekt `zckaxkpycyyxaymmkmvu` (Organisation RWG Rheinland eG, Projekt RAG).
+
+| Zugriffsart | Flows |
+|---|---|
+| HTTP auf PostgREST und Storage | SharePoint-, Confluence- und Jira-Ingest |
+| Postgres-Node | Wissenssuche, Jira-Agent, Teams-Agent, Jira Issue Create, Funktionen prüfen |
+| Vector Store und Supabase-Tool | Jira-Agent |
+
+## Wie die Flows zusammenhängen
+
+Die beiden KI-Daily-Flows gehören zusammen und müssen **auf denselben Wochentagen laufen** — die Kopplung trägt über Zustände in Supabase, nicht über ein Datum. Wer den Cron des einen ändert, muss den anderen mitändern.
+
+Die drei Marketing-Flows bilden eine Kette: Collect sammelt, Analyze wertet aus und legt Use Cases und Marketing-Ideen ab, das Content Studio verbraucht sie. Das Studio läuft **einen Tag vor dem Posttag** — der `weekday` in `content_schedule` meint deshalb den Posttag, nicht den Lauftag.
+
+Auf der RWG-Seite füllen drei Ingest-Flows dieselbe Tabelle `document_chunks`, unterschieden über `source_type`. Wissenssuche, Jira-Agent und Teams-Agent lesen daraus. Der Teams-Agent ruft dabei vier Subflows: Wissenssuche, Jira Tickets, Identity Resolver und Teams Image Read.
 
 ## Offene Punkte
 

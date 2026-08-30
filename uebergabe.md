@@ -8,6 +8,8 @@ Diese Datei ist als Eingangsnachricht für eine neue Sitzung gedacht. Sie ersetz
 
 Sebastian Linges, Geschäftsführer KAPA Digital, arbeitet für RWG Rheinland eG. n8n-Instanz `https://n8n.srv1307521.hstgr.cloud`. Zugriff per MCP auf n8n, Jira/Confluence (Atlassian), Supabase.
 
+**Zwei getrennte Welten in derselben Instanz.** Alle KAPA-Digital-Flows heißen `KAPA Digital - …` und hängen an den Supabase-Projekten `glhqajoxbscriskwzhbr` (Kapa-Core) und `ouccmqkwgdxjnplblnzk` (Marketing). Alles Übrige gehört zur RWG und hängt an `zckaxkpycyyxaymmkmvu` (Organisation RWG Rheinland eG, Projekt RAG). Die beiden Welten werden nie vermischt.
+
 ## Arbeitsregeln
 
 - **Native n8n-Nodes vor Code-Nodes.**
@@ -32,44 +34,55 @@ Sebastian Linges, Geschäftsführer KAPA Digital, arbeitet für RWG Rheinland eG
 - **In Schleifen liefert `$('Node').all()` nur den letzten Durchlauf.** Der zweite Parameter ist der Durchlaufindex.
 - **Ein Subworkflow bekommt alle Items auf einmal.** Liest er mit `$input.first()`, verarbeitet er nur das erste.
 - **PostgREST liefert höchstens 1000 Zeilen je Anfrage.** Ein `limit` im Querystring hebt das nicht auf.
-- **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** In einer Schleife über viele Dokumente reißt ein einzelner Netzabbruch alles Übrige mit — auch das, was noch gar nicht dran war. Wiederholung allein hilft nicht.
-- **n8n legt bei HTTP-Fehlern das komplette Request-Objekt in den Ausführungsdaten ab**, samt `apikey`- und `Authorization`-Kopfzeile im Klartext. Wer Ausführungen sehen darf, sieht die Schlüssel.
+- **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** In einer Schleife über viele Dokumente reißt ein einzelner Netzabbruch alles Übrige mit.
+- **n8n legt bei HTTP-Fehlern das komplette Request-Objekt in den Ausführungsdaten ab**, samt `apikey` und `Authorization` im Klartext.
+- **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern** — auch in Zeichenketten und **in Kommentaren**. Ein `$1` in einem Kommentar bricht die Abfrage mit `out of range`; ein `$` ohne Ziffer wird still verschluckt (ein Zeilenende-Anker in einem regulären Ausdruck verschwand samt Anführungszeichen). Platzhalter zur Laufzeit aus `chr(36)` bauen, Daten immer über `queryReplacement` binden.
+- **`queryBatching: single` verfälscht SQL**, wenn mehrere Anweisungen zusammengefasst werden. Immer `independently`.
+- **Große Ausführungen sind per MCP nicht abrufbar** — `get_execution` mit `includeData` reißt bei OCR- und bildlastigen Läufen die Sitzung ab. Die Ursache steht stattdessen in der Ausführung des Fehler-Workflows `pMGm0LaxRTldvPKEkmkzC`.
+- **n8n weist Credentials automatisch zu**, wenn nur eine des Typs existiert. Bei zwei Datenbanken ist das gefährlich — nach jedem `create_workflow_from_code` die Zuordnung prüfen.
 
 ---
 
-## Stand: SharePoint-Wissensbasis
+## Stand: die RWG-Wissensbasis
 
-**Der Hauptbau der letzten Sitzung.** `RAG - SharePoint Ingest` (`BBhGCRsQ8pdNSxTi`), 106 Nodes, publiziert.
+Drei Ingest-Flows füllen dieselbe Tabelle `document_chunks`, unterschieden über `source_type`:
 
-Ein Flow für alles — er holt seine Änderungen selbst, verarbeitet sie und schreibt sie fort. Kein Webhook, kein Power Automate, kein zweiter Flow.
-
-| | Takt | Was |
+| Quelle | Chunks | Dokumente |
 |---|---|---|
-| Delta | stündlich | nur Änderungen seit dem Anker |
-| Abgleich | 03:30 Ortszeit | voller Vergleich SharePoint ↔ Wissensbasis |
+| `jira` | 10 544 | 1 466 |
+| `sharepoint` | 7 267 | 252 |
+| `confluence` | 3 512 | 611 |
 
-Alle Dateitypen sind einzeln belegt: pdf, docx, pptx, txt, xls, xlsx. Word und PowerPoint laufen über die PDF-Wandlung von Graph durch dieselbe OCR-Strecke — bei PowerPoint erfasst Mistral dabei auch die Folienbilder. Arbeitsmappen laufen über die Workbook-API, Blatt für Blatt, mit Unterscheidung Tabelle/Notiz.
+Dazu der Bucket `rag` mit 7 384 Bildern (452 MB). Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
 
-**Stand der Erstbefüllung:** Der Abgleich feuert belegt zur Ortszeit. Acht Word-Dateien laufen in zwei Minuten durch. Ein Netzabbruch beim Bild-Upload einer bildreichen Groß-PDF hat den ersten Lauf abgebrochen — der Bildzweig ist seither ausfalltolerant, ein einzelnes verlorenes Bild beendet den Lauf nicht mehr. Neun Dokumente stehen ohne Chunks in der Wissensbasis, acht davon bildreiche Regaletiketten-PDFs; die Chunkprüfung des Abgleichs stellt sie selbsttätig wieder ein.
+**Der Umzug ins neue Supabase-Projekt ist am 30.08. vollzogen und abgenommen.** Einzelheiten in [migration/README.md](migration/README.md).
+
+**Gesundheitsprüfung:** Flow `RWG Wartung - Funktionen pruefen` (`h4uVcnxF5jbRUPHZ`) beantwortet in einer halben Sekunde, ob die Wissensbasis intakt ist — Bestand, Embeddings, Indizes, Bucket und ob noch Verweise aufs alte Projekt existieren.
+
+## Als Erstes in der neuen Sitzung
+
+1. **Wie lief der Abgleich um 03:30?** Ausführungen von `BBhGCRsQ8pdNSxTi`, der Lauf um 01:30 UTC ist der Abgleich. Bei einem Fehler steht die Ursache in der Ausführung von `pMGm0LaxRTldvPKEkmkzC`, nicht im Lauf selbst.
+2. **Gesundheitsprüfung laufen lassen** (`h4uVcnxF5jbRUPHZ`).
+3. Erst danach: **das alte Supabase-Projekt `zjabiweaihsezjjeycko` löschen.**
 
 ## Offene Themen
 
 Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
 
-**Zuerst: Die RWG-Datenbank zieht um**
-Supabase `zjabiweaihsezjjeycko` ist vollgelaufen und verschwindet. Alles nach `zckaxkpycyyxaymmkmvu`. Erst Strukturen und Ablagen anlegen, dann die Flows umstellen, dann die Daten migrieren. **Die KAPA-Digital-Verbindung ist nicht betroffen.** Betroffen sind Ingest, Wissenssuche und Jira-Agent.
-
 **Wartet auf Sebastian**
-- Power-Automate-Flow entfernen (liegt außerhalb von n8n, Ziel `.../webhook/8e16e07b-...`)
+- Altes Supabase-Projekt löschen (nach der Beobachtungsnacht)
+- Power-Automate-Flow entfernen (außerhalb von n8n, Ziel `.../webhook/8e16e07b-…`)
 - Vier leere Ordner in Shared Documents: löschen oder behalten?
-- Formatpaare (dieselbe Unterlage als pptx und pdf) und 5 unklare Doubletten — fachlich zu entscheiden
+- 23 Formatpaare und 5 unklare Doubletten — fachlich zu entscheiden
 - Beitragsprüfung im Content Studio testen (erzeugt echte Artefakte)
-- Use Cases für Handwerk und CAD/PDM: Zuarbeit nötig, der Bestand trägt die Positionierung nicht
+- Use Cases für Handwerk und CAD/PDM: Zuarbeit nötig
 
 **Technisch offen**
-- Erstbefüllung läuft: 458 Dateien fehlen, 30 je Nacht
+- Erstbefüllung läuft: rund 458 SharePoint-Dateien fehlen, 30 je Nacht
+- Drei Tabellen ohne bekannten Schreiber: `agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`
+- Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
-- Tabellendaten abfragbar machen: Vektorsuche findet, sie rechnet nicht. Für Umsatzfragen bräuchte es ein Abfragewerkzeug wie beim Jira-Agenten. Eigenes Vorhaben.
+- Tabellendaten abfragbar machen: Vektorsuche findet, sie rechnet nicht. Eigenes Vorhaben.
 - ProzessHub-Flow scharfschalten (`Muss6GBGPuG9fjE2`, stillgelegt aber funktionsfähig)
 - Dienstkonto statt persönlichem Zugang für Graph
 
@@ -77,12 +90,13 @@ Supabase `zjabiweaihsezjjeycko` ist vollgelaufen und verschwindet. Alles nach `z
 
 | Datei | Inhalt |
 |---|---|
-| `README.md` | Flow-Übersicht mit n8n-IDs |
-| `offene-punkte.md` | Was ansteht und was fehlt |
-| `ideen.md` | Was noch keine Aufgabe ist |
+| `README.md` | alle Flows mit n8n-ID, Datenbankzuordnung und Zusammenhängen |
+| `migration/` | Umzug: Befund, Abnahme, Struktur der alten Datenbank |
+| `offene-punkte.md` | was ansteht und was fehlt |
+| `ideen.md` | was noch keine Aufgabe ist |
 | `tests/laufprotokoll.csv` | jeder Lauf mit Execution-ID und Befund |
 | `flows/*/README.md` | je Flow: Aufbau, Entscheidungen, Fallstricke |
 
 ## Erster Schritt
 
-Hol dir den Stand aus dem Repo und aus n8n, statt dich auf diese Zusammenfassung zu verlassen. Sieh zuerst nach, wie der letzte nächtliche Abgleich gelaufen ist — Ausführungen des Flows `BBhGCRsQ8pdNSxTi`, der Lauf um 01:30 UTC ist der Abgleich. Bei einem Fehler steht die Ursache nicht im Lauf selbst (er ist zu groß zum Abrufen), sondern in der Ausführung des Fehler-Workflows `pMGm0LaxRTldvPKEkmkzC`.
+Hol dir den Stand aus dem Repo und aus n8n, statt dich auf diese Zusammenfassung zu verlassen.
