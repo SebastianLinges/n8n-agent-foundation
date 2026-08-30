@@ -83,9 +83,9 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
    **Was übrig ist, ist eine eigene Sorte Problem.** Die sechs verbliebenen sind Regaletiketten-PDFs aus der Power-Automate-Zeit vom 22.08., alle mit `ingestion_count: 0`: 3 640 bis 11 541 Wörter, 29 bis 92 kB Text, **null Bilder** — hunderte Seiten Etiketten, also sehr grosse OCR-Aufträge. Lauf `110980` starb nach 10 min 46 s an einem davon.
 
-   **Der Abgleich zieht sie mit Vorrang**, weil sie als unvollständig gelten. Solange nichts geschieht, läuft der nächtliche Abgleich also in dieselbe Wand. Immerhin: Was ein Lauf vorher schafft, bleibt jetzt erhalten — `110980` heilte zwei Dokumente, bevor er starb.
+   **Sie blockieren aber nicht dauerhaft.** Lauf `110982` griff danach auf neue Dateien zu und las fünf davon sauber ein — die sechs blieben unangetastet. Warum `110980` an einem von ihnen starb und `110982` sie überspringt, ist offen und gehört als Erstes geklärt. Immerhin: Was ein Lauf vorher schafft, bleibt jetzt erhalten — `110980` heilte zwei Dokumente, bevor er starb.
 
-   **Zu entscheiden:** die sechs überspringen lassen, einzeln über `nurDatei` nachfahren, oder `maxJeLauf` senken. Ohne eine Entscheidung heilt der Abgleich nichts mehr, weil er immer zuerst an diese sechs gerät.
+   **Zu entscheiden:** die sechs gezielt über `nurDatei` einzeln nachfahren, dauerhaft überspringen lassen, oder in Ruhe lassen und den Rückstand weiterlaufen lassen.
 
    **Die Ursache des Abbruchs ist nicht auslesbar.** Das Fehlerobjekt sprengt die MCP-Verbindung, und der Fehler-Workflow feuert nur bei Produktionsläufen — die Testläufe waren manuell. Ein Produktionslauf würde die Meldung in `pMGm0LaxRTldvPKEkmkzC` hinterlassen.
 
