@@ -22,47 +22,6 @@ Was daraus offen blieb:
 
 ## Zuerst
 
-### Zwei Ingest-Flows - Zugangsfix belegt
-**Mit der Loeschung des alten Supabase-Projekts ist auch dessen Zugang `11jCRVtytAyrsu96` verschwunden.** Der `RAG-JIRA-Ingest` hing noch daran und scheiterte bei jedem Jira-Webhook mit `Credential with ID "11jCRVtytAyrsu96" does not exist for type "supabaseApi"`.
-
-Die Adressen aller Nodes zeigen korrekt aufs neue Projekt - nur die Zugangsbindung war alt. Da die MCP-Schnittstelle Credentials nicht ausliest, liess sich nicht feststellen, welcher Node betroffen war; deshalb wurde der richtige Zugang `H1j5n8gUPkmrE97X` auf **allen** Nodes mit Supabase-Bezug ausdruecklich gesetzt. Beide Flows sind publiziert, `versionId` und `activeVersionId` stimmen ueberein:
-
-| Flow | Nodes mit Supabase-Bezug | aktive Version |
-|---|---|---|
-| `RAG-JIRA-Ingest` (`ESVtaoyTfaP3jm2G`) | 3 Supabase-Nodes + 18 HTTP-Nodes = 21 | `5826aa4c-4a0a-45a0-94b9-dd0cfdcc085b` |
-| `RAG - SharePoint Ingest` (`BBhGCRsQ8pdNSxTi`) | 17 HTTP-Nodes | `cd924752-af5a-410e-8be6-863b80fbe3e7` |
-
-Die Zugaenge haengen fast alle an HTTP-Nodes mit `nodeCredentialType: supabaseApi`, nicht an Supabase-Nodes. Im Export taucht der Fix deshalb gar nicht auf - Credentials sind nicht Teil des Exports.
-
-**Beide Flows sind durch einen Lauf belegt.**
-
-- **Jira** (`110886`): Eine Prioritaetsaenderung an SSD-9192 lief bis `Workflow Summary` durch. `Get Existing Ticket` - genau der Node, der zuvor starb - antwortete in 155 ms. Bestand 21323 auf 21326.
-- **SharePoint** (`110888`): Der Delta-Lauf um 17:00 fand fuenf Loeschmeldungen und fasste damit fuenf Nodes mit `supabaseApi` an, alle erfolgreich - darunter `Wissensbasis-Bestand` und `Chunkzahlen laden`.
-
-Anzustossen war keiner der beiden per MCP: Der Jira-Trigger gilt der MCP-Ausfuehrung nicht als Trigger, und beim SharePoint-Ingest ergibt ein Handstart laut Code-Node `Steuerung` immer `laufart: delta`.
-
-Im selben Entwurf des SharePoint-Ingests steckt der Filter fuer Office-Sperrdateien. Er ist der einzige inhaltliche Unterschied zum vorigen Export.
-
-
-### Loeschschleife des SharePoint-Ingests bricht nach der ersten Aufgabe ab
-Gemessen in Lauf `110888`. `Aufgaben bestimmen` meldete `zu_loeschen: 5`, abgearbeitet wurde **eine**. Der Ablauf endet bei `Delete All SharePoint Chunks`: Der PostgREST-DELETE findet zu der `doc_id` keine Chunks und gibt ein leeres Array zurueck. Ein Node ohne Ausgabeitems stoppt in n8n den nachfolgenden Zweig - die Rueckverbindung `Delete SharePoint Source` nach `Delete Workflow Summary` nach `Je Aufgabe` wird nie erreicht. Im gespeicherten Kontext bleiben vier Aufgaben mit `done: false` stehen, der Lauf gilt als erfolgreich.
-
-**Warum das zaehlt:** Graph meldet eine Loeschung genau einmal. Kommen mehrere Loeschungen in einer Delta-Meldung und die erste hat keine Entsprechung in der Wissensbasis, sind die uebrigen fort. Der naechtliche Abgleich faengt Verwaiste wieder auf, deshalb heilt es sich - aber nicht am selben Tag.
-
-**Hier ohne Datenverlust:** betroffen waren vier leere Ordner und eine Datei, die alle keinen Eintrag in der Wissensbasis hatten.
-
-**Behoben und publiziert.** `alwaysOutputData` steht jetzt auf den drei DELETE-Nodes des Loeschzweigs - `Delete All SharePoint Chunks`, `Delete SharePoint Source` und `Delete SharePoint Storage Object`. Damit gibt jeder von ihnen auch ohne Treffer ein Item aus und die Schleife laeuft weiter. Die beiden GET-Nodes desselben Zweigs trugen die Einstellung schon vorher; `Delete Workflow Summary` faengt den Leerfall bereits ab und meldet dann `deleted_chunk_count: 0`. Die Ziel-URLs beziehen die `doc_id` aus `Build Delete Context` und nicht aus `$json` - ein eingefuegtes Leer-Item kann keinen falschen DELETE ausloesen.
-
-**Der Einlese-Zweig ist ebenso abgesichert und publiziert.** `alwaysOutputData` steht dort jetzt auf `Delete Stale SharePoint Chunks` (DELETE) und `Touch Unchanged Source` (PATCH). Geprueft wurde vorher, dass die nachgelagerten Code-Nodes `Plan SharePoint Storage Cleanup` und `No Change Summary` ausschliesslich aus benannten Vorgaengern lesen und nie aus `$input` oder `$json` - ein Leer-Item kann dort nichts verfaelschen.
-
-**`Delete Stale SharePoint Image` bekommt die Absicherung bewusst nicht.** Er ist strukturell ein anderer Fall als die fuenf oben:
-
-- Vor ihm steht `IF Has Stale Storage Objects`. `Plan SharePoint Storage Cleanup` gibt **ein Item je verwaistem Pfad** aus, jedes mit `has_stale_storage: true` - der Zweig wird also nur betreten, wenn mindestens ein Objekt zu loeschen ist. Ein leerer Eingang kann dort nicht auftreten.
-- Die Loeschung geht gegen die Storage-API, nicht gegen PostgREST. Jeder Aufruf liefert einen Antwortkoerper, also ein Item.
-- `alwaysOutputData` waere hier sogar **schaedlich**: `Collect Storage Delete Results` aggregiert zu `deleted_objects`, und `Build Final SharePoint Source Row` rechnet `storage_deleted_count = Number(storageResult.storage_deleted_count || 0) || deleted_objects.length`. Ein eingefuegtes Leer-Item ergaebe `deleted_objects: [{}]` und damit **ein geloeschtes Bild statt null** in der Abschlussmeldung.
-
-Der Punkt ist damit entschieden, nicht offen.
-
 ### 14 SharePoint-Dokumente ohne Chunks - Ursache geklaert
 14 Eintraege in `sharepoint_documents` tragen keinen einzigen Chunk. Gemessen ueber `metadata->>'doc_id'` und ueber die Spalte `source_ref` - beide Wege ergeben dieselben 14. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden. Keine Zwillingszeile traegt die fehlenden Chunks, `ingestion_errors` ist leer.
 
