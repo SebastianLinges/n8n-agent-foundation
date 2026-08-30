@@ -4,15 +4,12 @@ Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes
 
 ## Umzug der RWG-Datenbank
 
-**Vollzogen und abgenommen.** Daten, Bilder und Flows liegen im Projekt `zckaxkpycyyxaymmkmvu` (RWG Rheinland eG / RAG). Vorgehen und Abnahme stehen in [migration/README.md](migration/README.md).
+**Abgeschlossen.** Das alte Projekt `zjabiweaihsezjjeycko` ist samt Zugang geloescht; die Gesundheitspruefung danach (Lauf 110871) trifft alle Erwartungswerte: 21 323 Chunks, 0 ohne Embedding, Bucket 7 384 Objekte, 0 Altverweise. Vorgehen und Abnahme stehen in [migration/README.md](migration/README.md).
 
-Was noch aussteht:
+Was daraus offen blieb:
 
-- **Das alte Projekt `zjabiweaihsezjjeycko` loeschen. Alle Bedingungen sind erfuellt, es fehlt nur die Ausfuehrung.** Der Abgleich um 03:30 (Lauf 110522) scheiterte zwar an einem Netzabbruch zu Cloudflare, lag aber **vor** dem Umzug — Trigger 03:30 MESZ, Workflow umgestellt 11:18 MESZ — und lief daher noch gegen die alte Adresse. Die zwoelf Stundenlaeufe danach sind alle bestanden, instanzweit kein einziger Fehlerlauf seit dem Umzug. Die Gesundheitspruefung (Lauf 110825) trifft alle vier Erwartungswerte exakt: 21323 Chunks, 0 ohne Embedding, Bucket 7384 Objekte, 0 Verweise aufs alte Projekt.
-
-  Nebenbefund: n8n hat den **Service-Role-Key des alten Projekts im Klartext** in den Ausfuehrungsdaten abgelegt, in `apikey` und `Authorization`. Mit dem Loeschen des Projekts wird der Schluessel wertlos — ein Grund mehr.
-- **Vier Tabellen ohne bekannten Schreiber:** `agent_ticket_dialogs` (2 Zeilen), `documentation_findings` (10), `documentation_review_state` (17). Dazu `agent_jira_create_requests` — die wird von `RWG Sub - Jira Issue Create` gebraucht und bleibt. Bei den drei uebrigen ist die Herkunft zu klaeren, bevor etwas verschwindet.
-- **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geaendert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile — semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent, falls es sauber sein soll.
+- **Drei Tabellen ohne bekannten Schreiber:** `agent_ticket_dialogs` (2 Zeilen), `documentation_findings` (10), `documentation_review_state` (17). Herkunft klaeren, bevor etwas verschwindet.
+- **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geaendert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile - semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent, falls es sauber sein soll.
 
 
 ## Zuerst
@@ -40,13 +37,6 @@ Der Fehlerweg hat dabei genau so gegriffen wie entworfen: `status = 'fehler'`, M
 
 Noch unbelegt sind vier Nodes, die nur hinter der Extraktion liegen: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die Umwandlungen in `Ergebnis auswerten` sind einzeln gegen Testwerte geprueft, die Spaltenliste des grossen `UPDATE` gegen `information_schema` und `jsonb_to_record`. Ein Lauf ersetzt das nicht.
 
-### Zwei Hinterlassenschaften von Power Automate wegraeumen
-`RWG_n8n_Trigg` hat um 12:28:27 - kurz vor seiner Loeschung - noch zweimal zugegriffen. Beides ist an der App-Kennung `Microsoft Power Platform` (`7ab7862c-...`) belegt; alles, was der n8n-Flow anlegt, traegt dagegen `n8n-SharePoint` (`676b0b05-...`).
-
-**Ein gespiegelter Leerpfad.** In der Bibliothekswurzel steht ein Ordner `Shared Documents`, darunter `IMPORTER` und weiter. Power Automate hat den vollstaendigen serverrelativen Pfad `/Shared Documents/IMPORTER/CONTRACT/...` als **relatives** Ziel benutzt - die Wurzel *ist* aber bereits Shared Documents, also entstand der Pfad ein zweites Mal darunter. Groesse durchgehend 0 Bytes, Graph rechnet rekursiv: keine einzige Datei darin. Kann samt Unterordnern geloescht werden.
-
-**Eine ueberholte Excel.** Die erste `Vertragsuebersicht.xlsx` liegt in `DONE`, weil Power Automate sie kurz nach dem Erzeugen dorthin verschob. Lauf 110838 hat eine neue Fassung in den Eingang geschrieben, und dort ist sie geblieben - damit ist zugleich belegt, dass der Power-Automate-Flow wirklich weg ist. Die Fassung in `DONE` kann weg.
-
 ### Altbestand in DONE nachziehen
 Elf Dokumente liegen in `/IMPORTER/CONTRACT/DONE` und stehen nicht in `vertraege`. Ein Einmallauf ueber den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar. Bewusst zurueckgestellt, bis der Eingang belegt ist.
 
@@ -55,18 +45,10 @@ Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`R
 
 ## ProzessHub nach SharePoint
 
-### Scharfschalten
-Der Flow ist belegt funktionsfaehig (Lauf 110370: 234 Seiten erkannt, 157 Dokumente abgelegt, 16,9 Sekunden), aber **stillgelegt**: Nachttrigger deaktiviert, Flow unpubliziert, Testdaten aus SharePoint entfernt.
-
-Zum Scharfschalten zwei Handgriffe: `Naechtlicher Lauf 02 Uhr` aktivieren, Flow publizieren. Die Voraussetzungen stehen: Der Ordner heisst jetzt `UWP - Unternehmensweite Prozesse`, seine beiden Prozessseiten werden erkannt.
-
+**Der Flow bleibt bewusst stillgelegt**, bis Sebastian ihn aktiviert. Er ist belegt funktionsfaehig (Lauf 110370). Wie er scharfgeschaltet wird, steht in [flows/prozesshub-sharepoint/README.md](flows/prozesshub-sharepoint/README.md).
 
 ### PDF-Layout beurteilen
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.
-
-### Dienstkonto statt persönlichem Zugang
-Der Flow schreibt unter `Sebastian.Linges`. Ändert sich das Passwort oder verlässt die Person das Unternehmen, bricht die Spiegelung. Sauberer wäre ein Dienstkonto mit Zugriff auf die Site *Qualitätsmanagement und Prozessbeschreibungen*.
-
 
 ### Zwei EK-Ordner in Confluence
 `EK – Einkauf` und `EK - Einkauf` unterscheiden sich nur im Bindestrich. `EK-01` hängt im einen, `EK-02` im anderen. Der Flow meldet die Dublette in `bereichsordner_dubletten` und legt beide zusammen ab — technisch unauffällig, fachlich zu bereinigen.

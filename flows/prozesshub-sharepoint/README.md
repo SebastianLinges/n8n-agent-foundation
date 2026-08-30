@@ -4,7 +4,7 @@ Spiegelt den Confluence-Bereich **ProzessHub** als HTML-Dokumente in eine ShareP
 
 Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spiegel`, kein Bezug zum RAG-Ingest und keine gemeinsame Datenhaltung mit ihm. Eine spätere Erweiterung auf weitere Bereiche mit eigenen Regeln ist vorgesehen.
 
-**Stand: funktionsfaehig, aber stillgelegt.** Lauf 110370 hat den gesamten Bereich gespiegelt und damit belegt, dass die Kette traegt: 234 Seiten erkannt, 157 Prozessdokumente abgelegt, 1,7 MB, 16,9 Sekunden. Die Testdaten wurden anschliessend wieder entfernt, der Nachttrigger ist deaktiviert und der Flow unpubliziert. Zum Scharfschalten: Trigger aktivieren, publizieren.
+**Stand: funktionsfaehig, bewusst stillgelegt.** Er bleibt es, bis Sebastian ihn aktiviert. Lauf 110370 hat den gesamten Bereich gespiegelt und damit belegt, dass die Kette traegt: 234 Seiten erkannt, 157 Prozessdokumente abgelegt, 1,7 MB, 16,9 Sekunden. Die Testdaten wurden anschliessend wieder entfernt, der Nachttrigger ist deaktiviert und der Flow unpubliziert. Zum Scharfschalten: Trigger aktivieren, publizieren.
 
 ## Aufbau
 

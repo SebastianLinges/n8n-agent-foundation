@@ -23,6 +23,15 @@ Sebastian Linges, Geschäftsführer KAPA Digital, arbeitet für RWG Rheinland eG
 - **Alle Node-Änderungen eines Workflows in einem `operations`-Array.** Getrennte `update_workflow`-Calls überschreiben sich gegenseitig.
 - Arbeitsrhythmus: **Block für Block** — erklären, Information holen, freigeben lassen.
 
+## Bewusst so entschieden
+
+Nicht aufwerfen, das ist geklärt:
+
+- **Graph läuft über den persönlichen Zugang `Sebastian.Linges`**, nicht über ein Dienstkonto. Bewusst so, bleibt so.
+- **Der ProzessHub-Flow (`Muss6GBGPuG9fjE2`) bleibt stillgelegt**, bis Sebastian ihn aktiviert. Er ist belegt funktionsfähig.
+- **Der Ablageordner des Contract Loaders heißt `DONE`**, nicht `Erledigt` — er bestand bereits und war gefüllt.
+- **Die Excel-Übersicht wird je Lauf neu erzeugt**, nicht fortgeschrieben, und enthält Fertiges wie Fehlerfälle mit `status` als erster Spalte.
+
 ## Teuer erkaufte technische Regeln
 
 - **Niemals `temperature` an GPT-5-Modellen.** Ungleich null scheitert immer; 0 läuft nur über Chat Completions.
@@ -55,22 +64,20 @@ Drei Ingest-Flows füllen dieselbe Tabelle `document_chunks`, unterschieden übe
 
 Dazu der Bucket `rag` mit 7 384 Bildern (452 MB). Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
 
-**Der Umzug ins neue Supabase-Projekt ist am 30.08. vollzogen und abgenommen.** Einzelheiten in [migration/README.md](migration/README.md).
+**Der Umzug ist am 30.08. vollzogen, abgenommen und abgeschlossen** — das alte Projekt ist samt Zugang gelöscht. Einzelheiten in [migration/README.md](migration/README.md).
 
 **Gesundheitsprüfung:** Flow `RWG Wartung - Funktionen pruefen` (`h4uVcnxF5jbRUPHZ`) beantwortet in einer halben Sekunde, ob die Wissensbasis intakt ist — Bestand, Embeddings, Indizes, Bucket und ob noch Verweise aufs alte Projekt existieren.
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
-2. **Das alte Supabase-Projekt `zjabiweaihsezjjeycko` löschen.** Beide Vorbedingungen sind erfüllt und belegt (Läufe 110522, 110825); es fehlt nur die Ausführung.
-3. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten.
+1. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten. Das ist die einzige terminlich gebundene Aufgabe.
+2. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten.
 
 ## Offene Themen
 
 Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
 
 **Wartet auf Sebastian**
-- Altes Supabase-Projekt löschen — alle Vorbedingungen sind belegt
 - Power-Automate-Flow des RAG-Ingests entfernen (außerhalb von n8n, Ziel `.../webhook/8e16e07b-…`). Der zweite, `RWG_n8n_Trigg`, ist bereits gelöscht.
 - Vier leere Ordner in Shared Documents: löschen oder behalten?
 - 23 Formatpaare und 5 unklare Doubletten — fachlich zu entscheiden
@@ -93,8 +100,6 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: Vektorsuche findet, sie rechnet nicht. Eigenes Vorhaben.
-- ProzessHub-Flow scharfschalten (`Muss6GBGPuG9fjE2`, stillgelegt aber funktionsfähig)
-- Dienstkonto statt persönlichem Zugang für Graph
 
 ## Was im Repo liegt
 

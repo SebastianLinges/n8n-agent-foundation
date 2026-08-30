@@ -1,11 +1,11 @@
 # Umzug der RWG-Datenbank
 
-Die Supabase-Datenbank der RWG ist vollgelaufen und verschwindet. Alles zieht in ein neues, leeres Projekt.
+Die alte Supabase-Datenbank der RWG war vollgelaufen. Alles ist in ein neues Projekt gezogen; das alte Projekt samt Zugang ist am 30.08.2026 gelöscht.
 
 | | Projekt | Organisation |
 |---|---|---|
-| Alt, verschwindet | `zjabiweaihsezjjeycko` | zu klären |
-| Neu, leer | `zckaxkpycyyxaymmkmvu` („RAG") | RWG Rheinland |
+| Alt, gelöscht am 30.08.2026 | `zjabiweaihsezjjeycko` | — |
+| Heute in Betrieb | `zckaxkpycyyxaymmkmvu` („RAG") | RWG Rheinland |
 
 **Die KAPA-Digital-Verbindung ist nicht betroffen.** `Kapa-Core` (`glhqajoxbscriskwzhbr`) und `Marketing` (`ouccmqkwgdxjnplblnzk`) liegen in der Organisation `kapa-digital` und werden nicht angefasst.
 
@@ -127,9 +127,11 @@ Der Effekt ist strukturell und nicht durch Aufräumen behebbar. Wer die Wissensb
 | `RWG Wartung - RAG-Bestand pruefen` | PostgREST |
 | `RWG Wartung - Wissensbasis Analyse` | PostgREST |
 
-Umgestellt wird erst, wenn das neue Projekt steht — und Flow für Flow mit einem Lauf belegt, nicht in einem Zug.
+Jeder dieser Flows wurde einzeln umgestellt und mit einem Lauf belegt, nicht in einem Zug.
 
-**Diese Liste ist nicht vollständig.** Sie stammt aus den Flows im Repo. Die Inventur hat fünf Tabellen gefunden, die dort in keinem Flow vorkommen: `confluence_pages`, `agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`, `agent_jira_create_requests`. Wer sie schreibt, ist offen — entweder Flows außerhalb des Repos oder stillgelegte Strecken. **Vor der Umstellung zu klären**, sonst schreibt nach dem Umzug etwas weiter in die alte Datenbank. Tabellen die am ende nach erneuter Prüfung in keinem flow benötigt wurden können entfernt wreden.
+Die Liste stammt aus den Flows im Repo und war deshalb nicht vollständig. Die Nachprüfung über **alle 35 Flows der Instanz** hat einen übersehenen gefunden: `RWG Sub - Jira Issue Create` mit fünf Postgres-Nodes auf der alten Datenbank. Der Flow ist inaktiv und hätte keinen Schaden angerichtet — beim Scharfschalten nach der Löschung aber schon. Nachträglich umgestellt.
+
+Drei Tabellen tragen Daten, für die sich kein schreibender Flow finden ließ: `agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`. Sie sind mitgezogen und stehen unverändert im Zielprojekt.
 
 ## Was im Zielprojekt entfernt wurde
 
@@ -157,21 +159,3 @@ Verblieben sind `funktion_match_document_chunks` (vom Jira-Agenten aufgerufen, P
 | `documentation_review_state` | 17 | dito |
 
 Tabellen mit Inhalt ohne bekannten Schreiber werden **nicht** gelöscht. Eine Funktion lässt sich aus dem Repo in Sekunden wiederherstellen, 27 Zeilen unbekannter Herkunft nicht.
-
-## Funktionen: erst übernehmen, dann aufräumen
-
-Sind Tabellen und Dokumentenspeicher überführt, gehören die fünf Funktionen auf den Prüfstand. Beim Anlegen kommen sie zunächst **unverändert** mit — sonst bräche die Umstellung an zwei Baustellen gleichzeitig. Danach ist zu klären, welche überhaupt in Verwendung ist:
-
-| Funktion | Bekannter Aufrufer |
-|---|---|
-| `funktion_match_document_chunks` | `RWG Jira-Agent`, Vector-Store-Node |
-| `funktion_rag_suche_chunks` | offen |
-| `funktion_jira_ticket_lesen` | offen |
-| `jira_agent_collect_context` | offen |
-| `match_documents` | offen — arbeitet über die Ansicht `documents` |
-
-`match_documents` und die Ansicht `documents` sind erkennbar ein Zugeständnis an die LangChain-Schnittstelle: die Ansicht rechnet die UUID in eine bigint-Kennung um, weil der Vector-Store-Node das so erwartet. Ob dieser Weg noch benutzt wird oder ob alles über `funktion_match_document_chunks` läuft, ist zu belegen.
-
-**Was gebraucht wird, wird gemeldet und in einer Fassung mit sauberer Nomenklatur angelegt** — heute stehen deutsche (`funktion_…`) und englische Namen nebeneinander. Was niemand aufruft, wird nicht mitgeschleppt. Dasselbe gilt für Tabellen: was nach erneuter Prüfung in keinem Flow gebraucht wird, kann entfallen.
-
-**Die Reihenfolge ist wichtig:** erst originalgetreu übernehmen und belegen, dass alles läuft; dann umbenennen und ausdünnen. Beides zugleich macht jeden Fehler unauffindbar.
