@@ -8,7 +8,15 @@ Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes
 
 Was daraus offen blieb:
 
-- **Drei Tabellen ohne bekannten Schreiber:** `agent_ticket_dialogs` (2 Zeilen), `documentation_findings` (10), `documentation_review_state` (17). Herkunft klaeren, bevor etwas verschwindet.
+- **Drei Tabellen ohne bekannten Schreiber - Herkunft inzwischen erkennbar.** Sie liegen im Projekt `zckaxkpycyyxaymmkmvu`, Schema `public`:
+
+  | Tabelle | Zeilen | Geschrieben | Was drinsteht |
+  |---|---|---|---|
+  | `agent_ticket_dialogs` | 2 | 15.07.2026 | Dialogstand eines Jira-Ticket-Agenten: `agent_key`, `conversation_id`, `draft`, `missing_fields`, `jira_ticket_key` |
+  | `documentation_findings` | 10 | 13.-16.08.2026 | Abweichungen zwischen Jira und Confluence, etwa `confluence_outdated` oder `jira_maybe_done`, mit Quelle A gegen Quelle B und Empfehlung |
+  | `documentation_review_state` | 17 | 13.-16.08.2026 | Pruefstand je Quelle: wann zuletzt gesehen, wann zuletzt geprueft, `review_status` |
+
+  Erkennbar ein Vorhaben, das Jira und Confluence auf widerspruechliche Dokumentation abgleicht. Es lief an drei Tagen im August und seither nicht mehr - kein Flow der Instanz schreibt dort hinein. Zu entscheiden: wiederbeleben oder entfernen. Bei 29 Zeilen ist der Datenverlust ueberschaubar, die Idee dahinter aber moeglicherweise nicht.
 - **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geaendert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile - semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent, falls es sauber sein soll.
 
 
@@ -51,29 +59,30 @@ Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`R
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.
 
 ### Zwei EK-Ordner in Confluence
-`EK – Einkauf` und `EK - Einkauf` unterscheiden sich nur im Bindestrich. `EK-01` hängt im einen, `EK-02` im anderen. Der Flow meldet die Dublette in `bereichsordner_dubletten` und legt beide zusammen ab — technisch unauffällig, fachlich zu bereinigen.
+Beide liegen im Bereich `ProzessHub` und unterscheiden sich nur im Strich:
+
+| Ordner | Zeichen | zuletzt geaendert |
+|---|---|---|
+| [EK – Einkauf](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/folder/438468881) | Gedankenstrich `–` | 15.08.2026 |
+| [EK - Einkauf](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/folder/442531841) | Bindestrich `-` | 17.08.2026 |
+
+Die Prozessseiten selbst fuehren durchgaengig den **Gedankenstrich**: [EK-01 – Lieferantenmanagement](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/438992990), [EK-02 – Beschaffungsabwicklung](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/442400769). Danach ist `EK – Einkauf` der Ordner, der zur Namenskonvention passt.
+
+Die EK-02-Familie wird gerade bearbeitet (zuletzt am 29.08.), die EK-01-Familie steht seit dem 15.08. Der Flow meldet die Dublette und legt beide zusammen ab - technisch unauffaellig, fachlich zu bereinigen.
 
 ## SharePoint Schulungen
 
 ### Vier leere Ordner - Entscheidung offen
-In Shared Documents sind die 18 Reste unter `Allgemeine Informationen` entfernt (Lauf 110380, nachgemessen mit 110382: keine Datei verloren). Stehen geblieben sind vier, weil sie nach vorbereiteter Struktur aussehen und nicht nach Rest:
+Alle vier liegen in der Bibliothek `Schulungen` und sind seit ihrer Anlage leer geblieben. Sie sehen nach vorbereiteter Struktur aus, nicht nach Rest - deshalb wurden sie bei der Bereinigung am 30.08. stehen gelassen.
 
-- `/Baumarkt Prozesse`
-- `/Baustoff Prozesse`
-- `/Dispo Prozesse`
-- `/Videos/Gebuchte Belege stornieren`
+| Ordner | angelegt |
+|---|---|
+| [Baustoff Prozesse](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Baustoff%20Prozesse) | 16.05.2024 |
+| [Dispo Prozesse](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Dispo%20Prozesse) | 16.05.2024 |
+| [Videos/Gebuchte Belege stornieren](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Videos/Gebuchte%20Belege%20stornieren) | 20.06.2024 |
+| [Baumarkt Prozesse](https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen/Shared%20Documents/Baumarkt%20Prozesse) | 08.05.2025 |
 
-Sebastian entscheidet, ob sie bleiben. Der Aufraeumflow ist archiviert, laesst sich aber jederzeit wiederholen - das Praefix in `Config` ist die einzige Stellschraube.
-
-Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer. Beides war nicht Teil der Freigabe.
-
-
-### Power-Automate-Flow entfernen
-**Der Ingest holt sich seine Aenderungen seit dem 30.08. selbst.** Webhook und Delta-Leser-Eingang sind deaktiviert, der getrennte Delta-Leser ist archiviert.
-
-Was bleibt: Der Power-Automate-Flow selbst liegt ausserhalb von n8n und muss dort entfernt werden. Er ist am Ziel erkennbar: `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`. Solange er laeuft, schickt er ins Leere - der Webhook nimmt nichts mehr an.
-
-**Nicht zu verwechseln mit `RWG_n8n_Trigg`.** Das war der zweite Power-Automate-Flow: Er ueberwachte `/IMPORTER/CONTRACT` und fuetterte den Webhook des alten Contract Loaders. Er hat am 30.08. um 12:28 noch gefeuert und ist seither geloescht. Damit ueberwacht nur noch n8n diesen Ordner.
+Zwei davon sind seit zwei Jahren leer, einer seit gut einem. Nicht angefasst: Die Bibliothek `Inventur` derselben Untersite traegt 333 oberste Leerordner, `Archiv Zaehlprotokolle` ist vollstaendig leer.
 
 ### Dokumenteintrag vor den Chunks - Reihenfolge im Ingest
 Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: neun solcher Eintraege (Lauf 110771), acht davon bildreiche Regaletiketten-PDFs.
@@ -83,67 +92,104 @@ Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht
 Sauberer waere, den Eintrag erst nach den Chunks zu schreiben. Das ist ein Umbau an der Verarbeitung und bleibt offen. Die Nachpruefung im Abgleich faengt den Fall zuverlaessig ab, also nicht dringend.
 
 
-### Erstbefuellung laeuft an - 458 Dateien fehlen noch
-Von 499 verwertbaren Dateien in Shared Documents stehen erst wenige unter einer Graph-Kennung in der Wissensbasis. Power Automate hatte nur PDF und Excel geschickt, Word und PowerPoint nie.
+### Erstbefuellung - erst aufraeumen, dann lesen
+Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) liest die Bibliothek `Schulungen` in einem Zug und wertet sie aus. Lauf 110875:
 
-Der naechtliche Abgleich holt jetzt **30 je Nacht** nach - gut zwei Wochen bis zur Vollstaendigkeit. Wer schneller will, setzt `maxJeLauf` in der Steuerung hoeher; jede Datei kostet einen OCR-Durchlauf bei Mistral.
+| | |
+|---|---|
+| Eintraege gesamt | 1 900 (479 Ordner, 1 421 Dateien, 12,9 GB) |
+| davon verwertbar | **499 Dateien** |
+| nicht verwertbar | 922 Dateien |
 
-Die 247 Dokumente mit Power-Automate-Kennung bleiben unangetastet, bis ihre Datei erneut eingelesen wird - dann entfernt der Uebergangsmechanismus die Altfassung.
+**Zwei Drittel der Bibliothek tragen keinen durchsuchbaren Text.** 402 Windows-Verknuepfungen (`.lnk`) und 89 Weblinks (`.url`) - zusammen 35 Prozent aller Dateien. Dazu 263 Bilder (3,6 GB), 101 Videos (5,7 GB), 8 DVD-Spuren (3,2 GB), 26 `.db` und 10 `.tmp`. Von den 12,9 GB sind 12,4 GB Medien.
 
-**Der Abgleich feuert belegt zur Ortszeit.** Acht Word-Dateien laufen in zwei Minuten durch. Was den Durchsatz jetzt bestimmt, sind die bildreichen Gross-PDFs: Sie kosten Minuten und haben den ersten Lauf an einem Netzabbruch beim Bild-Upload abgebrochen. Der Bildzweig ist seither ausfalltolerant.
+**Vor dem Einlesen zu bereinigen:**
+
+| Befund | Anzahl | Was dahintersteckt |
+|---|---|---|
+| Office-Sperrdateien `~$…` | 42 | 162 Byte je Stueck, tragen die Endung des Dokuments und liefen bisher mit in die OCR. **Behoben** - der Ingest filtert sie jetzt, siehe unten. |
+| inhaltsgleiche Kopien | 27 ueberzaehlige in 21 Gruppen | dieselbe Datei in mehreren Ordnern, etwa `Lagerplaene 2023` und `2024` |
+| namensgleich, Inhalt verschieden | 63 | `Debitorencockpit.pdf` liegt viermal mit unterschiedlichem Inhalt |
+| ueber 40 MB | 1 | `Praesentation Mitarbeiterversammlung 05.02.2024.pptx`, 45 MB - faellt aus dem Ingest |
+
+**Kein Altbestand.** Keine einzige verwertbare Datei ist aelter als drei Jahre; die aeltesten stammen von Mai 2024. Die Frage nach veralteten Dokumenten beantwortet sich damit von selbst - ueber das Aenderungsdatum ist nichts auszusortieren.
+
+**Was das fuer die OCR bedeutet:** 499 verwertbare Dateien, nach Abzug der 27 inhaltsgleichen Kopien **472**. Die 42 Sperrdateien sind darin nicht enthalten, weil der Filter sie bereits abfaengt. Bei 30 je Nacht rund sechzehn Naechte.
+
+**Der Sperrdatei-Filter liegt als unveroeffentlichter Entwurf** in `RAG - SharePoint Ingest`. Er greift erst mit dem naechsten Publizieren.
+
+Offen zu entscheiden bleibt, ob die 27 inhaltsgleichen Kopien in SharePoint bereinigt werden oder ob der Ingest sie ueber den Inhaltshash von sich aus ueberspringt. Letzteres waere weniger Eingriff, laesst die Doubletten aber in SharePoint stehen.
 
 
-### Tabellendaten abfragbar machen
-Die Hoffnung war, spaeter nach Umsaetzen oder Kennzahlen fragen zu koennen und aus Tabellen eine Antwort zu bekommen. **Das leistet Vektorsuche nicht.** Sie findet aehnliche Texte, sie rechnet nicht.
+### Tabellendaten abfragbar machen - Plan
+**Das Problem.** Vektorsuche findet aehnliche Texte, sie rechnet nicht. Punktabfragen gehen heute schon: Der Ingest macht jede Tabellenzeile selbsttragend (`### Zeile 47 / - Blatt: Januar / - Standort: … / - Betrag: …`), eine Frage nach einem benannten Standort findet ihre Zeile. Aggregationen gehen nicht - `Wie hoch war der Gesamtumsatz` verlangt, alle Zeilen zu sehen und zu rechnen, und die Suche liefert nur die aehnlichsten zwanzig.
 
-Was heute geht: Punktabfragen. Der Ingest macht jede Tabellenzeile selbsttragend - `### Zeile 47 / - Blatt: Januar / - Standort: ... / - Betrag: ...`. Eine Frage nach einem benannten Standort oder Vorgang findet ihre Zeile.
+**Der Weg: ein zweiter, rechnender Pfad neben der Vektorsuche.** Nicht statt ihr - Punktabfragen bleiben dort besser aufgehoben.
 
-Was nicht geht: Aggregationen. `Wie hoch war der Gesamtumsatz` oder `welcher Kunde war am staerksten` verlangt, alle Zeilen zu sehen und zu rechnen. Die Suche liefert aber nur die aehnlichsten Treffer - bei 5000 Zeilen vielleicht zwanzig.
+**1. Ablage.** Eine generische Tabelle statt je Mappe eine eigene:
 
-Dafuer braeuchte es einen zweiten Weg: Tabellendaten strukturiert ablegen und dem Agenten ein Werkzeug geben, das zaehlen und summieren kann - so wie es der Jira-Agent mit `RWG Sub - Jira Query` bereits hat. Eigenes Vorhaben, kein Nachbessern am RAG.
+```
+tabellen_zeilen (id, quelle_id, mappe, blatt, zeile_nr, daten jsonb, angelegt_am)
+```
 
-Zu klaeren waere zuerst: Welche Tabellen sind ueberhaupt gemeint, und wie stabil ist ihre Struktur? Die Sichtung vom 30.08. zeigt, dass viele Excel-Blaetter gar keine Tabellen sind, sondern Formulare und Notizen.
+Mit GIN-Index auf `daten`. Der Grund fuer generisch: Die Sichtung vom 30.08. zeigt, dass viele Excel-Blaetter gar keine Tabellen sind, sondern Formulare und Notizen. Ein festes Schema je Mappe waere Pflegeaufwand ohne Nutzen.
 
+**2. Katalog.** `tabellen_katalog` haelt fest, welche Mappe welches Blatt mit welchen Spalten und wie vielen Zeilen fuehrt. Ohne ihn weiss der Agent nicht, wonach er fragen kann.
 
-### Formatpaare und unklare Doubletten - fachlich zu entscheiden
-Bei der Bereinigung am 30.08. blieben zwei Gruppen absichtlich stehen:
+**3. Werkzeug.** Ein Subflow `RWG Sub - Tabellen abfragen`, gebaut wie `RWG Sub - Jira Query`: nimmt die Frage, sucht im Katalog das passende Blatt, baut die Abfrage, fuehrt sie aus, gibt Zahlen zurueck.
 
-**23 Formatpaare**: Dieselbe Unterlage liegt in SharePoint als `pptx` und als `pdf`, meist Regalplaene. Beide Eintraege sind technisch richtig. Ob beide im Wissensspeicher stehen sollen, ist eine fachliche Frage - doppelter Inhalt verwaessert die Suche, aber die Formate koennen unterschiedlich aktuell sein.
+**4. Absicherung.** Kein freies SQL des Modells gegen die Datenbank. Ein eigener, nur lesender Zugang mit `statement_timeout` und Zeilenobergrenze, beschraenkt auf `tabellen_zeilen` und den Katalog.
 
-**5 unklare Faelle**: Gleicher Dateiname, deutlich verschiedener Inhalt. Etwa `Debitorencockpit.pdf` mit 2495 gegen 480 Woerter oder `Aufteilung Standorte.xlsx` mit 795 gegen 432. Da steckt Unterschiedliches drin; welche Fassung gilt, kann nur der Fachbereich sagen.
+**Was es kostet:**
 
-Der Wartungsflow `RWG Wartung - RAG-Bestand pruefen` (`O5FKXpsz2UfcjNQg`) listet beide Gruppen bei jedem Lauf auf.
+| | |
+|---|---|
+| Speicher | wenige MB. Heute erzeugen 27 Mappen 2 088 Zeilen-Chunks mit 3,1 MB Text; als jsonb mit Index bleibt das unter 10 MB. Zum Vergleich: `document_chunks` belegt 407 MB, davon 190 MB Indizes. |
+| Embeddings | **keine.** Strukturierte Zeilen werden nicht vektorisiert - das ist der eigentliche Kostenvorteil. Kein OpenAI-Aufruf, kein Wachstum des Vektorindex. |
+| OCR | keine. Die Mappen werden ohnehin ueber die Workbook-API gelesen, nicht ueber die Erkennung. |
+| laufend | nur die Modellaufrufe beim Fragen: einmal Abfrage bauen, einmal Antwort formulieren. |
+
+Der Aufwand steckt nicht im Speicher, sondern im Bau: Ablage, Katalog, Subflow und die Anbindung an den Agenten.
+
+**Vor dem Bau zu klaeren:** Welche Mappen sind ueberhaupt gemeint? Von 42 Mappen in der Bibliothek sind viele Formulare. Eine Handvoll benannter Mappen, an denen sich der Nutzen zeigen laesst, ist der bessere Anfang als der Vollausbau.
+
+### Doubletten in der Wissensbasis - loesen sich groesstenteils selbst
+Die Wissensbasis traegt 29 Dateinamen mehrfach. Die Herkunft klaert das Bild:
+
+| Herkunft | Dokumente | eingelesen |
+|---|---|---|
+| Power-Automate-Kennung (`RWGID…`) | 247 | 13.07. bis 22.08. |
+| Graph-Kennung | 19 | 29./30.08. |
+
+Von den 61 Zeilen hinter den 29 doppelten Namen tragen **60 eine Power-Automate-Kennung**. Es sind also keine Format- oder Fachdoubletten, sondern Mehrfachsendungen aus der Power-Automate-Zeit: dieselbe Datei kam unter verschiedenen Kennungen an.
+
+**Das loest sich mit der Erstbefuellung.** Jede Datei, die ueber Graph neu eingelesen wird, ersetzt ihre Altfassung. Stehen bleiben nur Eintraege, deren Datei es in SharePoint nicht mehr gibt - die faengt der Verwaist-Befund des Abgleichs ab.
+
+Fachlich zu entscheiden bleibt allein, was in SharePoint selbst mehrfach liegt: 27 inhaltsgleiche Kopien und 63 namensgleiche mit verschiedenem Inhalt. Siehe den Abschnitt zur Erstbefuellung.
 
 ## Content Studio, weitere Themen
 
-### Beiträge auf Use Cases ausrichten
+### Use Cases: der Nachschub ist versiegt
+Zwei Stellen: Die Idee entsteht im Marketing Scout (`objM2PQrcTpEzik7`), ausformuliert wird sie im Content Studio (`bBBybznNNCnU2nOJ`). Positionierung auf Buero, Handwerk und CAD-/PDM-Prozesse.
 
-Zwei Stellen: Die Idee entsteht im Marketing Scout (`objM2PQrcTpEzik7`), ausformuliert wird sie im Content Studio (`bBBybznNNCnU2nOJ`). Positionierung auf Büro, Handwerk und CAD-/PDM-Prozesse.
+**Der Bestand ist nicht alt, er waechst nur nicht mehr.** Alle 50 Eintraege stammen aus einem Fenster vom 10. bis 20.08.2026. Seither: nichts.
 
-**Der Bestand wurde am 29.08. gesichtet. Er trägt die Positionierung nicht.** 35 Einträge mit `status = new`, verteilt so:
+| Saeule | new | used | rework | retired |
+|---|---|---|---|---|
+| buero | 17 | 2 | 2 | 8 |
+| engineering | 15 | 1 | - | - |
+| fertigung | 3 | - | - | - |
+| handwerk | - | 2 | - | - |
 
-| Säule | Anzahl | Score-Schnitt |
-|---|---|---|
-| buero | 17 | 7,9 |
-| engineering | 15 | 7,9 |
-| fertigung | 3 | 8,7 |
-| **handwerk** | **0** | — |
+**Die Ursache ist gemessen, nicht vermutet.** Der Scout laeuft taeglich um 04:20 und meldet Erfolg - zuletzt Lauf 110182 am 29.08. In diesem Lauf bekommt der Business Scout **21 Kandidaten** und gibt `[]` zurueck. Der Knoten `use_cases aufbereiten` liefert entsprechend null Items. Neun Laeufe in Folge, kein einziger neuer Use Case.
 
-Vier Befunde:
+Das Modell verwirft alle 21, und zwar zu Recht: Die Kandidaten sind Fachpresse - neues Hochdruckreiniger-Zubehoer, Arbeitgeberpreise Rheinland-Pfalz, Ruesten von Werkzeugmaschinen. Darin steckt kein Automatisierungs-Use-Case fuer Buero, Handwerk oder CAD/PDM.
 
-**Handwerk ist leer.** Der Zeitplan sieht Dienstag als „Werkstatt & Produktion" mit den Säulen handwerk, fertigung, engineering vor. Für handwerk gibt es nichts, für fertigung drei Einträge — von denen zwei die Zielgruppe „Ingenieurbüros" tragen. In der Praxis greift dort also immer die Ersatzsäule.
+**Damit ist es kein Prompt-Problem, sondern ein Quellenproblem.** Die Feeds in `content_sources` liefern Branchennachrichten, gesucht werden aber Prozessgeschichten. Am Prompt zu drehen aendert daran nichts.
 
-**Die engineering-Einträge sind keine Engineering-Themen.** Kein einziger der 15 handelt von CAD oder PDM. Es geht um Projektkoordination, Compliance, Kundenkommunikation, Lead-Management, Terminplanung — durchweg Büroarbeit, nur mit „Ingenieurbüros" als Etikett. Genau das Segment, das die Positionierung meint, fehlt vollständig.
+**Was der Bestand inhaltlich hergibt** (Sichtung vom 29.08.): Keiner der 15 `engineering`-Eintraege handelt von CAD oder PDM - es geht um Projektkoordination, Compliance, Kundenkommunikation, also Bueroarbeit mit dem Etikett "Ingenieurbueros". Fuenf Eintraege behandeln EU AI Act und KI-Compliance, drei die Belegverarbeitung. Vier Titel nennen Fremdprodukte (Power Automate, DocuWare, Zapier, n8n), die der Redaktions-Check im Beitragstext hart sperrt. Und "zeitaufwendig und fehleranfaellig" steht sechsmal als Problembeschreibung - der Check verlangt aber ein benanntes Dokument oder einen benannten Arbeitsschritt.
 
-**Mehrfachbelegung statt Vielfalt.** Fünf Einträge behandeln EU AI Act und KI-Compliance, drei die Rechnungs- und Belegverarbeitung, drei die Workflow-Automatisierung, zwei die Kundenkommunikation. Als Themenvorrat für drei Beiträge pro Woche ist das schmaler, als die Zahl 35 vermuten lässt.
-
-**Produktnamen im Titel.** „Automatisierung von E-Mails mit Microsoft Power Automate", „Workflow-Automatisierung mit DocuWare", „Lead-Management-Automatisierung mit Zapier", „Workflow-Automatisierung mit n8n". Der Redaktions-Check sperrt Fremdprodukte im Beitragstext hart — solche Use Cases führen mit hoher Wahrscheinlichkeit zu einem abgelehnten Beitrag.
-
-Dazu kommt: Die Probleme sind austauschbar formuliert. „Zeitaufwendig und fehleranfällig" steht sechsmal da. Der Redaktions-Check verlangt aber ein **benanntes Dokument oder einen benannten Arbeitsschritt** als harte Regel. Aufmaß, Prüfprotokoll, Stückliste, Zeichnungsfreigabe — nichts davon kommt vor.
-
-**Folgerung:** Sichten und Verwerfen genügt nicht. Für Handwerk und für CAD/PDM muss neu erhoben werden, und zwar an benannten Arbeitsschritten entlang statt an Technologiebegriffen. Die Zuarbeit „drei bis fünf echte Use Cases je Segment" bleibt also nötig — sie trifft nur nicht auf einen leeren Topf, sondern auf einen falsch gefüllten.
-
-Zu klären wäre außerdem, ob der Business Scout so weiterlaufen soll. Sein `score` liegt bei allen 35 Einträgen zwischen 7 und 9 — dasselbe Muster, das den `content_score` im Redaktions-Check unbrauchbar macht.
+**Zu entscheiden:** Quellen erweitern, damit der Scout ueberhaupt passendes Material bekommt - oder Use Cases fuer die drei Saeulen von Hand setzen und den Scout auf das Beobachten von Trends beschraenken.
 
 ### `builtInTools` — geprüft, nicht lösbar
 
