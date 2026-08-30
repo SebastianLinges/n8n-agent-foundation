@@ -3017,14 +3017,10 @@
             {
               "field": "cronExpression",
               "expression": "30 3 * * *"
-            },
-            {
-              "field": "cronExpression",
-              "expression": "15 18 * * *"
             }
           ]
         },
-        "notes": "03:30 Ortszeit - der Flow traegt timezone Europe/Berlin, sonst waere es Serverzeit UTC und damit 05:30. Vergleicht den vollstaendigen SharePoint-Bestand gegen die Wissensbasis und findet, was das Delta nicht finden kann. ZUSAETZLICH 18:15 - befristeter Testlauf unter Beobachtung, nach dem Beleg wieder entfernen."
+        "notes": "03:30 Ortszeit - der Flow traegt timezone Europe/Berlin, sonst waere es Serverzeit UTC und damit 05:30. Vergleicht den vollstaendigen SharePoint-Bestand gegen die Wissensbasis und findet, was das Delta nicht finden kann."
       },
       "notes": "Vergleicht den vollstaendigen SharePoint-Bestand gegen die Wissensbasis. Findet, was das Delta verpasst hat: verwaiste Eintraege, nie eingelesene Dateien, uebersehene Aenderungen. Der Vergleich selbst kostet keine OCR - nur was wirklich fehlt wird verarbeitet."
     },
