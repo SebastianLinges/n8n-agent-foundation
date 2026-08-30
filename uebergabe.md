@@ -48,6 +48,7 @@ Nicht aufwerfen, das ist geklärt:
 - **Der Supabase-MCP-Zugang liest nur.** `execute_sql` scheitert bei jedem Schreibversuch mit `cannot execute DROP TABLE in a read-only transaction`. DDL geht ausschliesslich ueber `apply_migration`.
 - **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern** — auch in Zeichenketten und **in Kommentaren**. Ein `$1` in einem Kommentar bricht die Abfrage mit `out of range`; ein `$` ohne Ziffer wird still verschluckt (ein Zeilenende-Anker in einem regulären Ausdruck verschwand samt Anführungszeichen). Platzhalter zur Laufzeit aus `chr(36)` bauen, Daten immer über `queryReplacement` binden.
 - **Ein Node ohne Ausgabeitems stoppt seinen Zweig.** Ein PostgREST-`DELETE` oder `PATCH` ohne Treffer liefert mit `Prefer: return=representation` ein leeres Array — n8n macht daraus null Items, und alles Nachfolgende läuft nicht mehr. In einer Schleife bleibt der Rest der Aufgaben liegen, und der Lauf gilt trotzdem als erfolgreich. Gegenmittel ist `alwaysOutputData` am betroffenen Node — aber nur, wenn die nachgelagerten Nodes aus **benannten Vorgängern** lesen. Hängt dahinter ein Aggregate-Node oder etwas, das Items zählt, verfälscht das eingefügte Leer-Item die Zahl.
+- **`$('Node').first()` liefert in einer Schleife den ersten Durchlauf, nicht den aktuellen.** Ohne Durchlaufindex bauen alle Folgeknoten ab der zweiten Runde wieder den Kontext der ersten. Bei einem Upsert entstehen dann keine neuen Zeilen, und der Lauf meldet trotzdem Erfolg. Richtig ist `$('Node').first(0, $runIndex)`. Dasselbe gilt für `.all()`.
 - **Ein Code-Node darf höchstens 300 Sekunden laufen.** Der Task-Runner bricht ihn dann mit `Task execution timed out after 300 seconds` ab und reisst den ganzen Lauf mit — unabhängig vom Workflow-Timeout. In einer Schleife über viele Dokumente ist das die eigentliche Obergrenze, nicht die Stunde in den Workflow-Einstellungen.
 - **Der Graph-Delta-Abruf liefert Einträge mehrfach.** Ein Item, das sich mehrmals geändert hat, kommt mehrfach zurück. Ungefiltert zählt man die Ordner fast doppelt — gemessen 1 876 gelieferte Zeilen gegen 1 650 verschiedene Item-IDs. Immer über die Item-ID entdoppeln.
 - **Ein abgebrochener Lauf friert den Delta-Anker ein.** Wird der Anker erst am Ende der Schleife geschrieben, schreibt ihn ein vorzeitiger Abbruch nie fort. Der nächste Lauf liest dasselbe Fenster erneut — tagelang, ohne dass etwas auffällt, weil jeder Lauf grün ist.
@@ -77,11 +78,13 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Der Abgleich vom 30.08. ist gescheitert — die 300-Sekunden-Grenze ist der neue Engpass.** Lauf `110900` startete um 18:15 und starb nach 31 Minuten mit `Task execution timed out after 300 seconds`. Das ist die Grenze des n8n-Task-Runners für **einen einzelnen Code-Node**, nicht der Workflow-Timeout von 3 600 s. Welcher Node es war, ist offen — die Ausführung selbst ist wegen der Bildlast per MCP nicht abrufbar, die Meldung stammt aus Lauf `110911` des Fehler-Workflows.
+1. **Der Einlesezweig verarbeitet je Lauf nur das erste Dokument — belegt.** Sieben Code-Nodes lesen mit `$('Node').first()` ohne Durchlaufindex auf benannte Vorgänger, vor allem auf `Build Source Context`. In der Schleife `Je Aufgabe` liefert `.first()` den **ersten** Durchlauf, nicht den aktuellen. Ab Dokument zwei wird deshalb wieder der Kontext von Dokument eins gebaut; der Upsert schreibt dessen Zeilen erneut und erzeugt keine neuen. Der Lauf meldet trotzdem Vollzug und `fehler: 0`.
 
-   **Der Lauf hat vorher gearbeitet und dabei Schaden angerichtet:** Chunks 7 267 → 7 287, Dokumente 266 → 288, 30 Aufgaben angefasst (das ist `maxJeLauf`). Weil der Dokumenteintrag **vor** den Chunks geschrieben wird, blieben 21 neue Einträge ohne Chunks stehen — die Zählung stieg von 14 auf **35**. `ingestion_errors` blieb dabei auf 0.
+   **Der Beleg:** Lauf `110947` mit fünf Dokumenten meldete 219 geschriebene Chunks — angekommen sind 11, alle für das erste. Lauf `110962` mit demselben Dokument allein (`nurDatei`) schrieb 56 Chunks und heilte es. Es liegt also nicht am Dokument und nicht an der Bildlast.
 
-   **Zu entscheiden:** `maxJeLauf` von 30 senken, damit die Schleife die Grenze nicht reisst — oder den langlaufenden Code-Node finden und teilen. Solange das offen ist, vergrössert jeder Abgleich den Rückstand an unvollständigen Einträgen, statt ihn abzubauen.
+   **Zu ändern sind sieben Code-Nodes:** `Build All SharePoint Chunk Rows`, `Prepare Embedding Batches`, `Build Stale Chunk Cleanup Request`, `Build Final SharePoint Source Row`, `Build Provisional Source Row`, `Build Image Upload Plan`, `Expand Images`. Sie brauchen den Durchlaufindex, in n8n `$('Node').first(0, $runIndex)`. Jeden Node byte-identisch zurücklesen und mit `node --check` prüfen.
+
+   **Bis dahin ist der Betrieb sicher, aber langsam:** Die aktive Fassung trägt `maxJeLauf: 5`. Der nächtliche Abgleich heilt damit ein Dokument je Lauf statt fünf — er legt aber keine neuen Leereinträge an, weil er zuerst die unvollständigen abarbeitet. Stand jetzt: **33** ohne Chunks.
 
 2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
@@ -111,7 +114,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 
 **Technisch offen**
 - Erstbefüllung: **432** Dateien einzulesen, 30 je Nacht — etwa fünfzehn Nächte
-- **35 Dokumente ohne Chunks**, Tendenz steigend. 14 stammen aus dem Fehllauf vom 29./30.08., 21 kamen am Abend des 30.08. dazu, als der Abgleich an der 300-Sekunden-Grenze starb. Solange die Grenze nicht entschärft ist, wächst die Zahl mit jedem Abgleich.
+- **33 Dokumente ohne Chunks.** Sie schrumpfen um eines je Abgleich, solange der `.first()`-Fehler in der Schleife steht. Danach um fünf.
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
