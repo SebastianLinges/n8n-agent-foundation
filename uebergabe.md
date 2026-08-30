@@ -133,7 +133,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 | `offene-punkte.md` | was ansteht und was fehlt |
 | `ideen.md` | was noch keine Aufgabe ist |
 | `referenz-dokumentationsbefunde.md` | offene Korrekturen an Confluence-Seiten und Jira-Vorgängen |
-| `referenz-sharepoint-prozesse-gegen-prozesshub.md` | welche SharePoint-Prozessdokumente im ProzessHub eine Entsprechung haben |
+| `referenz-sharepoint-prozesse-gegen-prozesshub.md` | die sieben alten PDF in der ProzessHub-Zielablage und ihre Entsprechungen |
 | `sharepoint-struktur-schulungen.xlsx` | die Bibliothek Schulungen Ebene für Ebene, 1 650 Einträge mit Links |
 | `tests/laufprotokoll.csv` | jeder Lauf mit Execution-ID und Befund |
 | `flows/*/README.md` | je Flow: Aufbau, Entscheidungen, Fallstricke |

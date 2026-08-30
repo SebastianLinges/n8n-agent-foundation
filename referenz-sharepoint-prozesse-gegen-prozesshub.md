@@ -1,101 +1,78 @@
-# SharePoint-Prozessdokumente gegen den ProzessHub
+# Alte PDF in der ProzessHub-Zielablage
 
-Die Ausgangsfrage: In SharePoint liegen Prozessdokumente, die aelter sind als der
-Confluence-Bereich ProzessHub. Gibt es sie dort inzwischen auch?
+Die Frage: In der SharePoint-Ablage, in die der ProzessHub-Flow seine
+HTML-Seiten spiegelt, liegen noch ein paar alte Prozessbeschreibungen als PDF.
+Gibt es die inzwischen in Confluence?
 
-**Die Altersvermutung stimmt.** Der ProzessHub traegt 248 Seiten, **alle seit dem
-15.08.2026** angelegt. Die SharePoint-Dokumente stammen aus 2024 und 2025. Die
-SharePoint-Ablage ist die Ausgangsbasis.
+**Antwort: sechs von sieben ja, eine nein.**
 
-## Wie gemessen wurde
+## Die Ablage
 
-Ein Abgleich ueber Titel ist unmoeglich: Der ProzessHub folgt einem strengen
-Schema (AGR-20-01, INV-05-02, RM-21-01), SharePoint hat sprechende Dateinamen.
-Ein erster Versuch ueber die deutsche Volltextsuche mit ts_rank war unbrauchbar -
-bei langen Anfragen saettigt die Bewertung, und "Bruch Schwund Buchung" landete
-bei "Hardware ausgeben".
+Ziel des Flows `RWG ProzessHub nach SharePoint` (`Muss6GBGPuG9fjE2`):
 
-Belastbar ist der Vergleich ueber die **Vektoren der Wissensbasis**: Fuer jedes
-SharePoint-Dokument wurde der erste Inhaltschunk gegen alle ProzessHub-Chunks
-gestellt und der kleinste Kosinusabstand genommen.
+```
+sites/rwgrheinland.sharepoint.com,b9765620-0ca2-4e4c-9cdb-ff6befc8cb7b,bf523aab-454e-4dfa-b651-c44e32067ba7
+   -> /drive/root:/{Bereichsordner}/{Gruppe}/{Datei}.html
+```
 
-**Was der Abstand aussagt und was nicht:** Er misst thematische Naehe, nicht
-inhaltliche Deckung. Die ProzessHub-Seiten beschreiben Prozesse - Rollen,
-Schritte, BPMN. Die SharePoint-Dokumente sind klickgenaue BC-Anleitungen mit
-Bildschirmfotos. Ein kleiner Abstand heisst also "dasselbe Thema", nicht
-"derselbe Inhalt". Die beiden Bestaende sind vermutlich eher **ergaenzend als
-doppelt**.
+Stand: **253 Eintraege, 87 Ordner, 166 Dateien** - davon **159 HTML** aus der
+Spiegelung und **7 PDF** aus der Zeit davor.
 
-## Geprueft: 25 von 34
+## Die sieben PDF
 
-| SharePoint-Dokument | naechste ProzessHub-Seite | Abstand |
-|---|---|---|
-| Prozessbeschreibungen benutzen | 00.04 - So liest du eine Prozessseite | 0,269 |
-| Auftraege Lager | LOG-02-01 - Ware kommissionieren und bereitstellen | 0,303 |
-| Einkaufsbestellungen Strecke | AGR-20-02 - Streckengeschaeft abwickeln | 0,309 |
-| Energie Tankstelle | EN-20-02 - RWG-Tankkarte verwalten | 0,311 |
-| Eigenverbrauch Standard | AGR-05-02 - Eigenverbrauch erfassen | 0,312 |
-| Anfrage | WAWI-01-01 - Artikelanfrage bearbeiten | 0,319 |
-| Einkaufsbestellungen Lager | RM-02-01 - Bestellung ausloesen | 0,320 |
-| Wareneingangsvorschau | BS-02-02 - Wareneingang erfassen | 0,328 |
-| Eigenverbrauch Erweitert | AGR-05-02 - Eigenverbrauch erfassen | 0,333 |
-| Barverkauf inkl Kassenabschluss | RM-21-01 - Kassen-/Tagesabschluss durchfuehren | 0,334 |
-| Angebote | BS-01-01 - Angebot erstellen | 0,335 |
-| Tankstelle AHL AZE Erkelenz | EN-20-03 - Tankstellenumsaetze uebernehmen | 0,336 |
-| POS Barverkauf inkl Kassenabschluss | RM-21-01 - Kassen-/Tagesabschluss durchfuehren | 0,355 |
-| Wiegekarte | AGR-22-01 - Lohnwiegung durchfuehren | 0,355 |
-| Kontrakt VK | AGR-20-03 - Bezugskontrakt abwickeln | 0,363 |
-| Bestellung stapelbuchen | BS-02-01 - Bestellung ausloesen | 0,389 |
-| Minusbestandsliste | AGR-05-03 - Bestand korrigieren | 0,394 |
-| Sammelrechnung | WAWI-02-01 - Warenrechnung verarbeiten | 0,400 |
-
-Diese achtzehn haben eine fachlich einleuchtende Entsprechung.
-
-## Ohne erkennbares Gegenstueck
-
-Sieben Dokumente finden nichts Passendes - der naechste Treffer ist beliebig:
-
-| SharePoint-Dokument | naechster Treffer | Abstand | Bewertung |
+| PDF | ProzessHub-Seite | Zeichen | Version |
 |---|---|---|---|
-| Bruch Schwund Buchung | FI-04-03 - Kundeninsolvenz bearbeiten | 0,391 | **Fehltreffer** trotz kleinem Abstand |
-| Arbeitsstation wechseln | AS-01-03 - Arbeitsschutzstandards | 0,406 | kein Gegenstueck |
-| Gebuchte Belege stornieren | LOG-01-04 - Liefernachweis archivieren | 0,410 | kein Gegenstueck |
-| MDE BC Anbindung | RM-02-02 - Wareneingang erfassen | 0,452 | kein Gegenstueck |
-| Sortieren Suchen und Filtern in BC | RWG ProzessHub | 0,452 | kein Gegenstueck |
-| Etikettendruck | 00.06 - Templates und Standards | 0,468 | kein Gegenstueck |
-| POS-Kurzwahlen Einrichtung | RM-22-01 - Warenplatzierung | 0,479 | kein Gegenstueck |
-| Shortcuts RTC BC | 00.06 - Templates und Standards | 0,516 | kein Gegenstueck |
+| `/Human Resources (HR)/PB-HR-4-1_PreBoarding.pdf` | [HR-04-01 – Preboarding durchfuehren](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/438698153) | 6 158 | 2 |
+| `/Human Resources (HR)/PB-HR-4-2_OnBoarding.pdf` | [HR-04-02 – Onboarding-Plan umsetzen](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/438468763) | 3 706 | 2 |
+| `/Human Resources (HR)/PB-HR-12-1_Ausloesung des Austrittsprozesses.pdf` | [HR-12-01 – Austrittsprozess einleiten](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/438632532) | 6 150 | 1 |
+| `/IT-Management/PB_IT-1-1_Hardware-Ausgabe.pdf` | [IT-01-01 – Hardware ausgeben](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/438960129) | 3 977 | 3 |
+| `/IT-Management/PB_IT-1-2_Inventarisierung.pdf` | [IT-01-02 – Hardware inventarisieren](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/438534392) | 4 925 | 3 |
+| `/Warenwirtschaft (WaWi)/PB-WaWi-1-4_Artikelanfrage.pdf` | [WAWI-01-01 – Artikelanfrage bearbeiten](https://rwg-r.atlassian.net/wiki/spaces/ProzessHub/pages/439189507) | 3 639 | 2 |
+| `/App - RWG IT-Ticketmeldung.pdf` | **keine** | - | - |
 
-Das Muster ist erkennbar: Es fehlen die **Werkzeug- und Bedienthemen** -
-Etikettendruck, Tastenkuerzel, MDE-Anbindung, Arbeitsstation, Sortieren und
-Filtern in BC. Der ProzessHub beschreibt Geschaeftsprozesse, nicht die Bedienung
-des Systems. **Bruch und Schwund** ist der einzige echte Prozess ohne
-Entsprechung.
+Alle sechs Zielseiten tragen echten Inhalt zwischen 3 639 und 6 158 Zeichen und
+wurden zwischen dem 15. und 18.08.2026 zuletzt geaendert.
 
-## Nicht geprueft: 9 von 34
+**Vorsicht bei der Nummer.** `PB-WaWi-1-4_Artikelanfrage` heisst nach Nummer
+WAWI-01-04, das waere "Artikelstammdaten aendern". Inhaltlich gehoert es zu
+WAWI-01-01. Die alte Nummerierung deckt sich also **nicht** mit der neuen -
+massgeblich ist der Titel, nicht die Nummer.
 
-Diese Dateien sind noch nicht in der Wissensbasis, ueber sie laesst sich nichts
-sagen:
+## Die eine ohne Entsprechung
 
-- /Agrar Prozesse/AHL-Tankstelle/Tankstelle AHL AZE Erkelenz.docx
-- /Agrar Prozesse/EDI/Agrar EDI Bestellausgang Fehlerpruefung.docx
-- /Bereichsuebergreifende Prozesse/A6-Etiketten drucken.pdf
-- /Bereichsuebergreifende Prozesse/Aktuellen Auftrag kopieren.docx
-- /Bereichsuebergreifende Prozesse/Bereichsuebergreifend Artikelbestand Uebersicht.docx
-- /Bereichsuebergreifende Prozesse/Bereichsuebergreifend Minusbestandsliste Artikelbestandsuebersicht.docx
-- /Bereichsuebergreifende Prozesse/Korrektur Eigenverbrauch.docx
-- /Bereichsuebergreifende Prozesse/Lagerzuordnung Warenausgabeschein drucken Ein- Aus-schalten.docx
-- /Bereichsuebergreifende Prozesse/d.3One_prozessdoku.docx (5 MB)
+`/App - RWG IT-Ticketmeldung.pdf` (02.08.2025, im Wurzelverzeichnis) beschreibt,
+wie ein Anwender eine IT-Stoerung meldet. Der ProzessHub hat dazu nur
+`IT-04-01 – IT-First-Level-Support leisten` - das ist dieselbe Sache aus Sicht
+der IT, nicht aus Sicht des Anwenders. Ob das eine Luecke ist oder Absicht, ist
+eine fachliche Frage.
 
-Sie kommen mit der Erstbefuellung, sobald das Mistral-Kontingent wieder laeuft.
+## Was NICHT geprueft wurde
 
-## Was daraus folgt
+**Der Inhalt.** Die sieben PDF liegen in einer Bibliothek, die der RAG-Ingest
+nicht erfasst - er deckt nur `Schulungen` ab. In der Wissensbasis sind sie
+deshalb mit **null** Treffern vertreten. Verglichen wurden Titel und Nummer,
+nicht der Text. Dass die ProzessHub-Seite denselben Sachverhalt vollstaendig
+abdeckt, ist damit **nicht belegt** - nur, dass es sie zum selben Thema gibt.
 
-**Nicht loeschen.** Auch bei den achtzehn mit Entsprechung ist nicht belegt, dass
-der ProzessHub den Inhalt wirklich traegt - nur, dass er dasselbe Thema behandelt.
-Die klickgenauen Anleitungen mit Bildschirmfotos sind in den Prozessseiten
-vermutlich nicht enthalten.
+Wer sicher gehen will, muss die sechs PDF gegen ihre Seiten lesen. Sieben
+Dokumente sind dafuer eine ueberschaubare Menge.
 
-**Zu klaeren waere fachlich:** Soll der ProzessHub die Bedienanleitungen
-aufnehmen, oder bleiben sie bewusst in SharePoint und werden von dort verlinkt?
-Davon haengt ab, ob die sieben ohne Gegenstueck eine Luecke sind oder Absicht.
+## Nebenbefund: drei Ordner ausserhalb der Namenskonvention
+
+Die Bereichsordner der obersten Ebene heissen `KUERZEL - Klartext`
+(`HR - Human Resources`, `IT - Informationstechnologie`, `WAWI - Warenwirtschaft`).
+Drei Ordner folgen dem nicht - und genau in ihnen liegen sechs der sieben PDF:
+
+- `Human Resources (HR)` - 3 PDF
+- `IT-Management` - 2 PDF
+- `Warenwirtschaft (WaWi)` - 1 PDF
+
+Der Flow bemerkt das selbst: Sein Code-Node `Seiten normalisieren` sammelt
+solche Ordner in `ordner_ohne_kuerzel` und ueberspringt sie, weil ihre Seiten
+keinen Zielpfad finden. Die drei sind also **Altordner neben den neuen**, keine
+Zielordner. Fuer HR, IT und WaWi existieren die richtig benannten Ordner
+daneben und sind gefuellt.
+
+**Zu entscheiden:** Die drei Altordner samt PDF nach Pruefung entfernen - oder
+die PDF in den jeweils richtigen Bereichsordner verschieben, falls sie als
+Anlage erhalten bleiben sollen.
