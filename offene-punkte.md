@@ -77,13 +77,19 @@ Sauberer waere, den Eintrag erst nach den Chunks zu schreiben. Das ist ein Umbau
 
 
 ### Erstbefuellung - erst aufraeumen, dann lesen
-Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) liest die Bibliothek `Schulungen` in einem Zug und wertet sie aus. Lauf 110893:
+Zwei Leseflows werten die Bibliothek `Schulungen` aus: `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) fuer Doubletten und Formate, `RWG Wartung - SharePoint Struktur` (`Izrp4qA84wuAGN8O`) fuer die Ordnerstruktur.
 
-| | |
-|---|---|
-| Eintraege gesamt | 1 896 (475 Ordner, 1 421 Dateien, 12,9 GB) |
-| davon verwertbar | **499 Dateien** |
-| nicht verwertbar | 922 Dateien |
+**Achtung bei den Zahlen des ersten Flows:** Er entdoppelt nicht. Der Graph-Delta-Abruf liefert einen Eintrag mehrfach, wenn er sich mehrmals geaendert hat - 1 876 gelieferte Zeilen gegen 1 650 verschiedene Item-IDs, 226 Mehrfachlieferungen. Bei den Ordnern verdoppelt das die Zahl fast. Massgeblich sind die entdoppelten Werte aus Lauf 110913:
+
+| | ungefiltert | **entdoppelt** |
+|---|---|---|
+| Eintraege gesamt | 1 876 | **1 650** |
+| Ordner | 475 | **239** |
+| Dateien | 1 421 | **1 411** |
+| davon verwertbar | 499 | **489** |
+| Office-Sperrdateien | hoechstens 42 | **39** |
+
+Die vollstaendige Struktur Ebene fuer Ebene steht in `sharepoint-struktur-schulungen.xlsx`.
 
 **Zwei Drittel der Bibliothek tragen keinen durchsuchbaren Text.** 402 Windows-Verknuepfungen (`.lnk`) und 89 Weblinks (`.url`) - zusammen 35 Prozent aller Dateien. Dazu 263 Bilder (3,6 GB), 101 Videos (5,7 GB), 8 DVD-Spuren (3,2 GB), 26 `.db` und 10 `.tmp`. Von den 12,9 GB sind 12,4 GB Medien.
 
@@ -91,7 +97,7 @@ Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) lie
 
 | Befund | Anzahl | Was dahintersteckt |
 |---|---|---|
-| Office-Sperrdateien `~$…` | 42 unter 2 kB | 162 Byte je Stueck, tragen die Endung des Dokuments. **Behoben** - der Ingest filtert sie jetzt. Sie zaehlen aber in den 499 verwertbaren mit. |
+| Office-Sperrdateien `~$…` | 39 | 162 Byte je Stueck, tragen die Endung des Dokuments. **Behoben** - der Ingest filtert sie jetzt. Sie zaehlen aber in den 489 verwertbaren mit. |
 | inhaltsgleiche Kopien | 17 ueberzaehlige in 15 Gruppen | dieselbe Datei in mehreren Ordnern, meist `Lagerplaene 2023` gegen `2024`. Zusammen 10 MB. Liste unten. |
 | davon Sperrdatei-Doubletten | 10 ueberzaehlige in 6 Gruppen | nicht zu bereinigen - der Filter faengt sie ohnehin ab |
 | namensgleich, Inhalt verschieden | 63 | `Debitorencockpit.pdf` liegt viermal mit unterschiedlichem Inhalt |
@@ -103,17 +109,15 @@ Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) lie
 
 | | |
 |---|---|
-| verwertbare Dateien | 499 |
-| abzueglich Sperrdateien | -42 |
+| verwertbare Dateien | 489 |
+| abzueglich Sperrdateien | -39 |
 | abzueglich ueber 40 MB | -1 |
 | abzueglich echter Doubletten | -17 |
-| **tatsaechlich einzulesen** | **rund 439** |
+| **tatsaechlich einzulesen** | **432** |
 
 Bei 30 je Nacht rund **fuenfzehn Naechte**.
 
-Die frueher genannten 472 waren zu hoch: Die Sperrdateien tragen die Endung des Dokuments und stecken deshalb sehr wohl in den 499 verwertbaren - sie wurden zuvor faelschlich als bereits abgezogen behandelt. Zugleich waren von den 27 inhaltsgleichen Kopien 10 selbst Sperrdateien und damit doppelt gezaehlt.
-
-**Eine Unschaerfe bleibt:** Der Analyseflow meldet 42 Dateien unter 2 kB, gibt die Liste aber nur bis 20 aus. Von diesen 20 sind 19 Sperrdateien, eine ist 37 Byte gross. Die genaue Zahl der Sperrdateien ist aus dem Lauf also nicht ableitbar - 42 ist die Obergrenze.
+Zwei Korrekturen stecken darin. Erstens tragen die Sperrdateien die Endung des Dokuments und stecken deshalb sehr wohl in den verwertbaren - sie wurden zuvor faelschlich als bereits abgezogen behandelt, und von den 27 inhaltsgleichen Kopien waren 10 selbst Sperrdateien. Zweitens waren alle Ausgangszahlen durch die Mehrfachlieferung des Delta-Abrufs zu hoch.
 
 **Der Sperrdatei-Filter ist publiziert** und steht im Code-Node `Aufgaben bestimmen` des `RAG - SharePoint Ingest`. Wirksam wird er beim naechsten Lauf, der Dateien sieht.
 
