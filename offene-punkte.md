@@ -22,7 +22,7 @@ Was daraus offen blieb:
 
 ## Zuerst
 
-### Zwei Ingest-Flows - Laufbeleg steht aus
+### Zwei Ingest-Flows - Zugangsfix belegt
 **Mit der Loeschung des alten Supabase-Projekts ist auch dessen Zugang `11jCRVtytAyrsu96` verschwunden.** Der `RAG-JIRA-Ingest` hing noch daran und scheiterte bei jedem Jira-Webhook mit `Credential with ID "11jCRVtytAyrsu96" does not exist for type "supabaseApi"`.
 
 Die Adressen aller Nodes zeigen korrekt aufs neue Projekt - nur die Zugangsbindung war alt. Da die MCP-Schnittstelle Credentials nicht ausliest, liess sich nicht feststellen, welcher Node betroffen war; deshalb wurde der richtige Zugang `H1j5n8gUPkmrE97X` auf **allen** Nodes mit Supabase-Bezug ausdruecklich gesetzt. Beide Flows sind publiziert, `versionId` und `activeVersionId` stimmen ueberein:
