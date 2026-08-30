@@ -51,7 +51,9 @@ Gemessen in Lauf `110888`. `Aufgaben bestimmen` meldete `zu_loeschen: 5`, abgear
 
 **Hier ohne Datenverlust:** betroffen waren vier leere Ordner und eine Datei, die alle keinen Eintrag in der Wissensbasis hatten.
 
-Nicht angefasst. Zu entscheiden, ob der Zweig gegen leere Ausgaben abgesichert wird.
+**Behoben und publiziert.** `alwaysOutputData` steht jetzt auf den drei DELETE-Nodes des Loeschzweigs - `Delete All SharePoint Chunks`, `Delete SharePoint Source` und `Delete SharePoint Storage Object`. Damit gibt jeder von ihnen auch ohne Treffer ein Item aus und die Schleife laeuft weiter. Die beiden GET-Nodes desselben Zweigs trugen die Einstellung schon vorher; `Delete Workflow Summary` faengt den Leerfall bereits ab und meldet dann `deleted_chunk_count: 0`. Die Ziel-URLs beziehen die `doc_id` aus `Build Delete Context` und nicht aus `$json` - ein eingefuegtes Leer-Item kann keinen falschen DELETE ausloesen.
+
+**Dieselbe Falle steckt im Einlese-Zweig**, dort nicht angefasst: `Delete Stale SharePoint Chunks` (DELETE) vor `Plan SharePoint Storage Cleanup` und `Touch Unchanged Source` (PATCH) vor `No Change Summary`. Beide koennen bei leerem Ergebnis denselben Abbruch ausloesen.
 
 ### 14 SharePoint-Dokumente ohne Chunks
 Der Lauf meldet `rag_dokumente: 266` gegen `rag_mit_chunks: 252`. Die Gegenmessung in der Datenbank ergibt dieselbe Zahl: 14 Eintraege in `sharepoint_documents`, zu denen kein einziger Chunk in `document_chunks` steht. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden.
