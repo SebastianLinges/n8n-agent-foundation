@@ -34,14 +34,18 @@ Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen,
 
 Der Fehlerweg hat dabei genau so gegriffen wie entworfen: `status = 'fehler'`, Meldung in `fehler_text`, beide Dateien unveraendert im Eingang. Beim naechsten Lauf werden sie erneut geholt, ohne neue OCR-Kosten - `ocr_text` steht ja schon.
 
+**Nachtraeglich eingebaut** (Lauf 110838, 30 Nodes): Steht `ocr_text` schon, wird die OCR uebersprungen - ohne das lief ein liegengebliebenes Dokument stuendlich erneut durch die Erkennung und wurde jedes Mal neu bezahlt. Dazu ein Zaehler `versuche`: Nach drei Fehlversuchen wandert die Datei nach `/IMPORTER/CONTRACT/FEHLER`, den der Flow selbst anlegt. In der Excel stehen `status` und `versuche` vorn, Fertiges zuoberst.
+
 **Zum Abarbeiten ab dem 01.09.:** Lauf anstossen, die Extraktion an den beiden Dokumenten pruefen, dann publizieren. Erst nach dem Publizieren geht der Export ins Git.
 
 Noch unbelegt sind vier Nodes, die nur hinter der Extraktion liegen: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die Umwandlungen in `Ergebnis auswerten` sind einzeln gegen Testwerte geprueft, die Spaltenliste des grossen `UPDATE` gegen `information_schema` und `jsonb_to_record`. Ein Lauf ersetzt das nicht.
 
-### Verirrte Excel in DONE
-`Vertragsuebersicht.xlsx` wurde im Lauf 110831 korrekt in den Eingang geschrieben, liegt jetzt aber in `/IMPORTER/CONTRACT/DONE`. Dazwischen lag um 12:28:26 ein Webhook-Lauf des alten Flows (110832) - Power Automate hatte die neue Datei bemerkt. Die naheliegende Erklaerung ist, dass `RWG_n8n_Trigg` sie anschliessend verschoben hat, so wie die elf Altdateien dorthin kamen.
+### Verirrte Excel in DONE - eine Leiche zum Wegraeumen
+`Vertragsuebersicht.xlsx` wurde im Lauf 110831 in den Eingang geschrieben und landete kurz darauf in `DONE`; dazwischen lag um 12:28:26 ein Webhook-Lauf des alten Flows. `RWG_n8n_Trigg` hat sie verschoben, so wie die elf Altdateien dorthin kamen.
 
-Da der Power-Automate-Flow inzwischen geloescht ist, schreibt der naechste Lauf die Datei wieder in den Eingang. Die Fassung in `DONE` ist dann eine Leiche und kann von Hand weg.
+**Belegt ist das inzwischen**: Lauf 110838 hat die Datei erneut in den Eingang geschrieben, und dort liegt sie seither. Der Power-Automate-Flow ist also wirklich weg.
+
+Die Fassung in `/IMPORTER/CONTRACT/DONE` ist damit ueberfluessig und kann von Hand geloescht werden.
 
 ### Altbestand in DONE nachziehen
 Elf Dokumente liegen in `/IMPORTER/CONTRACT/DONE` und stehen nicht in `vertraege`. Ein Einmallauf ueber den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar. Bewusst zurueckgestellt, bis der Eingang belegt ist.

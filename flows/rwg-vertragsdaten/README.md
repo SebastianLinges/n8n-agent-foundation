@@ -11,35 +11,47 @@
 | Drive-ID | `b!C2yhEx592Ei36yvay6U9n2886_vvW61LokJwBCKhlW_uiHYCBMlCRaEn9mGTdB1m` |
 | Eingang | `/IMPORTER/CONTRACT` |
 | Ablage | `/IMPORTER/CONTRACT/DONE` |
+| Fehlerablage | `/IMPORTER/CONTRACT/FEHLER` |
 | Excel | `/IMPORTER/CONTRACT/Vertragsuebersicht.xlsx` |
 
 Der Ablageordner heißt **`DONE`**, nicht `Erledigt`. Er besteht seit dem 08.03.2026 und war bereits gefüllt, als der Neuaufbau begann. Ein zweiter Ordner daneben hätte die Historie geteilt.
 
-Die Ordner-ID wird **nicht** fest hinterlegt, sondern bei jedem Lauf aus dem Verzeichnis gelesen. Wird `DONE` neu angelegt, findet der Flow ihn trotzdem.
+`FEHLER` legt der Flow selbst an, falls er fehlt. Beide Ordner-IDs werden **nicht** fest hinterlegt, sondern bei jedem Lauf aus dem Verzeichnis gelesen. Wird ein Ordner neu angelegt oder ersetzt, findet der Flow ihn trotzdem.
 
 ## Ablauf
 
 ```
-Zeitplan (stündlich) → Steuerung → Eingang lesen → Nur PDF → Je Datei
-                                                                 │
-   ┌─────────────────────────────────────────────────────────────┘
-   ▼
-Datei holen → Hash bilden → Zeile sichern → Datei und Stand vereinen
-                                                        ▼
-                                              Schon abgelegt? ──ja──┐
-                                                        │nein       │
-   Datei zu Mistral → Signierte URL → OCR → OCR-Text sichern        │
-                                              → OCR schreiben       │
-                                              → Extraktionsauftrag  │
-                                              → Vertragsdaten extrahieren
-                                              → Ergebnis auswerten  │
-                                              → Vertragsdaten schreiben
-                                                        ▼           │
-                                              Nach DONE verschieben ◄┘
-                                                        ▼
-                                              Ablage vermerken → nächste Datei
+Zeitplan (stuendlich) -> Steuerung -> Eingang lesen -> Fehlerordner sichern
+                                                    -> Nur PDF -> Je Datei
+                                                                     |
+   +-----------------------------------------------------------------+
+   v
+Datei holen -> Hash bilden -> Zeile sichern -> Datei und Stand vereinen
+                                                        v
+                                                      Weiche
+                        +-------------------------------+------------------------------+
+                        | abgelegt                      | OCR vorhanden                | neu
+                        v                               v                              v
+              Nach DONE verschieben        Vorhandenen OCR-Text laden     Datei zu Mistral
+                        ^                               |                  -> Signierte URL
+                        |                               |                  -> OCR
+                        |                               |                  -> OCR-Text sichern
+                        |                               |                  -> OCR schreiben
+                        |                               +------------+-----------------+
+                        |                                            v
+                        |                                   Extraktionsauftrag
+                        |                                -> Vertragsdaten extrahieren
+                        |                                -> Ergebnis auswerten
+                        +--------------------------------- Vertragsdaten schreiben
+                        v
+                Ablage vermerken -> naechste Datei
 
-nach der letzten Datei:  Liste holen → Als Excel → Excel ablegen
+Fehlerausgaenge -> Fehler vermerken (versuche + 1) -> Zu viele Versuche?
+                                        nein: naechste Datei
+                                        ja:   Nach FEHLER verschieben
+                                              -> Ablage FEHLER vermerken
+
+nach der letzten Datei:  Liste holen -> Als Excel -> Excel ablegen
 ```
 
 ## Die Entscheidungen dahinter
@@ -48,9 +60,15 @@ nach der letzten Datei:  Liste holen → Als Excel → Excel ablegen
 
 **Der OCR-Text bleibt gespeichert.** `ocr_text` und `rohdaten` erlauben eine erneute Auswertung ohne neue OCR. Wird der Extraktionsprompt besser — und das wird er, das Ziel ist „bestmögliche Erkennung" —, laufen alle Altverträge in Sekunden neu durch, ohne einen Cent für Mistral.
 
+**Deshalb überspringt `Weiche` die OCR, wenn `ocr_text` schon steht.** Ohne diesen Zweig liefe ein liegengebliebenes Dokument bei jedem stündlichen Versuch erneut durch die Erkennung — und würde jedes Mal neu bezahlt. Gemessen: mit OCR 53,6 Sekunden, ohne 18,8.
+
+**Nach drei Fehlversuchen wandert die Datei nach `FEHLER`.** Vorübergehende Störungen — ein Netzabbruch, ein erschöpftes Modellkontingent — heilen von selbst, weil der nächste Lauf es ohne neue OCR erneut versucht. Was dreimal scheitert, ist keine Störung mehr, sondern ein Fall für einen Menschen; dann ist der Eingang wieder sauber und nichts läuft endlos im Kreis. Die Grenze steht als `maxVersuche` in `Steuerung`, der Zähler als `versuche` in der Tabelle.
+
 **Erst schreiben, dann verschieben.** Bricht der Lauf zwischen OCR und Extraktion ab, liegt die Datei noch im Eingang und der nächste Lauf holt sie erneut. Der Hash verhindert die Dublette, der Status sagt, wie weit sie kam. `abgelegt_am` wird erst gesetzt, wenn die Datei tatsächlich in `DONE` liegt.
 
 **Die Excel wird bei jedem Lauf vollständig neu erzeugt**, nicht zeilenweise fortgeschrieben. Anhängen bedeutet, den Stand an zwei Orten zu führen; nach dem ersten abgebrochenen Lauf weichen sie voneinander ab, und niemand merkt es. Neu erzeugen ist immer deckungsgleich mit der Datenbank. Der Preis: Handeingaben in der Datei überleben einen Lauf nicht. Die Datei ist Ergebnisliste, kein Eingabemedium.
+
+**`status` und `versuche` stehen ganz vorn, Fertiges steht oben.** Sortiert wird `abgelegt`, `extrahiert`, `ocr`, `neu`, `fehler` — wer die Datei öffnet, sieht zuerst die fertigen Verträge und muss bis zu den Problemfällen scrollen. Die Fehler stehen mit in derselben Datei und nicht daneben: Eine getrennte Fehlerliste öffnet niemand.
 
 **Der Hash läuft über die Dateibytes**, nicht über eine Base64-Zeichenkette wie im alten Flow. Damit ist er unabhängig davon, auf welchem Weg das Dokument hereinkommt.
 
@@ -66,27 +84,30 @@ Definition, Mandant, Vertragsart, Vertragspartner, Lieferantennummer, Vertragsnu
 
 ## Fallstricke, die hier eingebaut sind
 
-- **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern**, auch in Zeichenketten und Kommentaren. Alle sechs Abfragen enthalten deshalb ausschließlich `$1` und keinen einzigen Kommentar. Sämtliche Daten kommen als **ein** JSON-Parameter herein und werden per `jsonb_to_record` aufgefächert — damit gibt es weder ein Komma-Problem in `queryReplacement` noch Typkonflikte. `queryBatching` steht überall auf `independently`.
+- **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern**, auch in Zeichenketten und Kommentaren. Alle acht Abfragen enthalten deshalb ausschließlich `$1` und keinen einzigen Kommentar. Sämtliche Daten kommen als **ein** JSON-Parameter herein und werden per `jsonb_to_record` aufgefächert — damit gibt es weder ein Komma-Problem in `queryReplacement` noch Typkonflikte. `queryBatching` steht überall auf `independently`.
 - **Der Postgres-Node reicht keine Binärdaten weiter.** Nach `Zeile sichern` wäre die Datei vor dem Mistral-Upload verloren. `Datei und Stand vereinen` führt Datei und Datenbankstand wieder zusammen.
-- **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** Alle sechs fehleranfälligen Aufrufe haben einen Fehlerausgang: fünf davon schreiben `status = 'fehler'` samt Meldung in die Zeile und gehen zur nächsten Datei.
+- **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** Alle fehleranfälligen Aufrufe haben einen Fehlerausgang: fünf davon schreiben `status = 'fehler'` samt Meldung in die Zeile, zählen `versuche` hoch und gehen zur nächsten Datei.
 - **`Datei holen` ist die eine Ausnahme:** Der Fehlerausgang führt direkt zur nächsten Datei, weil zu diesem Zeitpunkt noch keine Zeile existiert, in die man den Fehler schreiben könnte. Die Datei bleibt im Eingang und wird im nächsten Lauf erneut geholt. Kein Verlust, aber auch kein Eintrag — ein dauerhaft unlesbares Dokument fällt nur dadurch auf, dass es im Eingang liegen bleibt.
 - **Die Zeitzone steht im Workflow** (`Europe/Berlin`). Der Server läuft auf UTC.
 - **`$('Node').first()` statt `.all()`** in der Schleife.
+- **Der Fehlerordner wird mit `conflictBehavior: fail` angelegt.** Existiert er schon, antwortet Graph mit einem Konflikt statt mit einer Kennung — `Nur PDF` liest sie dann aus der Auflistung des Eingangs. `replace` wäre hier gefährlich: Es würde den gefüllten Ordner ersetzen.
+- **Die Ausgänge von IF und Switch wurden nach dem Setzen zurückgelesen.** Der bekannte Fallstrick, dass die MCP-Schnittstelle den Ausgangsindex ignoriert, ist hier nicht eingetreten — belegt statt vermutet.
 
 ## Grenzen
 
 - **10 Dateien je Lauf** (`maxJeLauf` in `Steuerung`). Bei größerem Nachlauf vorübergehend erhöhen.
 - **Ein Namenskonflikt in `DONE` lässt das Verschieben scheitern.** Graph antwortet mit 409, die Zeile bekommt `status = 'fehler'`, die Datei bleibt im Eingang. Bisher nicht eingetreten.
 - **Große PDF sind teuer und langsam.** Der Zeitausschuss für die OCR steht auf 15 Minuten, der des Workflows auf eine Stunde.
+- **Die Datei wird auch dann geladen, wenn die OCR übersprungen wird.** Der Hash braucht die Bytes. Für ein liegengebliebenes 24-MB-Dokument heißt das stündlich 24 MB Übertragung — kostenlos, aber nicht umsonst. Nach drei Versuchen ist ohnehin Schluss.
 
 ## Zieltabelle `vertraege`
 
-42 Spalten, `UNIQUE (datei_hash)` als Duplikatschutz, `CHECK` auf `status` in `neu`, `ocr`, `extrahiert`, `abgelegt`, `fehler`. Indizes auf `status`, `vertragspartner`, `laufzeit_ende` und `kuendigung_zum` (die beiden letzten nur wo gefüllt), dazu ein deutscher Volltextindex über Partner, Definition und Vertragsart. RLS ist an, ohne Regeln — wie im ganzen Projekt.
+43 Spalten, `UNIQUE (datei_hash)` als Duplikatschutz, `CHECK` auf `status` in `neu`, `ocr`, `extrahiert`, `abgelegt`, `fehler`. Indizes auf `status`, `vertragspartner`, `laufzeit_ende` und `kuendigung_zum` (die beiden letzten nur wo gefüllt), dazu ein deutscher Volltextindex über Partner, Definition und Vertragsart. RLS ist an, ohne Regeln — wie im ganzen Projekt.
 
 | Gruppe | Spalten |
 |---|---|
 | Herkunft | `datei_name`, `datei_hash`, `sharepoint_item_id`, `sharepoint_pfad`, `sharepoint_url` |
-| Verarbeitungsstand | `status`, `fehler_text`, `erkannt_am`, `abgelegt_am` |
+| Verarbeitungsstand | `status`, `versuche`, `fehler_text`, `erkannt_am`, `abgelegt_am` |
 | Klartext | `definition`, `mandant`, `vertragsart`, `vertragspartner`, `lieferantennummer`, `vertragsnummer`, `laufzeit_beginn_text`, `laufzeit_ende_text`, `intervalle`, `verlaengerung`, `kuendigungsfrist`, `kuendigung_zum_text`, `preis_netto_text`, `preis_brutto_text`, `kosten_jaehrlich_text`, `sparte_bereich`, `standortinfo`, `kostenstelle` |
 | Ausgewertet | `laufzeit_beginn`, `laufzeit_ende`, `kuendigung_zum` als `date`; `preis_netto`, `preis_brutto`, `kosten_jaehrlich` als `numeric(14,2)` |
 | Nachvollziehbarkeit | `ocr_text`, `rohdaten`, `ocr_modell`, `extraktions_modell`, `seiten`, `woerter` |
@@ -103,6 +124,7 @@ Es gibt **zwei** Mistral-Zugänge in der Instanz. Die automatische Zuordnung gre
 
 ## Offen
 
+- **Die Extraktion ist noch nicht belegt.** Die Mistral-Token sind bis zum 01.09.2026 aufgebraucht, der Chat-Endpunkt antwortet `Forbidden`. Damit sind vier Nodes ungetestet: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`.
 - **Der Altbestand in `DONE`** (11 Dateien) ist nicht in `vertraege` übernommen. Ein Einmallauf über den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar.
 - **Die alte Data Table `CEz5GXpTS7yHhjqS`** (`RWG Vertraege`) hält den Bestand des Formular- und Webhook-Wegs. Ob er übernommen wird, ist offen.
-- **Der Power-Automate-Flow `RWG_n8n_Trigg`** schickt bis heute Dateien aus demselben Ordner an den Webhook des alten Flows. Mit dem Publizieren dieses Umbaus verliert er sein Ziel und ist zu entfernen.
+Der Power-Automate-Flow `RWG_n8n_Trigg` überwachte denselben Ordner und ist am 30.08. gelöscht worden. Solange er lief, verschob er neu erzeugte Dateien nach `DONE` — auch die Excel des ersten Laufs. Seit seiner Löschung bleibt sie im Eingang liegen, wie vorgesehen.
