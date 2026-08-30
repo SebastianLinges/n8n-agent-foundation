@@ -79,11 +79,15 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Den reparierten SharePoint-Ingest publizieren.** Der Einlesezweig verarbeitete je Lauf nur das erste Dokument; alle weiteren wurden abgeschlossen, ohne je Chunks zu schreiben — bei `fehler: 0`. Die Ursache ist gefunden und behoben, die Reparatur ist ein einziger Parameter: `options.reset` auf dem Knoten `Embedding Batch Loop`.
+1. **Sechs Regaletiketten-PDFs blockieren den Abgleich.** Der stille Schreibverlust ist behoben und publiziert — die Reparatur ist `options.reset` auf dem Knoten `Embedding Batch Loop`. Belegt in drei sauberen Serienläufen (`110976`, `110977`, `110979`), die je fünf Dokumente heilten. Der Rückstand an Dokumenten ohne Chunks fiel am Abend des 30.08. von **35 auf 6**.
 
-   **Belegt in drei Läufen:** `110969` ohne Reset heilte 1 von 2 Dokumenten, `110973` mit Reset 2 von 2, `110975` mit `maxJeLauf: 5` dann **5 von 5** in 1 min 56 s. Der Rückstand an Dokumenten ohne Chunks fiel im Lauf des Abends von 35 auf **23**.
+   **Was übrig ist, ist eine eigene Sorte Problem.** Die sechs verbliebenen sind Regaletiketten-PDFs aus der Power-Automate-Zeit vom 22.08., alle mit `ingestion_count: 0`: 3 640 bis 11 541 Wörter, 29 bis 92 kB Text, **null Bilder** — hunderte Seiten Etiketten, also sehr grosse OCR-Aufträge. Lauf `110980` starb nach 10 min 46 s an einem davon.
 
-   **Der Entwurf ist noch nicht publiziert.** Er enthält gegenüber der aktiven Fassung genau zwei Änderungen: den Reset und eine überarbeitete `Steuerung` (Handstart gilt als Abgleich, `maxJeLauf` von 30 auf 5 wegen der 300-Sekunden-Grenze).
+   **Der Abgleich zieht sie mit Vorrang**, weil sie als unvollständig gelten. Solange nichts geschieht, läuft der nächtliche Abgleich also in dieselbe Wand. Immerhin: Was ein Lauf vorher schafft, bleibt jetzt erhalten — `110980` heilte zwei Dokumente, bevor er starb.
+
+   **Zu entscheiden:** die sechs überspringen lassen, einzeln über `nurDatei` nachfahren, oder `maxJeLauf` senken. Ohne eine Entscheidung heilt der Abgleich nichts mehr, weil er immer zuerst an diese sechs gerät.
+
+   **Die Ursache des Abbruchs ist nicht auslesbar.** Das Fehlerobjekt sprengt die MCP-Verbindung, und der Fehler-Workflow feuert nur bei Produktionsläufen — die Testläufe waren manuell. Ein Produktionslauf würde die Meldung in `pMGm0LaxRTldvPKEkmkzC` hinterlassen.
 
 2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
@@ -113,7 +117,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 
 **Technisch offen**
 - Erstbefüllung: **432** Dateien einzulesen, 30 je Nacht — etwa fünfzehn Nächte
-- **23 Dokumente ohne Chunks.** Mit der Reset-Reparatur schrumpfen sie um fünf je Abgleich. Vor der Reparatur waren es 35.
+- **6 Dokumente ohne Chunks** — ausschliesslich die Regaletiketten-PDFs, siehe oben. Alle anderen sind geheilt.
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
