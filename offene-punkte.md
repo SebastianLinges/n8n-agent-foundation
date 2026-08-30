@@ -119,11 +119,11 @@ Sauberer waere, den Eintrag erst nach den Chunks zu schreiben. Das ist ein Umbau
 
 
 ### Erstbefuellung - erst aufraeumen, dann lesen
-Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) liest die Bibliothek `Schulungen` in einem Zug und wertet sie aus. Lauf 110875:
+Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) liest die Bibliothek `Schulungen` in einem Zug und wertet sie aus. Lauf 110893:
 
 | | |
 |---|---|
-| Eintraege gesamt | 1 900 (479 Ordner, 1 421 Dateien, 12,9 GB) |
+| Eintraege gesamt | 1 896 (475 Ordner, 1 421 Dateien, 12,9 GB) |
 | davon verwertbar | **499 Dateien** |
 | nicht verwertbar | 922 Dateien |
 
@@ -133,18 +133,83 @@ Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) lie
 
 | Befund | Anzahl | Was dahintersteckt |
 |---|---|---|
-| Office-Sperrdateien `~$…` | 42 | 162 Byte je Stueck, tragen die Endung des Dokuments und liefen bisher mit in die OCR. **Behoben** - der Ingest filtert sie jetzt, siehe unten. |
-| inhaltsgleiche Kopien | 27 ueberzaehlige in 21 Gruppen | dieselbe Datei in mehreren Ordnern, etwa `Lagerplaene 2023` und `2024` |
+| Office-Sperrdateien `~$…` | 42 unter 2 kB | 162 Byte je Stueck, tragen die Endung des Dokuments. **Behoben** - der Ingest filtert sie jetzt. Sie zaehlen aber in den 499 verwertbaren mit. |
+| inhaltsgleiche Kopien | 17 ueberzaehlige in 15 Gruppen | dieselbe Datei in mehreren Ordnern, meist `Lagerplaene 2023` gegen `2024`. Zusammen 10 MB. Liste unten. |
+| davon Sperrdatei-Doubletten | 10 ueberzaehlige in 6 Gruppen | nicht zu bereinigen - der Filter faengt sie ohnehin ab |
 | namensgleich, Inhalt verschieden | 63 | `Debitorencockpit.pdf` liegt viermal mit unterschiedlichem Inhalt |
 | ueber 40 MB | 1 | `Praesentation Mitarbeiterversammlung 05.02.2024.pptx`, 45 MB - faellt aus dem Ingest |
 
 **Kein Altbestand.** Keine einzige verwertbare Datei ist aelter als drei Jahre; die aeltesten stammen von Mai 2024. Die Frage nach veralteten Dokumenten beantwortet sich damit von selbst - ueber das Aenderungsdatum ist nichts auszusortieren.
 
-**Was das fuer die OCR bedeutet:** 499 verwertbare Dateien, nach Abzug der 27 inhaltsgleichen Kopien **472**. Die 42 Sperrdateien sind darin nicht enthalten, weil der Filter sie bereits abfaengt. Bei 30 je Nacht rund sechzehn Naechte.
+**Was das fuer die OCR bedeutet:**
+
+| | |
+|---|---|
+| verwertbare Dateien | 499 |
+| abzueglich Sperrdateien | -42 |
+| abzueglich ueber 40 MB | -1 |
+| abzueglich echter Doubletten | -17 |
+| **tatsaechlich einzulesen** | **rund 439** |
+
+Bei 30 je Nacht rund **fuenfzehn Naechte**.
+
+Die frueher genannten 472 waren zu hoch: Die Sperrdateien tragen die Endung des Dokuments und stecken deshalb sehr wohl in den 499 verwertbaren - sie wurden zuvor faelschlich als bereits abgezogen behandelt. Zugleich waren von den 27 inhaltsgleichen Kopien 10 selbst Sperrdateien und damit doppelt gezaehlt.
+
+**Eine Unschaerfe bleibt:** Der Analyseflow meldet 42 Dateien unter 2 kB, gibt die Liste aber nur bis 20 aus. Von diesen 20 sind 19 Sperrdateien, eine ist 37 Byte gross. Die genaue Zahl der Sperrdateien ist aus dem Lauf also nicht ableitbar - 42 ist die Obergrenze.
 
 **Der Sperrdatei-Filter ist publiziert** und steht im Code-Node `Aufgaben bestimmen` des `RAG - SharePoint Ingest`. Wirksam wird er beim naechsten Lauf, der Dateien sieht.
 
-Offen zu entscheiden bleibt, ob die 27 inhaltsgleichen Kopien in SharePoint bereinigt werden oder ob der Ingest sie ueber den Inhaltshash von sich aus ueberspringt. Letzteres waere weniger Eingriff, laesst die Doubletten aber in SharePoint stehen.
+**Offen zu entscheiden:** ob die 17 ueberzaehligen Kopien in SharePoint bereinigt werden oder ob der Ingest sie ueber den Inhaltshash von sich aus ueberspringt. Letzteres waere weniger Eingriff, laesst die Doubletten aber in SharePoint stehen. Es geht um 17 Dateien und 10 MB - der Gewinn liegt nicht im Platz, sondern in siebzehn gesparten OCR-Durchlaeufen und einer Wissensbasis ohne Mehrfachtreffer.
+
+Die 15 Gruppen im Einzelnen, jeweils Dateiname und die Ordner, in denen sie liegt:
+
+- **2023 DOKU_Lageplan Lg 20 draussen 4xxx.pdf** — 2 Fassungen, je 2.7 MB
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2023/20-Willich/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2024/20-Willich/`
+- **RTC Prozessbeschreibung lose Schüttgüter Artikelbestand übersicht.pdf** — 2 Fassungen, je 1.7 MB
+  - `/Allgemeine Informationen/Prozessbeschreibungen/Inventur MDE RTC/`
+  - `/Allgemeine Informationen/Prozessbeschreibungen/Inventur MDE RTC/alt/`
+- **RTC Übergabe der Manuellen-Inventurlisten.pdf** — 2 Fassungen, je 1.6 MB
+  - `/Allgemeine Informationen/Prozessbeschreibungen/Inventur MDE RTC/`
+  - `/Allgemeine Informationen/Prozessbeschreibungen/Inventur MDE RTC/alt/`
+- **2023 DOKU_Lageplan Lg 20 innen Hallen 5xxx RM 3xxx.pdf** — 2 Fassungen, je 1.3 MB
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2023/20-Willich/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2024/20-Willich/`
+- **Tastenkombinationen RTC.pdf** — 3 Fassungen, je 251 kB
+  - `/Allgemeine Informationen/Prozessbeschreibungen/`
+  - `/Allgemeine Informationen/Prozessbeschreibungen/Prozessbeschreibung Landwirtschaft/Zusatzinfos/`
+  - `/Allgemeine Informationen/Prozessbeschreibungen/Prozessbeschreibungen Bestellung etc/Tastenkomb., Einstieg Dok., Deb.-cockpit/`
+- **Kompetenzregeln_Kreditlimit_Stand 03.07.2023.pdf** — 2 Fassungen, je 494 kB
+  - `/Allgemeine Informationen/Formulare Kundenneuanlage 2022/`
+  - `/Allgemeine Informationen/Kreditlimit/`
+- **Debitorencockpit.pdf** — 2 Fassungen, je 452 kB
+  - `/Allgemeine Informationen/Prozessbeschreibungen/`
+  - `/Allgemeine Informationen/Prozessbeschreibungen/Prozessbeschreibung Landwirtschaft/Einstieg/`
+- **12_ove_regaletiketten_online_individuell_1_bis_214.pdf** — 2 Fassungen, je 394 kB
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2022/12-Overath/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2023/12-Overath/`
+- **Regalplan Wuppertal 2022.pdf** — 2 Fassungen, je 381 kB
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2023/24-Wuppertal/old/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2024/24-Wuppertal/old/`
+- **Lagerplan Burscheid 2022.pdf** — 3 Fassungen, je 152 kB
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2022/05-Burscheid/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2023/05-Burscheid/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2024/05-Burscheid/`
+- **35-2019-Nitroverduennungen.pdf** — 2 Fassungen, je 126 kB
+  - `/Allgemeine Informationen/Alles für Vorgesetzte/Onboarding/Sicherheitsunterweisung bei neuen Mitarbeitern/NEUE MitArbeiter BAUSTOFFE/Betriebsanweisung MA Baustoffe/`
+  - `/Allgemeine Informationen/Alles für Vorgesetzte/Onboarding/Sicherheitsunterweisung bei neuen Mitarbeitern/NEUE MitArbeiter FAHRER BAUSTOFFE  AGRAR/BETRIEBSANWEISUNGEN FAHRER BAU/`
+- **Bestätigung persönliche Unterweisung Fahrer Pellets.pdf** — 2 Fassungen, je 60 kB
+  - `/Allgemeine Informationen/Alles für Vorgesetzte/Onboarding/Sicherheitsunterweisung bei neuen Mitarbeitern/NEUE MitArbeiter FAHRER BAUSTOFFE  AGRAR/`
+  - `/Allgemeine Informationen/Alles für Vorgesetzte/Onboarding/Sicherheitsunterweisung bei neuen Mitarbeitern/NEUE MitArbeiter FAHRER ENERGIE/`
+- **Anlage 1 zum Arbeitsvertrag Gratifikation RWG 2024_ 20.12.2023.pdf** — 2 Fassungen, je 49 kB
+  - `/Allgemeine Informationen/Richtlinien, DSGVO und Anlage 1/`
+  - `/Allgemeine Informationen/Zum Arbeitsvertrag - Jahressonderzahlung, Richtlinien, DSGVO/`
+- **Anleitung und Skripte.txt** — 2 Fassungen, je 3 kB
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2023/Makros um Text oder Tabelleninhalte zu löschen/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2024/Makros um Text oder Tabelleninhalte zu löschen/`
+- **Regalplan Wuppertal 2022 [Automatisch gespeichert].pptx** — 2 Fassungen, je 0 kB
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2023/24-Wuppertal/old/`
+  - `/Allgemeine Informationen/Lagerpläne/Lagerpläne 2024/24-Wuppertal/old/`
 
 
 ### Tabellendaten abfragbar machen - Plan
