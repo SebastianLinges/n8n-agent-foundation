@@ -127,4 +127,6 @@ Es gibt **zwei** Mistral-Zugänge in der Instanz. Die automatische Zuordnung gre
 - **Die Extraktion ist noch nicht belegt.** Die Mistral-Token sind bis zum 01.09.2026 aufgebraucht, der Chat-Endpunkt antwortet `Forbidden`. Damit sind vier Nodes ungetestet: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`.
 - **Der Altbestand in `DONE`** (11 Dateien) ist nicht in `vertraege` übernommen. Ein Einmallauf über den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar.
 - **Die alte Data Table `CEz5GXpTS7yHhjqS`** (`RWG Vertraege`) hält den Bestand des Formular- und Webhook-Wegs. Ob er übernommen wird, ist offen.
-Der Power-Automate-Flow `RWG_n8n_Trigg` überwachte denselben Ordner und ist am 30.08. gelöscht worden. Solange er lief, verschob er neu erzeugte Dateien nach `DONE` — auch die Excel des ersten Laufs. Seit seiner Löschung bleibt sie im Eingang liegen, wie vorgesehen.
+Der Power-Automate-Flow `RWG_n8n_Trigg` überwachte denselben Ordner und ist am 30.08. gelöscht worden. Solange er lief, verschob er neu erzeugte Dateien nach `DONE` — auch die Excel des ersten Laufs — und legte in der Bibliothekswurzel einen gespiegelten Leerpfad `Shared Documents/IMPORTER/…` an. Beides steht als Aufräumpunkt in [offene-punkte.md](../../offene-punkte.md).
+
+**Woran man erkennt, wer geschrieben hat:** Graph vermerkt bei jedem Eintrag die App. Der Flow hier schreibt als `n8n-SharePoint` (`676b0b05-…`), Power Automate als `Microsoft Power Platform` (`7ab7862c-…`).

@@ -40,12 +40,12 @@ Der Fehlerweg hat dabei genau so gegriffen wie entworfen: `status = 'fehler'`, M
 
 Noch unbelegt sind vier Nodes, die nur hinter der Extraktion liegen: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die Umwandlungen in `Ergebnis auswerten` sind einzeln gegen Testwerte geprueft, die Spaltenliste des grossen `UPDATE` gegen `information_schema` und `jsonb_to_record`. Ein Lauf ersetzt das nicht.
 
-### Verirrte Excel in DONE - eine Leiche zum Wegraeumen
-`Vertragsuebersicht.xlsx` wurde im Lauf 110831 in den Eingang geschrieben und landete kurz darauf in `DONE`; dazwischen lag um 12:28:26 ein Webhook-Lauf des alten Flows. `RWG_n8n_Trigg` hat sie verschoben, so wie die elf Altdateien dorthin kamen.
+### Zwei Hinterlassenschaften von Power Automate wegraeumen
+`RWG_n8n_Trigg` hat um 12:28:27 - kurz vor seiner Loeschung - noch zweimal zugegriffen. Beides ist an der App-Kennung `Microsoft Power Platform` (`7ab7862c-...`) belegt; alles, was der n8n-Flow anlegt, traegt dagegen `n8n-SharePoint` (`676b0b05-...`).
 
-**Belegt ist das inzwischen**: Lauf 110838 hat die Datei erneut in den Eingang geschrieben, und dort liegt sie seither. Der Power-Automate-Flow ist also wirklich weg.
+**Ein gespiegelter Leerpfad.** In der Bibliothekswurzel steht ein Ordner `Shared Documents`, darunter `IMPORTER` und weiter. Power Automate hat den vollstaendigen serverrelativen Pfad `/Shared Documents/IMPORTER/CONTRACT/...` als **relatives** Ziel benutzt - die Wurzel *ist* aber bereits Shared Documents, also entstand der Pfad ein zweites Mal darunter. Groesse durchgehend 0 Bytes, Graph rechnet rekursiv: keine einzige Datei darin. Kann samt Unterordnern geloescht werden.
 
-Die Fassung in `/IMPORTER/CONTRACT/DONE` ist damit ueberfluessig und kann von Hand geloescht werden.
+**Eine ueberholte Excel.** Die erste `Vertragsuebersicht.xlsx` liegt in `DONE`, weil Power Automate sie kurz nach dem Erzeugen dorthin verschob. Lauf 110838 hat eine neue Fassung in den Eingang geschrieben, und dort ist sie geblieben - damit ist zugleich belegt, dass der Power-Automate-Flow wirklich weg ist. Die Fassung in `DONE` kann weg.
 
 ### Altbestand in DONE nachziehen
 Elf Dokumente liegen in `/IMPORTER/CONTRACT/DONE` und stehen nicht in `vertraege`. Ein Einmallauf ueber den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar. Bewusst zurueckgestellt, bis der Eingang belegt ist.
