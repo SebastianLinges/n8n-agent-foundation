@@ -34,12 +34,29 @@ Die Adressen aller Nodes zeigen korrekt aufs neue Projekt - nur die Zugangsbindu
 
 Die Zugaenge haengen fast alle an HTTP-Nodes mit `nodeCredentialType: supabaseApi`, nicht an Supabase-Nodes. Im Export taucht der Fix deshalb gar nicht auf - Credentials sind nicht Teil des Exports.
 
-**Was noch fehlt, ist der Laufbeleg.** Keiner der beiden Flows laesst sich per MCP anstossen:
+**Beide Flows sind durch einen Lauf belegt.**
 
-- Der **Jira-Trigger** ist fuer die MCP-Ausfuehrung kein gueltiger Trigger (`Only workflows with the following trigger nodes can be executed: Schedule, Webhook, Form, Chat`). Es braucht ein echtes Jira-Ereignis im Projekt SSD.
-- Beim **SharePoint-Ingest** ergibt ein Handstart laut Code-Node `Steuerung` immer `laufart: delta`, und ein Delta-Lauf ohne Aenderung fasst die Supabase-Nodes nicht an. Der Beleg faellt beim naechtlichen Abgleich um 03:30. Belegt wird er dort ueber die Nodes `Wissensbasis-Bestand` und `Chunkzahlen laden`.
+- **Jira** (`110886`): Eine Prioritaetsaenderung an SSD-9192 lief bis `Workflow Summary` durch. `Get Existing Ticket` - genau der Node, der zuvor starb - antwortete in 155 ms. Bestand 21323 auf 21326.
+- **SharePoint** (`110888`): Der Delta-Lauf um 17:00 fand fuenf Loeschmeldungen und fasste damit fuenf Nodes mit `supabaseApi` an, alle erfolgreich - darunter `Wissensbasis-Bestand` und `Chunkzahlen laden`.
+
+Anzustossen war keiner der beiden per MCP: Der Jira-Trigger gilt der MCP-Ausfuehrung nicht als Trigger, und beim SharePoint-Ingest ergibt ein Handstart laut Code-Node `Steuerung` immer `laufart: delta`.
 
 Im selben Entwurf des SharePoint-Ingests steckt der Filter fuer Office-Sperrdateien. Er ist der einzige inhaltliche Unterschied zum vorigen Export.
+
+
+### Loeschschleife des SharePoint-Ingests bricht nach der ersten Aufgabe ab
+Gemessen in Lauf `110888`. `Aufgaben bestimmen` meldete `zu_loeschen: 5`, abgearbeitet wurde **eine**. Der Ablauf endet bei `Delete All SharePoint Chunks`: Der PostgREST-DELETE findet zu der `doc_id` keine Chunks und gibt ein leeres Array zurueck. Ein Node ohne Ausgabeitems stoppt in n8n den nachfolgenden Zweig - die Rueckverbindung `Delete SharePoint Source` nach `Delete Workflow Summary` nach `Je Aufgabe` wird nie erreicht. Im gespeicherten Kontext bleiben vier Aufgaben mit `done: false` stehen, der Lauf gilt als erfolgreich.
+
+**Warum das zaehlt:** Graph meldet eine Loeschung genau einmal. Kommen mehrere Loeschungen in einer Delta-Meldung und die erste hat keine Entsprechung in der Wissensbasis, sind die uebrigen fort. Der naechtliche Abgleich faengt Verwaiste wieder auf, deshalb heilt es sich - aber nicht am selben Tag.
+
+**Hier ohne Datenverlust:** betroffen waren vier leere Ordner und eine Datei, die alle keinen Eintrag in der Wissensbasis hatten.
+
+Nicht angefasst. Zu entscheiden, ob der Zweig gegen leere Ausgaben abgesichert wird.
+
+### 14 SharePoint-Dokumente ohne Chunks
+Der Lauf meldet `rag_dokumente: 266` gegen `rag_mit_chunks: 252`. Die Gegenmessung in der Datenbank ergibt dieselbe Zahl: 14 Eintraege in `sharepoint_documents`, zu denen kein einziger Chunk in `document_chunks` steht. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden.
+
+Der Delta-Lauf erkennt sie nicht - `unvollstaendig_gefunden` bleibt 0, weil er nur die Items der Delta-Meldung bewertet. Der naechtliche Abgleich soll unvollstaendige Eintraege nachholen; ob er das tut, ist am Lauf um 03:30 zu pruefen.
 
 
 ### Beitragsprüfung im Content Studio testen

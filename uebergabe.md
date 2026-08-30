@@ -72,7 +72,7 @@ Dazu der Bucket `rag` mit 7 384 Bildern (452 MB). Gelesen wird über `RWG Sub - 
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Den Laufbeleg für die beiden Ingest-Flows nachholen.** Der Zugangsfix ist publiziert, aber noch durch keinen Lauf bestätigt. Beim **Jira-Ingest** braucht es dafür ein echtes Ereignis im Projekt SSD — der Jira-Trigger lässt sich per MCP nicht anstossen. Beim **SharePoint-Ingest** fällt der Beleg beim nächtlichen Abgleich um 03:30; ein Handstart ergibt immer einen Delta-Lauf und fasst die Supabase-Nodes nicht an. Einzelheiten in [offene-punkte.md](offene-punkte.md).
+1. **Zwei Nebenbefunde aus dem SharePoint-Ingest entscheiden.** Beide sind gemessen und unangetastet: die Löschschleife bricht nach der ersten Aufgabe ab, und 14 Dokumente tragen keine Chunks. Einzelheiten in [offene-punkte.md](offene-punkte.md).
 2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
 3. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten. Zuletzt bestanden: 21 323 Chunks, 0 ohne Embedding, Bucket 7 384, 0 Altverweise.
 
