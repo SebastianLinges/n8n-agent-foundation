@@ -72,16 +72,15 @@ Dazu der Bucket `rag` mit 7 384 Bildern (452 MB). Gelesen wird über `RWG Sub - 
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Zwei Ingest-Flows publizieren — der Jira-Ingest ist kaputt.** Mit dem gelöschten Supabase-Projekt verschwand dessen Zugang `11jCRVtytAyrsu96`. `RAG-JIRA-Ingest` hing noch daran und scheitert seit dem 30.08., 15:05 bei jedem Webhook. Der Fix liegt als Entwurf auf 21 Nodes bereit; `RAG - SharePoint Ingest` hat dasselbe Problem auf 17 Nodes, dort nur noch nicht sichtbar. **Beides greift erst mit dem Publizieren.** Prüfen, ob Sebastian das inzwischen getan hat — sonst danach fragen.
+1. **Den Laufbeleg für die beiden Ingest-Flows nachholen.** Der Zugangsfix ist publiziert, aber noch durch keinen Lauf bestätigt. Beim **Jira-Ingest** braucht es dafür ein echtes Ereignis im Projekt SSD — der Jira-Trigger lässt sich per MCP nicht anstossen. Beim **SharePoint-Ingest** fällt der Beleg beim nächtlichen Abgleich um 03:30; ein Handstart ergibt immer einen Delta-Lauf und fasst die Supabase-Nodes nicht an. Einzelheiten in [offene-punkte.md](offene-punkte.md).
 2. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
-3. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten.
+3. **Gesundheitsprüfung** (`h4uVcnxF5jbRUPHZ`) als Routine vor größeren Eingriffen. Der Flow hat keine publizierte Fassung — im Manuell-Modus starten. Zuletzt bestanden: 21 323 Chunks, 0 ohne Embedding, Bucket 7 384, 0 Altverweise.
 
 ## Offene Themen
 
 Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
 
 **Wartet auf Sebastian**
-- **Die beiden Ingest-Entwürfe publizieren** — solange das nicht geschieht, bleibt der Jira-Ingest kaputt
 - Beitragsprüfung im Content Studio testen (erzeugt echte Artefakte)
 - Handwerks-Use-Cases: der Scout kann sie nicht aus Branchennachrichten erfinden — Quellen ergänzen oder von Hand setzen
 - Drei Tabellen ohne Schreiber (`agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`): wiederbeleben oder entfernen

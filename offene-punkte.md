@@ -22,19 +22,24 @@ Was daraus offen blieb:
 
 ## Zuerst
 
-### Zwei Ingest-Flows publizieren - Produktionsstoerung
-**Mit der Loeschung des alten Supabase-Projekts ist auch dessen Zugang `11jCRVtytAyrsu96` verschwunden.** Der `RAG-JIRA-Ingest` hing noch daran: Seit 15:05 Uhr scheitert jeder Jira-Webhook mit `Credential with ID "11jCRVtytAyrsu96" does not exist for type "supabaseApi"`. Acht Fehllaeufe, alle gemeldet.
+### Zwei Ingest-Flows - Laufbeleg steht aus
+**Mit der Loeschung des alten Supabase-Projekts ist auch dessen Zugang `11jCRVtytAyrsu96` verschwunden.** Der `RAG-JIRA-Ingest` hing noch daran und scheiterte bei jedem Jira-Webhook mit `Credential with ID "11jCRVtytAyrsu96" does not exist for type "supabaseApi"`.
 
-Die Adressen aller Nodes zeigen korrekt aufs neue Projekt - nur die Zugangsbindung war alt. Da die MCP-Schnittstelle Credentials nicht ausliest, liess sich nicht feststellen, welcher Node betroffen war; deshalb wurde der richtige Zugang auf **allen** Supabase-Nodes ausdruecklich gesetzt:
+Die Adressen aller Nodes zeigen korrekt aufs neue Projekt - nur die Zugangsbindung war alt. Da die MCP-Schnittstelle Credentials nicht ausliest, liess sich nicht feststellen, welcher Node betroffen war; deshalb wurde der richtige Zugang `H1j5n8gUPkmrE97X` auf **allen** Nodes mit Supabase-Bezug ausdruecklich gesetzt. Beide Flows sind publiziert, `versionId` und `activeVersionId` stimmen ueberein:
 
-| Flow | Nodes | Stand |
+| Flow | Nodes mit Supabase-Bezug | aktive Version |
 |---|---|---|
-| `RAG-JIRA-Ingest` (`ESVtaoyTfaP3jm2G`) | 21 | Entwurf, **nicht publiziert** |
-| `RAG - SharePoint Ingest` (`BBhGCRsQ8pdNSxTi`) | 17 | Entwurf, **nicht publiziert** |
+| `RAG-JIRA-Ingest` (`ESVtaoyTfaP3jm2G`) | 3 Supabase-Nodes + 18 HTTP-Nodes = 21 | `5826aa4c-4a0a-45a0-94b9-dd0cfdcc085b` |
+| `RAG - SharePoint Ingest` (`BBhGCRsQ8pdNSxTi`) | 17 HTTP-Nodes | `cd924752-af5a-410e-8be6-863b80fbe3e7` |
 
-**Der Fix greift erst mit dem Publizieren.** Bis dahin laeuft die alte, kaputte Fassung weiter. Beim SharePoint-Ingest ist die Stoerung noch nicht sichtbar, weil die Delta-Laeufe ohne Aenderungen die Supabase-Nodes gar nicht anfassen - der naechtliche Abgleich um 03:30 wuerde aber scheitern.
+Die Zugaenge haengen fast alle an HTTP-Nodes mit `nodeCredentialType: supabaseApi`, nicht an Supabase-Nodes. Im Export taucht der Fix deshalb gar nicht auf - Credentials sind nicht Teil des Exports.
 
-Im selben Entwurf des SharePoint-Ingests steckt der Filter fuer Office-Sperrdateien.
+**Was noch fehlt, ist der Laufbeleg.** Keiner der beiden Flows laesst sich per MCP anstossen:
+
+- Der **Jira-Trigger** ist fuer die MCP-Ausfuehrung kein gueltiger Trigger (`Only workflows with the following trigger nodes can be executed: Schedule, Webhook, Form, Chat`). Es braucht ein echtes Jira-Ereignis im Projekt SSD.
+- Beim **SharePoint-Ingest** ergibt ein Handstart laut Code-Node `Steuerung` immer `laufart: delta`, und ein Delta-Lauf ohne Aenderung fasst die Supabase-Nodes nicht an. Der Beleg faellt beim naechtlichen Abgleich um 03:30. Belegt wird er dort ueber die Nodes `Wissensbasis-Bestand` und `Chunkzahlen laden`.
+
+Im selben Entwurf des SharePoint-Ingests steckt der Filter fuer Office-Sperrdateien. Er ist der einzige inhaltliche Unterschied zum vorigen Export.
 
 
 ### Beitragsprüfung im Content Studio testen
@@ -107,7 +112,7 @@ Der Flow `RWG Wartung - SharePoint Bestand analysieren` (`OQh5K8D1UrQK9fPQ`) lie
 
 **Was das fuer die OCR bedeutet:** 499 verwertbare Dateien, nach Abzug der 27 inhaltsgleichen Kopien **472**. Die 42 Sperrdateien sind darin nicht enthalten, weil der Filter sie bereits abfaengt. Bei 30 je Nacht rund sechzehn Naechte.
 
-**Der Sperrdatei-Filter liegt als unveroeffentlichter Entwurf** in `RAG - SharePoint Ingest`. Er greift erst mit dem naechsten Publizieren.
+**Der Sperrdatei-Filter ist publiziert** und steht im Code-Node `Aufgaben bestimmen` des `RAG - SharePoint Ingest`. Wirksam wird er beim naechsten Lauf, der Dateien sieht.
 
 Offen zu entscheiden bleibt, ob die 27 inhaltsgleichen Kopien in SharePoint bereinigt werden oder ob der Ingest sie ueber den Inhaltshash von sich aus ueberspringt. Letzteres waere weniger Eingriff, laesst die Doubletten aber in SharePoint stehen.
 
