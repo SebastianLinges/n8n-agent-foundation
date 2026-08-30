@@ -77,6 +77,14 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 - Beitragsprüfung im Content Studio testen (erzeugt echte Artefakte)
 - Use Cases für Handwerk und CAD/PDM: Zuarbeit nötig
 
+**Das größte offene Vorhaben: Contract Loader neu aufsetzen**
+
+Der alte `RWG_Contract_Loader` (`661BDwEditNicEc0`) läuft über Formular und Webhook und schreibt in eine n8n-Data-Table. Der Neuaufbau soll aus **SharePoint** lesen, nach **Supabase** schreiben und die verarbeitete Datei in einen Unterordner **`Erledigt`** legen. Ergebnisse zusätzlich in eine Excel-Liste. Ziel ist die bestmögliche Erkennung von Vertragsinformationen — Laufzeit, Kundennummern, Kündigungsfristen, Preise.
+
+**Die Zieltabelle `vertraege` steht bereits.** Aufbau und die beiden Entwurfsentscheidungen dahinter stehen in [flows/rwg-vertragsdaten/README.md](flows/rwg-vertragsdaten/README.md).
+
+**Was fehlt:** Site, Bibliothek und Eingangsordner in SharePoint. Die liefert Sebastian. Dazu der Ablageort der Excel-Liste.
+
 **Technisch offen**
 - Erstbefüllung läuft: rund 458 SharePoint-Dateien fehlen, 30 je Nacht
 - Drei Tabellen ohne bekannten Schreiber: `agent_ticket_dialogs`, `documentation_findings`, `documentation_review_state`
