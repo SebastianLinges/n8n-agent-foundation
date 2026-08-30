@@ -55,7 +55,13 @@ Gemessen in Lauf `110888`. `Aufgaben bestimmen` meldete `zu_loeschen: 5`, abgear
 
 **Der Einlese-Zweig ist ebenso abgesichert und publiziert.** `alwaysOutputData` steht dort jetzt auf `Delete Stale SharePoint Chunks` (DELETE) und `Touch Unchanged Source` (PATCH). Geprueft wurde vorher, dass die nachgelagerten Code-Nodes `Plan SharePoint Storage Cleanup` und `No Change Summary` ausschliesslich aus benannten Vorgaengern lesen und nie aus `$input` oder `$json` - ein Leer-Item kann dort nichts verfaelschen.
 
-**Ein dritter Kandidat bleibt offen:** `Delete Stale SharePoint Image` (DELETE) fuehrt auf den Aggregate-Node `Collect Storage Delete Results`. Anders als bei einem Code-Node ist ein eingefuegtes Leer-Item dort nicht folgenlos - die Aggregation zaehlte dann eins statt null. Vor einer Aenderung ist zu klaeren, was diese Zahl weiterverwendet.
+**`Delete Stale SharePoint Image` bekommt die Absicherung bewusst nicht.** Er ist strukturell ein anderer Fall als die fuenf oben:
+
+- Vor ihm steht `IF Has Stale Storage Objects`. `Plan SharePoint Storage Cleanup` gibt **ein Item je verwaistem Pfad** aus, jedes mit `has_stale_storage: true` - der Zweig wird also nur betreten, wenn mindestens ein Objekt zu loeschen ist. Ein leerer Eingang kann dort nicht auftreten.
+- Die Loeschung geht gegen die Storage-API, nicht gegen PostgREST. Jeder Aufruf liefert einen Antwortkoerper, also ein Item.
+- `alwaysOutputData` waere hier sogar **schaedlich**: `Collect Storage Delete Results` aggregiert zu `deleted_objects`, und `Build Final SharePoint Source Row` rechnet `storage_deleted_count = Number(storageResult.storage_deleted_count || 0) || deleted_objects.length`. Ein eingefuegtes Leer-Item ergaebe `deleted_objects: [{}]` und damit **ein geloeschtes Bild statt null** in der Abschlussmeldung.
+
+Der Punkt ist damit entschieden, nicht offen.
 
 ### 14 SharePoint-Dokumente ohne Chunks - Ursache geklaert
 14 Eintraege in `sharepoint_documents` tragen keinen einzigen Chunk. Gemessen ueber `metadata->>'doc_id'` und ueber die Spalte `source_ref` - beide Wege ergeben dieselben 14. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden. Keine Zwillingszeile traegt die fehlenden Chunks, `ingestion_errors` ist leer.
