@@ -244,6 +244,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Dienst nicht verfuegbar",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -252,6 +259,13 @@
         [
           {
             "node": "Build Mistral OCR Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dienst nicht verfuegbar",
             "type": "main",
             "index": 0
           }
@@ -274,6 +288,13 @@
         [
           {
             "node": "Build OCR Canonical Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dienst nicht verfuegbar",
             "type": "main",
             "index": 0
           }
@@ -1264,6 +1285,17 @@
           }
         ]
       ]
+    },
+    "Dienst nicht verfuegbar": {
+      "main": [
+        [
+          {
+            "node": "Log Ingest Error To Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "nodes": [
@@ -1710,7 +1742,8 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 3000
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1747,7 +1780,8 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1783,7 +1817,8 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 5000
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -2135,7 +2170,7 @@
     },
     {
       "parameters": {
-        "jsCode": "let summary = null;\n\ntry { summary = $('Build Unsupported Error').first().json.summary; } catch {}\nif (!summary) {\n  try { summary = $('Build Extraction Error').first().json.summary; } catch {}\n}\n\nreturn [{ json: summary || { ok: false, status: 'ERROR_LOGGED', finished_at: new Date().toISOString() } }];"
+        "jsCode": "let summary = null;\n\ntry { summary = $('Dienst nicht verfuegbar').first().json.summary; } catch {}\nif (!summary) {\n  try { summary = $('Build Unsupported Error').first().json.summary; } catch {}\n}\nif (!summary) {\n  try { summary = $('Build Extraction Error').first().json.summary; } catch {}\n}\n\nreturn [{ json: summary || { ok: false, status: 'ERROR_LOGGED', finished_at: new Date().toISOString() } }];"
       },
       "id": "5ee62a7b-9d06-4046-8f33-e4ab0a08a8a9",
       "name": "Ingest Error Summary",
@@ -3614,7 +3649,7 @@
         160
       ],
       "parameters": {
-        "jsCode": "// In einer splitInBatches-Schleife liefert $('Node').all() nur den\n// letzten Durchlauf. Der zweite Parameter ist der Durchlaufindex; er\n// wird hochgezaehlt, bis kein Durchlauf mehr kommt.\nfunction sammle(name) {\n  const raus = [];\n  for (let i = 0; i < 2000; i++) {\n    let items;\n    try { items = $(name).all(0, i); } catch (e) { break; }\n    if (!items || !items.length) break;\n    for (const it of items) raus.push(it.json || {});\n  }\n  return raus;\n}\n\nconst st = $('Steuerung').first().json._steuerung;\nconst lauf = $('Aufgaben bestimmen').first().json._lauf || {};\nconst aufgaben = $('Aufgaben bestimmen').first().json.aufgaben || [];\n\nconst eingelesen = sammle('Workflow Summary');\nconst geloescht = sammle('Delete Workflow Summary');\nconst unveraendert = sammle('No Change Summary');\nconst fehler = sammle('Ingest Error Summary');\nconst uebersprungen = sammle('Uebergabe Datei').concat(sammle('Tabelle als CSV bauen')).filter(j => j._uebersprungen);\nconst mappen = sammle('Tabelle als CSV bauen').filter(j => !j._uebersprungen);\n\nreturn [{ json: {\n  laufart: lauf.laufart,\n  bibliothek: st.driveName,\n\n  gesehen: {\n    items_im_bestand: lauf.items_im_bestand,\n    dateien: lauf.dateien,\n    rag_dokumente: lauf.rag_dokumente,\n    rag_nicht_zuordenbar: lauf.rag_nicht_zuordenbar,\n    formate: lauf.formate_gesehen\n  },\n\n  geplant: {\n    einzulesen: lauf.einzulesen,\n    zu_loeschen: lauf.zu_loeschen,\n    verwaist_gefunden: lauf.verwaist_gefunden,\n    geloescht_gemeldet: lauf.geloescht_gemeldet,\n    uebersprungen: lauf.uebersprungen\n  },\n\n  ergebnis: {\n    neu_oder_geaendert: eingelesen.length,\n    unveraendert: unveraendert.length,\n    geloescht: geloescht.length,\n    uebersprungen: uebersprungen.length,\n    fehler: fehler.length\n  },\n\n  woerter_eingelesen: eingelesen.reduce((s, j) => s + (Number(j.word_count) || 0), 0),\n  chunks_geschrieben: eingelesen.reduce((s, j) => s + (Number(j.expected_chunk_count) || 0), 0),\n  bilder_erkannt: eingelesen.reduce((s, j) => s + (Number(j.image_count) || 0), 0),\n\n  arbeitsmappen: mappen.map(m => ({\n    datei: m.filename,\n    als_tabelle: m._blaetter_tabelle,\n    als_text: m._blaetter_text,\n    zeilen: (Number(m._zeilen_tabelle) || 0) + (Number(m._zeilen_text) || 0)\n  })),\n\n  uebersprungene: uebersprungen.map(j => (j.filename || j.item_id) + ': ' + j._uebersprungen),\n  fehlerdetails: fehler.slice(0, 10).map(j => String(j.error_code || j.message || JSON.stringify(j)).slice(0, 160)),\n\n  anker_geschrieben: !!st.zustandSchreiben && !!lauf.delta_link_erhalten,\n  aufgabenliste: aufgaben.slice(0, 40).map(a => a.aktion + ' | ' + (a.grund || '-') + ' | ' + (a.filename || a.item_id))\n} }];"
+        "jsCode": "// In einer splitInBatches-Schleife liefert $('Node').all() nur den\n// letzten Durchlauf. Der zweite Parameter ist der Durchlaufindex; er\n// wird hochgezaehlt, bis kein Durchlauf mehr kommt.\nfunction sammle(name) {\n  const raus = [];\n  for (let i = 0; i < 2000; i++) {\n    let items;\n    try { items = $(name).all(0, i); } catch (e) { break; }\n    if (!items || !items.length) break;\n    for (const it of items) raus.push(it.json || {});\n  }\n  return raus;\n}\n\nconst st = $('Steuerung').first().json._steuerung;\nconst lauf = $('Aufgaben bestimmen').first().json._lauf || {};\nconst aufgaben = $('Aufgaben bestimmen').first().json.aufgaben || [];\n\nconst eingelesen = sammle('Workflow Summary');\nconst geloescht = sammle('Delete Workflow Summary');\nconst unveraendert = sammle('No Change Summary');\n// Ein zurueckgestellter Dienstausfall ist kein Dokumentfehler - er wird\n// getrennt gezaehlt, damit die Fehlerzahl aussagekraeftig bleibt.\nconst fehlerAlle = sammle('Ingest Error Summary');\nconst zurueckgestellt = fehlerAlle.filter(j => j.zurueckgestellt);\nconst fehler = fehlerAlle.filter(j => !j.zurueckgestellt);\nconst uebersprungen = sammle('Uebergabe Datei').concat(sammle('Tabelle als CSV bauen')).filter(j => j._uebersprungen);\nconst mappen = sammle('Tabelle als CSV bauen').filter(j => !j._uebersprungen);\n\nreturn [{ json: {\n  laufart: lauf.laufart,\n  bibliothek: st.driveName,\n\n  gesehen: {\n    items_im_bestand: lauf.items_im_bestand,\n    dateien: lauf.dateien,\n    rag_dokumente: lauf.rag_dokumente,\n    rag_nicht_zuordenbar: lauf.rag_nicht_zuordenbar,\n    formate: lauf.formate_gesehen\n  },\n\n  geplant: {\n    einzulesen: lauf.einzulesen,\n    zu_loeschen: lauf.zu_loeschen,\n    verwaist_gefunden: lauf.verwaist_gefunden,\n    geloescht_gemeldet: lauf.geloescht_gemeldet,\n    uebersprungen: lauf.uebersprungen\n  },\n\n  ergebnis: {\n    neu_oder_geaendert: eingelesen.length,\n    unveraendert: unveraendert.length,\n    geloescht: geloescht.length,\n    uebersprungen: uebersprungen.length,\n    zurueckgestellt: zurueckgestellt.length,\n    fehler: fehler.length\n  },\n\n  woerter_eingelesen: eingelesen.reduce((s, j) => s + (Number(j.word_count) || 0), 0),\n  chunks_geschrieben: eingelesen.reduce((s, j) => s + (Number(j.expected_chunk_count) || 0), 0),\n  bilder_erkannt: eingelesen.reduce((s, j) => s + (Number(j.image_count) || 0), 0),\n\n  arbeitsmappen: mappen.map(m => ({\n    datei: m.filename,\n    als_tabelle: m._blaetter_tabelle,\n    als_text: m._blaetter_text,\n    zeilen: (Number(m._zeilen_tabelle) || 0) + (Number(m._zeilen_text) || 0)\n  })),\n\n  uebersprungene: uebersprungen.map(j => (j.filename || j.item_id) + ': ' + j._uebersprungen),\n  zurueckgestellte: zurueckgestellt.slice(0, 20).map(j => (j.filename || j.doc_id || '?') + ': ' + (j.error_code || j.status)),\n  fehlerdetails: fehler.slice(0, 10).map(j => String(j.error_code || j.message || JSON.stringify(j)).slice(0, 160)),\n\n  anker_geschrieben: !!st.zustandSchreiben && !!lauf.delta_link_erhalten,\n  aufgabenliste: aufgaben.slice(0, 40).map(a => a.aktion + ' | ' + (a.grund || '-') + ' | ' + (a.filename || a.item_id))\n} }];"
       }
     },
     {
@@ -3673,6 +3708,20 @@
       "waitBetweenTries": 2000,
       "onError": "continueRegularOutput",
       "alwaysOutputData": true
+    },
+    {
+      "id": "4b013233-2981-4760-b31c-ee09b0dd0018",
+      "name": "Dienst nicht verfuegbar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2400,
+        480
+      ],
+      "parameters": {
+        "jsCode": "// Faellt ein Aufruf der OCR-Strecke aus, wird die Aufgabe zurueckgestellt,\n// statt den ganzen Lauf zu reissen. Die Schleife laeuft weiter, die\n// Laufbilanz entsteht, und der Delta-Anker wird fortgeschrieben.\n//\n// Uebernommen wird ausschliesslich die Fehlermeldung, der Knotenname und\n// der HTTP-Code. Das Rohobjekt bleibt aussen vor - n8n legt darin bei\n// HTTP-Fehlern das komplette Request-Objekt samt Zugangsdaten ab.\nconst roh = $input.first().json || {};\nconst fehler = roh.error || roh;\n\nconst nachricht = String(fehler.message || roh.message || 'unbekannter Fehler');\nconst httpCode = String(fehler.httpCode || roh.httpCode || '');\n// Der Fehlerausgang liefert weder Knotennamen noch HTTP-Code mit -\n// gemessen in Lauf 111419. Verlaesslich ist nur $prevNode.\nlet knoten = (fehler.node && fehler.node.name) || '';\nif (!knoten) { try { knoten = $prevNode.name; } catch (e) {} }\nif (!knoten) knoten = 'Mistral';\n\nlet einordnung = 'DIENST_GESTOERT';\nif (httpCode === '402' || /payment required/i.test(nachricht)) einordnung = 'KONTINGENT_ERSCHOEPFT';\nelse if (httpCode === '429') einordnung = 'RATE_LIMIT';\nelse if (httpCode === '401' || httpCode === '403') einordnung = 'ZUGANG';\nelse if (/ECONNRESET|socket hang up|closed unexpectedly/i.test(nachricht)) einordnung = 'KONTINGENT_ERSCHOEPFT';\n\nlet input = {};\ntry { input = $('Normalize SharePoint Input').first().json || {}; } catch (e) {}\n\nconst now = new Date().toISOString();\nconst kennung = einordnung + ' an ' + knoten + (httpCode ? ' (HTTP ' + httpCode + ')' : '');\n\nreturn [{\n  json: {\n    error_row: {\n      source_type: 'sharepoint',\n      source_ref: input.doc_id || null,\n      workflow_step: knoten,\n      error_type: einordnung,\n      error_message: 'OCR-Strecke nicht verfuegbar: ' + nachricht.slice(0, 300),\n      error_detail: {\n        filename: input.filename || null,\n        extension: input.ext || null,\n        http_code: httpCode || null,\n        node: knoten\n      },\n      retry_count: 0,\n      max_retries: 0,\n      next_retry_at: null,\n      resolved_at: null,\n      resolved_by: null,\n      raw_payload: {\n        doc_id: input.doc_id || null,\n        filename: input.filename || null,\n        file_path: input.file_path || null,\n        sharepoint_url: input.sharepoint_url || null\n      },\n      created_at: now\n    },\n    summary: {\n      ok: false,\n      zurueckgestellt: true,\n      status: 'DEFERRED_' + einordnung,\n      error_code: kennung,\n      doc_id: input.doc_id || null,\n      filename: input.filename || null,\n      finished_at: now\n    }\n  }\n}];"
+      },
+      "notes": "Fehlerausgang der drei Mistral-Nodes. Stellt die Aufgabe zurueck, statt den Lauf zu reissen - sonst laeuft die Laufbilanz nie und der Delta-Anker wird nicht fortgeschrieben."
     }
   ],
   "nodeGroups": [],

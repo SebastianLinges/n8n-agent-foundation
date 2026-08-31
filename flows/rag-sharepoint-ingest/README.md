@@ -93,6 +93,20 @@ Scheitern **alle** Bilder eines Dokuments, liefert `Collect Uploaded Images` dan
 
 **Der Preis:** Ein verlorenes Bild fällt nicht auf. Es gibt keine Meldung, nur eine kürzere Bildliste am Dokument. Das ist bewusst so — ein durchgelaufener Abgleich mit einem fehlenden Bild ist mehr wert als ein abgebrochener mit vollständigen Bildern.
 
+## Ein ausgefallener Dienst beendet den Lauf nicht
+
+Die OCR hängt an einem einzigen Anbieter. Ist der nicht erreichbar — Kontingent erschöpft, Abo abgelaufen, Ratengrenze —, scheitert **jede** Aufgabe, die durch die OCR muss. Ohne Absicherung reißt die erste davon den ganzen Lauf mit, und zwar samt allem, was danach käme: auch die Tabellen und Textdateien, die den Dienst gar nicht brauchen.
+
+**Schwerer wiegt, was dabei nicht mehr passiert.** Ein abgebrochener Lauf erreicht weder `Laufbilanz` noch `Anker fortschreiben`. Es gibt keine Bilanz, und der Delta-Anker bleibt stehen — der nächste stündliche Lauf liest dasselbe Fenster erneut, tagelang, ohne dass es auffällt.
+
+`Upload Source To Mistral`, `Get Mistral Signed URL` und `Mistral OCR And Visual Annotations` gehen deshalb bei Fehler in ihren Fehlerausgang. `Dienst nicht verfuegbar` ordnet den Ausfall ein, protokolliert ihn nach `ingestion_errors` und führt über `Ingest Error Summary` zurück in die Schleife. Die Aufgabe gilt als **zurückgestellt**, nicht als gescheitert: Die Laufbilanz zählt `zurueckgestellt` getrennt von `fehler` und nennt die betroffenen Dateien mit Grund.
+
+**Eingeordnet wird über den Meldungstext, nicht über den HTTP-Code.** Der Fehlerausgang liefert weder `httpCode` noch den Knotennamen mit — der Knoten kommt deshalb aus `$prevNode`. Unterschieden werden `KONTINGENT_ERSCHOEPFT`, `RATE_LIMIT`, `ZUGANG` und `DIENST_GESTOERT`.
+
+**Übernommen wird nur Meldung, Knotenname und HTTP-Code.** Das Rohobjekt bleibt außen vor: n8n legt bei HTTP-Fehlern das komplette Request-Objekt samt Zugangsdaten im Klartext ab, und diese Zeile geht in die Datenbank.
+
+**Der Preis:** Die zurückgestellte Datei bleibt unbearbeitet liegen. Sie wird beim nächsten Lauf wieder gezogen — solange der Dienst klemmt, jedes Mal. Das ist gewollt: Ein durchgelaufener Abgleich mit einer liegengebliebenen Datei ist mehr wert als ein abgebrochener, der den Anker einfriert.
+
 ## Zwei Fallstricke, die hier zuschlugen
 
 **Der Ingest verarbeitet je Aufruf genau ein Dokument.** Er liest seine Eingabe mit `$input.first()`. Zehn Aufträge in einem Aufruf werden zu einem, der Rest fällt lautlos weg. Deshalb die Schleife mit `batchSize: 1`.

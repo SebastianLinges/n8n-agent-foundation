@@ -79,7 +79,7 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Das Mistral-Kontingent ist aufgebraucht — Zurücksetzung am 31.08.2026.** Die Abrechnungsmail sagt es wörtlich: 100 Prozent der enthaltenen API-Nutzung erreicht, Zugriff pausiert. **Die pausierte API wirft die Verbindung weg, statt einen 403 zu senden** — der Knoten `Upload Source To Mistral` meldet dann `ECONNRESET` mit *„The connection to the server was closed unexpectedly"*, und die drei Wiederholungen laufen alle ins Leere. Ein Abrechnungsproblem sieht dadurch wie ein Netzabbruch aus.
+1. **Das Mistral-Abo ist abgelaufen und läuft ab dem 01.09.2026 wieder.** Die Abrechnungsmail nennt 100 Prozent der enthaltenen API-Nutzung erreicht, Zugriff pausiert. **Die Sperre zeigt sich in zwei Gestalten.** Solange die API nur pausiert war, warf sie die Verbindung weg, statt einen Fehlercode zu senden — der Knoten `Upload Source To Mistral` meldete `ECONNRESET` mit *„The connection to the server was closed unexpectedly"*, und die drei Wiederholungen liefen ins Leere; ein Abrechnungsproblem sah dadurch wie ein Netzabbruch aus. Seit dem Ablauf antwortet dieselbe Stelle sauber mit `402 Payment required` und *Check your subscription on admin.mistral.ai/subscription*. Belegt in den Läufen 111062 und 111286. **Gesperrt ist inzwischen auch der Datei-Upload**, nicht mehr nur der Chat-Endpunkt — der OCR-Endpunkt wird gar nicht mehr erreicht.
 
    **Solange das gilt, kann der Ingest keine Datei einlesen, die durch die OCR muss.** Der nächtliche Abgleich läuft, findet Aufgaben und scheitert an der ersten. Das ist erwartet, kein Defekt.
 
@@ -91,7 +91,7 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
    **Zu tun, sobald Mistral wieder läuft:** die fünf verbliebenen Regaletiketten einlesen, danach die sechs Altzeilen löschen — aber erst, wenn die jeweilige Graph-Fassung nachweislich Chunks trägt.
 
-3. **Ist der 31.08. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
+3. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
 
 ## Offene Themen
@@ -113,7 +113,7 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 
 **Der Umbau ist unveröffentlichter Entwurf.** Die alte Fassung ist noch die aktive.
 
-Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist die Extraktion**: Die Mistral-Token sind bis zum **31.08.2026** aufgebraucht, der Chat-Endpunkt antwortet `Forbidden`. Der OCR-Endpunkt läuft weiter.
+Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist die Extraktion**: Die Mistral-Token sind bis zum **01.09.2026** aufgebraucht. Inzwischen ist die ganze API gesperrt, nicht nur der Chat-Endpunkt — schon der Datei-Upload wird mit `402` abgewiesen.
 
 **Zum Abarbeiten ab dem 01.09.:** Lauf anstoßen, Extraktion an den beiden liegengebliebenen Dokumenten prüfen, publizieren, danach Export ins Git. Vier Nodes sind noch ungetestet, alle hinter der Extraktion.
 
@@ -131,6 +131,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 | `README.md` | alle Flows mit n8n-ID, Datenbankzuordnung und Zusammenhängen |
 | `migration/` | Umzug: Befund, Abnahme, Struktur der alten Datenbank |
 | `offene-punkte.md` | was ansteht und was fehlt |
+| `konzept-ocr-schonen.md` | wie der SharePoint-Ingest Mistral schont, ohne Bilder zu verlieren |
 | `ideen.md` | was noch keine Aufgabe ist |
 | `referenz-dokumentationsbefunde.md` | offene Korrekturen an Confluence-Seiten und Jira-Vorgängen |
 | `referenz-sharepoint-prozesse-gegen-prozesshub.md` | die sieben alten PDF in der ProzessHub-Zielablage und ihre Entsprechungen |
