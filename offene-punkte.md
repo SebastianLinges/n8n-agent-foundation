@@ -30,12 +30,26 @@ Was daraus offen blieb:
 **Nebenbefund, bekannt und hier bestaetigt:** In den Fehlerdaten von `110522` steht das komplette Request-Objekt samt `apikey` und `Authorization` im Klartext. Der Schluessel gehoert zum geloeschten Projekt und ist damit wertlos.
 
 
-### Beitragsprüfung im Content Studio testen
-Die Prüfung ist publiziert, aber **noch nie gelaufen**. Ein Testlauf erzeugt echte Artefakte: einen Eintrag in `content_packages`, eine E-Mail und einen Buffer-Entwurf.
+### Beitragsprüfung im Content Studio — Gate blockiert strukturell
+Die Prüfung ist einmal gelaufen und hat den Lauf abgebrochen: **111258 am 31.08., 08:00, kein Buffer-Entwurf.** Harter Befund im Code-Node `Lesbarkeit pruefen`: „Antwortblock zu kurz (21 Woerter, mindestens 30)". Der vorgelagerte `Redaktions-Check` war grün.
 
-Zu prüfen sind zwei Fälle: ein Beitrag, der durchgeht, und einer, der am Antwortblock scheitert. Der zweite lässt sich erzwingen, indem `Lesbarkeit pruefen` vorübergehend eine engere Wortgrenze bekommt — nicht, indem der COPY-Prompt verbogen wird.
+**Die Schwelle ist unter dem heutigen COPY-Prompt nicht erreichbar.** Der System-Prompt von `COPY (Text)` fordert „Absaetze aus 1-2 Saetzen, Leerzeile dazwischen", ohne Ausnahme für den ersten Absatz. `Lesbarkeit pruefen` splittet am Doppel-Umbruch, meint also dieselbe Texteinheit, und verlangt dort 30 bis 80 Wörter. Bei gemessener Satzlänge 13,2 Wörter ergeben zwei Sätze rund 26 Wörter — die Obergrenze der Prompt-Regel liegt unter der Untergrenze des Gates. Das Modell hat nicht versagt, es hat die falsche Anweisung befolgt.
 
-Zu belegen: `qa_passed`, die Zahl der Befunde, und dass bei einer Ablehnung **kein** Buffer-Entwurf entsteht, aber eine Telegram-Meldung ankommt.
+**Nachgerechnet auf die vier Vorläufe** hätte die Regel ausnahmslos gegriffen: 100455 → 25 Wörter, 106294 → 19, 108062 → 27, 111258 → 21. Null von vier.
+
+`Lesbarkeit pruefen` und das IF `Freigabe erteilt` wurden zwischen dem 27. und 29.08. eingebaut — in den älteren Läufen fehlen beide in `runData`. 111258 ist der erste Produktivlauf durch das Gate.
+
+**Das Gate selbst bleibt richtig.** Vorher wurde `qa_passed` nirgends ausgewertet: 100455 und 108062 trugen den harten Befund „Fremdprodukt im Text genannt" und haben trotzdem einen Buffer-Entwurf erzeugt. Falsch ist nur die Kalibrierung.
+
+**Dringlich, weil es sich wiederholt:** `use_case abschliessen` hängt nur am Erfolgspfad. `uc_1786422016792_0` wurde nicht abgeschlossen, kein `content_package` geschrieben — der Use-Case wird am Mittwoch erneut gezogen und läuft in denselben Abbruch.
+
+**Abzuarbeiten, in dieser Reihenfolge:**
+
+1. **Prompt-Fix in `COPY (Text)` — vor dem Lauf am Mi 02.09.** Erster Absatz explizit 30–80 Wörter / 3–4 Sätze, Folgeabsätze bleiben 1–2 Sätze. Gate unverändert. 3–4 Sätze × 13,2 Wörter = 40–53 Wörter, mittig im Band, und die 700–1300 Zeichen bleiben eingehalten.
+2. **Retry als Netz — danach, nicht stattdessen.** Der Prompt allein macht die Wortzahl nicht deterministisch. False-Route einmal zurück auf `COPY (Text)` mit den Befunden im Prompt, Zähler hart auf einen Versuch, erst beim zweiten Fehlschlag an Telegram. **Fallstrick:** `COPY parsen` verwirft die Analysefelder (`kernaussage`, `gewaehlte_perspektive`, `kapa_bruecke`, `takeaway`). Ein naiver Rücksprung generiert mit leerem Analyseblock und wäre schlechter als der erste Versuch — der Retry-Node muss sie aus `$('Analyse parsen').first().json` zurückholen.
+3. **Zahlen-Check im `Redaktions-Check` erweitern.** Er prüft rein numerisch gegen `belegte_zahlen`. In 111258 stand „erhebliche Kosteneinsparungen" bei leerem Beleg-Feld — eine ausgeschriebene Mengenangabe, die der Prompt ausdrücklich verbietet, und im Effekt dasselbe Reputationsrisiko wie eine erfundene Zahl. Wortliste erheblich/deutlich/massiv/drastisch/signifikant/spürbar, aktiv nur bei leerem `belegte_zahlen`.
+
+Der erste Punkt hat den Termin, die anderen beiden nicht. Nach jeder Änderung publizieren, exportieren, Läufe ins `tests/laufprotokoll.csv`.
 
 
 ### Contract Loader publizieren - wartet auf Mistral-Token
@@ -61,7 +75,19 @@ Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`R
 
 ## ProzessHub nach SharePoint
 
-**Der Flow bleibt bewusst stillgelegt**, bis Sebastian ihn aktiviert. Er ist belegt funktionsfaehig (Lauf 110370). Wie er scharfgeschaltet wird, steht in [flows/rwg-prozesshub-sharepoint/README.md](flows/rwg-prozesshub-sharepoint/README.md).
+**Der Flow ist aktiv.** Publiziert am 31.08., Nachttrigger 02 Uhr scharf. Anlegen, Aktualisieren und Entfernen sind an vier Läufen belegt (111432, 111433, 111440, 111456), die Titelspalte in SharePoint zeigt die Umlaute wieder richtig. Aufbau und Belege in [flows/rwg-prozesshub-sharepoint/README.md](flows/rwg-prozesshub-sharepoint/README.md).
+
+Zwei Dinge blieben dabei offen:
+
+### Umbenennungen hinterlassen Waisen
+Ändert sich in Confluence ein Seiten- oder Gruppentitel, ändert sich der Zielpfad. Die Datei entsteht am neuen Ort, **die alte bleibt liegen** — der Löschpfad greift nicht, weil die `page_id` weiter existiert. Bei einem Gruppentitel wandert der ganze Ordner, dann bleibt der alte komplett zurück.
+
+Sauber wäre, den Zielpfad einmalig in `Seiten normalisieren` zu bestimmen statt in `Dokument bauen`. Dann kann `Abgleich` den gespeicherten `sp_pfad` gegen den neuen halten und den alten als `entfernen` anmelden — ohne neue Nodes, weil der bestehende Löschzweig das trägt. Es sind drei Code-Nodes, die dafür angefasst werden müssen.
+
+**Noch nicht eingetreten:** Zwischen Lauf 110822 und 111432 ist kein einziger der 159 Pfade gewandert. Dringlich wird es, sobald jemand im ProzessHub einen Titel korrigiert.
+
+### Null-Zeilen in der Data Table aufräumen
+Rund 370 Zeilen ohne `page_id` stehen in `prozesshub_spiegel` — Rückstand aus der Zeit, als `Bestand fortschreiben` in jede Spalte `null` schrieb. Wirkungslos, weil `Bestand laden` auf `space_key = ProzessHub` filtert und sie nicht findet. Aufzuräumen nur über die n8n-Oberfläche und **nicht** pauschal über alle Zeilen: die 175 echten stehen daneben.
 
 ### PDF-Layout beurteilen
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.
@@ -245,6 +271,8 @@ Bei drei Beitraegen je Woche reichen 23 saubere Eintraege rund sieben Wochen. Da
 **Die eine echte Luecke ist handwerk.** Der Dienstagsslot „Werkstatt & Produktion" fuehrt `handwerk,fertigung,engineering` - da handwerk leer ist, greift dort immer die Ersatzsaeule. Und keiner der zehn `engineering`-Eintraege handelt von CAD oder PDM; es geht um Projektkoordination und Bueroarbeit mit dem Etikett „Ingenieurbueros".
 
 **Zu entscheiden:** Der Scout kann Handwerk nicht aus Branchennachrichten erfinden. Entweder Quellen ergaenzen, die Prozessgeschichten statt Produktmeldungen liefern - oder eine Handvoll Handwerks-Use-Cases von Hand setzen und den Scout auf das Beobachten beschraenken.
+
+**Am 31.08. zum ersten Mal sichtbar geworden, was die Luecke kostet.** Lauf 111258 fiel im Dienstagsslot auf die Ersatzsaeule zurueck (`selection_note`: „keine Use-Cases mehr in handwerk") und zog `uc_1786422016792_0` — pillar `fertigung`, aber `target_group` „Ingenieurbueros". `Thema waehlen` waehlt ueber die Saeule aus und reicht die Zielgruppe unveraendert durch, der Prompt bekommt dadurch zwei einander widersprechende Rahmen. Das Modell ist der Zielgruppe gefolgt und schreibt ueber Fertigungsstuecke in Ingenieurbueros. Der Filter `zielgruppePasst` greift nicht, weil Ingenieurbueros eine legitime KAPA-Zielgruppe ist — nur nicht zu dieser Saeule. Datenpflege, kein Logikfehler; abzustellen entweder durch eine Plausibilitaetspruefung Saeule↔Zielgruppe bei der Auswahl oder durch Korrektur der Zeile.
 
 ### `builtInTools` — geprüft, nicht lösbar
 

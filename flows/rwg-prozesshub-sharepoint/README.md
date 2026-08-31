@@ -4,7 +4,7 @@ Spiegelt den Confluence-Bereich **ProzessHub** als HTML-Dokumente in eine ShareP
 
 Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spiegel`, kein Bezug zum RAG-Ingest und keine gemeinsame Datenhaltung mit ihm. Eine spätere Erweiterung auf weitere Bereiche mit eigenen Regeln ist vorgesehen.
 
-**Stand: funktionsfaehig, bewusst stillgelegt.** Er bleibt es, bis Sebastian ihn aktiviert. Lauf 110370 hat den gesamten Bereich gespiegelt und damit belegt, dass die Kette traegt: 234 Seiten erkannt, 157 Prozessdokumente abgelegt, 1,7 MB, 16,9 Sekunden. Die Testdaten wurden anschliessend wieder entfernt, der Nachttrigger ist deaktiviert und der Flow unpubliziert. Zum Scharfschalten: Trigger aktivieren, publizieren.
+**Stand: aktiv.** Publiziert, `Naechtlicher Lauf 02 Uhr` scharf. Belegt an vier Läufen vom 31.08.: `111432` baute den Bereich vollständig auf — 260 Seiten erkannt, 175 Prozessdokumente abgelegt, 1,99 MB, 16,7 Sekunden. `111433` schrieb unmittelbar danach nichts mehr (2,6 Sekunden, 260-mal `unveraendert`). `111440` und `111456` belegen den Löschpfad.
 
 ## Aufbau
 
@@ -68,7 +68,15 @@ Ordner- und Dateinamen laufen durch `sicherName()`: Die in SharePoint verbotenen
 
 `Seiten normalisieren` bildet je Seite einen `content_hash` aus Titel und Inhalt. `Abgleich` vergleicht ihn mit dem Bestand des letzten Laufs und setzt je Seite `aktion` auf `spiegeln`, `entfernen` oder `nichts`.
 
-Belegt in Lauf 110323: Derselbe Bereich ein zweites Mal gelaufen ergab neunmal `nichts`, keine Neuaufbereitung.
+Belegt in Lauf 111433: Der ganze Bereich ein zweites Mal gelaufen ergab 260-mal `nichts` und keine einzige Neuaufbereitung — 2,6 Sekunden statt 16,7.
+
+### Warum der Zustand vorher leer blieb
+
+`Bestand fortschreiben` schrieb bis zum 31.08. in **jede Spalte `null`**. Der Grund steckt in der Reihenfolge: `Datei schreiben` ist ein HTTP-Node, und seine Graph-Antwort **ersetzt** die Item-Daten. Zwei Nodes weiter griff `$json.page_id` deshalb ins Leere — ebenso die Filterbedingung des Upserts und dieselbe Stelle in `Bestandszeile entfernen`.
+
+Die Folge war doppelt. Die Änderungserkennung lief leer, jeder Lauf schrieb alle Dokumente neu. Und der **Löschpfad war tot**, weil `Abgleich` ohne Bestand nie eine fehlende Seite finden konnte — eine in Confluence gelöschte Seite wäre für immer in SharePoint stehen geblieben.
+
+Alle Feldbezüge in `Bestand fortschreiben` zeigen jetzt auf `$('Dokument bauen').item.json`, `sp_item_id` kommt aus `$('Datei schreiben').item.json.id`. `Bestandszeile entfernen` filtert über `$('Was ist zu tun').item.json.page_id`. **Wer hier etwas anfasst, muss das im Kopf behalten: hinter einem HTTP-Node ist `$json` die Antwort des Dienstes, nicht mehr der eigene Datensatz.**
 
 **`neuAufbauen` in `Config`** erzwingt das Neuschreiben aller Seiten, auch wenn sich der Inhalt nicht geändert hat. Der `content_hash` bildet nämlich nur die Confluence-Seite ab, nicht die Aufbereitung — ohne diesen Schalter bliebe eine Änderung am Template unsichtbar. Nach Gebrauch wieder auf `false` setzen, sonst schreibt jeder Lauf alles neu.
 
@@ -94,6 +102,8 @@ Abgebrochen wird nur noch, wenn **keine einzige** Seite einen Zielpfad hat — d
 - **`LOESCHSCHUTZ_ANTEIL`** — mehr als 35 Prozent des Bestands fehlen. Greift erst ab 20 bestehenden Seiten, damit kleine Bereiche nicht blockieren.
 
 Gelöschte Seiten werden im Ziel **entfernt**, nicht archiviert.
+
+`Datei entfernen` trägt `onError: continueRegularOutput` und drei Wiederholungen. Ein `404 itemNotFound` — die Datei ist bereits weg — darf den nächtlichen Lauf nicht reißen; die Bestandszeile wird dann trotzdem entfernt, was in genau diesem Fall richtig ist. Belegt in Lauf 111440: eine künstliche Bestandszeile auf einen nicht existierenden Pfad, `zu_entfernen: 1`, Löschsicherung durchgelassen (1 von 176 sind 0,6 Prozent gegen erlaubte 35), 404 abgefangen, Zeile entfernt, die 175 echten Dokumente unberührt.
 
 ## Aufbereitung ins RWG-Blatt
 
@@ -195,11 +205,12 @@ Das Konto **RWG.Automate hat keine Confluence-Lizenz** und bekommt auf jeden Con
 
 1. In `Config` `bereichFilter` auf den gewünschten Bereich setzen, oder leeren für alle 15
 2. Lauf starten und die Zusammenfassung prüfen
-3. Erst wenn ein voller Durchlauf getragen hat: `Naechtlicher Lauf 02 Uhr` aktivieren und den Flow publizieren
+3. Erst wenn ein voller Durchlauf getragen hat, publizieren — der Nachttrigger läuft bereits
 
 ## Offene Punkte
 
-- **Zwei Ordner mit Kürzel `EK`** in Confluence, die sich nur im Bindestrich unterscheiden: `EK – Einkauf` und `EK - Einkauf`. `EK-01` hängt im einen, `EK-02` im anderen. Der Flow meldet das in `bereichsordner_dubletten`, in SharePoint landen beide im selben Ordner. Fachlich zu klären.
+- **Umbenennungen hinterlassen Waisen.** Ändert sich in Confluence ein Seiten- oder Gruppentitel, ändert sich der Zielpfad: Die Datei entsteht am neuen Ort, die alte bleibt liegen. Der Löschpfad greift nicht, weil die `page_id` weiter existiert. Sauber wäre, den Zielpfad einmalig in `Seiten normalisieren` zu bestimmen — dann könnte `Abgleich` den gespeicherten gegen den neuen Pfad halten und den alten zum Entfernen anmelden. Zwischen Lauf 110822 und 111432 ist kein Pfad gewandert, eingetreten ist der Fall also noch nicht.
+- **Null-Zeilen in `prozesshub_spiegel`.** Aus der Zeit vor der Reparatur stehen rund 370 Zeilen ohne `page_id` in der Tabelle. Wirkungslos, weil `Bestand laden` auf `space_key = ProzessHub` filtert und sie nicht findet — aufzuräumen sind sie trotzdem. Geht nur über die n8n-Oberfläche, und **nicht** pauschal über alle Zeilen: die echten stehen daneben.
 - **Bilder und BPMN-Diagramme** werden nicht mitgespiegelt. Der ProzessHub hat eine eigene Orientierungsseite zu BPMN-Standards, die Diagramme sind also gewollt und zahlreich.
 - **Kein Logo im Kopf.** Bisher steht dort nur der Schriftzug.
 - **Die Freigabefrage.** Der ProzessHub ist im RAG-Ingest als `it_internal` eingestuft. Eine Spiegelung für alle Beschäftigten hebt das faktisch auf.
