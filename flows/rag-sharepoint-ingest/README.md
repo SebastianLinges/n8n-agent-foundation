@@ -105,6 +105,10 @@ Die OCR hängt an einem einzigen Anbieter. Ist der nicht erreichbar — Kontinge
 
 **Übernommen wird nur Meldung, Knotenname und HTTP-Code.** Das Rohobjekt bleibt außen vor: n8n legt bei HTTP-Fehlern das komplette Request-Objekt samt Zugangsdaten im Klartext ab, und diese Zeile geht in die Datenbank.
 
+**Damit die Rückstellung nicht lautlos bleibt**, hängen hinter `Laufbilanz` das IF `Etwas zurueckgestellt` und der Telegram-Node `Rueckstellung melden`. Ein zurückgestellter Lauf ist grün, der Error Trigger feuert also nicht — ohne diese Meldung stünde die liegengebliebene Arbeit nur in der Bilanz und in `ingestion_errors`, wo sie niemand sieht. Gemeldet wird über denselben Bot wie die Fehlermeldungen, mit der Kopfzeile `[ZURUECKGESTELLT]` und den betroffenen Dateien.
+
+**Der Node sendet mit `parse_mode: HTML`, und die Dateiliste wird maskiert.** Telegram liest jede Nachricht als Markup: Der Unterstrich in `KONTINGENT_ERSCHOEPFT` blieb ohne Gegenstück und ließ den Versand mit `can't parse entities` scheitern. Weil SharePoint-Dateinamen `&`, `<` und `>` tragen können, werden die drei ersetzt. Der Node trägt `onError` — eine klemmende Meldung darf den Ingest nicht kosten.
+
 **Der Preis:** Die zurückgestellte Datei bleibt unbearbeitet liegen. Sie wird beim nächsten Lauf wieder gezogen — solange der Dienst klemmt, jedes Mal. Das ist gewollt: Ein durchgelaufener Abgleich mit einer liegengebliebenen Datei ist mehr wert als ein abgebrochener, der den Anker einfriert.
 
 ## Zwei Fallstricke, die hier zuschlugen

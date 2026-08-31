@@ -1,6 +1,6 @@
 # Mistral schonen, ohne Bilder zu verlieren
 
-Konzept für `RAG - SharePoint Ingest` (`BBhGCRsQ8pdNSxTi`). Hebel 2 ist gebaut und belegt, aber unveröffentlicht; Hebel 1, 3 und 4 sind Vorschläge.
+Konzept für `RAG - SharePoint Ingest` (`BBhGCRsQ8pdNSxTi`). Hebel 2 ist gebaut, belegt und publiziert; Hebel 1, 3 und 4 sind Vorschläge.
 
 ---
 
@@ -54,9 +54,9 @@ Das ist kein Randfall. Die Heilungsaktion am 30.08. hat 35 Dokumente wiederherge
 
 ---
 
-## Hebel 2 — Der Lauf stirbt nicht mehr an einer gesperrten API (gebaut, unveröffentlicht)
+## Hebel 2 — Der Lauf stirbt nicht mehr an einer gesperrten API (erledigt)
 
-Im aktiven Stand reißt ein einzelner Fehler bei `Upload Source To Mistral` den ganzen Lauf mit. Belegt in `111062` und `111286`: Der Abgleich hatte drei Aufgaben, scheiterte an der ersten und hat die beiden anderen nie angefasst — obwohl darunter ein `.xlsx` sein kann, das Mistral gar nicht braucht.
+Vor dieser Änderung riss ein einzelner Fehler bei `Upload Source To Mistral` den ganzen Lauf mit. Belegt in `111062` und `111286`: Der Abgleich hatte drei Aufgaben, scheiterte an der ersten und hat die beiden anderen nie angefasst — obwohl darunter ein `.xlsx` sein kann, das Mistral gar nicht braucht.
 
 **Zwei Folgen, die schwerer wiegen als die verlorene Aufgabe:**
 
@@ -67,7 +67,7 @@ Im aktiven Stand reißt ein einzelner Fehler bei `Upload Source To Mistral` den 
 
 **Belegt** in den Läufen 111419 und 111424: derselbe Fall, der vorher rot abbrach, endet grün mit `zurueckgestellt: 1`, `fehler: 0` und geschriebenem Anker. Die Fehlerzeile enthält keine Zugangsdaten.
 
-**Der Umbau ist unveröffentlichter Entwurf.** Bis zum Publizieren läuft der nächtliche Abgleich auf dem alten Stand und bricht weiter ab.
+**Publiziert.** Dazu meldet der Flow zurückgestellte Dateien per Telegram, damit ein grüner Lauf mit liegengebliebener Arbeit nicht lautlos bleibt.
 
 Das spart kein Kontingent, aber es sorgt dafür, dass eine Sperre nur die OCR-Aufgaben kostet und nicht die Nacht.
 
@@ -106,7 +106,7 @@ Ein Dokument mit hunderten Etikettenseiten verbraucht ein Vielfaches eines norma
 
 ## Reihenfolge
 
-1. **Hebel 2** ist gebaut und belegt. Offen ist nur das Publizieren.
+1. **Hebel 2** ist erledigt.
 2. **Hebel 1** als eigentliche Ersparnis. Braucht eine Freigabe für die neue Tabelle und sorgfältige Behandlung des Bucket-Aufräumens.
 3. **Hebel 3** erst nach einer Messung an echten Dateien. Ohne diese Messung ist er eine Vermutung.
 4. **Hebel 4** nur, wenn du die Etikettendokumente überhaupt im Bestand haben willst.

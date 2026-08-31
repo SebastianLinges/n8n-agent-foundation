@@ -1296,6 +1296,28 @@
           }
         ]
       ]
+    },
+    "Laufbilanz": {
+      "main": [
+        [
+          {
+            "node": "Etwas zurueckgestellt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etwas zurueckgestellt": {
+      "main": [
+        [
+          {
+            "node": "Rueckstellung melden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "nodes": [
@@ -3722,6 +3744,65 @@
         "jsCode": "// Faellt ein Aufruf der OCR-Strecke aus, wird die Aufgabe zurueckgestellt,\n// statt den ganzen Lauf zu reissen. Die Schleife laeuft weiter, die\n// Laufbilanz entsteht, und der Delta-Anker wird fortgeschrieben.\n//\n// Uebernommen wird ausschliesslich die Fehlermeldung, der Knotenname und\n// der HTTP-Code. Das Rohobjekt bleibt aussen vor - n8n legt darin bei\n// HTTP-Fehlern das komplette Request-Objekt samt Zugangsdaten ab.\nconst roh = $input.first().json || {};\nconst fehler = roh.error || roh;\n\nconst nachricht = String(fehler.message || roh.message || 'unbekannter Fehler');\nconst httpCode = String(fehler.httpCode || roh.httpCode || '');\n// Der Fehlerausgang liefert weder Knotennamen noch HTTP-Code mit -\n// gemessen in Lauf 111419. Verlaesslich ist nur $prevNode.\nlet knoten = (fehler.node && fehler.node.name) || '';\nif (!knoten) { try { knoten = $prevNode.name; } catch (e) {} }\nif (!knoten) knoten = 'Mistral';\n\nlet einordnung = 'DIENST_GESTOERT';\nif (httpCode === '402' || /payment required/i.test(nachricht)) einordnung = 'KONTINGENT_ERSCHOEPFT';\nelse if (httpCode === '429') einordnung = 'RATE_LIMIT';\nelse if (httpCode === '401' || httpCode === '403') einordnung = 'ZUGANG';\nelse if (/ECONNRESET|socket hang up|closed unexpectedly/i.test(nachricht)) einordnung = 'KONTINGENT_ERSCHOEPFT';\n\nlet input = {};\ntry { input = $('Normalize SharePoint Input').first().json || {}; } catch (e) {}\n\nconst now = new Date().toISOString();\nconst kennung = einordnung + ' an ' + knoten + (httpCode ? ' (HTTP ' + httpCode + ')' : '');\n\nreturn [{\n  json: {\n    error_row: {\n      source_type: 'sharepoint',\n      source_ref: input.doc_id || null,\n      workflow_step: knoten,\n      error_type: einordnung,\n      error_message: 'OCR-Strecke nicht verfuegbar: ' + nachricht.slice(0, 300),\n      error_detail: {\n        filename: input.filename || null,\n        extension: input.ext || null,\n        http_code: httpCode || null,\n        node: knoten\n      },\n      retry_count: 0,\n      max_retries: 0,\n      next_retry_at: null,\n      resolved_at: null,\n      resolved_by: null,\n      raw_payload: {\n        doc_id: input.doc_id || null,\n        filename: input.filename || null,\n        file_path: input.file_path || null,\n        sharepoint_url: input.sharepoint_url || null\n      },\n      created_at: now\n    },\n    summary: {\n      ok: false,\n      zurueckgestellt: true,\n      status: 'DEFERRED_' + einordnung,\n      error_code: kennung,\n      doc_id: input.doc_id || null,\n      filename: input.filename || null,\n      finished_at: now\n    }\n  }\n}];"
       },
       "notes": "Fehlerausgang der drei Mistral-Nodes. Stellt die Aufgabe zurueck, statt den Lauf zu reissen - sonst laeuft die Laufbilanz nie und der Delta-Anker wird nicht fortgeschrieben."
+    },
+    {
+      "id": "b119ba73-36ba-4dd0-9914-7f01f8448355",
+      "name": "Etwas zurueckgestellt",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        360,
+        160
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "zg1",
+              "leftValue": "={{ $json.ergebnis.zurueckgestellt }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "rightValue": 0
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "notes": "Ohne diese Meldung waere die Rueckstellung stumm: Der Lauf ist gruen, der Error Trigger feuert nicht, und die liegengebliebenen Dateien stehen nur in der Bilanz."
+    },
+    {
+      "id": "1b149eba-ff46-47b6-b554-85a2e0633927",
+      "name": "Rueckstellung melden",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        580,
+        160
+      ],
+      "parameters": {
+        "chatId": "6341837340",
+        "text": "=[ZURUECKGESTELLT] {{ $workflow.name }}\n\nDer Abgleich ist sauber durchgelaufen, aber {{ $json.ergebnis.zurueckgestellt }} Datei(en) blieben liegen.\n\nEingelesen:      {{ $json.ergebnis.neu_oder_geaendert }}\nZurueckgestellt: {{ $json.ergebnis.zurueckgestellt }}\nFehler:          {{ $json.ergebnis.fehler }}\n\n{{ $json.zurueckgestellte.join(String.fromCharCode(10)).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;') }}\n\nLauf:    {{ $execution.id }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        },
+        "resource": "message",
+        "operation": "sendMessage"
+      },
+      "notes": "Derselbe Bot wie der Fehler-Workflow. Meldet keinen Fehler, sondern liegengebliebene Arbeit.",
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "webhookId": "003e7ad7-de5d-4ebd-9969-37c68799dd18"
     }
   ],
   "nodeGroups": [],

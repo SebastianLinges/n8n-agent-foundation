@@ -13,6 +13,27 @@ Was daraus offen blieb:
 
 ## Zuerst
 
+### Morgen zuerst: Mistral prüfen, dann die Kette abarbeiten
+
+**Das Mistral-Abo ist abgelaufen und läuft ab dem 01.09.2026 wieder.** Gemessen am 31.08.: Die API antwortet auf den Datei-Upload mit `402 Payment required` — nicht mehr mit `ECONNRESET` wie bei der bloßen Pause. Belegt in den Läufen `111062` (nachts 03:30) und `111286` (morgens 08:42, dieselbe Antwort elf Stunden später). Gesperrt ist inzwischen die ganze API, nicht nur der Chat-Endpunkt.
+
+**Erster Handgriff:** ein Abgleich mit `nurDatei` auf eine kleine PDF — etwa `fahrer pellets`, 61 kB. Dauert 40 Sekunden und beantwortet mit einer Messung statt einer Vermutung, ob die OCR wieder offen ist. Danach `nurDatei` wieder leeren.
+
+**Läuft die OCR, hängt daran diese Kette:**
+
+1. **Die fünf verbliebenen Regaletiketten einlesen**, danach die sechs Altzeilen löschen — aber erst, wenn die jeweilige Graph-Fassung nachweislich Chunks trägt. Die Altzeilen sind Power-Automate-Leichen mit `RWGID`-Kennung; der Abgleich ordnet über die Graph-`doc_id` zu und legt daneben eine zweite Zeile an, statt sie zu heilen.
+2. **Contract Loader zu Ende belegen** (`661BDwEditNicEc0`): Lauf anstoßen, Extraktion an den beiden liegengebliebenen Dokumenten prüfen, publizieren, exportieren. Vier Nodes sind noch ungetestet, alle hinter der Extraktion. Der Umbau ist unveröffentlichter Entwurf, die alte Fassung ist aktiv.
+3. **Erstbefüllung läuft von selbst weiter** — 402 Dateien fehlen noch, drei je Nacht.
+
+**Unabhängig davon zu prüfen: der Nachtlauf um 03:30.** Er ist die erste Probe der heute publizierten Absicherung. Erwartet wird: Status `success` statt `error`, in der Laufbilanz `zurueckgestellt` statt `fehler`, `anker_geschrieben: true` — und eine Telegram-Meldung mit der Kopfzeile `[ZURUECKGESTELLT]`, die die liegengebliebenen Dateien nennt. Bleibt die Meldung aus, obwohl Dateien zurückgestellt wurden, klemmt der Telegram-Node, nicht der Ingest.
+
+**Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md) offen:**
+
+- **Hebel 1, der OCR-Zwischenspeicher.** Der größte Hebel: Bei vier von sechs Rebuild-Gründen ist die Datei unverändert, und trotzdem läuft die komplette OCR erneut. **Braucht eine Freigabe für eine neue Supabase-Tabelle** und sorgfältige Behandlung des Bucket-Aufräumens.
+- **Hebel 3, der native Textpfad** für die gemessenen 21 % bildloser Dokumente. Vor dem Bau zu messen, wie viele der fehlenden PDF eine Textebene tragen — die Gegenprobe braucht ein OCR-Ergebnis zum Vergleich, geht also erst mit laufendem Abo.
+- **Hebel 4, ein Seitendeckel** für Dokumente wie die Regaletiketten. Fachliche Entscheidung, keine technische.
+
+
 ### 14 SharePoint-Dokumente ohne Chunks - Ursache geklaert
 14 Eintraege in `sharepoint_documents` tragen keinen einzigen Chunk. Gemessen ueber `metadata->>'doc_id'` und ueber die Spalte `source_ref` - beide Wege ergeben dieselben 14. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden. Keine Zwillingszeile traegt die fehlenden Chunks, `ingestion_errors` ist leer.
 

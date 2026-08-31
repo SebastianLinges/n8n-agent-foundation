@@ -45,6 +45,8 @@ Nicht aufwerfen, das ist geklärt:
 - **PostgREST liefert höchstens 1000 Zeilen je Anfrage.** Ein `limit` im Querystring hebt das nicht auf.
 - **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** In einer Schleife über viele Dokumente reißt ein einzelner Netzabbruch alles Übrige mit.
 - **n8n legt bei HTTP-Fehlern das komplette Request-Objekt in den Ausführungsdaten ab**, samt `apikey` und `Authorization` im Klartext.
+- **Ein Fehlerausgang liefert weder `httpCode` noch den Knotennamen mit.** Bei `onError: continueErrorOutput` trägt das Item nur die Meldung. Wer wissen will, an welchem Knoten es klemmte, muss `$prevNode.name` lesen; die Fehlerart lässt sich nur am Meldungstext erkennen. Gemessen in Lauf 111419.
+- **Telegram liest jede Nachricht als Markup.** Ein einzelner Unterstrich ohne Gegenstück — etwa in `KONTINGENT_ERSCHOEPFT` — lässt den Versand mit `can't parse entities` scheitern, und zwar lautlos, wenn der Node `onError` trägt. Gegenmittel ist `parse_mode: HTML` und das Maskieren von `&`, `<` und `>` im eingesetzten Text. Belegt in Lauf 111467 gegen 111469.
 - **Der Supabase-MCP-Zugang liest nur.** `execute_sql` scheitert bei jedem Schreibversuch mit `cannot execute DROP TABLE in a read-only transaction`. DDL geht ausschliesslich ueber `apply_migration`.
 - **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern** — auch in Zeichenketten und **in Kommentaren**. Ein `$1` in einem Kommentar bricht die Abfrage mit `out of range`; ein `$` ohne Ziffer wird still verschluckt (ein Zeilenende-Anker in einem regulären Ausdruck verschwand samt Anführungszeichen). Platzhalter zur Laufzeit aus `chr(36)` bauen, Daten immer über `queryReplacement` binden.
 - **Ein Node ohne Ausgabeitems stoppt seinen Zweig.** Ein PostgREST-`DELETE` oder `PATCH` ohne Treffer liefert mit `Prefer: return=representation` ein leeres Array — n8n macht daraus null Items, und alles Nachfolgende läuft nicht mehr. In einer Schleife bleibt der Rest der Aufgaben liegen, und der Lauf gilt trotzdem als erfolgreich. Gegenmittel ist `alwaysOutputData` am betroffenen Node — aber nur, wenn die nachgelagerten Nodes aus **benannten Vorgängern** lesen. Hängt dahinter ein Aggregate-Node oder etwas, das Items zählt, verfälscht das eingefügte Leer-Item die Zahl.
@@ -85,13 +87,15 @@ Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** �
 
    **Was ohne Mistral trotzdem geht:** `.txt`, `.csv` (Textpfad) und `.xlsx` (Workbook-API). Nur PDF, Word und PowerPoint brauchen die OCR.
 
+   **Der Abgleich stirbt daran nicht mehr.** Fällt die OCR aus, stellt er die Aufgabe zurück, zählt sie in der Laufbilanz als `zurueckgestellt`, schreibt den Delta-Anker fort und meldet die liegengebliebenen Dateien per Telegram mit der Kopfzeile `[ZURUECKGESTELLT]`. Ein Lauf ohne Meldung und ohne Rückstellung ist ein sauberer Lauf.
+
 2. **Sechs Altzeilen ohne Chunks sind nicht heilbar, sondern zu löschen.** Es sind Power-Automate-Zeilen mit `RWGID`-Kennung. Der Abgleich ordnet über die Graph-`doc_id` zu und findet keine Entsprechung — er liest die Datei stattdessen als **neue** ein und legt eine zweite Zeile an. Belegt an `16_ber_regaletiketten…`: Die Graph-Fassung hat jetzt 163 Chunks, die Altzeile steht weiter bei null.
 
    Das widerlegt die Annahme in `offene-punkte.md`, eine über Graph neu eingelesene Datei ersetze ihre Altfassung. Sie stellt sich daneben. Betroffen sind potenziell alle **247** Zeilen, die Lauf `110947` als `rag_nicht_zuordenbar` zählte.
 
    **Zu tun, sobald Mistral wieder läuft:** die fünf verbliebenen Regaletiketten einlesen, danach die sechs Altzeilen löschen — aber erst, wenn die jeweilige Graph-Fassung nachweislich Chunks trägt.
 
-3. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder, und der Contract Loader lässt sich zu Ende belegen — siehe unten.
+3. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder. Was dann in welcher Reihenfolge ansteht, steht unter „Morgen zuerst" in [offene-punkte.md](offene-punkte.md).
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
 
 ## Offene Themen
