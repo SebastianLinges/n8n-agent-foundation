@@ -15,7 +15,7 @@ Was daraus offen blieb:
 
 **Zwei Dinge sind für den 01.09.2026 gesetzt:** das Mistral-Kontingent prüfen und die Kette daran abarbeiten, und die Waisen im ProzessHub abstellen. Die Waisen hat Sebastian ausdrücklich auf den 01.09. gelegt.
 
-**Der Prompt-Fix im Content Studio ist am 31.08. publiziert** — die Terminsache vor dem Lauf am Mittwoch ist damit erledigt. Was daran offen bleibt, steht unter [Beitragsprüfung im Content Studio](#beitragsprüfung-im-content-studio--absatzregel-gefixt-retry-offen).
+**Der Prompt-Fix im Content Studio ist am 31.08. publiziert und in Lauf 111879 belegt** — der erste Absatz erreicht jetzt 44 statt 21 Wörter. **Der Termin am Mittwoch ist damit aber nicht abgeräumt:** derselbe Lauf fällt an einem Fehlalarm der Fremdprodukt-Prüfung durch, der vor dem 02.09. behoben sein muss. Beides unter [Beitragsprüfung im Content Studio](#beitragsprüfung-im-content-studio--absatzregel-gefixt-retry-offen).
 
 ### Morgen zuerst: Mistral prüfen, dann die Kette abarbeiten
 
@@ -83,7 +83,16 @@ Die Prüfung ist einmal gelaufen und hat den Lauf abgebrochen: **111258 am 31.08
 
 **Der Prompt ist korrigiert und publiziert** (31.08., Version `211428cf`). Die Regel „Absaetze aus 1-2 Saetzen" gilt jetzt ausdrücklich erst ab dem zweiten Absatz; der erste trägt die Kernaussage in 3 bis 4 Sätzen mit 30 bis 80 Wörtern. Der Selbsttest am Prompt-Ende fragt die Wortzahl zusätzlich ab. Das Gate blieb unverändert. Rechnerisch landen 3–4 Sätze × 13,2 Wörter bei 40–53 Wörtern, mittig im Band, und die 700–1300 Zeichen bleiben eingehalten.
 
-**Noch unbelegt.** Es gab keinen Lauf nach der Änderung — der nächste ist der Regeltermin am **Mi 02.09., 08:00**. Zu prüfen sind dort `qa_antwortblock_woerter` (soll 30–80) und ob ein Buffer-Entwurf entsteht.
+**Belegt in Lauf 111879** (Testlauf mit Pin-Daten auf allen Datenbank- und Netzzugriffen, Modelle liefen echt, Eingabe war derselbe Use-Case wie in 111258): `qa_antwortblock_woerter` **44** statt 21, Satzlänge 14,8, drei Absätze. Der Befund „Antwortblock zu kurz" ist weg. Nebenbefund: `CREATIVE (Bildidee)` und `Bild generieren` haben nicht ausgeführt — die Sperre sitzt belegt vor der Bilderzeugung.
+
+**Der Lauf fällt trotzdem durch das Gate.** Neuer harter Befund aus dem `Redaktions-Check`: „Fremdprodukt im Text genannt: KI-gestützte". Das ist ein Fehlalarm und der nächste Termin-Punkt — siehe unten.
+
+### Fremdprodukt-Prüfung schlägt bei Bindestrich-Wörtern falsch an — vor Mi 02.09.
+Der `Redaktions-Check` zerlegt `uc_technology` in Tokens und sucht jedes davon im Beitragstext. Das Trennmuster ist `[^A-Za-z0-9ÄÖÜäöüß-]+` — **der Bindestrich zählt zu den erlaubten Zeichen**, `KI-gestützte` bleibt deshalb ein einziges Token. Die STOP-Liste kennt nur `gestützte` ohne Vorsilbe und greift nicht.
+
+Bei `uc_1786422016792_0` steht in `technology` genau „KI-gestützte Bildverarbeitung und maschinelles Lernen." Schreibt das Modell irgendwo „KI-gestützte", bricht der Lauf ab. In 111258 war das nur deshalb unsichtbar, weil der kürzere Text das Wort nicht enthielt — der Fehler ist älter als der Prompt-Fix.
+
+**Dringlich:** ohne Korrektur bricht der Lauf am Mi 02.09. erneut ab, nur mit anderer Meldung. Zwei Wege stehen zur Wahl — den Bindestrich aus der Zeichenklasse nehmen, sodass `KI` und `gestützte` einzeln geprüft werden (`KI` fällt dann unter die Mindestlänge 4, `gestützte` steht in STOP), oder Bindestrich-Tokens zusätzlich an ihren Teilen gegen STOP prüfen. Der erste Weg ist kleiner, verliert aber die Erkennung echter Produktnamen mit Bindestrich.
 
 **Nachgerechnet auf die vier Vorläufe** hätte die Regel ausnahmslos gegriffen: 100455 → 25 Wörter, 106294 → 19, 108062 → 27, 111258 → 21. Null von vier.
 
