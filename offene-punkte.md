@@ -13,6 +13,8 @@ Was daraus offen blieb:
 
 ## Zuerst
 
+**Stand zum Feierabend am 31.08.** Nichts hängt in Arbeit, alles ist publiziert und gepusht. Was von allein weiterläuft: ProzessHub-Spiegelung nachts um 02, SharePoint-Abgleich um 03:30, Marketing Scout um 04:20 — alle unverändert. Der Content Studio läuft erst wieder am **Mi 02.09. um 08:00**; dort ist zu prüfen, ob ein Buffer-Entwurf entsteht und ob die Bildstrecke trägt, die bisher ungeprüft ist.
+
 **Zwei Dinge sind für den 01.09.2026 gesetzt:** das Mistral-Kontingent prüfen und die Kette daran abarbeiten, und die Waisen im ProzessHub abstellen. Die Waisen hat Sebastian ausdrücklich auf den 01.09. gelegt.
 
 **Die Beitragsprüfung im Content Studio ist am 31.08. abgeräumt.** Zwei Ursachen, beide publiziert und belegt: der erste Absatz erreicht jetzt 44 statt 21 Wörter, und die Fremdprodukt-Prüfung meldet, statt zu blockieren. Lauf `111893` geht durch das Gate. Einzelheiten unter [Beitragsprüfung im Content Studio](#beitragsprüfung-im-content-studio--absatzregel-gefixt-retry-offen).
