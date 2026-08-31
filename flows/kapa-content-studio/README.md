@@ -68,6 +68,8 @@ const woerterErster = ersterAbsatz.split(/\s+/).filter(Boolean).length;
 
 LinkedIn kappt mobil bei „mehr anzeigen". Was dahinter steht, liest kaum jemand — der erste Absatz muss die Aussage allein tragen. Satzlänge und Absatzzahl werden zusätzlich gemessen, melden aber nur und blockieren nicht: ein inhaltlich richtiger Text soll daran nicht scheitern.
 
+**Der Prompt trägt dieselbe Regel.** Der System-Prompt von `COPY (Text)` verlangt für den ersten Absatz 3 bis 4 Sätze mit 30 bis 80 Wörtern und schreibt die kurzen 1–2-Satz-Absätze erst ab dem zweiten vor; der Selbsttest am Prompt-Ende fragt die Wortzahl noch einmal ab. Beide Stellen müssen zusammen geändert werden — steht im Prompt eine engere Absatzregel als im Gate, kann das Modell die Schwelle nicht erreichen und jeder Lauf bricht ab.
+
 ## Themenauswahl in vier Stufen
 
 `Thema waehlen` geht der Reihe nach vor und nimmt das erste, was trägt:

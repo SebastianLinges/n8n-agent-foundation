@@ -13,7 +13,9 @@ Was daraus offen blieb:
 
 ## Zuerst
 
-**Drei Dinge sind für den 01.09.2026 gesetzt:** das Mistral-Kontingent prüfen und die Kette daran abarbeiten, die Waisen im ProzessHub abstellen, und den Prompt-Fix im Content Studio vor dem Lauf am Mittwoch. Die Waisen hat Sebastian ausdrücklich auf morgen gelegt.
+**Zwei Dinge sind für den 01.09.2026 gesetzt:** das Mistral-Kontingent prüfen und die Kette daran abarbeiten, und die Waisen im ProzessHub abstellen. Die Waisen hat Sebastian ausdrücklich auf den 01.09. gelegt.
+
+**Der Prompt-Fix im Content Studio ist am 31.08. publiziert** — die Terminsache vor dem Lauf am Mittwoch ist damit erledigt. Was daran offen bleibt, steht unter [Beitragsprüfung im Content Studio](#beitragsprüfung-im-content-studio--absatzregel-gefixt-retry-offen).
 
 ### Morgen zuerst: Mistral prüfen, dann die Kette abarbeiten
 
@@ -74,10 +76,14 @@ Was daraus offen blieb:
 **Nebenbefund, bekannt und hier bestaetigt:** In den Fehlerdaten von `110522` steht das komplette Request-Objekt samt `apikey` und `Authorization` im Klartext. Der Schluessel gehoert zum geloeschten Projekt und ist damit wertlos.
 
 
-### Beitragsprüfung im Content Studio — Gate blockiert strukturell
+### Beitragsprüfung im Content Studio — Absatzregel gefixt, Retry offen
 Die Prüfung ist einmal gelaufen und hat den Lauf abgebrochen: **111258 am 31.08., 08:00, kein Buffer-Entwurf.** Harter Befund im Code-Node `Lesbarkeit pruefen`: „Antwortblock zu kurz (21 Woerter, mindestens 30)". Der vorgelagerte `Redaktions-Check` war grün.
 
-**Die Schwelle ist unter dem heutigen COPY-Prompt nicht erreichbar.** Der System-Prompt von `COPY (Text)` fordert „Absaetze aus 1-2 Saetzen, Leerzeile dazwischen", ohne Ausnahme für den ersten Absatz. `Lesbarkeit pruefen` splittet am Doppel-Umbruch, meint also dieselbe Texteinheit, und verlangt dort 30 bis 80 Wörter. Bei gemessener Satzlänge 13,2 Wörter ergeben zwei Sätze rund 26 Wörter — die Obergrenze der Prompt-Regel liegt unter der Untergrenze des Gates. Das Modell hat nicht versagt, es hat die falsche Anweisung befolgt.
+**Die Schwelle war unter dem damaligen COPY-Prompt nicht erreichbar.** Der System-Prompt von `COPY (Text)` forderte „Absaetze aus 1-2 Saetzen, Leerzeile dazwischen", ohne Ausnahme für den ersten Absatz. `Lesbarkeit pruefen` splittet am Doppel-Umbruch, meint also dieselbe Texteinheit, und verlangt dort 30 bis 80 Wörter. Bei gemessener Satzlänge 13,2 Wörter ergeben zwei Sätze rund 26 Wörter — die Obergrenze der Prompt-Regel lag unter der Untergrenze des Gates. Das Modell hat nicht versagt, es hat die falsche Anweisung befolgt.
+
+**Der Prompt ist korrigiert und publiziert** (31.08., Version `211428cf`). Die Regel „Absaetze aus 1-2 Saetzen" gilt jetzt ausdrücklich erst ab dem zweiten Absatz; der erste trägt die Kernaussage in 3 bis 4 Sätzen mit 30 bis 80 Wörtern. Der Selbsttest am Prompt-Ende fragt die Wortzahl zusätzlich ab. Das Gate blieb unverändert. Rechnerisch landen 3–4 Sätze × 13,2 Wörter bei 40–53 Wörtern, mittig im Band, und die 700–1300 Zeichen bleiben eingehalten.
+
+**Noch unbelegt.** Es gab keinen Lauf nach der Änderung — der nächste ist der Regeltermin am **Mi 02.09., 08:00**. Zu prüfen sind dort `qa_antwortblock_woerter` (soll 30–80) und ob ein Buffer-Entwurf entsteht.
 
 **Nachgerechnet auf die vier Vorläufe** hätte die Regel ausnahmslos gegriffen: 100455 → 25 Wörter, 106294 → 19, 108062 → 27, 111258 → 21. Null von vier.
 
@@ -85,15 +91,14 @@ Die Prüfung ist einmal gelaufen und hat den Lauf abgebrochen: **111258 am 31.08
 
 **Das Gate selbst bleibt richtig.** Vorher wurde `qa_passed` nirgends ausgewertet: 100455 und 108062 trugen den harten Befund „Fremdprodukt im Text genannt" und haben trotzdem einen Buffer-Entwurf erzeugt. Falsch ist nur die Kalibrierung.
 
-**Dringlich, weil es sich wiederholt:** `use_case abschliessen` hängt nur am Erfolgspfad. `uc_1786422016792_0` wurde nicht abgeschlossen, kein `content_package` geschrieben — der Use-Case wird am Mittwoch erneut gezogen und läuft in denselben Abbruch.
+**`uc_1786422016792_0` ist weiter offen.** `use_case abschliessen` hängt nur am Erfolgspfad, der Use-Case wurde also nicht abgeschlossen und kein `content_package` geschrieben. Er wird am Mittwoch erneut gezogen — jetzt allerdings gegen den korrigierten Prompt. Zu beachten: Die Zeile trägt die Säule `fertigung` bei Zielgruppe „Ingenieurbueros", der Widerspruch aus dem Abschnitt [Use Cases](#use-cases-bestand-bereinigt-handwerk-bleibt-die-luecke) steckt also weiter darin.
 
-**Abzuarbeiten, in dieser Reihenfolge:**
+**Abzuarbeiten, ohne Termin:**
 
-1. **Prompt-Fix in `COPY (Text)` — vor dem Lauf am Mi 02.09.** Erster Absatz explizit 30–80 Wörter / 3–4 Sätze, Folgeabsätze bleiben 1–2 Sätze. Gate unverändert. 3–4 Sätze × 13,2 Wörter = 40–53 Wörter, mittig im Band, und die 700–1300 Zeichen bleiben eingehalten.
-2. **Retry als Netz — danach, nicht stattdessen.** Der Prompt allein macht die Wortzahl nicht deterministisch. False-Route einmal zurück auf `COPY (Text)` mit den Befunden im Prompt, Zähler hart auf einen Versuch, erst beim zweiten Fehlschlag an Telegram. **Fallstrick:** `COPY parsen` verwirft die Analysefelder (`kernaussage`, `gewaehlte_perspektive`, `kapa_bruecke`, `takeaway`). Ein naiver Rücksprung generiert mit leerem Analyseblock und wäre schlechter als der erste Versuch — der Retry-Node muss sie aus `$('Analyse parsen').first().json` zurückholen.
-3. **Zahlen-Check im `Redaktions-Check` erweitern.** Er prüft rein numerisch gegen `belegte_zahlen`. In 111258 stand „erhebliche Kosteneinsparungen" bei leerem Beleg-Feld — eine ausgeschriebene Mengenangabe, die der Prompt ausdrücklich verbietet, und im Effekt dasselbe Reputationsrisiko wie eine erfundene Zahl. Wortliste erheblich/deutlich/massiv/drastisch/signifikant/spürbar, aktiv nur bei leerem `belegte_zahlen`.
+1. **Retry als Netz.** Der Prompt allein macht die Wortzahl nicht deterministisch. False-Route einmal zurück auf `COPY (Text)` mit den Befunden im Prompt, Zähler hart auf einen Versuch, erst beim zweiten Fehlschlag an Telegram. **Fallstrick:** `COPY parsen` verwirft die Analysefelder (`kernaussage`, `gewaehlte_perspektive`, `kapa_bruecke`, `takeaway`). Ein naiver Rücksprung generiert mit leerem Analyseblock und wäre schlechter als der erste Versuch — der Retry-Node muss sie aus `$('Analyse parsen').first().json` zurückholen.
+2. **Zahlen-Check im `Redaktions-Check` erweitern.** Er prüft rein numerisch gegen `belegte_zahlen`. In 111258 stand „erhebliche Kosteneinsparungen" bei leerem Beleg-Feld — eine ausgeschriebene Mengenangabe, die der Prompt ausdrücklich verbietet, und im Effekt dasselbe Reputationsrisiko wie eine erfundene Zahl. Wortliste erheblich/deutlich/massiv/drastisch/signifikant/spürbar, aktiv nur bei leerem `belegte_zahlen`.
 
-Der erste Punkt hat den Termin, die anderen beiden nicht. Nach jeder Änderung publizieren, exportieren, Läufe ins `tests/laufprotokoll.csv`.
+Nach jeder Änderung publizieren, exportieren, Läufe ins `tests/laufprotokoll.csv`.
 
 
 ### Contract Loader publizieren - wartet auf Mistral-Token
