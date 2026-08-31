@@ -13,6 +13,8 @@ Was daraus offen blieb:
 
 ## Zuerst
 
+**Drei Dinge sind für den 01.09.2026 gesetzt:** das Mistral-Kontingent prüfen und die Kette daran abarbeiten, die Waisen im ProzessHub abstellen, und den Prompt-Fix im Content Studio vor dem Lauf am Mittwoch. Die Waisen hat Sebastian ausdrücklich auf morgen gelegt.
+
 ### Morgen zuerst: Mistral prüfen, dann die Kette abarbeiten
 
 **Das Mistral-Abo ist abgelaufen und läuft ab dem 01.09.2026 wieder.** Gemessen am 31.08.: Die API antwortet auf den Datei-Upload mit `402 Payment required` — nicht mehr mit `ECONNRESET` wie bei der bloßen Pause. Belegt in den Läufen `111062` (nachts 03:30) und `111286` (morgens 08:42, dieselbe Antwort elf Stunden später). Gesperrt ist inzwischen die ganze API, nicht nur der Chat-Endpunkt.
@@ -33,6 +35,27 @@ Was daraus offen blieb:
 - **Hebel 3, der native Textpfad** für die gemessenen 21 % bildloser Dokumente. Vor dem Bau zu messen, wie viele der fehlenden PDF eine Textebene tragen — die Gegenprobe braucht ein OCR-Ergebnis zum Vergleich, geht also erst mit laufendem Abo.
 - **Hebel 4, ein Seitendeckel** für Dokumente wie die Regaletiketten. Fachliche Entscheidung, keine technische.
 
+
+### Morgen erledigen: ProzessHub verliert Dateien bei Umbenennungen
+
+**Von Sebastian für den 01.09. gesetzt.** Der Flow läuft seit dem 31.08. nächtlich um 02 Uhr und legt an, aktualisiert und entfernt sauber — mit einer Lücke: **Umbenennungen hinterlassen Waisen.**
+
+Ändert sich in Confluence ein Seiten- oder Gruppentitel, ändert sich der Zielpfad. Die Datei entsteht am neuen Ort, die alte bleibt liegen — der Löschpfad greift nicht, weil die `page_id` weiter existiert. Bei einem Gruppentitel wandert der ganze Ordner, dann bleibt der alte vollständig zurück. Das Tückische daran: Die Waisen tragen dasselbe Layout und dieselbe Kopfzeile wie die gültigen Fassungen, niemand erkennt sie als veraltet.
+
+**Noch nicht eingetreten.** Zwischen Lauf 110822 und 111432 ist kein einziger der 159 Pfade gewandert. Ein einziger korrigierter Titel im ProzessHub löst es aus.
+
+**Die Ursache ist die Stelle, an der der Zielpfad entsteht.** `Dokument bauen` berechnet ihn — also erst, nachdem `Abgleich` seine Entscheidung längst getroffen hat. Der Abgleich kann deshalb gar nicht wissen, dass eine Seite umgezogen ist.
+
+**Der Umbau, vier Schritte:**
+
+1. **`sicherName()` und die Pfadbildung nach `Seiten normalisieren` verlegen.** Dort stehen alle Bestandteile bereit: `bereich_ordner`, `gruppe_nr`, `gruppe_titel`, `prozess_nr`, `klartext`. Auf die Reihenfolge achten — `gruppe_titel` steht erst nach dem zweiten Durchgang fest, die Pfade gehören also in einen letzten Durchgang danach. Ergebnis je Seite: `sp_ordner`, `sp_datei`, `sp_pfad`, `sp_pfad_url`.
+2. **`Abgleich` vergleicht alt gegen neu.** Zu jeder Seite mit `aktion: spiegeln` liegt die Bestandszeile bereits vor. Ist `alt.sp_ordner + '/' + alt.sp_datei` ungleich dem neuen `sp_pfad`, kommt ein zusätzliches Item mit `aktion: 'entfernen'` und dem **alten** Pfad dazu.
+3. **Die Bestandszeile darf dabei nicht mitgelöscht werden.** `Datei entfernen` führt zu `Bestandszeile entfernen`, und das filtert über `page_id`. Das Umzugs-Item bekommt deshalb eine Kennung, die keine echte Zeile trifft, etwa `page_id: '__pfadwechsel__'` — die richtige Zeile hebt `Bestand fortschreiben` im selben Lauf auf den neuen Pfad. **Vor dem Bau zu prüfen:** dass der Data-Table-Node bei einem Filter ohne Treffer nichts löscht und nicht etwa alles.
+4. **`Dokument bauen` rechnet nicht mehr selbst**, sondern nimmt `sp_ordner` und `sp_datei` aus dem Datensatz — auch für die Linkkarte, sonst laufen interne Verweise gegen zwei verschiedene Wahrheiten.
+
+**Die Löschsicherung darf davon nichts mitbekommen.** Sie rechnet ihren Anteil über die in Confluence fehlenden Seiten. Die Umzugs-Items gehören **hinter** diese Prüfung, sonst schlägt ein umbenannter Gruppentitel mit all seinen Seiten in die 35-Prozent-Schwelle und blockiert den ganzen Lauf.
+
+**Abnahme:** eine Testseite im ProzessHub umbenennen, Lauf starten, dann dreierlei belegen — die Datei liegt unter dem neuen Namen, die alte ist weg, und in `prozesshub_spiegel` steht genau **eine** Zeile für diese `page_id`. Damit ist nebenbei auch das Löschen einer real vorhandenen Datei gemessen, das bisher fehlt.
 
 ### 14 SharePoint-Dokumente ohne Chunks - Ursache geklaert
 14 Eintraege in `sharepoint_documents` tragen keinen einzigen Chunk. Gemessen ueber `metadata->>'doc_id'` und ueber die Spalte `source_ref` - beide Wege ergeben dieselben 14. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden. Keine Zwillingszeile traegt die fehlenden Chunks, `ingestion_errors` ist leer.
@@ -98,14 +121,12 @@ Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`R
 
 **Der Flow ist aktiv.** Publiziert am 31.08., Nachttrigger 02 Uhr scharf. Anlegen, Aktualisieren und Entfernen sind an vier Läufen belegt (111432, 111433, 111440, 111456), die Titelspalte in SharePoint zeigt die Umlaute wieder richtig. Aufbau und Belege in [flows/rwg-prozesshub-sharepoint/README.md](flows/rwg-prozesshub-sharepoint/README.md).
 
-Zwei Dinge blieben dabei offen:
+**Umbenennungen hinterlassen Waisen.** Der Umbau steht oben unter [Morgen erledigen](#morgen-erledigen-prozesshub-verliert-dateien-bei-umbenennungen) — er ist für den 01.09. gesetzt.
 
-### Umbenennungen hinterlassen Waisen
-Ändert sich in Confluence ein Seiten- oder Gruppentitel, ändert sich der Zielpfad. Die Datei entsteht am neuen Ort, **die alte bleibt liegen** — der Löschpfad greift nicht, weil die `page_id` weiter existiert. Bei einem Gruppentitel wandert der ganze Ordner, dann bleibt der alte komplett zurück.
+Was daneben offen bleibt:
 
-Sauber wäre, den Zielpfad einmalig in `Seiten normalisieren` zu bestimmen statt in `Dokument bauen`. Dann kann `Abgleich` den gespeicherten `sp_pfad` gegen den neuen halten und den alten als `entfernen` anmelden — ohne neue Nodes, weil der bestehende Löschzweig das trägt. Es sind drei Code-Nodes, die dafür angefasst werden müssen.
-
-**Noch nicht eingetreten:** Zwischen Lauf 110822 und 111432 ist kein einziger der 159 Pfade gewandert. Dringlich wird es, sobald jemand im ProzessHub einen Titel korrigiert.
+### Titelspalte gegenprüfen
+Sebastian hat die Bibliotheksansicht nach dem Neuaufbau als „besser" beschrieben. Ob sie damit **richtig** ist, ist nicht beantwortet. Zeigt noch ein Titel zerlegte Umlaute, reicht der BOM nicht, und es braucht zusätzlich ein `PATCH {site}/drive/items/{item-id}/listItem/fields` mit ausdrücklich gesetztem `Title`. Die `sp_item_id` je Seite steht seit dem 31.08. in der Data Table — der Nachtrag wäre billig.
 
 ### Null-Zeilen in der Data Table aufräumen
 Rund 370 Zeilen ohne `page_id` stehen in `prozesshub_spiegel` — Rückstand aus der Zeit, als `Bestand fortschreiben` in jede Spalte `null` schrieb. Wirkungslos, weil `Bestand laden` auf `space_key = ProzessHub` filtert und sie nicht findet. Aufzuräumen nur über die n8n-Oberfläche und **nicht** pauschal über alle Zeilen: die 175 echten stehen daneben.
