@@ -56,8 +56,10 @@ Die Sperre sitzt bewusst **vor** der Bilderzeugung. Ein abgelehnter Beitrag kost
 
 `Redaktions-Check` prüft hart — was hier fällt, wird nicht gepostet:
 
-- **Fremdprodukte im Text.** Ein Beitrag, der ein Konkurrenzprodukt benennt, geht nicht raus. Das trifft auch Use Cases, die einen Produktnamen schon im Titel tragen.
+- **Gesperrte Marken im Text.** Namen aus der Blocklist (`competitor`, `consulting`, `vendor_sales`) gehen nicht raus. Das trifft auch Use Cases, die einen Produktnamen schon im Titel tragen.
 - **Benanntes Dokument oder benannter Arbeitsschritt.** Ein Beitrag über „zeitaufwendige Prozesse" ohne Aufmaß, Prüfprotokoll oder Stückliste fällt durch.
+
+Daneben steht eine **weiche** Prüfung auf Begriffe aus dem Feld `uc_technology` des Use Cases. Sie meldet, blockiert aber nicht: In diesem Feld steht oft gar kein Produkt, sondern ein Allerweltsbegriff wie „Bildverarbeitung", und den könnte nur eine vollständige Liste generischer Wörter aussortieren. Echte Marken fängt die Blocklist-Prüfung darüber ab.
 
 `Lesbarkeit pruefen` prüft die Form. Der erste Absatz muss **30 bis 80 Wörter** haben:
 

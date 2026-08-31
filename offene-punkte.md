@@ -15,7 +15,7 @@ Was daraus offen blieb:
 
 **Zwei Dinge sind für den 01.09.2026 gesetzt:** das Mistral-Kontingent prüfen und die Kette daran abarbeiten, und die Waisen im ProzessHub abstellen. Die Waisen hat Sebastian ausdrücklich auf den 01.09. gelegt.
 
-**Der Prompt-Fix im Content Studio ist am 31.08. publiziert und in Lauf 111879 belegt** — der erste Absatz erreicht jetzt 44 statt 21 Wörter. **Der Termin am Mittwoch ist damit aber nicht abgeräumt:** derselbe Lauf fällt an einem Fehlalarm der Fremdprodukt-Prüfung durch, der vor dem 02.09. behoben sein muss. Beides unter [Beitragsprüfung im Content Studio](#beitragsprüfung-im-content-studio--absatzregel-gefixt-retry-offen).
+**Die Beitragsprüfung im Content Studio ist am 31.08. abgeräumt.** Zwei Ursachen, beide publiziert und belegt: der erste Absatz erreicht jetzt 44 statt 21 Wörter, und die Fremdprodukt-Prüfung meldet, statt zu blockieren. Lauf `111893` geht durch das Gate. Einzelheiten unter [Beitragsprüfung im Content Studio](#beitragsprüfung-im-content-studio--absatzregel-gefixt-retry-offen).
 
 ### Morgen zuerst: Mistral prüfen, dann die Kette abarbeiten
 
@@ -85,14 +85,18 @@ Die Prüfung ist einmal gelaufen und hat den Lauf abgebrochen: **111258 am 31.08
 
 **Belegt in Lauf 111879** (Testlauf mit Pin-Daten auf allen Datenbank- und Netzzugriffen, Modelle liefen echt, Eingabe war derselbe Use-Case wie in 111258): `qa_antwortblock_woerter` **44** statt 21, Satzlänge 14,8, drei Absätze. Der Befund „Antwortblock zu kurz" ist weg. Nebenbefund: `CREATIVE (Bildidee)` und `Bild generieren` haben nicht ausgeführt — die Sperre sitzt belegt vor der Bilderzeugung.
 
-**Der Lauf fällt trotzdem durch das Gate.** Neuer harter Befund aus dem `Redaktions-Check`: „Fremdprodukt im Text genannt: KI-gestützte". Das ist ein Fehlalarm und der nächste Termin-Punkt — siehe unten.
+Der Lauf fiel dabei noch an einer zweiten Stelle durch — die ist inzwischen ebenfalls behoben, siehe den nächsten Abschnitt.
 
-### Fremdprodukt-Prüfung schlägt bei Bindestrich-Wörtern falsch an — vor Mi 02.09.
-Der `Redaktions-Check` zerlegt `uc_technology` in Tokens und sucht jedes davon im Beitragstext. Das Trennmuster ist `[^A-Za-z0-9ÄÖÜäöüß-]+` — **der Bindestrich zählt zu den erlaubten Zeichen**, `KI-gestützte` bleibt deshalb ein einziges Token. Die STOP-Liste kennt nur `gestützte` ohne Vorsilbe und greift nicht.
+### Fremdprodukt-Prüfung meldet, statt zu blockieren
+Der `Redaktions-Check` zerlegt `uc_technology` in Tokens und sucht jedes davon im Beitragstext. Alles, was nicht in einer STOP-Liste generischer Wörter steht, galt als Fremdprodukt und brach den Lauf ab.
 
-Bei `uc_1786422016792_0` steht in `technology` genau „KI-gestützte Bildverarbeitung und maschinelles Lernen." Schreibt das Modell irgendwo „KI-gestützte", bricht der Lauf ab. In 111258 war das nur deshalb unsichtbar, weil der kürzere Text das Wort nicht enthielt — der Fehler ist älter als der Prompt-Fix.
+**Das trägt nicht.** Bei `uc_1786422016792_0` steht in `technology` „KI-gestützte Bildverarbeitung und maschinelles Lernen." — **kein einziger Produktname**, nur Allerweltsbegriffe. Zwei Testläufe haben das der Reihe nach vorgeführt: `111879` scheiterte an `KI-gestützte`, nach dem Entfernen des Bindestrichs aus dem Trennmuster scheiterte `111892` an `Bildverarbeitung`. Eine Liste generischer Wörter kann nie vollständig sein.
 
-**Dringlich:** ohne Korrektur bricht der Lauf am Mi 02.09. erneut ab, nur mit anderer Meldung. Zwei Wege stehen zur Wahl — den Bindestrich aus der Zeichenklasse nehmen, sodass `KI` und `gestützte` einzeln geprüft werden (`KI` fällt dann unter die Mindestlänge 4, `gestützte` steht in STOP), oder Bindestrich-Tokens zusätzlich an ihren Teilen gegen STOP prüfen. Der erste Weg ist kleiner, verliert aber die Erkennung echter Produktnamen mit Bindestrich.
+**Der Befund meldet jetzt, er blockiert nicht mehr** — `soft` statt `issues`, umbenannt in „Begriff aus dem Technologiefeld im Text". Echte Marken hält weiterhin die Blocklist-Prüfung im selben Node hart auf (`Gesperrte Marke im Text`, gespeist aus `competitor`/`consulting`/`vendor_sales`). Der Bindestrich bleibt aus dem Trennmuster heraus, damit der Befund wenigstens an sinnvollen Tokens ansetzt.
+
+**Belegt in Lauf 111893:** `qa_passed: true`, `Freigabe erteilt` leitet auf Ausgang 0, `CREATIVE (Bildidee)` läuft, die `content_packages`-Zeile steht auf `ready_for_review`. Der Lauf endete rot an `Zuschnitt 1:1` — Artefakt der Pin-Daten, das gepinnte `Bild generieren` liefert keine Bilddatei. **Die Bildstrecke selbst ist damit weiter ungeprüft**, alles davor ist belegt.
+
+Publiziert als `eba7a53a`. Nebenwirkung des Weges über die MCP-Schnittstelle: die 28 Unicode-Escapes im Quelltext des Nodes stehen jetzt als echte Umlaute — in JavaScript gleichbedeutend, auf Zeichensalat gegengeprüft.
 
 **Nachgerechnet auf die vier Vorläufe** hätte die Regel ausnahmslos gegriffen: 100455 → 25 Wörter, 106294 → 19, 108062 → 27, 111258 → 21. Null von vier.
 
