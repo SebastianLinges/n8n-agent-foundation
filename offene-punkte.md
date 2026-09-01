@@ -183,7 +183,6 @@ Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`R
 
 Was daraus offen blieb:
 
-- **Die Wegwerfseite `470188033` steht noch in Confluence**, Titel `ZZ Testseite Umbenennung – bitte loeschen`. Sie wird nicht mehr gespiegelt, muss aber von Hand gelöscht werden — ein Löschwerkzeug für Confluence-Seiten gibt es über MCP nicht.
 - **Leere Ordner bleiben stehen.** Der Aufräumer entfernt nur Dateien. Nach einer Gruppen-Umbenennung bleibt der alte, dann leere Ordner sichtbar zurück.
 - **`sicherName()` steht jetzt zweimal im Flow** — in `Zielpfade bestimmen` und in `Dokument bauen`. Beide müssen zeichengleich bleiben, sonst räumt der Aufräumer weg, was derselbe Lauf geschrieben hat. Sie zusammenzuführen hieße, den 280-Zeilen-Knoten `Dokument bauen` anzufassen; das war es heute nicht wert.
 
