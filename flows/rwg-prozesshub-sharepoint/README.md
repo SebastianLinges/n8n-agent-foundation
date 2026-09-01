@@ -8,7 +8,7 @@ Der Flow ist **autark**: eigener Zustand in der n8n Data Table `prozesshub_spieg
 
 ## Aufbau
 
-`Manueller Start` → `Config` → `Bereich aufloesen` → `Bereichsordner laden` → `Seiten laden` → `Seiten normalisieren` → `Bestand laden` → `Abgleich` → `Was ist zu tun`
+`Manueller Start` → `Config` → `Bereich aufloesen` → `Bereichsordner laden` → `Seiten laden` → `Seiten normalisieren` → `Zielpfade bestimmen` → `Bestand laden` → `Abgleich` → `Was ist zu tun`
 
 Der Wegweiser hat drei Ausgänge:
 
@@ -19,6 +19,42 @@ Der Wegweiser hat drei Ausgänge:
 | **nichts zu tun** | direkt → `Zusammenfassung` |
 
 Der dritte Ausgang ist kein Beiwerk: Ohne ihn endet ein Lauf, in dem sich nichts geändert hat, stumm am Wegweiser und hinterlässt keine Meldung.
+
+Hinter `Zusammenfassung` hängt der Aufräumer: `Ablage lesen` → `Ueberzaehlige bestimmen` → `Ueberzaehlige entfernen`.
+
+## Warum der Ablageort am Anfang berechnet wird
+
+Der Ablageort einer Seite entsteht aus Überschriften — der eigenen und der der Gruppe:
+
+```
+<Bereichsordner>/<Gruppennummer Gruppentitel>/<Prozessnummer Klartext>.html
+```
+
+Er wird deshalb in **`Zielpfade bestimmen`** berechnet, direkt nach dem Normalisieren. Früher entstand er erst in `Dokument bauen` — zwei Knoten hinter `Abgleich`, der über spiegeln oder nichts entscheidet. Der Abgleich konnte einen Umzug also gar nicht bemerken.
+
+**`Abgleich` vergleicht seither zweierlei:** den Inhalts-Fingerabdruck *und* den Ablageort gegen die Bestandszeile. Weicht der Ort ab, gilt die Seite als `umgezogen` und wird am neuen Ort neu geschrieben.
+
+Das ist nicht nur Kosmetik: Der Fingerabdruck bildet **Titel und Inhalt der Seite selbst** ab. Ändert jemand einen **Gruppentitel**, bleibt der Fingerabdruck aller Seiten darunter gleich — ohne den Pfadvergleich würden sie als unverändert durchgewinkt, und im umbenannten Ordner entstünde nie eine Datei.
+
+## Der Aufräumer: Abgleich gegen die Wirklichkeit
+
+Der Flow arbeitete früher allein aus dem Gedächtnis: Die Data Table sagte ihm, was er zuletzt abgelegt hat. Was tatsächlich in SharePoint liegt, hat er nie nachgesehen — deshalb blieben Dateien aus Umbenennungen unbemerkt liegen, mit demselben Layout und derselben Kopfzeile wie die gültigen.
+
+`Ablage lesen` holt jetzt einmal je Lauf den Ist-Bestand über den Graph-Delta-Abruf. `Ueberzaehlige bestimmen` hält ihn gegen die Soll-Liste aus `Zielpfade bestimmen` und meldet, was nicht dazugehört — gleich aus welchem Grund es dort liegt: Umbenennung, abgebrochener Lauf, von Hand hineinkopiert.
+
+**Drei Sicherungen, jede einzeln notwendig:**
+
+1. **Nur `.html` und nur innerhalb der eigenen Bereichsordner.** Die Bibliothek gehört dem Flow nicht allein.
+2. **Leere Soll-Liste heißt Abbruch.** Liefert Confluence nichts, dürfte sonst der gesamte Spiegel gelöscht werden.
+3. **Dieselbe 35-Prozent-Schwelle wie beim Abgleich.** Ein halber Confluence-Abruf räumt nicht den halben Spiegel weg.
+
+**`sicherName()` steht zweimal im Flow** — in `Zielpfade bestimmen` und in `Dokument bauen` — und muss zeichengleich bleiben. Weichen die beiden auseinander, räumt der Aufräumer Dateien weg, die derselbe Lauf gerade geschrieben hat.
+
+**`Ueberzaehlige bestimmen` bricht bei `$runIndex > 0` ab.** `Zusammenfassung` hat zwei Eingänge und läuft dadurch zweimal an; ohne die Sperre liefe der Aufräumer doppelt.
+
+**Belegt am 01.09.** an drei Läufen mit einer Wegwerfseite: `113059` legt sie an, `113060` benennt sie um — die neue Datei entsteht, die alte wird als überzählig erkannt und entfernt —, `113061` nimmt sie wieder aus dem Muster. Dass `113061` die *umbenannte* Datei meldet und nicht die ursprüngliche, belegt, dass die Löschung aus `113060` in SharePoint durchgegangen ist.
+
+**Leere Ordner bleiben stehen.** Entfernt werden nur Dateien. Nach einer Gruppen-Umbenennung bleibt der alte, dann leere Ordner sichtbar zurück.
 
 ## Die drei Ebenen des ProzessHubs
 

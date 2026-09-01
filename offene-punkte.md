@@ -13,69 +13,123 @@ Was daraus offen blieb:
 
 ## Zuerst
 
-**Stand zum Feierabend am 31.08.** Nichts hängt in Arbeit, alles ist publiziert und gepusht. Was von allein weiterläuft: ProzessHub-Spiegelung nachts um 02, SharePoint-Abgleich um 03:30, Marketing Scout um 04:20 — alle unverändert. Der Content Studio läuft erst wieder am **Mi 02.09. um 08:00**; dort ist zu prüfen, ob ein Buffer-Entwurf entsteht und ob die Bildstrecke trägt, die bisher ungeprüft ist.
+**Stand zum Feierabend am 01.09.** Drei Vorhaben sind an diesem Tag live gegangen, alle drei belegt:
 
-**Zwei Dinge sind für den 01.09.2026 gesetzt:** das Mistral-Kontingent prüfen und die Kette daran abarbeiten, und die Waisen im ProzessHub abstellen. Die Waisen hat Sebastian ausdrücklich auf den 01.09. gelegt.
+| Was | Stand |
+|---|---|
+| **SharePoint-Ingest neu geschnitten** | seit 18:25 live, beide Flows publiziert, Vorgänger abgeschaltet |
+| **Mengenbremse `maxJeLauf` 3 → 15** | gemessen an Lauf `113044`, publiziert |
+| **ProzessHub: Umbenennungen** | Ablageort wird vorn berechnet, Aufräumer gegen den Ist-Bestand, publiziert |
 
-**Die Beitragsprüfung im Content Studio ist am 31.08. abgeräumt.** Zwei Ursachen, beide publiziert und belegt: der erste Absatz erreicht jetzt 44 statt 21 Wörter, und die Fremdprodukt-Prüfung meldet, statt zu blockieren. Lauf `111893` geht durch das Gate. Einzelheiten unter [Beitragsprüfung im Content Studio](#beitragsprüfung-im-content-studio--absatzregel-gefixt-retry-offen).
+Nichts hängt in Arbeit. Was von allein weiterläuft: der neue SharePoint-Ingest stündlich und um 03:30,
+ProzessHub-Spiegelung nachts um 02, Contract Loader stündlich mit leerem Eingang. Der Content Studio
+läuft erst wieder am **Mi 02.09. um 08:00**; dort ist zu prüfen, ob ein Buffer-Entwurf entsteht und ob
+die Bildstrecke trägt, die bisher ungeprüft ist.
 
-### Morgen zuerst: Mistral prüfen, dann die Kette abarbeiten
+**Morgen früh zuerst:** der Abgleich um 03:30. Er ist die erste volle Nacht der neuen Ingest-Kette
+**und** die erste Nacht mit 15 statt 3 Einlesungen. Danach lohnt ein Blick auf den Mistral-Verbrauch,
+bevor die 15 stehen bleiben.
 
-**Das Mistral-Abo ist abgelaufen und läuft ab dem 01.09.2026 wieder.** Gemessen am 31.08.: Die API antwortet auf den Datei-Upload mit `402 Payment required` — nicht mehr mit `ECONNRESET` wie bei der bloßen Pause. Belegt in den Läufen `111062` (nachts 03:30) und `111286` (morgens 08:42, dieselbe Antwort elf Stunden später). Gesperrt ist inzwischen die ganze API, nicht nur der Chat-Endpunkt.
+**Die OCR ist wieder offen.** Belegt in Lauf `112948` vom 01.09., 17:05: `Bestätigung persönliche
+Unterweisung Fahrer Pellets.pdf` (61 kB) lief in 7,5 Sekunden komplett durch — Upload, signierte URL,
+OCR, Chunks, Embedding, 198 Wörter, 3 Chunks, keiner ohne Embedding. Kein `402`, kein `ECONNRESET`.
+Der Lauf ging über die **neue** Verarbeitung; der alte Flow ist damit nicht gegengeprüft, nutzt aber
+dasselbe Credential (`tv4AxZ1FALgZCIVK`).
 
-**Erster Handgriff:** ein Abgleich mit `nurDatei` auf eine kleine PDF — etwa `fahrer pellets`, 61 kB. Dauert 40 Sekunden und beantwortet mit einer Messung statt einer Vermutung, ob die OCR wieder offen ist. Danach `nurDatei` wieder leeren.
+**Die Rückstellung hat ihre erste Probe im Betrieb bestanden.** Der Nachtlauf `112030` um 03:30 lag
+noch vor der Freischaltung. Er ist **grün** geblieben und hat drei Dateien zurückgestellt — in
+`ingestion_errors` stehen sie um 03:30 mit `OCR-Strecke nicht verfuegbar: Payment required`. Vor dem
+31.08. hätte derselbe Fall den ganzen Lauf gerissen.
 
-**Läuft die OCR, hängt daran diese Kette:**
+### Der Neuschnitt ist live — eine Nacht beobachten
 
-1. **Die fünf verbliebenen Regaletiketten einlesen**, danach die sechs Altzeilen löschen — aber erst, wenn die jeweilige Graph-Fassung nachweislich Chunks trägt. Die Altzeilen sind Power-Automate-Leichen mit `RWGID`-Kennung; der Abgleich ordnet über die Graph-`doc_id` zu und legt daneben eine zweite Zeile an, statt sie zu heilen.
-2. **Contract Loader zu Ende belegen** (`661BDwEditNicEc0`): Lauf anstoßen, Extraktion an den beiden liegengebliebenen Dokumenten prüfen, publizieren, exportieren. Vier Nodes sind noch ungetestet, alle hinter der Extraktion. Der Umbau ist unveröffentlichter Entwurf, die alte Fassung ist aktiv.
-3. **Erstbefüllung läuft von selbst weiter** — 402 Dateien fehlen noch, drei je Nacht.
+**Am 01.09. um 18:25 umgeschaltet.** Der Wechsel ist vollzogen:
 
-**Unabhängig davon zu prüfen: der Nachtlauf um 03:30.** Er ist die erste Probe der heute publizierten Absicherung. Erwartet wird: Status `success` statt `error`, in der Laufbilanz `zurueckgestellt` statt `fehler`, `anker_geschrieben: true` — und eine Telegram-Meldung mit der Kopfzeile `[ZURUECKGESTELLT]`, die die liegengebliebenen Dateien nennt. Bleibt die Meldung aus, obwohl Dateien zurückgestellt wurden, klemmt der Telegram-Node, nicht der Ingest.
+| Flow | ID | Stand |
+|---|---|---|
+| `RAG - SharePoint Ingest OLD` | `BBhGCRsQ8pdNSxTi` | umbenannt, **deaktiviert** seit 17:19 |
+| `RAG - SharePoint Ingest` (die Verarbeitung) | `coDhu7pIaI2bpmGZ` | publiziert und aktiv |
+| `RAG - SharePoint Steuerung` | `PAqphQur0CTQRypM` | **publiziert und aktiv**, beide Trigger registriert |
 
-**Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md) offen:**
+Genau eine Steuerung ist aktiv — der Vorgänger bleibt aus. Beide tragen dieselben Cron-Zeiten und
+denselben Delta-Anker; nie beide gleichzeitig. Der Rückweg bleibt billig: alten Flow aktivieren,
+Steuerung abschalten. Beide schreiben in dieselben Tabellen, kein Datenumbau.
+
+**Das stündliche Delta läuft belegt.** Zwei planmäßige Läufe nach dem Umschalten: `113028` um 19:00
+in 1,6 Sekunden, `113035` um 20:00 in 1,0 Sekunden, beide grün. Ohne Änderungen in SharePoint ist der
+Delta-Lauf nach einer Sekunde fertig — der erwartete Normalfall.
+
+**Was noch aussteht:**
+
+1. **Der Abgleich um 03:30.** Die erste vollständige Nacht der neuen Kette. Erwartet: Status
+   `success`, **15** Einlesungen (`maxJeLauf`), `anker_geschrieben: true`, keine Rückstellung. Kommt
+   eine Telegram-Meldung mit `[ZURUECKGESTELLT]`, ist die OCR wieder zu.
+2. **Die Mengenbremse steht jetzt auf 15** statt 3 — gemessen und publiziert, Einzelheiten unten
+   unter [Die Mengenbremse ist gemessen](#die-mengenbremse-ist-gemessen--3-ist-nicht-mehr-begründet).
+   Der Abgleich um 03:30 ist damit zugleich die erste Probe des neuen Werts: Erwartet werden **15**
+   Einlesungen statt drei.
+
+**Belegt vor dem Umschalten:** Handstart `112961` um 17:19 über die volle Kette — drei Dokumente
+eingelesen (`Handout Einführung in die Arbeitssicherheit.pdf` mit 5 Chunks, zweimal
+`Checkliste neue Mitarbeiter _ Praktikanten.docx` mit je 3), keines ohne Embedding.
+
+### Die Mengenbremse ist gemessen — 3 ist nicht mehr begründet
+
+**Lauf `113044` am 01.09., 21:07.** Handstart im Entwurf mit `maxJeLauf: 10` und
+`zustandSchreiben: false`; die publizierte Fassung blieb bei 3, der Delta-Anker unangetastet.
+
+| | |
+|---|---|
+| 10 Dokumente gesamt | **69,4 s** |
+| davon Bestandsabgleich über 1 651 Einträge | 12,4 s (fester Aufschlag je Lauf) |
+| Summe der Teilläufe | 55,8 s |
+| je Dokument | min 3,6 s · **Mittel 5,6 s** · max 9,2 s |
+
+Alle zehn Teilläufe grün, alle zehn Dokumente mit Chunks in der Wissensbasis.
+
+**Die alte Begründung ist entfallen.** Die 3 stammten aus der 300-Sekunden-Grenze des Task-Runners je
+Code-Node — sie galt dem flowweiten Sammler im alten Ingest. Jede Datei läuft jetzt in einer eigenen
+Ausführung mit eigenem Zeitbudget. Bindend ist nur noch der Ausführungs-Timeout der Steuerung von
+**3 600 s**.
+
+**Was die Messung nicht hergibt.** Die Stichprobe trug ausschließlich kleine Dokumente, 162 bis
+1 107 Wörter. Der schwere Fall — Regaletiketten mit über 300 Chunks — war nicht dabei. Aus 5,6 s
+Mittel darf man deshalb **nicht** auf 600 Dokumente je Nacht schließen; die Obergrenze bestimmt der
+langsamste Fall, nicht der Durchschnitt.
+
+**Gesetzt ist 15**, publiziert am 01.09. Nicht die technische Grenze — die läge höher —, sondern die
+Kostenbremse: Sebastian hat auf 15 begrenzt, damit das Mistral-Kontingent nicht verbrennt. Aus rund
+390 fehlenden Dateien werden damit etwa **26 Nächte** statt 130. Der Wert steht in `Startbereiche`
+unter `vorgaben.maxJeLauf`, die Begründung als Kommentar daneben.
+
+**Begrenzend ist damit das Kontingent, nicht die Technik.** Wer die Zahl später anfassen will, muss
+zuerst den Mistral-Verbrauch je Nacht kennen, nicht die Laufzeit.
+
+**Sauberer als jede Stückzahl wäre ein Zeitbudget**: die Schleife bricht ab, wenn der Lauf eine
+gesetzte Dauer überschreitet. Das ist ein Umbau, kein Parameter — erst sinnvoll, wenn die Stückzahl
+sich als untauglich erweist.
+
+### Vier Regaletiketten einlesen, dann zwei Altzeilen löschen
+
+Am 01.09. gemessen: In `sharepoint_documents` stehen **nur noch sechs** Zeilen ohne einen einzigen
+Chunk, alle mit Power-Automate-Kennung, alle Regaletiketten-PDFs. Die sieben bildreichen
+`Bereichsuebergreifend ….docx` sind geheilt.
+
+| Altzeile ohne Chunks | Graph-Fassung | Was zu tun ist |
+|---|---|---|
+| `00_lev…`, `16_ber…` | vorhanden, 150 bzw. 163 Chunks | **löschbar**, die Bedingung ist erfüllt |
+| `01_wip…`, `15_lin…`, `17_erk…`, `22_hei…` | fehlt | erst über Graph einlesen, dann löschen |
+
+Der Abgleich heilt sie nicht: Er ordnet über die Graph-`doc_id` zu, findet keine Entsprechung und legt
+die Datei **daneben** als neue Zeile an, statt die alte zu ersetzen.
+
+### OCR schonen — drei Hebel liegen noch
+
+Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md):
 
 - **Hebel 1, der OCR-Zwischenspeicher.** Der größte Hebel: Bei vier von sechs Rebuild-Gründen ist die Datei unverändert, und trotzdem läuft die komplette OCR erneut. **Braucht eine Freigabe für eine neue Supabase-Tabelle** und sorgfältige Behandlung des Bucket-Aufräumens.
-- **Hebel 3, der native Textpfad** für die gemessenen 21 % bildloser Dokumente. Vor dem Bau zu messen, wie viele der fehlenden PDF eine Textebene tragen — die Gegenprobe braucht ein OCR-Ergebnis zum Vergleich, geht also erst mit laufendem Abo.
+- **Hebel 3, der native Textpfad** für die gemessenen 21 % bildloser Dokumente. Vor dem Bau zu messen, wie viele der fehlenden PDF eine Textebene tragen — die Gegenprobe braucht ein OCR-Ergebnis zum Vergleich. Seit dem 01.09. steht dem nichts mehr im Weg.
 - **Hebel 4, ein Seitendeckel** für Dokumente wie die Regaletiketten. Fachliche Entscheidung, keine technische.
-
-
-### Morgen erledigen: ProzessHub verliert Dateien bei Umbenennungen
-
-**Von Sebastian für den 01.09. gesetzt.** Der Flow läuft seit dem 31.08. nächtlich um 02 Uhr und legt an, aktualisiert und entfernt sauber — mit einer Lücke: **Umbenennungen hinterlassen Waisen.**
-
-Ändert sich in Confluence ein Seiten- oder Gruppentitel, ändert sich der Zielpfad. Die Datei entsteht am neuen Ort, die alte bleibt liegen — der Löschpfad greift nicht, weil die `page_id` weiter existiert. Bei einem Gruppentitel wandert der ganze Ordner, dann bleibt der alte vollständig zurück. Das Tückische daran: Die Waisen tragen dasselbe Layout und dieselbe Kopfzeile wie die gültigen Fassungen, niemand erkennt sie als veraltet.
-
-**Noch nicht eingetreten.** Zwischen Lauf 110822 und 111432 ist kein einziger der 159 Pfade gewandert. Ein einziger korrigierter Titel im ProzessHub löst es aus.
-
-**Die Ursache ist die Stelle, an der der Zielpfad entsteht.** `Dokument bauen` berechnet ihn — also erst, nachdem `Abgleich` seine Entscheidung längst getroffen hat. Der Abgleich kann deshalb gar nicht wissen, dass eine Seite umgezogen ist.
-
-**Der Umbau, vier Schritte:**
-
-1. **`sicherName()` und die Pfadbildung nach `Seiten normalisieren` verlegen.** Dort stehen alle Bestandteile bereit: `bereich_ordner`, `gruppe_nr`, `gruppe_titel`, `prozess_nr`, `klartext`. Auf die Reihenfolge achten — `gruppe_titel` steht erst nach dem zweiten Durchgang fest, die Pfade gehören also in einen letzten Durchgang danach. Ergebnis je Seite: `sp_ordner`, `sp_datei`, `sp_pfad`, `sp_pfad_url`.
-2. **`Abgleich` vergleicht alt gegen neu.** Zu jeder Seite mit `aktion: spiegeln` liegt die Bestandszeile bereits vor. Ist `alt.sp_ordner + '/' + alt.sp_datei` ungleich dem neuen `sp_pfad`, kommt ein zusätzliches Item mit `aktion: 'entfernen'` und dem **alten** Pfad dazu.
-3. **Die Bestandszeile darf dabei nicht mitgelöscht werden.** `Datei entfernen` führt zu `Bestandszeile entfernen`, und das filtert über `page_id`. Das Umzugs-Item bekommt deshalb eine Kennung, die keine echte Zeile trifft, etwa `page_id: '__pfadwechsel__'` — die richtige Zeile hebt `Bestand fortschreiben` im selben Lauf auf den neuen Pfad. **Vor dem Bau zu prüfen:** dass der Data-Table-Node bei einem Filter ohne Treffer nichts löscht und nicht etwa alles.
-4. **`Dokument bauen` rechnet nicht mehr selbst**, sondern nimmt `sp_ordner` und `sp_datei` aus dem Datensatz — auch für die Linkkarte, sonst laufen interne Verweise gegen zwei verschiedene Wahrheiten.
-
-**Die Löschsicherung darf davon nichts mitbekommen.** Sie rechnet ihren Anteil über die in Confluence fehlenden Seiten. Die Umzugs-Items gehören **hinter** diese Prüfung, sonst schlägt ein umbenannter Gruppentitel mit all seinen Seiten in die 35-Prozent-Schwelle und blockiert den ganzen Lauf.
-
-**Abnahme:** eine Testseite im ProzessHub umbenennen, Lauf starten, dann dreierlei belegen — die Datei liegt unter dem neuen Namen, die alte ist weg, und in `prozesshub_spiegel` steht genau **eine** Zeile für diese `page_id`. Damit ist nebenbei auch das Löschen einer real vorhandenen Datei gemessen, das bisher fehlt.
-
-### 14 SharePoint-Dokumente ohne Chunks - Ursache geklaert
-14 Eintraege in `sharepoint_documents` tragen keinen einzigen Chunk. Gemessen ueber `metadata->>'doc_id'` und ueber die Spalte `source_ref` - beide Wege ergeben dieselben 14. In der Wissenssuche sind sie unsichtbar, gelten dem Ingest aber als vorhanden. Keine Zwillingszeile traegt die fehlenden Chunks, `ingestion_errors` ist leer.
-
-**Zwei Gruppen:**
-
-| Gruppe | Anzahl | `ingestion_count` | Merkmal |
-|---|---|---|---|
-| Regaletiketten-PDFs | 7 | 0 | sechs aus der Power-Automate-Zeit (22.08.), eine ueber Graph. `00_lev…` steht unter beiden Herkuenften. Nie fertiggestellt. |
-| `Bereichsuebergreifend ….docx` | 7 | 2 | Text vollstaendig da (4 449 bis 22 460 Zeichen), `content_hash` gesetzt, 4 bis 47 Bilder je Dokument |
-
-**Die Ursache der zweiten Gruppe ist belegt.** Der naechtliche Abgleich `110522` vom 30.08., 01:30 UTC lief 9 min 45 s und scheiterte. Lauf `110524` des Fehler-Workflows nennt den Grund: letzter Node `Upload Extracted Image To Supabase`, `NodeApiError ETIMEDOUT` gegen `zjabiweaihsezjjeycko.supabase.co` - das alte, inzwischen geloeschte Projekt, mit dem alten Zugang. Der Lauf starb beim Bildupload; die sieben bildreichen `.docx` blieben ohne Chunks zurueck.
-
-**Nichts zu tun.** Beide Voraussetzungen haben sich seither geaendert: Der Node zeigt aufs neue Projekt mit gueltigem Zugang und traegt `onError: continueRegularOutput` - ein einzelner Bildfehler reisst den Lauf nicht mehr mit. Der Abgleich um 03:30 ist die erste Probe unter den neuen Bedingungen und sollte die sieben `.docx` nachziehen. Danach zu pruefen, ob die sieben Regaletiketten-PDFs uebrig bleiben.
-
-**Nebenbefund, bekannt und hier bestaetigt:** In den Fehlerdaten von `110522` steht das komplette Request-Objekt samt `apikey` und `Authorization` im Klartext. Der Schluessel gehoert zum geloeschten Projekt und ist damit wertlos.
 
 
 ### Beitragsprüfung im Content Studio — Absatzregel gefixt, Retry offen
@@ -116,18 +170,16 @@ Publiziert als `eba7a53a`. Nebenwirkung des Weges über die MCP-Schnittstelle: d
 Nach jeder Änderung publizieren, exportieren, Läufe ins `tests/laufprotokoll.csv`.
 
 
-### Contract Loader publizieren - wartet auf Mistral-Token
-**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 30 Nodes statt 36. Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
+### Contract Loader zu Ende belegen - die Dateien muessen erst zurueck in den Eingang
+**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 30 Nodes statt 36; aktiv ist weiter die alte Fassung. Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
 
-Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen, Mistral-Upload, signierte URL, OCR und das Sichern des OCR-Textes. Beide Dokumente vollstaendig gelesen - 46 Seiten mit 20630 Woertern und 1 Seite mit 190 Woertern.
+Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen, Mistral-Upload, signierte URL, OCR und das Sichern des OCR-Textes. Beide Dokumente vollstaendig gelesen - 46 Seiten mit 20630 Woertern und 1 Seite mit 190 Woertern. **Gescheitert ist allein die Extraktion**, damals am aufgebrauchten Mistral-Kontingent. Das ist seit dem 01.09. keine Huerde mehr.
 
-**Gescheitert ist die Extraktion**: `Forbidden` vom Mistral-Chat-Endpunkt. Ursache ist nicht der Umbau, sondern das Kontingent - die Token des Mistral-Zugangs sind bis zum **01.09.2026** aufgebraucht. Der OCR-Endpunkt desselben Zugangs laeuft weiter, OCR und Chat werden getrennt abgerechnet. Zur Sicherheit gegengeprueft (Lauf 110833): Konto `rwg-r.de` antwortet `Forbidden`, Konto `gmx.de` antwortet `Payment required`.
+**Nur liegen die beiden Dokumente nicht mehr im Eingang.** In `vertraege` stehen sie auf `status = 'fehler'` mit `versuche = 3` - der Zaehler war voll, die Dateien sind nach `/IMPORTER/CONTRACT/FEHLER` gewandert. Der Eingang ist seither leer, jeder stuendliche Lauf ist nach einer halben Sekunde fertig (zuletzt `113012`).
 
-Der Fehlerweg hat dabei genau so gegriffen wie entworfen: `status = 'fehler'`, Meldung in `fehler_text`, beide Dateien unveraendert im Eingang. Beim naechsten Lauf werden sie erneut geholt, ohne neue OCR-Kosten - `ocr_text` steht ja schon.
+**Zum Abarbeiten:** die beiden Dateien aus `FEHLER` zurueck in `/IMPORTER/CONTRACT` legen und `versuche` zuruecksetzen, sonst wandern sie sofort wieder hinaus. `ocr_text` steht in beiden Zeilen schon - die Erkennung laeuft nicht erneut, es kostet also keine OCR. Dann Lauf anstossen, die Extraktion pruefen, publizieren. Erst nach dem Publizieren geht der Export ins Git.
 
-**Nachtraeglich eingebaut** (Lauf 110838, 30 Nodes): Steht `ocr_text` schon, wird die OCR uebersprungen - ohne das lief ein liegengebliebenes Dokument stuendlich erneut durch die Erkennung und wurde jedes Mal neu bezahlt. Dazu ein Zaehler `versuche`: Nach drei Fehlversuchen wandert die Datei nach `/IMPORTER/CONTRACT/FEHLER`, den der Flow selbst anlegt. In der Excel stehen `status` und `versuche` vorn, Fertiges zuoberst.
-
-**Zum Abarbeiten ab dem 01.09.:** Lauf anstossen, die Extraktion an den beiden Dokumenten pruefen, dann publizieren. Erst nach dem Publizieren geht der Export ins Git.
+**Zur Mechanik**, nachtraeglich eingebaut (Lauf 110838): Steht `ocr_text` schon, wird die OCR uebersprungen - ohne das lief ein liegengebliebenes Dokument stuendlich erneut durch die Erkennung und wurde jedes Mal neu bezahlt. Der Zaehler `versuche` schiebt die Datei nach drei Fehlversuchen nach `/IMPORTER/CONTRACT/FEHLER`, den der Flow selbst anlegt. In der Excel stehen `status` und `versuche` vorn, Fertiges zuoberst.
 
 Noch unbelegt sind vier Nodes, die nur hinter der Extraktion liegen: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die Umwandlungen in `Ergebnis auswerten` sind einzeln gegen Testwerte geprueft, die Spaltenliste des grossen `UPDATE` gegen `information_schema` und `jsonb_to_record`. Ein Lauf ersetzt das nicht.
 
@@ -141,7 +193,13 @@ Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`R
 
 **Der Flow ist aktiv.** Publiziert am 31.08., Nachttrigger 02 Uhr scharf. Anlegen, Aktualisieren und Entfernen sind an vier Läufen belegt (111432, 111433, 111440, 111456), die Titelspalte in SharePoint zeigt die Umlaute wieder richtig. Aufbau und Belege in [flows/rwg-prozesshub-sharepoint/README.md](flows/rwg-prozesshub-sharepoint/README.md).
 
-**Umbenennungen hinterlassen Waisen.** Der Umbau steht oben unter [Morgen erledigen](#morgen-erledigen-prozesshub-verliert-dateien-bei-umbenennungen) — er ist für den 01.09. gesetzt.
+**Umbenennungen sind erledigt.** Der Flow rechnet den Ablageort seit dem 01.09. in `Zielpfade bestimmen` am Anfang aus, `Abgleich` vergleicht ihn mit, und ein Aufräumer hält den Ist-Bestand in SharePoint gegen die Soll-Liste. Belegt an den Läufen `113059`, `113060` und `113061` mit einer Wegwerfseite. Aufbau und Sicherungen: [flows/rwg-prozesshub-sharepoint/README.md](flows/rwg-prozesshub-sharepoint/README.md).
+
+Was daraus offen blieb:
+
+- **Die Wegwerfseite `470188033` steht noch in Confluence**, Titel `ZZ Testseite Umbenennung – bitte loeschen`. Sie wird nicht mehr gespiegelt, muss aber von Hand gelöscht werden — ein Löschwerkzeug für Confluence-Seiten gibt es über MCP nicht.
+- **Leere Ordner bleiben stehen.** Der Aufräumer entfernt nur Dateien. Nach einer Gruppen-Umbenennung bleibt der alte, dann leere Ordner sichtbar zurück.
+- **`sicherName()` steht jetzt zweimal im Flow** — in `Zielpfade bestimmen` und in `Dokument bauen`. Beide müssen zeichengleich bleiben, sonst räumt der Aufräumer weg, was derselbe Lauf geschrieben hat. Sie zusammenzuführen hieße, den 280-Zeilen-Knoten `Dokument bauen` anzufassen; das war es heute nicht wert.
 
 Was daneben offen bleibt:
 
@@ -155,6 +213,50 @@ Rund 370 Zeilen ohne `page_id` stehen in `prozesshub_spiegel` — Rückstand aus
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.
 
 ## SharePoint Schulungen
+
+### Der Ingest ist in zwei Flows geschnitten - am 01.09. umgeschaltet
+
+**Am 01.09. entschieden, gebaut und belegt.** Der Vorgaenger trug Scanner und Verarbeitung in
+einem Canvas: 109 Nodes, 46 Code-Nodes mit 2 475 Zeilen, `Config` von drei Stellen angesprungen,
+vier Rueckkanten in die Aufgabenschleife. Bauplan und Etappenstand:
+[konzept-sharepoint-neubau.md](konzept-sharepoint-neubau.md).
+
+| Flow in n8n | Ordner | ID | Nodes | Stand |
+|---|---|---|---|---|
+| RAG - SharePoint Steuerung | [rag-sharepoint-steuerung](flows/rag-sharepoint-steuerung/README.md) | `PAqphQur0CTQRypM` | 23 | publiziert, aktiv |
+| RAG - SharePoint Ingest | [rag-sharepoint-verarbeitung](flows/rag-sharepoint-verarbeitung/README.md) | `coDhu7pIaI2bpmGZ` | 82 | publiziert, aktiv |
+| RAG - SharePoint Ingest OLD | [rag-sharepoint-ingest](flows/rag-sharepoint-ingest/README.md) | `BBhGCRsQ8pdNSxTi` | 109 | deaktiviert |
+
+**Achtung bei den Namen:** Die Verarbeitung traegt in n8n den Namen des Vorgaengers
+(`RAG - SharePoint Ingest`), der Vorgaenger heisst jetzt `… OLD`. Massgeblich ist die ID, nicht der
+Name. Die Ordner im Repo behalten ihren Schnitt: `rag-sharepoint-verarbeitung` ist die Verarbeitung.
+
+**Belegt** (Laeufe im Protokoll): Trockenlauf-Gegenprobe gegen den alten Flow trifft alle Zahlen
+(1 411 Dateien, 922 falscher Typ, 39 Sperrdateien, 402 fehlend, 0 verwaist). PDF, Arbeitsmappe und
+Word ueber die PDF-Wandlung laufen durch und schreiben dieselben Ergebnisse wie der alte Flow.
+Der Loeschzweig ist mit Pin-Daten geprueft. **Der Inhaltshash ist zeichengleich geblieben** - belegt
+ueber zwei inhaltsgleiche Kopien mit identischem `content_hash`, die eine vom alten Flow, die andere
+von der neuen Kette. Damit gilt beim Umschalten kein Bestandsdokument faelschlich als geaendert.
+Dazu der erste echte Kettenlauf `112961` mit drei eingelesenen Dokumenten.
+
+**Was nach dem Umschalten bleibt:**
+
+1. **Eine Nacht beobachten** - siehe [Der Neuschnitt ist live](#der-neuschnitt-ist-live--eine-nacht-beobachten).
+   Rueckweg ist billig: alten Flow aktivieren, neuen abschalten - beide schreiben in dieselben
+   Tabellen, kein Datenumbau. **Nie beide Steuerungen gleichzeitig aktiv**: gleiche Cron-Zeiten,
+   gleicher Delta-Anker in `sharepoint_delta`.
+2. **`maxJeLauf` neu ausloten.** Steht auf 3, begruendet mit der 300-Sekunden-Grenze des
+   Task-Runners je Code-Node. Bei rund 400 fehlenden Dateien sind das rechnerisch ueber 130 Naechte.
+   Jetzt laeuft jede Datei in einer eigenen Ausfuehrung - wie weit die Grenze steigen kann, ist zu
+   **messen**, nicht zu schaetzen.
+3. **Danach aufraeumen:** Power-Automate-Flow in SharePoint entfernen (Ziel
+   `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`), alten Flow archivieren, nach einer Woche
+   loeschen, `flows/rag-sharepoint-ingest/` aufloesen.
+
+**Offen geblieben ist der Mehrbereichs-Fall.** Die Bereichsliste steht in `Startbereiche`, aber der
+`@odata.deltaLink` einer Antwortseite traegt selbst keine Laufwerkskennung - er wird dem Bereich
+zugeordnet, dessen Eintraege auf derselben Seite lagen. Bei einem Bereich exakt, beim zweiten zu
+pruefen.
 
 ### Dokumenteintrag vor den Chunks - Reihenfolge im Ingest
 Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: neun solcher Eintraege (Lauf 110771), acht davon bildreiche Regaletiketten-PDFs.
@@ -203,11 +305,11 @@ Die vollstaendige Struktur Ebene fuer Ebene steht in `sharepoint-struktur-schulu
 | abzueglich echter Doubletten | -17 |
 | **tatsaechlich einzulesen** | **432** |
 
-Bei 30 je Nacht rund **fuenfzehn Naechte**.
+Der Trockenlauf `112947` zaehlte davon **402** noch fehlende Dateien; am 01.09. sind sechs dazugekommen. Bei `maxJeLauf` auf 3 waeren das rechnerisch ueber 130 Naechte - deshalb steht das Neuausloten der Mengenbremse oben in der Umschaltliste.
 
 Zwei Korrekturen stecken darin. Erstens tragen die Sperrdateien die Endung des Dokuments und stecken deshalb sehr wohl in den verwertbaren - sie wurden zuvor faelschlich als bereits abgezogen behandelt, und von den 27 inhaltsgleichen Kopien waren 10 selbst Sperrdateien. Zweitens waren alle Ausgangszahlen durch die Mehrfachlieferung des Delta-Abrufs zu hoch.
 
-**Der Sperrdatei-Filter ist publiziert** und steht im Code-Node `Aufgaben bestimmen` des `RAG - SharePoint Ingest`. Wirksam wird er beim naechsten Lauf, der Dateien sieht.
+**Der Sperrdatei-Filter** steht im Code-Node `Aufgaben bestimmen` und ist mit dem Neuschnitt in die `RAG - SharePoint Steuerung` gewandert.
 
 **Offen zu entscheiden:** ob die 17 ueberzaehligen Kopien in SharePoint bereinigt werden oder ob der Ingest sie ueber den Inhaltshash von sich aus ueberspringt. Letzteres waere weniger Eingriff, laesst die Doubletten aber in SharePoint stehen. Es geht um 17 Dateien und 10 MB - der Gewinn liegt nicht im Platz, sondern in siebzehn gesparten OCR-Durchlaeufen und einer Wissensbasis ohne Mehrfachtreffer.
 
@@ -294,7 +396,7 @@ Der Aufwand steckt nicht im Speicher, sondern im Bau: Ablage, Katalog, Subflow u
 
 **Vor dem Bau zu klaeren:** Welche Mappen sind ueberhaupt gemeint? Von 42 Mappen in der Bibliothek sind viele Formulare. Eine Handvoll benannter Mappen, an denen sich der Nutzen zeigen laesst, ist der bessere Anfang als der Vollausbau.
 
-### Doubletten in der Wissensbasis - loesen sich groesstenteils selbst
+### Doubletten in der Wissensbasis - die Altzeilen bleiben stehen
 Die Wissensbasis traegt 29 Dateinamen mehrfach. Die Herkunft klaert das Bild:
 
 | Herkunft | Dokumente | eingelesen |
@@ -304,7 +406,7 @@ Die Wissensbasis traegt 29 Dateinamen mehrfach. Die Herkunft klaert das Bild:
 
 Von den 61 Zeilen hinter den 29 doppelten Namen tragen **60 eine Power-Automate-Kennung**. Es sind also keine Format- oder Fachdoubletten, sondern Mehrfachsendungen aus der Power-Automate-Zeit: dieselbe Datei kam unter verschiedenen Kennungen an.
 
-**Das loest sich mit der Erstbefuellung.** Jede Datei, die ueber Graph neu eingelesen wird, ersetzt ihre Altfassung. Stehen bleiben nur Eintraege, deren Datei es in SharePoint nicht mehr gibt - die faengt der Verwaist-Befund des Abgleichs ab.
+**Das loest sich nicht von selbst - diese Annahme ist widerlegt.** Eine ueber Graph neu eingelesene Datei ersetzt ihre Altfassung **nicht**, sie stellt sich daneben: Der Abgleich ordnet ueber die Graph-`doc_id` zu, findet zur Power-Automate-Kennung keine Entsprechung und legt eine zweite Zeile an. Belegt an `00_lev…` und `16_ber…`, die beide unter beiden Herkuenften stehen - die Graph-Fassung mit 150 bzw. 163 Chunks, die Altzeile weiter bei null. Die Altzeilen sind also von Hand zu loeschen, sobald die Graph-Fassung nachweislich Chunks traegt. Der Verwaist-Befund faengt sie nicht ab: Er ruehrt bewusst nichts an, was keine Graph-Item-ID traegt.
 
 Fachlich zu entscheiden bleibt allein, was in SharePoint selbst mehrfach liegt: 27 inhaltsgleiche Kopien und 63 namensgleiche mit verschiedenem Inhalt. Siehe den Abschnitt zur Erstbefuellung.
 
@@ -350,3 +452,57 @@ Bleibt liegen, bis diese Nodes ohnehin angefasst werden.
 
 ### Startseite der SharePoint-Site
 Ob eingeladene Nutzer die Bereiche samt Unterseiten dynamisch sehen, ließe sich über das Dokumentbibliothek-Webpart mit der Ansicht *Alle Dokumente ohne Ordner* lösen — ohne Code. Eine Navigation, die der Flow mitpflegt, gäbe es damit aber nicht; dafür müsste er zusätzlich eine Übersichtsseite schreiben.
+
+## Lead Intake von der Website: die zwei Mails sind zwei Empfaenger
+
+Flow `KAPA Digital - Lead Intake from Website`
+([HW170WdNT9yQGErU](https://n8n.srv1307521.hstgr.cloud/workflow/HW170WdNT9yQGErU)). Am 01.09.
+gemeldet und am selben Tag an Lauf `112933` untersucht.
+
+### Es gibt keinen Doppelversand - die Vermutung ist widerlegt
+
+`Interne Meldung per E-Mail` ist im Lauf **genau einmal** gelaufen: ein einziger Eintrag in den
+Laufdaten, eine `messageId` (`<fac67e10-…>`), eine SMTP-Quittung (`queued as 4hZ7fd6nCfzyc0`).
+
+Der Grund fuer zwei Mails im Postfach steht im Code-Node `Score berechnen und Wiedervorlage setzen`:
+
+```
+empfaengerIntern: 'info@kapa-digital.de, sebastian.linges@kapa-digital.de'
+```
+
+**Eine Nachricht an zwei Adressen** - der SMTP-Server hat beide angenommen
+(`accepted: [info@kapa-digital.de, sebastian.linges@kapa-digital.de]`). Sebastian liest beide
+Postfaecher und sieht deshalb dieselbe Mail zweimal, gleicher Betreff, gleiche Minute. Telegram geht
+dagegen an **eine** Chat-ID, daher genau eine Meldung. Kein Knoten laeuft doppelt, kein Item wird
+doppelt verarbeitet.
+
+**Zu entscheiden, keine Fehlersuche mehr:** Sollen beide Adressen die interne Meldung bekommen? Wenn
+`info@` ohnehin bei Sebastian landet, ist die zweite Adresse zu streichen - eine Zeile.
+
+### Der Spamverdacht kam vom Modell, nicht von einer Regel
+
+`istSpam` uebernimmt schlicht das Urteil der Analyse: `analyse.spam_verdacht === true`. Es gibt keine
+Stichwort- oder Themenliste, die zu breit greifen koennte.
+
+**Auf die eingereichten Daten gesehen war das Urteil vertretbar.** Der Freitext lautete
+`Das ist ein Test nfedehuwehdfwe dde Ende`; die Einschaetzung des Modells: „Der Freitext enthält
+keine relevanten Informationen und deutet auf eine Testanfrage hin." Bewertung 0, Einstufungsvorschlag
+`e_pruefen`. Es war tatsaechlich eine Testanfrage mit Buchstabensalat - das Modell hat sie als solche
+erkannt.
+
+**Offen ist damit nicht die Erkennung, sondern die Beschriftung.** Eine erkannte Testanfrage bekommt
+heute die Kopfzeile `SPAMVERDACHT - bitte pruefen`. Die Kategorie `unbewertet` gibt es im selben Code
+bereits; eine Testanfrage koennte dorthin laufen, statt als Spam ueberschrieben zu werden. Ob sich
+das lohnt, entscheidet sich an einem echten Fall - **ein einzelner Testlauf ist keine Messgrundlage.**
+
+### Entwurfsstand aufgeraeumt
+
+Der Flow trug einen nicht veroeffentlichten Entwurf. Der Vergleich gegen die aktive Fassung zeigte:
+**kein einziger Unterschied** - 31 Knoten, Verbindungen und Knotengruppen zeichengleich, auch die
+Positionen. Es war ein Autosave vom Oeffnen des Editors um 16:35, eine Minute nach dem Testlauf.
+
+Am 01.09. publiziert, damit `versionId` und `activeVersionId` wieder zusammenfallen. Am Verhalten
+aendert das nichts.
+
+**Kein Ordner im Repo.** Der Flow gehoert zu den KAPA-Digital-Flows ohne eigenen Ordner, es gibt also
+keinen Export. Wenn er weiter angefasst wird, gehoert einer angelegt.

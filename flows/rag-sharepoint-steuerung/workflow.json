@@ -1,0 +1,886 @@
+{
+  "id": "PAqphQur0CTQRypM",
+  "name": "RAG - SharePoint Steuerung",
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "timezone": "Europe/Berlin",
+    "saveDataErrorExecution": "all",
+    "executionTimeout": 3600,
+    "binaryMode": "separate"
+  },
+  "connections": {
+    "Manueller Start": {
+      "main": [
+        [
+          {
+            "node": "Laufart handstart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stuendlich (Delta)": {
+      "main": [
+        [
+          {
+            "node": "Laufart delta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Taeglich (Abgleich)": {
+      "main": [
+        [
+          {
+            "node": "Laufart abgleich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Laufart delta": {
+      "main": [
+        [
+          {
+            "node": "Startbereiche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Laufart abgleich": {
+      "main": [
+        [
+          {
+            "node": "Startbereiche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Laufart handstart": {
+      "main": [
+        [
+          {
+            "node": "Startbereiche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Startbereiche": {
+      "main": [
+        [
+          {
+            "node": "Anker laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anker laden": {
+      "main": [
+        [
+          {
+            "node": "Anker zuordnen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anker zuordnen": {
+      "main": [
+        [
+          {
+            "node": "SharePoint-Bestand",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SharePoint-Bestand": {
+      "main": [
+        [
+          {
+            "node": "Wissensbasis-Bestand",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wissensbasis-Bestand": {
+      "main": [
+        [
+          {
+            "node": "Chunkzahlen laden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunkzahlen laden": {
+      "main": [
+        [
+          {
+            "node": "Aufgaben bestimmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aufgaben bestimmen": {
+      "main": [
+        [
+          {
+            "node": "Etwas zu tun",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etwas zu tun": {
+      "main": [
+        [
+          {
+            "node": "Auftraege auffaechern",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Laufbilanz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auftraege auffaechern": {
+      "main": [
+        [
+          {
+            "node": "Je Auftrag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Je Auftrag": {
+      "main": [
+        [
+          {
+            "node": "Anker sichern",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verarbeitung aufrufen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verarbeitung aufrufen": {
+      "main": [
+        [
+          {
+            "node": "Je Auftrag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anker sichern": {
+      "main": [
+        [
+          {
+            "node": "Ankerzeile bauen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Laufbilanz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ankerzeile bauen": {
+      "main": [
+        [
+          {
+            "node": "Anker fortschreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anker fortschreiben": {
+      "main": [
+        [
+          {
+            "node": "Laufbilanz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Laufbilanz": {
+      "main": [
+        [
+          {
+            "node": "Etwas zurueckgestellt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etwas zurueckgestellt": {
+      "main": [
+        [
+          {
+            "node": "Rueckstellung melden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4a4380cc-7530-40be-944e-35db3ef5f06f",
+      "name": "Manueller Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "la-h",
+              "name": "laufart",
+              "value": "handstart",
+              "type": "string"
+            },
+            {
+              "id": "la-n",
+              "name": "nurDatei",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "la-b",
+              "name": "nurBereich",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "la-m",
+              "name": "maxJeLauf",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "la-v",
+              "name": "verarbeiten",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "la-z",
+              "name": "zustandSchreiben",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "fcd1f210-4190-4d47-8525-b17532464921",
+      "name": "Laufart handstart",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "c7c28df6-c33e-4464-93c7-11484b6e58e3",
+      "name": "Stuendlich (Delta)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "la-d",
+              "name": "laufart",
+              "value": "delta",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "8c1c4cc0-e25b-45e6-91bd-dc908474ac3b",
+      "name": "Laufart delta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "8815dc05-fd73-4882-b27e-c6dcb804b4bf",
+      "name": "Taeglich (Abgleich)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        144
+      ],
+      "notes": "03:30 Ortszeit - der Flow traegt timezone Europe/Berlin, sonst waere es Serverzeit UTC und damit 05:30. Vergleicht den vollstaendigen SharePoint-Bestand gegen die Wissensbasis und findet, was das Delta nicht finden kann."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "la-a",
+              "name": "laufart",
+              "value": "abgleich",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "d10e3c8e-88aa-473e-b5ad-c145d6ca4600",
+      "name": "Laufart abgleich",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// WAS ABGEGLICHEN WIRD\n//\n// Ein Item je Startbereich. Der Startbereich ist ein Ordner auf\n// hoher Ebene; alles darunter kommt ueber den Delta-Abruf mit -\n// die Schleife durch die Ordner ist die Paginierung des Abrufs,\n// kein eigener Abstieg. Weitere Bereiche kommen als weiterer\n// Eintrag in die Liste; der Rest des Flows laeuft je Item.\n//\n// Die Laufart wird gesetzt, nicht geraten: Jeder Trigger fuehrt\n// ueber einen eigenen Set-Knoten hierher. Frueher wurde sie ueber\n// isExecuted dreier Trigger erschlossen, weil n8n beim Handstart\n// den erstbesten Trigger nimmt.\n// ============================================================\nconst e = $input.first().json || {};\nconst laufart = String(e.laufart || 'delta');\n\nconst bereiche = [\n  {\n    bezeichnung: 'Schulungen',\n    driveId: 'b!C2yhEx592Ei36yvay6U9n6Opn9Rg7v1LnJCWDZ9ZCSJEbUEViC4mS52f5_kGkuq_',\n    driveName: 'Documents (Shared Documents) der Untersite Schulungen',\n    siteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet/Schulungen',\n\n    // Leer heisst: ab der Wurzel der Bibliothek. Sonst die Item-ID\n    // des Startordners - alles darunter kommt mit.\n    startordnerId: '',\n\n    audience: 'public'\n  }\n];\n\nconst vorgaben = {\n  // Bilder, Videos, Verknuepfungen und Weblinks bleiben aussen vor -\n  // sie machen zwei Drittel der Bibliothek aus, tragen aber keinen\n  // durchsuchbaren Text.\n  aktiveTypen: ['pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'csv', 'xlsx', 'xls', 'xlsm'],\n  maxDateiMb: 40,\n\n  // Obergrenze je Lauf. Eine grosse PDF braucht mehrere Minuten in\n  // der OCR; ohne Bremse liefe der Abgleich in den Zeitrahmen.\n  // Loeschungen sind billig und bleiben unbegrenzt.\n  //\n  // 15 ist nicht die technische Grenze, sondern die Kostenbremse: Lauf\n  // 113044 las 10 Dokumente in 69 s, im Mittel 5,6 s je Stueck. Der\n  // Zeitrahmen gaebe mehr her - begrenzend ist das Mistral-Kontingent.\n  maxJeLauf: 15,\n\n  // Namensfilter fuer gezielte Nacharbeit. Im Betrieb leer.\n  nurDatei: '',\n\n  verarbeiten: true,\n  loeschungenMelden: true,\n  zustandSchreiben: true\n};\n\n// ------------------------------------------------------------\n// STARTPARAMETER VOM HANDSTART\n//\n// Sie haben Vorrang vor den Vorgaben. So laesst sich eine\n// Urbefuellung anstossen, ohne Code zu aendern: Laufart handstart\n// oeffnen, Grenze hochsetzen, starten.\n//\n// verarbeiten=false und zustandSchreiben=false ergeben zusammen\n// einen Trockenlauf: Der Bestand wird vollstaendig verglichen und\n// die Aufgabenliste gebaut, aber nichts eingelesen und der Anker\n// nicht angefasst. Das ist die Gegenprobe gegen den alten Flow -\n// sie kostet nichts und veraendert nichts.\n// ------------------------------------------------------------\nif (String(e.nurDatei || '').trim()) vorgaben.nurDatei = String(e.nurDatei).trim();\nif (Number(e.maxJeLauf || 0) > 0) vorgaben.maxJeLauf = Number(e.maxJeLauf);\nif (e.verarbeiten === false) vorgaben.verarbeiten = false;\nif (e.zustandSchreiben === false) vorgaben.zustandSchreiben = false;\n\nconst nurBereich = String(e.nurBereich || '').trim().toLowerCase();\nconst gewaehlt = nurBereich\n  ? bereiche.filter(b => String(b.bezeichnung).toLowerCase() === nurBereich)\n  : bereiche;\n\nif (!gewaehlt.length) {\n  throw new Error('STARTBEREICH_UNBEKANNT: ' + (e.nurBereich || '(leer)'));\n}\n\n// Delta liest nur die Aenderungen seit dem Anker. Abgleich und\n// Handstart lesen den vollen Bestand - derselbe Graph-Abruf, nur\n// ohne Anker.\nconst istAbgleich = laufart !== 'delta';\n\nreturn gewaehlt.map(bereich => ({ json: {\n  laufart,\n  istAbgleich,\n  ankerIgnorieren: istAbgleich,\n  lauf_id: String($execution.id),\n  bereich,\n  vorgaben\n} }));"
+      },
+      "id": "6f6f6f7c-1eaa-4a30-b3f4-e19ff83bc3e6",
+      "name": "Startbereiche",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "RbdhNeubkrmgZkOC"
+        },
+        "returnAll": true
+      },
+      "id": "fe84dd3e-26a9-4613-852a-1603718709af",
+      "name": "Anker laden",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        144
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "notes": "Holt alle Ankerzeilen auf einmal statt je Bereich gefiltert. Ein Bereich ohne Ankerzeile - beim ersten Lauf - wuerde sonst kein Ergebnisitem liefern und stillschweigend aus dem Lauf fallen."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Je Bereich den passenden Anker danebenlegen. Fehlt er - erster\n// Lauf eines Bereichs -, bleibt er null und der Abruf holt den\n// vollen Bestand.\nconst bereiche = $('Startbereiche').all().map(i => i.json);\nconst zeilen = $input.all().map(i => i.json || {});\n\nreturn bereiche.map(b => {\n  const zeile = zeilen.find(z => String(z.drive_id || '') === String(b.bereich.driveId)) || {};\n  return { json: Object.assign({}, b, {\n    delta_link: b.ankerIgnorieren ? null : (zeile.delta_link || null),\n    anker_vorhanden: Boolean(zeile.delta_link)\n  }) };\n});"
+      },
+      "id": "4f386a08-5ab9-4320-a8ff-b8c6a9f6f2c5",
+      "name": "Anker zuordnen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.delta_link || (\"https://graph.microsoft.com/v1.0/drives/\" + $json.bereich.driveId + ($json.bereich.startordnerId ? (\"/items/\" + $json.bereich.startordnerId) : \"/root\") + \"/delta?$top=999\") }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{ $response.body[\"@odata.nextLink\"] }}",
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body[\"@odata.nextLink\"] }}",
+              "limitPagesFetched": true,
+              "maxRequests": 40
+            }
+          }
+        }
+      },
+      "id": "e26666c6-ee61-40f2-b219-5deda4d97cc8",
+      "name": "SharePoint-Bestand",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1152,
+        144
+      ],
+      "notes": "Derselbe Abruf fuer beide Betriebsarten: mit Anker liefert Graph nur die Aenderungen, ohne Anker den vollen Bestand ab dem Startordner. Alles unterhalb kommt paginiert nach."
+    },
+    {
+      "parameters": {
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?select=doc_id,file_name,file_path,last_modified_sp,last_ingested_at,word_count&order=doc_id.asc",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "offset",
+                    "value": "={{ $pageCount * 1000 }}"
+                  },
+                  {
+                    "name": "limit",
+                    "value": "1000"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ $response.body.length < 1000 }}",
+              "limitPagesFetched": true,
+              "maxRequests": 40
+            }
+          }
+        }
+      },
+      "id": "6ca0484e-c302-44bb-ba1e-21096c6fadb0",
+      "name": "Wissensbasis-Bestand",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1360,
+        144
+      ],
+      "executeOnce": true,
+      "notes": "PostgREST liefert hoechstens 1 000 Zeilen je Anfrage - ein limit im Querystring hebt das nicht auf, deshalb die Seitenschaltung. Der Bestand ist bereichsuebergreifend, der Knoten laeuft deshalb nur einmal."
+    },
+    {
+      "parameters": {
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&chunk_index=eq.0&select=source_ref&order=source_ref.asc",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "offset",
+                    "value": "={{ $pageCount * 1000 }}"
+                  },
+                  {
+                    "name": "limit",
+                    "value": "1000"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ $response.body.length < 1000 }}",
+              "limitPagesFetched": true,
+              "maxRequests": 5
+            }
+          },
+          "timeout": 20000
+        }
+      },
+      "id": "1dafcf66-b530-4f93-9d82-75eb35342c62",
+      "name": "Chunkzahlen laden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1584,
+        144
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "onError": "continueRegularOutput",
+      "notes": "Sucht den Kopfsatz jedes Dokuments. Antwortet die Abfrage nicht, wird der Befund uebersprungen und alles Vorhandene als vollstaendig behandelt - lieber eine Nacht spaeter nachgeholt als der ganze Abgleich blockiert."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// WAS IST ZU TUN?\n//\n//   DELTA - Graph hat gefiltert. Was kommt, hat sich geaendert.\n//   ABGLEICH - der volle Bestand wird gegen die Wissensbasis\n//   gehalten. Vier Befunde: fehlend, unvollstaendig, veraltet,\n//   verwaist.\n//\n// Das Ergebnis ist eine Liste von Auftraegen - je Datei ein Objekt\n// nach dem Vertrag, den RAG - SharePoint Verarbeitung annimmt.\n// Nichts Binaeres: die Datei holt sich die Verarbeitung selbst.\n//\n// UNVOLLSTAENDIGE EINTRAEGE\n// Der Ingest legt das Dokument an, bevor er die Chunks schreibt.\n// Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks\n// stehen - in der Wissenssuche unsichtbar. Ohne diese Pruefung\n// gaelte er als vorhanden und bliebe fuer immer leer.\n//\n// VORSICHT BEIM VERWAIST-BEFUND\n// Als verwaist gilt nur, was eine Graph-Item-ID traegt und damit\n// nachweislich aus dieser Bibliothek stammt. Dokumente aus der\n// Power-Automate-Zeit bleiben unangetastet. Und geprueft wird nur,\n// wenn der Lauf den vollen Bestand gesehen hat - ein auf einen\n// Bereich oder einen Dateinamen eingeschraenkter Lauf sieht die\n// uebrigen Dokumente nicht und darf sie nicht fuer verwaist halten.\n// ============================================================\nconst laeufe = $('Anker zuordnen').all().map(i => i.json);\nif (!laeufe.length) throw new Error('KEIN_STARTBEREICH');\n\nconst kopf = laeufe[0];\nconst laufart = kopf.laufart;\nconst istAbgleich = Boolean(kopf.istAbgleich);\nconst st = kopf.vorgaben || {};\nconst lauf_id = kopf.lauf_id;\n\nconst aktiv = new Set((st.aktiveTypen || []).map(t => String(t).toLowerCase()));\nconst maxBytes = Number(st.maxDateiMb || 40) * 1048576;\nconst nurDatei = String(st.nurDatei || '').trim().toLowerCase();\n\nconst nachDrive = {};\nfor (const l of laeufe) nachDrive[String(l.bereich.driveId)] = l;\nconst alleBereicheImLauf = laeufe.length > 0 && !nurDatei;\n\n// ------------------------------------------------------------\n// SharePoint-Bestand einsammeln und entdoppeln.\n// Der Delta-Abruf liefert einen Eintrag mehrfach, wenn er sich\n// mehrmals geaendert hat. Zugeordnet wird ueber die driveId am\n// Eintrag; die Seite ohne eigene Eintraege erbt den zuletzt\n// gesehenen Bereich.\n// ------------------------------------------------------------\nconst spNachId = {};\nconst deltaLinks = {};\nlet letzteDrive = String(laeufe[0].bereich.driveId);\n\nfor (const s of $('SharePoint-Bestand').all()) {\n  const b = s.json || {};\n  for (const v of (b.value || [])) {\n    const dv = (v.parentReference && v.parentReference.driveId)\n      ? String(v.parentReference.driveId)\n      : letzteDrive;\n    if (nachDrive[dv]) letzteDrive = dv;\n    spNachId[String(v.id)] = { item: v, driveId: nachDrive[dv] ? dv : letzteDrive };\n  }\n  if (b['@odata.deltaLink']) deltaLinks[letzteDrive] = b['@odata.deltaLink'];\n}\n\nconst spEintraege = Object.keys(spNachId).map(k => spNachId[k]);\n\n// Wissensbasis, entdoppelt\nconst ragNachId = {};\nfor (const i of $('Wissensbasis-Bestand').all()) {\n  const d = i.json;\n  if (d && d.doc_id) ragNachId[String(d.doc_id)] = d;\n}\nconst ragDocs = Object.keys(ragNachId).map(k => ragNachId[k]);\n\n// Chunkpruefung, sofern die Abfrage geantwortet hat\nconst mitChunks = {};\nlet chunkpruefung = false;\nfor (const i of $('Chunkzahlen laden').all()) {\n  const ref = i.json && i.json.source_ref;\n  if (ref) { mitChunks[String(ref)] = true; chunkpruefung = true; }\n}\n\nconst ragNachName = {};\nfor (const d of ragDocs) {\n  const n = String(d.file_name || '').toLowerCase();\n  if (!n) continue;\n  if (!ragNachName[n]) ragNachName[n] = [];\n  ragNachName[n].push(d);\n}\nconst istGraphKennung = (id) => /^01[A-Z0-9]{20,}$/.test(String(id || ''));\n\nfunction endung(name) {\n  const t = String(name || '').split('.');\n  return t.length > 1 ? t.pop().toLowerCase() : '';\n}\nfunction pfadVon(it) {\n  const p = (it.parentReference && it.parentReference.path) || '';\n  const rein = p.replace(/^\\/drives?\\/[^/]+\\/root:?/, '');\n  return (rein ? decodeURIComponent(rein) : '') + '/' + it.name;\n}\nfunction abteilungVon(pfad) {\n  const teile = String(pfad || '').split('/').filter(Boolean);\n  return teile.length > 1 ? teile[0] : null;\n}\n\nfunction auftragAus(it, driveId, grund) {\n  const lauf = nachDrive[driveId] || laeufe[0];\n  const b = lauf.bereich;\n  const ext = endung(it.name);\n  const pfad = pfadVon(it);\n  const erst = (it.createdBy && it.createdBy.user) || {};\n  const letzt = (it.lastModifiedBy && it.lastModifiedBy.user) || {};\n  const gleichnamig = (ragNachName[String(it.name || '').toLowerCase()] || [])\n    .filter(d => String(d.doc_id) !== String(it.id));\n\n  return {\n    aktion: 'einlesen',\n    grund,\n    lauf_id,\n    quelle: 'steuerung-' + laufart,\n\n    item_id: it.id,\n    drive_id: b.driveId,\n    bereich: b.bezeichnung,\n    site_url: b.siteUrl,\n\n    filename: it.name,\n    endung: ext,\n    bytes: Number(it.size || 0),\n    file_path: pfad,\n    department: abteilungVon(pfad),\n    sharepoint_url: it.webUrl || null,\n    author_name: erst.displayName || null,\n    author_email: erst.email || null,\n    last_modified_by: letzt.displayName || null,\n    created_at_sp: it.createdDateTime || null,\n    last_modified_sp: it.lastModifiedDateTime || null,\n    etag: it.eTag || null,\n    audience: b.audience,\n    alt_doc_id: gleichnamig.length === 1 ? String(gleichnamig[0].doc_id) : null\n  };\n}\n\nfunction loeschauftrag(item_id, filename, driveId, grund) {\n  const lauf = nachDrive[driveId] || laeufe[0];\n  return {\n    aktion: 'loeschen',\n    grund,\n    lauf_id,\n    quelle: 'steuerung-' + laufart,\n    item_id,\n    filename: filename || null,\n    drive_id: lauf.bereich.driveId,\n    bereich: lauf.bereich.bezeichnung\n  };\n}\n\nconst auftraege = [];\nconst gesehen = {};\nconst uebersprungen = { falscher_typ: 0, sperrdatei: 0, zu_gross: 0, namensfilter: 0, unveraendert: 0, limit_erreicht: 0 };\nlet geloeschtGemeldet = 0;\nlet unvollstaendig = 0;\n\nconst dateien = [];\nconst spIds = new Set();\n\nfor (const eintrag of spEintraege) {\n  const it = eintrag.item;\n  if (it.deleted) {\n    geloeschtGemeldet++;\n    if (st.loeschungenMelden) {\n      auftraege.push(loeschauftrag(it.id, it.name, eintrag.driveId, 'in SharePoint geloescht'));\n    }\n    continue;\n  }\n  if (!it.file) continue;\n  dateien.push(eintrag);\n  spIds.add(String(it.id));\n}\n\nfor (const eintrag of dateien) {\n  const it = eintrag.item;\n  const ext = endung(it.name);\n  gesehen[ext] = (gesehen[ext] || 0) + 1;\n  if (!aktiv.has(ext)) { uebersprungen.falscher_typ++; continue; }\n  // Office legt beim Oeffnen eine Sperrdatei mit Praefix ~$ an. Sie\n  // traegt dieselbe Endung wie das Dokument, ist aber 162 Byte gross\n  // und enthaelt nur den Namen des Bearbeiters. Ohne diesen Filter\n  // laufen sie durch die OCR und landen als Leerdokumente im Bestand.\n  if (String(it.name || '').indexOf('~$') === 0) { uebersprungen.sperrdatei++; continue; }\n  if (nurDatei && String(it.name || '').toLowerCase().indexOf(nurDatei) === -1) { uebersprungen.namensfilter++; continue; }\n  if (Number(it.size || 0) > maxBytes) { uebersprungen.zu_gross++; continue; }\n\n  const imRag = ragNachId[String(it.id)];\n\n  if (istAbgleich && imRag) {\n    if (chunkpruefung && !mitChunks[String(it.id)]) {\n      unvollstaendig++;\n      auftraege.push(auftragAus(it, eintrag.driveId, 'im RAG ohne Chunks'));\n      continue;\n    }\n    const spZeit = Date.parse(it.lastModifiedDateTime || 0) || 0;\n    const ragZeit = Date.parse(imRag.last_ingested_at || 0) || 0;\n    if (spZeit <= ragZeit) { uebersprungen.unveraendert++; continue; }\n    auftraege.push(auftragAus(it, eintrag.driveId, 'in SharePoint neuer als im RAG'));\n    continue;\n  }\n\n  auftraege.push(auftragAus(it, eintrag.driveId, istAbgleich ? 'fehlt in der Wissensbasis' : 'aus dem Delta'));\n}\n\nconst verwaist = [];\nlet nichtZuordenbar = 0;\nconst verwaistGeprueft = istAbgleich && alleBereicheImLauf;\n\nif (verwaistGeprueft) {\n  for (const d of ragDocs) {\n    const id = String(d.doc_id);\n    if (!istGraphKennung(id)) { nichtZuordenbar++; continue; }\n    if (spIds.has(id)) continue;\n    verwaist.push(loeschauftrag(id, d.file_name, letzteDrive, 'liegt nicht mehr in SharePoint'));\n  }\n  const zuordenbar = ragDocs.length - nichtZuordenbar;\n  if (zuordenbar > 0 && verwaist.length > Math.max(5, zuordenbar * 0.2)) {\n    throw new Error('SICHERUNG: ' + verwaist.length + ' von ' + zuordenbar + ' zuordenbaren Dokumenten gaelten als verwaist. Abgleich abgebrochen.');\n  }\n  for (const v of verwaist) auftraege.push(v);\n}\n\n// Unvollstaendige zuerst: Sie sind bereits angelegt und blockieren\n// sonst dauerhaft einen Platz im Bestand.\nconst max = Number(st.maxJeLauf || 20);\nconst loeschen = auftraege.filter(a => a.aktion === 'loeschen');\nconst luecken = auftraege.filter(a => a.aktion !== 'loeschen' && a.grund === 'im RAG ohne Chunks');\nconst uebrige = auftraege.filter(a => a.aktion !== 'loeschen' && a.grund !== 'im RAG ohne Chunks');\nconst einlesen = luecken.concat(uebrige);\nif (einlesen.length > max) uebersprungen.limit_erreicht = einlesen.length - max;\nconst liste = loeschen.concat(einlesen.slice(0, max));\n\nconst formate = Object.keys(gesehen).sort((a, b) => gesehen[b] - gesehen[a]).map(e => e + ':' + gesehen[e]);\n\nreturn [{ json: {\n  _lauf: {\n    laufart,\n    lauf_id,\n    bereiche: laeufe.map(l => l.bereich.bezeichnung),\n    items_im_bestand: spEintraege.length,\n    dateien: dateien.length,\n    rag_dokumente: ragDocs.length,\n    chunkpruefung_moeglich: chunkpruefung,\n    rag_mit_chunks: Object.keys(mitChunks).length,\n    rag_nicht_zuordenbar: nichtZuordenbar,\n    formate_gesehen: formate,\n    geloescht_gemeldet: geloeschtGemeldet,\n    verwaist_geprueft: verwaistGeprueft,\n    verwaist_gefunden: verwaist.length,\n    unvollstaendig_gefunden: unvollstaendig,\n    fehlend_gesamt: einlesen.length,\n    einzulesen: Math.min(einlesen.length, max),\n    zu_loeschen: loeschen.length,\n    aufgaben_gesamt: liste.length,\n    uebersprungen,\n    delta_links: deltaLinks,\n    delta_link_erhalten: Object.keys(deltaLinks).length > 0,\n    vollabruf: Boolean(kopf.ankerIgnorieren),\n    max_je_lauf: max\n  },\n  auftraege: liste\n} }];"
+      },
+      "id": "25d8ba42-5b1f-4691-bf8d-1d9bad4319c8",
+      "name": "Aufgaben bestimmen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "t1",
+              "leftValue": "={{ $('Anker zuordnen').first().json.vorgaben.verarbeiten }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "t2",
+              "leftValue": "={{ $json.auftraege.length }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "rightValue": 0
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0cffaab6-dbee-4e2c-91ff-3df011c15dd6",
+      "name": "Etwas zu tun",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2032,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return ($input.first().json.auftraege || []).map(a => ({ json: a }));"
+      },
+      "id": "a7007a4c-f4ad-4a4d-833e-713c210a9f71",
+      "name": "Auftraege auffaechern",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "416ec5d5-dd27-41db-810c-e464ac2bf033",
+      "name": "Je Auftrag",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        48
+      ],
+      "notes": "Ein Auftrag je Durchlauf. Die Verarbeitung nimmt genau ein Dokument an; mehrere Auftraege in einem Aufruf wuerden zu einem, der Rest fiele lautlos weg."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "coDhu7pIaI2bpmGZ",
+          "cachedResultName": "RAG - SharePoint Verarbeitung"
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "1c89e129-e319-4700-8e8f-3db0434f2093",
+      "name": "Verarbeitung aufrufen",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2688,
+        160
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Ein Aufruf je Auftrag, es wird auf das Ergebnis gewartet - die Laufbilanz braucht es. Bei Fehler laeuft die Schleife weiter: ein Dokument, das die Verarbeitung reisst, darf nicht den ganzen Lauf kosten. Die Bilanz zaehlt solche Faelle als Fehler."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1",
+              "leftValue": "={{ $('Anker zuordnen').first().json.vorgaben.zustandSchreiben }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a2",
+              "leftValue": "={{ $('Aufgaben bestimmen').first().json._lauf.delta_link_erhalten }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2ad88353-4f6c-43af-826d-84d35fff02f4",
+      "name": "Anker sichern",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2688,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Je Bereich eine Zeile. Der Anker rueckt nur vor, wenn tatsaechlich\n// verarbeitet wurde - ein Trockenlauf laesst ihn stehen, sonst gingen\n// ungelesene Aenderungen verloren.\nconst lauf = $('Aufgaben bestimmen').first().json._lauf;\nconst bereiche = $('Anker zuordnen').all().map(i => i.json.bereich);\nconst links = lauf.delta_links || {};\n\nreturn bereiche\n  .filter(b => links[String(b.driveId)])\n  .map(b => ({ json: {\n    drive_id: b.driveId,\n    drive_name: b.driveName,\n    delta_link: links[String(b.driveId)],\n    letzte_items: lauf.items_im_bestand,\n    letzte_uebergeben: lauf.aufgaben_gesamt\n  } }));"
+      },
+      "id": "b88fb0ab-fd65-4b43-a335-606e60a0bb09",
+      "name": "Ankerzeile bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "RbdhNeubkrmgZkOC"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "drive_id",
+              "keyValue": "={{ $json.drive_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "drive_id"
+          ],
+          "schema": [],
+          "value": {
+            "drive_id": "={{ $json.drive_id }}",
+            "drive_name": "={{ $json.drive_name }}",
+            "delta_link": "={{ $json.delta_link }}",
+            "aktualisiert_am": "={{ $now.toISO() }}",
+            "letzte_items": "={{ $json.letzte_items }}",
+            "letzte_uebergeben": "={{ $json.letzte_uebergeben }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "e33c4d55-9bb4-47c2-b609-c1a54db6a7ec",
+      "name": "Anker fortschreiben",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3120,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// WAS DER LAUF GETAN HAT\n//\n// In einer splitInBatches-Schleife liefert $('Node').all() nur den\n// letzten Durchlauf. Der zweite Parameter ist der Durchlaufindex; er\n// wird hochgezaehlt, bis kein Durchlauf mehr kommt.\n//\n// Frueher mussten dafuer fuenf verschiedene Enden der Verarbeitung\n// eingesammelt werden. Die Verarbeitung liefert jetzt genau eine\n// Antwortform - gesammelt wird nur noch an einer Stelle.\n// ============================================================\nfunction sammle(name) {\n  const raus = [];\n  for (let i = 0; i < 2000; i++) {\n    let items;\n    try { items = $(name).all(0, i); } catch (e) { break; }\n    if (!items || !items.length) break;\n    for (const it of items) raus.push(it.json || {});\n  }\n  return raus;\n}\n\nconst kopf = $('Anker zuordnen').first().json;\nconst lauf = $('Aufgaben bestimmen').first().json._lauf || {};\nconst auftraege = $('Aufgaben bestimmen').first().json.auftraege || [];\n\nconst alle = sammle('Verarbeitung aufrufen');\n\n// Bei Fehler laeuft die Schleife weiter; der Knoten legt dann ein\n// Item mit error ab, statt einer Antwort nach dem Vertrag.\nconst geplatzt = alle.filter(e => e && e.error !== undefined && e.error !== null);\nconst ergebnisse = alle.filter(e => e && (e.error === undefined || e.error === null));\n\nconst mit = (s) => ergebnisse.filter(e => e.status === s);\nconst eingelesen = mit('eingelesen');\nconst unveraendert = mit('unveraendert');\nconst geloescht = mit('geloescht');\nconst zurueckgestellt = mit('zurueckgestellt');\nconst uebersprungen = mit('uebersprungen');\nconst fehler = mit('fehler').concat(geplatzt);\n\nfunction kurz(e) {\n  const name = e.filename || e.doc_id || '?';\n  const grund = e.grund || e.roh_status || (e.error && (e.error.message || e.error)) || 'unbekannt';\n  return name + ': ' + String(grund).slice(0, 160);\n}\n\nconst mappen = ergebnisse.filter(e => e.blaetter_tabelle || e.blaetter_text);\n\nreturn [{ json: {\n  laufart: lauf.laufart,\n  lauf_id: lauf.lauf_id,\n  bereiche: lauf.bereiche,\n\n  gesehen: {\n    items_im_bestand: lauf.items_im_bestand,\n    dateien: lauf.dateien,\n    rag_dokumente: lauf.rag_dokumente,\n    rag_nicht_zuordenbar: lauf.rag_nicht_zuordenbar,\n    formate: lauf.formate_gesehen\n  },\n\n  geplant: {\n    einzulesen: lauf.einzulesen,\n    zu_loeschen: lauf.zu_loeschen,\n    verwaist_geprueft: lauf.verwaist_geprueft,\n    verwaist_gefunden: lauf.verwaist_gefunden,\n    geloescht_gemeldet: lauf.geloescht_gemeldet,\n    max_je_lauf: lauf.max_je_lauf,\n    uebersprungen: lauf.uebersprungen\n  },\n\n  ergebnis: {\n    neu_oder_geaendert: eingelesen.length,\n    unveraendert: unveraendert.length,\n    geloescht: geloescht.length,\n    uebersprungen: uebersprungen.length,\n    zurueckgestellt: zurueckgestellt.length,\n    fehler: fehler.length,\n    antworten_gesamt: alle.length\n  },\n\n  woerter_eingelesen: eingelesen.reduce((s, e) => s + (Number(e.woerter) || 0), 0),\n  chunks_geschrieben: eingelesen.reduce((s, e) => s + (Number(e.chunks) || 0), 0),\n  bilder_erkannt: eingelesen.reduce((s, e) => s + (Number(e.bilder) || 0), 0),\n\n  arbeitsmappen: mappen.map(m => ({\n    datei: m.filename,\n    als_tabelle: m.blaetter_tabelle,\n    als_text: m.blaetter_text\n  })),\n\n  uebersprungene: uebersprungen.map(kurz),\n  zurueckgestellte: zurueckgestellt.slice(0, 20).map(kurz),\n  fehlerdetails: fehler.slice(0, 10).map(kurz),\n\n  anker_geschrieben: Boolean(kopf.vorgaben.zustandSchreiben) && Boolean(lauf.delta_link_erhalten),\n  auftragsliste: auftraege.slice(0, 40).map(a => a.aktion + ' | ' + (a.grund || '-') + ' | ' + (a.filename || a.item_id))\n} }];"
+      },
+      "id": "22a56d41-5acf-4f92-bac3-69e8d59f8b43",
+      "name": "Laufbilanz",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3552,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "zg1",
+              "leftValue": "={{ $json.ergebnis.zurueckgestellt }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "rightValue": 0
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "da32dbbe-6f65-4c92-a232-997ea795362f",
+      "name": "Etwas zurueckgestellt",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3776,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "6341837340",
+        "text": "=[ZURUECKGESTELLT] {{ $workflow.name }}\n\nDer Abgleich ist sauber durchgelaufen, aber {{ $json.ergebnis.zurueckgestellt }} Datei(en) blieben liegen.\n\nEingelesen:      {{ $json.ergebnis.neu_oder_geaendert }}\nZurueckgestellt: {{ $json.ergebnis.zurueckgestellt }}\nFehler:          {{ $json.ergebnis.fehler }}\n\n{{ $json.zurueckgestellte.join(String.fromCharCode(10)).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;') }}\n\nLauf:    {{ $execution.id }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "0df22a11-8c1d-4f4a-9753-6f80ee8e5362",
+      "name": "Rueckstellung melden",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4000,
+        160
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "webhookId": "40991570-a240-4fbd-828f-7cab6016553f",
+      "onError": "continueRegularOutput",
+      "notes": "Ein zurueckgestellter Lauf ist gruen, der Error Trigger feuert also nicht - ohne diese Meldung staende die liegengebliebene Arbeit nur in der Bilanz. Gesendet wird als HTML, und die Dateiliste wird maskiert: Der Unterstrich in KONTINGENT_ERSCHOEPFT blieb ohne Gegenstueck und liess den Versand mit can't parse entities scheitern."
+    }
+  ],
+  "nodeGroups": [],
+  "description": "Findet, was in SharePoint neu, geaendert oder geloescht ist, und ruft je Datei RAG - SharePoint Verarbeitung auf. Stuendlich als Delta, nachts als voller Abgleich, von Hand als Urbefuellung."
+}

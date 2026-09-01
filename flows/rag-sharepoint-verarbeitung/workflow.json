@@ -1,0 +1,2877 @@
+{
+  "id": "coDhu7pIaI2bpmGZ",
+  "name": "RAG - SharePoint Ingest",
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "timezone": "Europe/Berlin",
+    "saveDataErrorExecution": "all",
+    "executionTimeout": 3600,
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate"
+  },
+  "connections": {
+    "Auftrag": {
+      "main": [
+        [
+          {
+            "node": "Vorgaben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vorgaben": {
+      "main": [
+        [
+          {
+            "node": "Auftrag pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auftrag pruefen": {
+      "main": [
+        [
+          {
+            "node": "Was tun",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Was tun": {
+      "main": [
+        [
+          {
+            "node": "Datei holen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Blattnamen holen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Delete Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datei holen": {
+      "main": [
+        [
+          {
+            "node": "Normalize SharePoint Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blattnamen holen": {
+      "main": [
+        [
+          {
+            "node": "Blaetter auffaechern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blaetter auffaechern": {
+      "main": [
+        [
+          {
+            "node": "Blattwerte holen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blattwerte holen": {
+      "main": [
+        [
+          {
+            "node": "Tabelle als CSV bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tabelle als CSV bauen": {
+      "main": [
+        [
+          {
+            "node": "Blattdaten brauchbar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blattdaten brauchbar": {
+      "main": [
+        [
+          {
+            "node": "CSV nach Datei",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSV nach Datei": {
+      "main": [
+        [
+          {
+            "node": "Normalize SharePoint Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize SharePoint Input": {
+      "main": [
+        [
+          {
+            "node": "Route File Family",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route File Family": {
+      "main": [
+        [
+          {
+            "node": "Upload Source To Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route Spreadsheet Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Decode Text Like File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Unsupported Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Spreadsheet Type": {
+      "main": [
+        [
+          {
+            "node": "Normalize CSV Encoding",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract XLS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract XLSX XLSM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract ODS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Unsupported Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize CSV Encoding": {
+      "main": [
+        [
+          {
+            "node": "Extract CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract CSV": {
+      "main": [
+        [
+          {
+            "node": "Build Tabular Canonical Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract XLS": {
+      "main": [
+        [
+          {
+            "node": "Build Tabular Canonical Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract XLSX XLSM": {
+      "main": [
+        [
+          {
+            "node": "Build Tabular Canonical Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract ODS": {
+      "main": [
+        [
+          {
+            "node": "Build Tabular Canonical Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Source To Mistral": {
+      "main": [
+        [
+          {
+            "node": "Get Mistral Signed URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dienst nicht verfuegbar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Mistral Signed URL": {
+      "main": [
+        [
+          {
+            "node": "Build Mistral OCR Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dienst nicht verfuegbar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Mistral OCR Request": {
+      "main": [
+        [
+          {
+            "node": "Mistral OCR And Visual Annotations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral OCR And Visual Annotations": {
+      "main": [
+        [
+          {
+            "node": "Build OCR Canonical Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dienst nicht verfuegbar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build OCR Canonical Content": {
+      "main": [
+        [
+          {
+            "node": "IF Content Usable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Tabular Canonical Content": {
+      "main": [
+        [
+          {
+            "node": "IF Content Usable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decode Text Like File": {
+      "main": [
+        [
+          {
+            "node": "IF Content Usable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Content Usable": {
+      "main": [
+        [
+          {
+            "node": "Create Source Binary Hash",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Extraction Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dienst nicht verfuegbar": {
+      "main": [
+        [
+          {
+            "node": "Log Ingest Error To Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Unsupported Error": {
+      "main": [
+        [
+          {
+            "node": "Log Ingest Error To Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Extraction Error": {
+      "main": [
+        [
+          {
+            "node": "Log Ingest Error To Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Ingest Error To Supabase": {
+      "main": [
+        [
+          {
+            "node": "Ingest Error Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Source Binary Hash": {
+      "main": [
+        [
+          {
+            "node": "Get Existing SharePoint Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing SharePoint Source": {
+      "main": [
+        [
+          {
+            "node": "Normalize Source State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Source State": {
+      "main": [
+        [
+          {
+            "node": "Check Existing SharePoint Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing SharePoint Chunks": {
+      "main": [
+        [
+          {
+            "node": "Decide Rebuild Or Skip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Rebuild Or Skip": {
+      "main": [
+        [
+          {
+            "node": "IF Rebuild Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Rebuild Required": {
+      "main": [
+        [
+          {
+            "node": "Build Provisional Source Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build No Change Touch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Provisional Source Row": {
+      "main": [
+        [
+          {
+            "node": "Provisional Upsert SharePoint Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Provisional Upsert SharePoint Source": {
+      "main": [
+        [
+          {
+            "node": "Build Source Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Source Context": {
+      "main": [
+        [
+          {
+            "node": "Build Image Upload Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Image Upload Plan": {
+      "main": [
+        [
+          {
+            "node": "IF Has Extracted Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Has Extracted Images": {
+      "main": [
+        [
+          {
+            "node": "Expand Images",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Extracted Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand Images": {
+      "main": [
+        [
+          {
+            "node": "Convert Extracted Image To Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Extracted Image To Binary": {
+      "main": [
+        [
+          {
+            "node": "Restore Image Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Image Metadata": {
+      "main": [
+        [
+          {
+            "node": "Upload Extracted Image To Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Extracted Image To Supabase": {
+      "main": [
+        [
+          {
+            "node": "Build Uploaded Image Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Uploaded Image Metadata": {
+      "main": [
+        [
+          {
+            "node": "Collect Uploaded Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build No Change Touch": {
+      "main": [
+        [
+          {
+            "node": "Touch Unchanged Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Touch Unchanged Source": {
+      "main": [
+        [
+          {
+            "node": "No Change Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Uploaded Images": {
+      "main": [
+        [
+          {
+            "node": "Build All SharePoint Chunk Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Extracted Images": {
+      "main": [
+        [
+          {
+            "node": "Build All SharePoint Chunk Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build All SharePoint Chunk Rows": {
+      "main": [
+        [
+          {
+            "node": "Prepare Embedding Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Embedding Batches": {
+      "main": [
+        [
+          {
+            "node": "Embedding Batch Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding Batch Loop": {
+      "main": [
+        [
+          {
+            "node": "Build Stale Chunk Cleanup Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI Embedding Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embedding Batch": {
+      "main": [
+        [
+          {
+            "node": "Build Embedded Chunk Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Embedded Chunk Batch": {
+      "main": [
+        [
+          {
+            "node": "Bulk Upsert SharePoint Chunk Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Upsert SharePoint Chunk Batch": {
+      "main": [
+        [
+          {
+            "node": "Embedding Batch Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding Batch Status": {
+      "main": [
+        [
+          {
+            "node": "Embedding Batch Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Stale Chunk Cleanup Request": {
+      "main": [
+        [
+          {
+            "node": "Delete Stale SharePoint Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Stale SharePoint Chunks": {
+      "main": [
+        [
+          {
+            "node": "Plan SharePoint Storage Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan SharePoint Storage Cleanup": {
+      "main": [
+        [
+          {
+            "node": "IF Has Stale Storage Objects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Has Stale Storage Objects": {
+      "main": [
+        [
+          {
+            "node": "Delete Stale SharePoint Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Storage Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Stale SharePoint Image": {
+      "main": [
+        [
+          {
+            "node": "Collect Storage Delete Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Storage Delete Results": {
+      "main": [
+        [
+          {
+            "node": "Build Final SharePoint Source Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Storage Cleanup": {
+      "main": [
+        [
+          {
+            "node": "Build Final SharePoint Source Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Final SharePoint Source Row": {
+      "main": [
+        [
+          {
+            "node": "Finalize SharePoint Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize SharePoint Source": {
+      "main": [
+        [
+          {
+            "node": "Workflow Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Delete Context": {
+      "main": [
+        [
+          {
+            "node": "Get Delete SharePoint Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Delete SharePoint Source": {
+      "main": [
+        [
+          {
+            "node": "Get Delete SharePoint Image Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Delete SharePoint Image Chunks": {
+      "main": [
+        [
+          {
+            "node": "Build Delete Storage Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Delete Storage Plan": {
+      "main": [
+        [
+          {
+            "node": "IF Delete Has Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Delete Has Storage": {
+      "main": [
+        [
+          {
+            "node": "Delete SharePoint Storage Object",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Delete Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete SharePoint Storage Object": {
+      "main": [
+        [
+          {
+            "node": "Collect Delete Storage Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Delete Storage Results": {
+      "main": [
+        [
+          {
+            "node": "Delete All SharePoint Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Delete Storage": {
+      "main": [
+        [
+          {
+            "node": "Delete All SharePoint Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete All SharePoint Chunks": {
+      "main": [
+        [
+          {
+            "node": "Delete SharePoint Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete SharePoint Source": {
+      "main": [
+        [
+          {
+            "node": "Delete Workflow Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Summary": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Change Summary": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Workflow Summary": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingest Error Summary": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "cfc7ce85-6b79-4882-839e-b2838121cdcb",
+      "name": "Auftrag",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -928,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// DER EINE AUSGANG\n//\n// Alle Wege der Verarbeitung muenden hier: eingelesen, unveraendert,\n// geloescht, zurueckgestellt, uebersprungen, fehlgeschlagen. Frueher\n// sprangen vier verschiedene Enden zurueck in die Schleife des\n// Scanners; die Steuerung liest jetzt genau eine Antwortform.\n// ============================================================\nconst e = $input.first().json || {};\n\nlet auftrag = {};\ntry { auftrag = $('Auftrag pruefen').first().json || {}; } catch (err) {}\n\nconst roh = String(e.status || '');\n\nlet status = 'fehler';\nif (roh === 'DONE_INSERTED' || roh === 'DONE_UPDATED') status = 'eingelesen';\nelse if (roh === 'DONE_NO_CHANGE') status = 'unveraendert';\nelse if (roh === 'DONE_DELETED') status = 'geloescht';\nelse if (roh.indexOf('DEFERRED_') === 0) status = 'zurueckgestellt';\nelse if (roh.indexOf('SKIPPED_') === 0) status = 'uebersprungen';\nelse if (e._uebersprungen) status = 'uebersprungen';\n\nconst grund = e._uebersprungen\n  || e.error_code\n  || e.rebuild_reason\n  || roh\n  || null;\n\nreturn [{ json: {\n  status,\n  doc_id: e.doc_id || auftrag.doc_id || null,\n  filename: e.filename || auftrag.filename || null,\n  aktion: auftrag.aktion || null,\n  grund,\n  chunks: Number(e.expected_chunk_count || e.deleted_chunk_count || 0),\n  bilder: Number(e.image_count || 0),\n  woerter: Number(e.word_count || 0),\n  lauf_id: auftrag.lauf_id || null,\n  auftrag_grund: auftrag.grund || null,\n\n  // Arbeitsmappen: welche Blaetter als Tabelle und welche als Text\n  // gelesen wurden, damit die Laufbilanz es ausweisen kann.\n  blaetter_tabelle: e._blaetter_tabelle || null,\n  blaetter_text: e._blaetter_text || null,\n  hinweise: e._hinweise || null,\n\n  roh_status: roh || null,\n  fertig_am: e.finished_at || new Date().toISOString()\n} }];"
+      },
+      "id": "77a8f4af-7bc4-4322-9ab4-01f933c4ca58",
+      "name": "Ergebnis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10800,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// VORGABEN DER VERARBEITUNG\n// Alles, was nicht vom einzelnen Auftrag abhaengt: Chunkgroesse,\n// Modelle, Speicherort - und das Formatwissen, welche Endung ueber\n// die PDF-Wandlung und welche ueber die Workbook-API laeuft.\n// Frueher hiess dieser Knoten Config.\n// ============================================================\nconst config = {\n  flowVersion: 'sharepoint-verarbeitung-v1',\n  embeddingModel: 'text-embedding-3-small',\n  embeddingDimensions: 1536,\n  chunkSize: 1600,\n  chunkOverlap: 200,\n  embeddingBatchSize: 50,\n  mistralModel: 'mistral-ocr-latest',\n  storageBucket: 'rag',\n  storagePublicBase: 'https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/public/rag/',\n  defaultAudience: 'public',\n  minBodyLength: 20,\n  sharePointSiteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet',\n\n  // Word und PowerPoint laesst Graph selbst nach PDF wandeln - sie\n  // laufen dann durch dieselbe OCR-Strecke wie die PDFs.\n  ueberPdf: ['docx', 'doc', 'pptx', 'ppt'],\n\n  // Arbeitsmappen ueber die Workbook-API, weil der Extract-Node nur\n  // ein Blatt kennt und die uebrigen lautlos weglaesst.\n  ueberWorkbook: ['xlsx', 'xlsm'],\n\n  maxZeilenJeBlatt: 5000\n};\n\nreturn $input.all().map(item => ({\n  json: { ...item.json, _config: config },\n  binary: item.binary\n}));"
+      },
+      "id": "b078a46b-20a5-4974-a2a9-17043d8974c4",
+      "name": "Vorgaben",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// DER AUFTRAG\n//\n// Ein Objekt je Datei, gebaut von der Steuerung. Nichts Binaeres\n// ueberquert die Flowgrenze - die Datei wird hier beschafft, nicht\n// uebergeben. Das ersetzt Normalize SharePoint Event und den\n// groessten Teil von Normalize SharePoint Input: Beide mussten ein\n// Dutzend Feldnamen erraten, weil Power Automate sie unterschiedlich\n// schrieb. Der Vertrag kennt genau einen Namen je Feld.\n// ============================================================\nconst a = $input.first().json || {};\nconst cfg = a._config || {};\n\nfunction txt(v) {\n  if (v === undefined || v === null) return null;\n  const s = String(v).trim();\n  return s ? s : null;\n}\n\nconst aktion = String(a.aktion || '').trim().toLowerCase();\nif (aktion !== 'einlesen' && aktion !== 'loeschen') {\n  throw new Error('AUFTRAG_AKTION_UNGUELTIG: ' + (a.aktion || '(leer)'));\n}\n\nconst item_id = txt(a.item_id);\nif (!item_id) throw new Error('AUFTRAG_ITEM_ID_FEHLT');\n\nconst drive_id = txt(a.drive_id);\nif (!drive_id && aktion === 'einlesen') throw new Error('AUFTRAG_DRIVE_ID_FEHLT: ' + item_id);\n\nconst filename = txt(a.filename) || 'unbenannt';\nconst endung = String(txt(a.endung) || filename.split('.').pop() || '').toLowerCase();\n\nconst ueberPdf = new Set(cfg.ueberPdf || []);\nconst ueberWorkbook = new Set(cfg.ueberWorkbook || []);\n\n// Laesst Graph die Datei nach PDF wandeln, ist der Inhalt ein PDF -\n// unabhaengig davon, was der Dateiname sagt. Frueher wurde das an den\n// ersten Base64-Zeichen erraten; hier ist es bekannt.\nconst als_pdf = aktion === 'einlesen' && ueberPdf.has(endung);\nconst als_mappe = aktion === 'einlesen' && ueberWorkbook.has(endung);\nconst ext = als_pdf ? 'pdf' : endung;\n\nconst mimeByExt = {\n  pdf: 'application/pdf',\n  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n  doc: 'application/msword',\n  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',\n  ppt: 'application/vnd.ms-powerpoint',\n  csv: 'text/csv',\n  xls: 'application/vnd.ms-excel',\n  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',\n  xlsm: 'application/vnd.ms-excel.sheet.macroEnabled.12',\n  ods: 'application/vnd.oasis.opendocument.spreadsheet',\n  txt: 'text/plain', md: 'text/markdown', markdown: 'text/markdown', log: 'text/plain',\n  json: 'application/json', xml: 'application/xml', html: 'text/html', htm: 'text/html',\n  ics: 'text/calendar', rtf: 'application/rtf',\n  png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg',\n  tif: 'image/tiff', tiff: 'image/tiff', webp: 'image/webp', avif: 'image/avif'\n};\n\nconst documentAi = new Set(['pdf', 'docx', 'pptx', 'doc', 'ppt', 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp', 'avif']);\nconst spreadsheet = new Set(['csv', 'xls', 'xlsx', 'xlsm', 'ods']);\nconst textLike = new Set(['txt', 'md', 'markdown', 'log', 'json', 'xml', 'html', 'htm', 'ics', 'rtf']);\n\nlet route_group = 'unsupported';\nif (als_mappe) route_group = 'spreadsheet';\nelse if (documentAi.has(ext)) route_group = 'document_ai';\nelse if (spreadsheet.has(ext)) route_group = 'spreadsheet';\nelse if (textLike.has(ext)) route_group = 'text';\n\n// Drei Wege: ueber den Dateiinhalt, ueber die Workbook-API, oder gar\n// nicht, weil geloescht wird.\nlet weg = 'datei';\nif (aktion === 'loeschen') weg = 'loeschen';\nelse if (als_mappe) weg = 'arbeitsmappe';\n\nconst imageExts = new Set(['png', 'jpg', 'jpeg', 'tif', 'tiff', 'webp', 'avif']);\n\n// Die Dokument-URL kommt aus dem Graph-Bestand mit. Fehlt sie, wird\n// sie aus Site und Pfad gebaut - ohne sie ist ein Treffer fuer den\n// Anwender nicht anklickbar.\nfunction dokumentUrl() {\n  const direkt = txt(a.sharepoint_url);\n  if (direkt && /^https?:\\/\\//i.test(direkt)) return { url: direkt, quelle: 'uebergeben' };\n  const site = txt(a.site_url) || txt(cfg.sharePointSiteUrl);\n  const pfad = txt(a.file_path);\n  if (site && pfad) {\n    const rein = pfad.replace(/^\\/+/, '');\n    const kodiert = /%[0-9A-Fa-f]{2}/.test(rein) ? rein : rein.split('/').map(s => encodeURIComponent(s)).join('/');\n    return { url: site.replace(/\\/+$/, '') + '/' + kodiert, quelle: 'site_und_pfad' };\n  }\n  return { url: null, quelle: 'nicht_ableitbar' };\n}\nconst url = dokumentUrl();\n\nconst erlaubteAudience = new Set(['public', 'it_internal']);\nconst rohAudience = String(txt(a.audience) || '').toLowerCase();\nconst audience = erlaubteAudience.has(rohAudience)\n  ? rohAudience\n  : (erlaubteAudience.has(String(cfg.defaultAudience || '')) ? cfg.defaultAudience : 'it_internal');\n\nreturn [{ json: {\n  aktion,\n  weg,\n\n  doc_id: item_id,\n  file_id: item_id,\n  item_id,\n  drive_id,\n  site_id: txt(a.site_id),\n  site_url: txt(a.site_url) || txt(cfg.sharePointSiteUrl),\n\n  filename,\n  title: filename.replace(/\\.[^/.]+$/, ''),\n  endung,\n  ext,\n  fileType: ext,\n  original_extension: endung,\n  als_pdf,\n  ueber_pdf_gewandelt: als_pdf,\n  mime_type: mimeByExt[ext] || 'application/octet-stream',\n  mimeType: mimeByExt[ext] || 'application/octet-stream',\n  route_group,\n  mistral_document_type: imageExts.has(ext) ? 'image_url' : 'document_url',\n\n  file_path: txt(a.file_path),\n  sharepoint_url: url.url,\n  sharepoint_url_quelle: url.quelle,\n  department: txt(a.department),\n  author_name: txt(a.author_name),\n  author_email: txt(a.author_email),\n  last_modified_by: txt(a.last_modified_by),\n  created_at_sp: txt(a.created_at_sp),\n  last_modified_sp: txt(a.last_modified_sp),\n  document_version: txt(a.etag) || txt(a.document_version),\n  bytes: Number(a.bytes || 0),\n  tags: Array.isArray(a.tags) ? a.tags : [],\n  language: txt(a.language) || 'de',\n  sensitivity_label: txt(a.sensitivity_label),\n  audience,\n  alt_doc_id: txt(a.alt_doc_id),\n\n  grund: txt(a.grund),\n  lauf_id: txt(a.lauf_id),\n  quelle: txt(a.quelle) || 'steuerung',\n  sharepoint_crud_intent: aktion === 'loeschen' ? 'DELETE' : 'UPSERT',\n\n  flow_version: cfg.flowVersion || 'sharepoint-verarbeitung-v1',\n  _config: cfg,\n  geprueft_am: new Date().toISOString()\n} }];"
+      },
+      "id": "007e9f8a-8821-43d2-acf4-de8c14229397",
+      "name": "Auftrag pruefen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "w1",
+                    "leftValue": "={{ $json.weg }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "datei"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "w2",
+                    "leftValue": "={{ $json.weg }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "arbeitsmappe"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "w3",
+                    "leftValue": "={{ $json.weg }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "loeschen"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f1111aa2-b249-43b7-8c61-24455f519597",
+      "name": "Was tun",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"/items/\" + $json.item_id + \"/content\" + ($json.als_pdf ? \"?format=pdf\" : \"\") }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "18aa263c-f802-4ced-bc26-2dc62c6ca89d",
+      "name": "Datei holen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        448,
+        -176
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "notes": "Wiederholung als Absicherung gegen Netzabbrueche beim Herunterladen. Word und PowerPoint kommen ueber ?format=pdf schon gewandelt an."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// METADATEN NEBEN DIE DATEI LEGEN\n//\n// Der HTTP-Knoten und die Dateiwandlung ersetzen das JSON durch die\n// Binaerdaten. Hier kommen die Auftragsdaten wieder daneben.\n//\n// Beim Arbeitsmappen-Weg gelten die Angaben aus Tabelle als CSV\n// bauen: dort heisst die Datei anders und ist eine CSV geworden.\n//\n// Der Knoten behaelt seinen alten Namen, weil neun Knoten der\n// Verarbeitung ihn ueber $('Normalize SharePoint Input') lesen.\n//\n// FILEBASE64CLEAN\n// Der Inhaltshash entscheidet, ob ein Dokument neu aufgebaut wird.\n// Gebildet wurde er bisher ueber den Base64-Text der Datei. Wuerde\n// hier etwas anderes gehasht, gaelte jedes Dokument im Bestand als\n// geaendert und liefe erneut durch die OCR. Der Wert wird deshalb\n// aus den Binaerdaten wiederhergestellt - dieselbe Zeichenkette wie\n// frueher, nur ohne den Umweg ueber die Flowgrenze.\n// ============================================================\nlet meta = null;\ntry {\n  const m = $('Tabelle als CSV bauen').first().json;\n  if (m && m._mappe) meta = m;\n} catch (e) {}\nif (!meta) meta = $('Auftrag pruefen').first().json;\n\nconst rest = Object.assign({}, meta);\ndelete rest.csv_base64;\n\nlet fileBase64Clean = null;\ntry {\n  const buf = await this.helpers.getBinaryDataBuffer(0, 'data');\n  fileBase64Clean = buf.toString('base64');\n} catch (e) {\n  throw new Error('DATEI_BINAER_FEHLT: ' + (rest.filename || rest.doc_id || '?'));\n}\n\nreturn $input.all().map(item => ({\n  json: Object.assign({}, rest, {\n    fileBase64Clean,\n    normalized_at: new Date().toISOString()\n  }),\n  binary: item.binary\n}));"
+      },
+      "id": "fe06feae-c26d-4f80-a7e2-1503adab0d8b",
+      "name": "Normalize SharePoint Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"/items/\" + $json.item_id + \"/workbook/worksheets?$select=name,position,visibility\" }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "id": "1960fb63-4344-42d9-b178-71e1a18c676a",
+      "name": "Blattnamen holen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        64
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Jedes Blatt wird ein eigenes Item, damit der folgende Abruf je\n// Blatt einmal laeuft. Ausgeblendete Blaetter bleiben aussen vor -\n// sie sind bewusst versteckt.\nconst antwort = $input.first().json || {};\nconst a = $('Auftrag pruefen').first().json;\n\nif (antwort.error || !antwort.value) {\n  const grund = antwort.error ? String(antwort.error.message || antwort.error).slice(0, 160) : 'KEINE_ANTWORT';\n  return [{ json: Object.assign({}, a, { blatt: null, blatt_fehler: grund, blaetter_gesamt: 0, blatt_index: 0 }) }];\n}\n\nconst alle = antwort.value || [];\nconst sichtbar = alle.filter(w => !w.visibility || w.visibility === 'Visible');\n\nif (!sichtbar.length) {\n  return [{ json: Object.assign({}, a, { blatt: null, blatt_fehler: 'KEINE_SICHTBAREN_BLAETTER', blaetter_gesamt: 0, blatt_index: 0 }) }];\n}\n\nreturn sichtbar\n  .sort((x, y) => Number(x.position || 0) - Number(y.position || 0))\n  .map((w, i) => ({ json: Object.assign({}, a, {\n    blatt: w.name,\n    blatt_index: i,\n    blaetter_gesamt: sichtbar.length,\n    blaetter_alle: alle.length,\n    blatt_fehler: null\n  }) }));"
+      },
+      "id": "55869d7d-15a4-4320-b9b7-3942800b4f99",
+      "name": "Blaetter auffaechern",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.blatt ? (\"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"/items/\" + $json.item_id + \"/workbook/worksheets/\" + encodeURIComponent($json.blatt) + \"/usedRange(valuesOnly=true)?$select=values,address,rowCount,columnCount\") : (\"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"?$select=id\") }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "id": "0b72eb88-d8f9-42a4-a0ba-2d3f88c854a4",
+      "name": "Blattwerte holen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        448,
+        64
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// ARBEITSMAPPE AUFBEREITEN\n//\n// Nicht jedes Blatt einer Arbeitsmappe ist eine Tabelle. Es gibt\n// Deckblaetter, Notizen, ausgefuellte Formulare und Layouts. Wer\n// dort blind die erste Zeile als Kopfzeile nimmt, erzeugt Unsinn.\n//\n// Und selbst echte Tabellen fangen selten in Zeile 1 an. Ueber der\n// Kopfzeile stehen Titel, Stand-Angaben oder Leerzeilen. Deshalb\n// wird die Kopfzeile in den ersten Zeilen gesucht statt angenommen.\n//\n// Tabellenblaetter kommen mit ihren echten Spalten, alles andere als\n// Text unter Blatt, Zeile und Inhalt. Beides landet in derselben\n// CSV, damit eine Datei ein Dokument bleibt.\n// ============================================================\nconst a = $('Auftrag pruefen').first().json;\nconst cfg = a._config || {};\nconst maxZeilen = Number(cfg.maxZeilenJeBlatt || 5000);\nconst SUCHTIEFE = 8;\n\nfunction text(v) { return v === null || v === undefined ? '' : String(v).trim(); }\nfunction istZahl(v) {\n  const s = text(v);\n  return s !== '' && !isNaN(Number(s.replace(/\\./g, '').replace(',', '.')));\n}\n\nfunction kopfGuete(werte, i) {\n  const zeile = werte[i] || [];\n  const gefuellt = zeile.filter(c => text(c) !== '');\n  if (gefuellt.length < 2) return 0;\n  const zahlanteil = gefuellt.filter(istZahl).length / gefuellt.length;\n  if (zahlanteil > 0.5) return 0;\n  const eindeutig = new Set(gefuellt.map(c => text(c).toLowerCase())).size;\n  if (eindeutig < gefuellt.length * 0.8) return 0;\n  if (gefuellt.filter(c => text(c).length > 120).length) return 0;\n  const probe = werte.slice(i + 1, i + 21);\n  if (probe.length < 2) return 0;\n  const schnitt = probe.reduce((s, z) => s + z.filter(c => text(c) !== '').length, 0) / probe.length;\n  if (schnitt / gefuellt.length < 0.3) return 0;\n  return gefuellt.length * Math.min(schnitt / gefuellt.length, 1) * 100 - i;\n}\n\nconst eingang = $input.all();\nconst tabellen = [];\nconst notizen = [];\nconst hinweise = [];\n\nfor (let i = 0; i < eingang.length; i++) {\n  const j = eingang[i].json || {};\n  const meta = $('Blaetter auffaechern').all()[i];\n  const name = (meta && meta.json.blatt) || j.blatt || ('Blatt ' + (i + 1));\n\n  if (meta && meta.json.blatt_fehler) { hinweise.push(name + ': ' + meta.json.blatt_fehler); continue; }\n  if (j.error) { hinweise.push(name + ': ' + String(j.error.message || j.error).slice(0, 120)); continue; }\n\n  const alle = Array.isArray(j.values) ? j.values : [];\n  const werte = alle.filter(z => z.some(c => text(c) !== ''));\n  if (!werte.length) { hinweise.push(name + ': leer'); continue; }\n  if (werte.length > maxZeilen + 1) hinweise.push(name + ': auf ' + maxZeilen + ' von ' + (werte.length - 1) + ' Zeilen begrenzt');\n\n  let besteZeile = -1;\n  let besteGuete = 0;\n  for (let k = 0; k < Math.min(SUCHTIEFE, werte.length - 2); k++) {\n    const g = kopfGuete(werte, k);\n    if (g > besteGuete) { besteGuete = g; besteZeile = k; }\n  }\n\n  if (besteZeile >= 0) {\n    const kopf = werte[besteZeile].map((c, k) => text(c) || ('Spalte ' + (k + 1)));\n    const davor = werte.slice(0, besteZeile)\n      .map((z, k) => ({ nr: k + 1, inhalt: z.map(text).filter(Boolean).join('  |  ') }))\n      .filter(z => z.inhalt);\n    if (davor.length) notizen.push({ name: name + ' (Kopfbereich)', zeilen: davor });\n    if (besteZeile > 0) hinweise.push(name + ': Kopfzeile in Zeile ' + (besteZeile + 1) + ' gefunden');\n    tabellen.push({ name, kopf, zeilen: werte.slice(besteZeile + 1, besteZeile + 1 + maxZeilen) });\n  } else {\n    const zeilen = werte.slice(0, maxZeilen).map((z, k) => ({\n      nr: k + 1,\n      inhalt: z.map(text).filter(Boolean).join('  |  ')\n    })).filter(z => z.inhalt);\n    if (zeilen.length) {\n      notizen.push({ name, zeilen });\n      hinweise.push(name + ': als Text uebernommen, keine Tabellenstruktur erkannt');\n    }\n  }\n}\n\nif (!tabellen.length && !notizen.length) {\n  return [{ json: Object.assign({}, a, { _uebersprungen: 'KEINE_BLATTDATEN', _hinweise: hinweise }) }];\n}\n\nconst spalten = [];\nconst bekannt = new Set();\nfor (const b of tabellen) {\n  for (const s of b.kopf) { if (!bekannt.has(s)) { bekannt.add(s); spalten.push(s); } }\n}\nif (notizen.length) {\n  for (const s of ['Zeile', 'Inhalt']) { if (!bekannt.has(s)) { bekannt.add(s); spalten.push(s); } }\n}\n\nfunction feld(v) {\n  const t = v === null || v === undefined ? '' : String(v);\n  return /[\",\\n\\r]/.test(t) ? '\"' + t.replace(/\"/g, '\"\"') + '\"' : t;\n}\n\nconst ausgabe = [['Blatt'].concat(spalten).map(feld).join(',')];\nlet zeilenTabelle = 0;\nlet zeilenText = 0;\n\nfor (const b of tabellen) {\n  const nachSpalte = {};\n  b.kopf.forEach((s, k) => { if (nachSpalte[s] === undefined) nachSpalte[s] = k; });\n  for (const z of b.zeilen) {\n    if (!z.some(c => text(c) !== '')) continue;\n    const reihe = [b.name].concat(spalten.map(s => {\n      const k = nachSpalte[s];\n      return k === undefined ? '' : z[k];\n    }));\n    ausgabe.push(reihe.map(feld).join(','));\n    zeilenTabelle++;\n  }\n}\n\nfor (const b of notizen) {\n  for (const z of b.zeilen) {\n    const reihe = [b.name].concat(spalten.map(s => {\n      if (s === 'Zeile') return z.nr;\n      if (s === 'Inhalt') return z.inhalt;\n      return '';\n    }));\n    ausgabe.push(reihe.map(feld).join(','));\n    zeilenText++;\n  }\n}\n\nconst csv = ausgabe.join('\\n');\nconst art = tabellen.length && notizen.length ? 'Tabellen und Text'\n          : tabellen.length ? 'alle Blaetter'\n          : 'als Text';\nconst basis = String(a.filename || '').replace(/\\.[^/.]+$/, '');\nconst csvName = basis + ' (' + a.endung + ', ' + art + ').csv';\n\n// Ab hier ist das Dokument eine CSV - Name, Endung und Weg werden\n// umgestellt, damit die Extraktionsstrecke sie richtig behandelt.\nreturn [{ json: Object.assign({}, a, {\n  _mappe: true,\n  csv_base64: Buffer.from(csv, 'utf8').toString('base64'),\n  filename: csvName,\n  title: csvName.replace(/\\.[^/.]+$/, ''),\n  ext: 'csv',\n  fileType: 'csv',\n  mime_type: 'text/csv',\n  mimeType: 'text/csv',\n  route_group: 'spreadsheet',\n  ueber_pdf_gewandelt: false,\n  _blaetter_tabelle: tabellen.map(b => b.name),\n  _blaetter_text: notizen.map(b => b.name),\n  _zeilen_tabelle: zeilenTabelle,\n  _zeilen_text: zeilenText,\n  _hinweise: hinweise\n}) }];"
+      },
+      "id": "c58bbb72-343a-4ef5-914e-f87859f3834c",
+      "name": "Tabelle als CSV bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b1",
+              "leftValue": "={{ $json._uebersprungen }}",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "96cedd89-4024-4375-9094-5538480dd225",
+      "name": "Blattdaten brauchbar",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "csv_base64",
+        "options": {
+          "fileName": "={{ $json.filename }}",
+          "mimeType": "text/csv"
+        }
+      },
+      "id": "6dfa980b-7c35-4942-80c8-dcf26aa01d08",
+      "name": "CSV nach Datei",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "rf-1",
+                    "leftValue": "={{ $json.route_group }}",
+                    "rightValue": "document_ai",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DOCUMENT_AI"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "rf-2",
+                    "leftValue": "={{ $json.route_group }}",
+                    "rightValue": "spreadsheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SPREADSHEET"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "rf-3",
+                    "leftValue": "={{ $json.route_group }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "TEXT"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "UNSUPPORTED"
+        }
+      },
+      "id": "b8f5a698-2474-410a-98b1-6b417a2f29d6",
+      "name": "Route File Family",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1792,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "rs-1",
+                    "leftValue": "={{ $json.ext === 'xlsm' ? 'xlsx' : $json.ext }}",
+                    "rightValue": "csv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CSV"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "rs-2",
+                    "leftValue": "={{ $json.ext === 'xlsm' ? 'xlsx' : $json.ext }}",
+                    "rightValue": "xls",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "XLS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "rs-3",
+                    "leftValue": "={{ $json.ext === 'xlsm' ? 'xlsx' : $json.ext }}",
+                    "rightValue": "xlsx",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "XLSX"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "rs-4",
+                    "leftValue": "={{ $json.ext === 'xlsm' ? 'xlsx' : $json.ext }}",
+                    "rightValue": "ods",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ODS"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "UNSUPPORTED"
+        }
+      },
+      "id": "42e88aea-d436-4312-b09f-484b54d01293",
+      "name": "Route Spreadsheet Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2208,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const binField = 'data';\n\n// Zeichen 0xFEFF ist die Byte-Order-Mark. Frueher stand hier ein Regex\n// mit Unicode-Escape; als Zeichencode-Pruefung ist dasselbe Verhalten\n// sichtbar im Code, statt als unsichtbares Zeichen darin zu stehen.\nfunction ohneBom(text) {\n  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;\n}\n\nfunction normalizeBuffer(buf) {\n  if (buf.length >= 3 && buf[0] === 0xEF && buf[1] === 0xBB && buf[2] === 0xBF) {\n    return buf.slice(3);\n  }\n  if (buf.length >= 2 && buf[0] === 0xFF && buf[1] === 0xFE) {\n    return Buffer.from(ohneBom(buf.slice(2).toString('utf16le')), 'utf8');\n  }\n  if (buf.length >= 2 && buf[0] === 0xFE && buf[1] === 0xFF) {\n    const src = buf.slice(2);\n    const swapped = Buffer.alloc(src.length);\n    for (let i = 0; i + 1 < src.length; i += 2) {\n      swapped[i] = src[i + 1];\n      swapped[i + 1] = src[i];\n    }\n    return Buffer.from(ohneBom(swapped.toString('utf16le')), 'utf8');\n  }\n  return Buffer.from(ohneBom(buf.toString('utf8')), 'utf8');\n}\n\nfor (let i = 0; i < items.length; i++) {\n  const oldBin = items[i].binary?.[binField];\n  if (!oldBin) throw new Error('CSV_BINARY_' + binField + '_MISSING');\n  const buf = await this.helpers.getBinaryDataBuffer(i, binField);\n  const cleaned = normalizeBuffer(buf);\n  items[i].binary[binField] = await this.helpers.prepareBinaryData(\n    cleaned,\n    oldBin.fileName || 'file.csv',\n    'text/csv'\n  );\n}\nreturn items;"
+      },
+      "id": "77ae2b19-7965-4a41-b013-81659c4b5c97",
+      "name": "Normalize CSV Encoding",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2512,
+        -272
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ae145ffa-12c4-4522-804e-050e36b61755",
+      "name": "Extract CSV",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        2752,
+        -272
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "options": {}
+      },
+      "id": "e578f7f6-86f4-400a-9f09-d2337f2c40ca",
+      "name": "Extract XLS",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "2a7813c8-0a06-441b-b31b-065757e081e1",
+      "name": "Extract XLSX XLSM",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "ods",
+        "options": {}
+      },
+      "id": "627f4fac-11b9-4c5f-84f1-51d6bcb04146",
+      "name": "Extract ODS",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize SharePoint Input').first().json;\nconst rows = $input.all().map(item => item.json || {});\nconst schema = Array.from(new Set(\n  rows.flatMap(row => Object.keys(row).map(key => key.trim()).filter(Boolean))\n));\n\nfunction printable(value) {\n  if (value === null || value === undefined) return '';\n  if (typeof value === 'string') return value.trim();\n  if (typeof value === 'number' || typeof value === 'boolean') return String(value);\n  try { return JSON.stringify(value); } catch { return String(value); }\n}\n\nconst header = [\n  '[SHAREPOINT-TABELLE] ' + input.filename,\n  'Dokument-ID: ' + input.doc_id,\n  'Format: ' + String(input.ext).toUpperCase(),\n  'Zeilen: ' + rows.length,\n  'Spalten: ' + (schema.join(', ') || '[keine]'),\n  input.file_path ? 'Pfad: ' + input.file_path : '',\n  input.department ? 'Bereich: ' + input.department : '',\n  input.sharepoint_url ? 'SharePoint-URL: ' + input.sharepoint_url : ''\n].filter(Boolean).join('\\n');\n\nconst rowText = rows.map((row, index) => {\n  const fields = schema\n    .map(key => {\n      const value = printable(row[key]);\n      return value ? '- ' + key + ': ' + value : '';\n    })\n    .filter(Boolean)\n    .join('\\n');\n  return '### Zeile ' + (index + 1) + '\\n' + (fields || '- [Leere Zeile]');\n}).join('\\n\\n');\n\nconst body_length = rowText.trim().length;\nconst content_text = (header + '\\n\\n' + (rowText || '[Keine Tabellenzeilen extrahiert.]')).trim();\n\nreturn [{\n  json: {\n    ...input,\n    content_text,\n    body_length,\n    content_type: 'relational',\n    word_count: content_text.split(/\\s+/).filter(Boolean).length,\n    raw_images: [],\n    links: [],\n    schema,\n    row_count: rows.length,\n    extraction_model: 'n8n-extract-from-file',\n    extraction_mode: 'spreadsheet'\n  }\n}];"
+      },
+      "id": "b195a150-e4c9-485e-a0a9-619fc2a718e6",
+      "name": "Build Tabular Canonical Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3104,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize SharePoint Input').first().json;\nconst buf = await this.helpers.getBinaryDataBuffer(0, 'data');\n\n// Zeichen 0xFEFF ist die Byte-Order-Mark. Frueher stand hier ein Regex\n// mit Unicode-Escape; als Zeichencode-Pruefung ist dasselbe Verhalten\n// sichtbar im Code, statt als unsichtbares Zeichen darin zu stehen.\nfunction ohneBom(text) {\n  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;\n}\n\nfunction decode(buffer) {\n  if (buffer.length >= 3 && buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {\n    return buffer.slice(3).toString('utf8');\n  }\n  if (buffer.length >= 2 && buffer[0] === 0xFF && buffer[1] === 0xFE) {\n    return ohneBom(buffer.slice(2).toString('utf16le'));\n  }\n  if (buffer.length >= 2 && buffer[0] === 0xFE && buffer[1] === 0xFF) {\n    const src = buffer.slice(2);\n    const swapped = Buffer.alloc(src.length);\n    for (let i = 0; i + 1 < src.length; i += 2) {\n      swapped[i] = src[i + 1];\n      swapped[i + 1] = src[i];\n    }\n    return ohneBom(swapped.toString('utf16le'));\n  }\n  return ohneBom(buffer.toString('utf8'));\n}\n\nfunction decodeEntities(text) {\n  const entities = { '&nbsp;': ' ', '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '\"', '&#39;': \"'\" };\n  return text.replace(/&(nbsp|amp|lt|gt|quot|#39);/gi, match => entities[match.toLowerCase()] || match);\n}\n\nlet text = decode(buf).replace(/\\r\\n?/g, '\\n');\nconst ext = input.ext;\n\nif (ext === 'html' || ext === 'htm') {\n  text = text\n    .replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, ' ')\n    .replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi, ' ')\n    .replace(/<(br|\\/p|\\/div|\\/li|\\/tr|h[1-6])\\b[^>]*>/gi, '\\n')\n    .replace(/<[^>]+>/g, ' ');\n  text = decodeEntities(text);\n} else if (ext === 'rtf') {\n  text = text\n    .replace(/\\\\par[d]?/g, '\\n')\n    .replace(/\\\\'[0-9a-fA-F]{2}/g, ' ')\n    .replace(/\\\\[a-zA-Z]+-?\\d* ?/g, ' ')\n    .replace(/[{}]/g, ' ');\n} else if (ext === 'json') {\n  try { text = JSON.stringify(JSON.parse(text), null, 2); } catch {}\n}\n\ntext = text\n  .replace(/[ \\t]+\\n/g, '\\n')\n  .replace(/\\n{4,}/g, '\\n\\n\\n')\n  .trim();\n\nconst body_length = text.length;\n\nconst header = [\n  '[SHAREPOINT-TEXTDOKUMENT] ' + input.filename,\n  'Dokument-ID: ' + input.doc_id,\n  'Format: ' + String(input.ext).toUpperCase(),\n  input.file_path ? 'Pfad: ' + input.file_path : '',\n  input.department ? 'Bereich: ' + input.department : '',\n  input.sharepoint_url ? 'SharePoint-URL: ' + input.sharepoint_url : ''\n].filter(Boolean).join('\\n');\n\nconst content_text = (header + '\\n\\n' + (text || '[Kein verwertbarer Textinhalt extrahiert.]')).trim();\n\nreturn [{\n  json: {\n    ...input,\n    content_text,\n    body_length,\n    content_type: 'semantic',\n    word_count: content_text.split(/\\s+/).filter(Boolean).length,\n    raw_images: [],\n    links: [],\n    schema: [],\n    extraction_model: 'internal-text-decoder',\n    extraction_mode: 'text'\n  }\n}];"
+      },
+      "id": "c06c13a0-c565-42eb-b97c-a92d24f65403",
+      "name": "Decode Text Like File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize SharePoint Input').first().json;\nconst now = new Date().toISOString();\n\nreturn [{\n  json: {\n    error_row: {\n      source_type: 'sharepoint',\n      source_ref: input.doc_id,\n      workflow_step: 'Route File Family',\n      error_type: 'UNSUPPORTED_FILE_TYPE',\n      error_message: 'Nicht unterstuetztes SharePoint-Dateiformat: ' + (input.ext || '[ohne Erweiterung]'),\n      error_detail: {\n        filename: input.filename,\n        extension: input.ext,\n        mime_type: input.mime_type,\n        route_group: input.route_group\n      },\n      retry_count: 0,\n      max_retries: 0,\n      next_retry_at: null,\n      resolved_at: null,\n      resolved_by: null,\n      raw_payload: {\n        doc_id: input.doc_id,\n        filename: input.filename,\n        file_path: input.file_path,\n        sharepoint_url: input.sharepoint_url\n      },\n      created_at: now\n    },\n    summary: {\n      ok: true,\n      status: 'SKIPPED_UNSUPPORTED',\n      doc_id: input.doc_id,\n      filename: input.filename,\n      extension: input.ext,\n      mime_type: input.mime_type,\n      route_group: input.route_group,\n      finished_at: now\n    }\n  }\n}];"
+      },
+      "id": "cfd8b06b-444d-477e-a995-e1e41ec2770a",
+      "name": "Build Unsupported Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2608,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "purpose",
+              "value": "ocr"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cd40054b-11cf-4bc3-870d-66be3470bab8",
+      "name": "Upload Source To Mistral",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2112,
+        -688
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput",
+      "notes": "Ist das Mistral-Kontingent erschoepft, wirft die API die Verbindung weg statt einen 403 zu senden. Der Node meldet dann ECONNRESET mit der Meldung The connection to the server was closed unexpectedly - und die drei Wiederholungen laufen alle ins Leere. Das sieht wie ein Netzproblem aus, ist aber eines der Abrechnung. Belegt am 30.08. in Lauf 110988: reproduzierbarer Abbruch nach 35 Sekunden bei einer 490 kB grossen Datei, waehrend das Kontingent laut Mistral zu 100 Prozent aufgebraucht und die API pausiert war."
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiry",
+              "value": "24"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "45801da7-d091-41db-a7fc-496feafad5cc",
+      "name": "Get Mistral Signed URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2336,
+        -848
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize SharePoint Input').first().json;\nconst signed = $input.first().json;\nconst url = signed.url;\n\nif (!url) throw new Error('MISTRAL_SIGNED_URL_MISSING');\n\nconst annotationSchema = {\n  name: 'sharepoint_visual_annotation',\n  description:\n    'AUSSCHLIESSLICH AUF DEUTSCH. ' +\n    'Beschreibe das visuelle Element sachlich und nur anhand sichtbar erkennbarer Inhalte. ' +\n    'Keine Ursachen oder Loesungen erfinden. ' +\n    'Keine Vermutungen ueber Systeme, Produkte oder Prozesse. ' +\n    'Die gesamte Beschreibung soll kompakt bleiben und insgesamt moeglichst nicht mehr als 1200 Zeichen umfassen.',\n\n  schema: {\n    type: 'object',\n    properties: {\n      image_type: {\n        type: 'string',\n        description:\n          'Art des visuellen Elements, z. B. Screenshot, Diagramm, Foto, Formular, UI oder Skizze. Maximal 100 Zeichen.'\n      },\n\n      short_description: {\n        type: 'string',\n        description:\n          'Kurze deutsche Beschreibung der Kernaussage in maximal zwei Saetzen und maximal 250 Zeichen.'\n      },\n\n      detailed_description: {\n        type: 'string',\n        description:\n          'Praezise und kompakte deutsche Beschreibung relevanter sichtbar erkennbarer Inhalte. ' +\n          'Keine allgemeinen Erklaerungen, keine Vermutungen und keine Wiederholung der Kurzbeschreibung. ' +\n          'Maximal 450 Zeichen.'\n      },\n\n      visible_text: {\n        type: 'string',\n        description:\n          'Nur relevanter eindeutig sichtbarer Text, Fehlercodes, Bezeichnungen, Buttons, Felder und Werte. ' +\n          'Nicht den gesamten Bildinhalt transkribieren. Nichts ergaenzen. Maximal 300 Zeichen. ' +\n          'KEINE PERSONENBEZOGENEN DATEN uebernehmen: keine Klarnamen, Benutzernamen, Benutzer-IDs, ' +\n          'Personalnummern, E-Mail-Adressen, Telefonnummern oder Unterschriften. ' +\n          'Solche Angaben durch die Platzhalter [NAME], [BENUTZER-ID] oder [KONTAKT] ersetzen.'\n      },\n\n      document_relevance: {\n        type: 'string',\n        description:\n          'Warum dieses Bild im Dokument relevant ist, nur soweit aus Dokument und Bild eindeutig ableitbar. ' +\n          'Maximal ein Satz und maximal 150 Zeichen.'\n      }\n    },\n\n    required: [\n      'image_type',\n      'short_description',\n      'detailed_description',\n      'visible_text',\n      'document_relevance'\n    ],\n\n    additionalProperties: false\n  },\n\n  strict: true\n};\n\nconst type = input.mistral_document_type;\n\nconst document = type === 'image_url'\n  ? {\n      type: 'image_url',\n      image_url: url\n    }\n  : {\n      type: 'document_url',\n      document_url: url\n    };\n\nreturn [{\n  json: {\n    ocrBody: {\n      model: input._config?.mistralModel || 'mistral-ocr-latest',\n      document,\n      table_format: 'markdown',\n      bbox_annotation_format: {\n        type: 'json_schema',\n        json_schema: annotationSchema\n      },\n      include_image_base64: true\n    }\n  }\n}];"
+      },
+      "id": "30aef9a4-7a6c-4d73-acc2-53d0e5fbe4b9",
+      "name": "Build Mistral OCR Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2624,
+        -1056
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.ocrBody }}",
+        "options": {}
+      },
+      "id": "28880baf-5dfd-4a18-b117-8bfc2fdc24e8",
+      "name": "Mistral OCR And Visual Annotations",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2832,
+        -1056
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize SharePoint Input').first().json;\nconst response = $input.first().json || {};\nconst pages = Array.isArray(response.pages) ? response.pages : [];\n\nfunction safeObject(value) {\n  if (value && typeof value === 'object' && !Array.isArray(value)) return value;\n  if (typeof value === 'string') {\n    const trimmed = value.trim();\n    if (!trimmed) return {};\n    try {\n      const parsed = JSON.parse(trimmed);\n      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;\n      if (Array.isArray(parsed)) return { descriptions: parsed };\n    } catch {}\n    return { short_description: trimmed };\n  }\n  if (Array.isArray(value)) return { descriptions: value };\n  return {};\n}\n\nfunction annotationText(annotation) {\n  const a = safeObject(annotation);\n  const parts = [];\n  const fields = [\n    ['Bildtyp', a.image_type],\n    ['Kurzbeschreibung', a.short_description],\n    ['Detailbeschreibung', a.detailed_description],\n    ['Sichtbarer Text', a.visible_text],\n    ['Dokumentbezug', a.document_relevance]\n  ];\n  for (const pair of fields) {\n    const label = pair[0];\n    const value = pair[1];\n    if (value !== undefined && value !== null && String(value).trim()) {\n      parts.push(label + ': ' + String(value).trim());\n    }\n  }\n  if (Array.isArray(a.descriptions)) {\n    const text = a.descriptions.map(v => String(v).trim()).filter(Boolean).join(' | ');\n    if (text) parts.push('Beschreibung: ' + text);\n  }\n  return parts.join('\\n') || 'Keine belastbare Bildbeschreibung vorhanden.';\n}\n\nfunction dataMime(dataUri, fallback) {\n  const match = String(dataUri || '').match(/^data:([^;]+);base64,/i);\n  return (match && match[1]) || fallback || 'image/png';\n}\nfunction dataBase64(dataUri) {\n  return String(dataUri || '').replace(/^data:[^;]+;base64,/i, '').replace(/\\s/g, '');\n}\n\nconst rawImages = [];\nconst links = [];\nconst pageTexts = [];\nconst tableTexts = [];\n\nfor (const page of pages) {\n  const pageIndex = Number.isInteger(page?.index) ? page.index : pageTexts.length;\n  let markdown = String(page?.markdown || '');\n\n  for (const link of (Array.isArray(page?.hyperlinks) ? page.hyperlinks : [])) {\n    const normalized = typeof link === 'string' ? { url: link } : link;\n    if (normalized && normalized.url) links.push({ page_index: pageIndex, ...normalized });\n  }\n\n  for (const image of (Array.isArray(page?.images) ? page.images : [])) {\n    const id = String(image?.id || image?.name || ('page-' + pageIndex + '-image-' + rawImages.length));\n    const annotation = safeObject(image?.image_annotation ?? image?.annotation);\n    const annotation_text = annotationText(annotation);\n    const imageBase64 = dataBase64(image?.image_base64);\n    const mime = dataMime(image?.image_base64, 'image/png');\n\n    if (imageBase64) {\n      rawImages.push({\n        page_index: pageIndex,\n        mistral_image_id: id,\n        image_base64_clean: imageBase64,\n        image_mime: mime,\n        annotation,\n        annotation_text,\n        origin: 'mistral_bbox'\n      });\n    }\n\n    const escaped = id.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n    const placeholder = new RegExp('!?\\\\[[^\\\\]]*\\\\]\\\\(' + escaped + '\\\\)', 'g');\n    // Im Fliesstext steht nur ein kurzer Verweis. Die vollstaendige Annotation\n    // liegt im zugehoerigen image_attachment-Chunk. Frueher wurde der komplette\n    // Annotationstext hier eingesetzt - dadurch lag er doppelt im Index und\n    // verdraengte in bildlastigen Dokumenten den eigentlichen Dokumenttext.\n    const verweisText = String(annotation.short_description || '').trim();\n    const verweisTyp = String(annotation.image_type || 'Bild').trim();\n    const verweis = verweisText\n      ? '[VISUELLES ELEMENT ' + id + ' | ' + verweisTyp + ': ' + verweisText.slice(0, 200) + ']'\n      : '[VISUELLES ELEMENT ' + id + ' | ' + verweisTyp + ']';\n\n    markdown = markdown.replace(placeholder, '\\n\\n' + verweis + '\\n');\n  }\n\n  for (const table of (Array.isArray(page?.tables) ? page.tables : [])) {\n    const tableId = String(table?.id || ('page-' + pageIndex + '-table-' + tableTexts.length));\n    const content = String(table?.content || '').trim();\n    if (content) tableTexts.push('### ' + tableId + '\\n' + content);\n  }\n\n  if (markdown.trim()) pageTexts.push('## Seite ' + (pageIndex + 1) + '\\n' + markdown.trim());\n}\n\n// Eigenstaendige Bilddateien: Die Steuerung liest sie derzeit nicht ein,\n// der Zweig greift also nicht. Ohne Base64 in der Uebergabe - die Datei\n// kommt jetzt binaer - wird das Originalbild nur noch aufgenommen, wenn\n// es tatsaechlich vorliegt, statt einen leeren Eintrag zu erzeugen.\nif (input.mistral_document_type === 'image_url' && input.fileBase64Clean) {\n  const existsOriginal = rawImages.some(img => img.origin === 'source_image');\n  if (!existsOriginal) {\n    const visibleText = pageTexts.join('\\n\\n').trim();\n    const annotation = {\n      image_type: 'Quelldatei / Bild',\n      short_description: visibleText\n        ? 'Eigenstaendige Bilddatei aus SharePoint; erkannter Bildtext ist in der Annotation enthalten.'\n        : 'Eigenstaendige Bilddatei aus SharePoint.',\n      detailed_description: 'Das vollstaendige Originalbild wird fuer spaetere Ausgabe und Nachvollziehbarkeit gespeichert.',\n      visible_text: visibleText || 'Kein belastbarer OCR-Text erkannt.',\n      document_relevance: 'Das Bild ist selbst das SharePoint-Dokument ' + input.filename + '.'\n    };\n    rawImages.unshift({\n      page_index: 0,\n      mistral_image_id: 'source-image',\n      image_base64_clean: input.fileBase64Clean,\n      image_mime: input.mime_type,\n      annotation,\n      annotation_text: annotationText(annotation),\n      origin: 'source_image'\n    });\n  }\n}\n\nlet content = pageTexts.join('\\n\\n').trim();\nif (tableTexts.length) {\n  content += (content ? '\\n\\n' : '') + '---\\n\\n## Tabellen\\n\\n' + tableTexts.join('\\n\\n');\n}\n\nconst body_length = content.trim().length;\n\nconst header = [\n  '[SHAREPOINT-DOKUMENT] ' + input.filename,\n  'Dokument-ID: ' + input.doc_id,\n  input.file_path ? 'Pfad: ' + input.file_path : '',\n  input.department ? 'Bereich: ' + input.department : '',\n  (input.tags && input.tags.length) ? 'Tags: ' + input.tags.join(', ') : '',\n  input.sharepoint_url ? 'SharePoint-URL: ' + input.sharepoint_url : ''\n].filter(Boolean).join('\\n');\n\nconst content_text = (header + '\\n\\n' + (content || '[Kein verwertbarer Textinhalt extrahiert.]')).trim();\nconst word_count = content_text.trim().split(/\\s+/).filter(Boolean).length;\n\nreturn [{\n  json: {\n    ...input,\n    content_text,\n    body_length: rawImages.length > 0 ? Math.max(body_length, 200) : body_length,\n    content_type: 'semantic',\n    word_count,\n    raw_images: rawImages,\n    links,\n    schema: [],\n    extraction_model: response.model || input._config?.mistralModel || 'mistral-ocr-latest',\n    extraction_mode: 'document_ai',\n    page_count: pages.length\n  }\n}];"
+      },
+      "id": "6df38e22-49f3-408f-b16e-2abe57128c85",
+      "name": "Build OCR Canonical Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3136,
+        -1072
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c-usable",
+              "leftValue": "={{ $json.body_length }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "04ea2b30-7387-462e-b2a6-d6eec50b62a7",
+      "name": "IF Content Usable",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3344,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Faellt ein Aufruf der OCR-Strecke aus, wird die Aufgabe zurueckgestellt,\n// statt den ganzen Lauf zu reissen. Die Schleife der Steuerung laeuft weiter,\n// die Laufbilanz entsteht, und der Delta-Anker wird fortgeschrieben.\n//\n// Uebernommen wird ausschliesslich die Fehlermeldung, der Knotenname und\n// der HTTP-Code. Das Rohobjekt bleibt aussen vor - n8n legt darin bei\n// HTTP-Fehlern das komplette Request-Objekt samt Zugangsdaten ab.\nconst roh = $input.first().json || {};\nconst fehler = roh.error || roh;\n\nconst nachricht = String(fehler.message || roh.message || 'unbekannter Fehler');\nconst httpCode = String(fehler.httpCode || roh.httpCode || '');\n// Der Fehlerausgang liefert weder Knotennamen noch HTTP-Code mit -\n// gemessen in Lauf 111419. Verlaesslich ist nur $prevNode.\nlet knoten = (fehler.node && fehler.node.name) || '';\nif (!knoten) { try { knoten = $prevNode.name; } catch (e) {} }\nif (!knoten) knoten = 'Mistral';\n\nlet einordnung = 'DIENST_GESTOERT';\nif (httpCode === '402' || /payment required/i.test(nachricht)) einordnung = 'KONTINGENT_ERSCHOEPFT';\nelse if (httpCode === '429') einordnung = 'RATE_LIMIT';\nelse if (httpCode === '401' || httpCode === '403') einordnung = 'ZUGANG';\nelse if (/ECONNRESET|socket hang up|closed unexpectedly/i.test(nachricht)) einordnung = 'KONTINGENT_ERSCHOEPFT';\n\nlet input = {};\ntry { input = $('Normalize SharePoint Input').first().json || {}; } catch (e) {}\n\nconst now = new Date().toISOString();\nconst kennung = einordnung + ' an ' + knoten + (httpCode ? ' (HTTP ' + httpCode + ')' : '');\n\nreturn [{\n  json: {\n    error_row: {\n      source_type: 'sharepoint',\n      source_ref: input.doc_id || null,\n      workflow_step: knoten,\n      error_type: einordnung,\n      error_message: 'OCR-Strecke nicht verfuegbar: ' + nachricht.slice(0, 300),\n      error_detail: {\n        filename: input.filename || null,\n        extension: input.ext || null,\n        http_code: httpCode || null,\n        node: knoten\n      },\n      retry_count: 0,\n      max_retries: 0,\n      next_retry_at: null,\n      resolved_at: null,\n      resolved_by: null,\n      raw_payload: {\n        doc_id: input.doc_id || null,\n        filename: input.filename || null,\n        file_path: input.file_path || null,\n        sharepoint_url: input.sharepoint_url || null\n      },\n      created_at: now\n    },\n    summary: {\n      ok: false,\n      zurueckgestellt: true,\n      status: 'DEFERRED_' + einordnung,\n      error_code: kennung,\n      doc_id: input.doc_id || null,\n      filename: input.filename || null,\n      finished_at: now\n    }\n  }\n}];"
+      },
+      "id": "4cc6427f-ad52-4761-a31e-bff575142d1a",
+      "name": "Dienst nicht verfuegbar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3232,
+        -704
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst now = new Date().toISOString();\n\nreturn [{\n  json: {\n    error_row: {\n      source_type: 'sharepoint',\n      source_ref: input.doc_id,\n      workflow_step: 'IF Content Usable',\n      error_type: 'EMPTY_EXTRACTION',\n      error_message: 'Aus der Datei konnte kein verwertbarer Inhalt extrahiert werden: ' + input.filename,\n      error_detail: {\n        filename: input.filename,\n        extension: input.ext,\n        mime_type: input.mime_type,\n        route_group: input.route_group,\n        extraction_mode: input.extraction_mode,\n        body_length: input.body_length,\n        word_count: input.word_count\n      },\n      retry_count: 0,\n      max_retries: 0,\n      next_retry_at: null,\n      resolved_at: null,\n      resolved_by: null,\n      raw_payload: {\n        doc_id: input.doc_id,\n        filename: input.filename,\n        file_path: input.file_path,\n        sharepoint_url: input.sharepoint_url\n      },\n      created_at: now\n    },\n    summary: {\n      ok: false,\n      status: 'SKIPPED_EMPTY_EXTRACTION',\n      doc_id: input.doc_id,\n      filename: input.filename,\n      extension: input.ext,\n      route_group: input.route_group,\n      extraction_mode: input.extraction_mode,\n      body_length: input.body_length,\n      finished_at: now\n    }\n  }\n}];"
+      },
+      "id": "d1b11e50-db3a-4aa6-8594-3f50b2d21668",
+      "name": "Build Extraction Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3568,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/ingestion_errors",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.error_row }}",
+        "options": {}
+      },
+      "id": "14b5c041-b9d9-4514-8400-b4a63b5dee1e",
+      "name": "Log Ingest Error To Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3792,
+        -704
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "let summary = null;\n\ntry { summary = $('Dienst nicht verfuegbar').first().json.summary; } catch {}\nif (!summary) {\n  try { summary = $('Build Unsupported Error').first().json.summary; } catch {}\n}\nif (!summary) {\n  try { summary = $('Build Extraction Error').first().json.summary; } catch {}\n}\n\nreturn [{ json: summary || { ok: false, status: 'ERROR_LOGGED', finished_at: new Date().toISOString() } }];"
+      },
+      "id": "6986a96e-9108-49ec-a53e-65e6e78ec893",
+      "name": "Ingest Error Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4032,
+        -704
+      ]
+    },
+    {
+      "parameters": {
+        "type": "SHA256",
+        "value": "={{ $('Normalize SharePoint Input').first().json.fileBase64Clean }}",
+        "dataPropertyName": "hash"
+      },
+      "id": "f043195e-496d-43aa-a6d0-bcc067749ff6",
+      "name": "Create Source Binary Hash",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        3568,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Normalize SharePoint Input').first().json.doc_id) }}&select=id,doc_id,content_hash,images,links,word_count,content_type,audience,ingestion_count,ingested_at,last_ingested_at",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cca121c2-b36f-423f-8235-379af062f765",
+      "name": "Get Existing SharePoint Source",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3792,
+        -304
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const current = $('Create Source Binary Hash').first().json;\nconst raw = $input.first().json;\nconst existing = Array.isArray(raw) ? (raw[0] || {}) : (raw || {});\n\nfunction parseJsonContainer(value, fallback) {\n  if (Array.isArray(value) || (value && typeof value === 'object')) return value;\n  if (typeof value === 'string') {\n    try {\n      const parsed = JSON.parse(value);\n      return parsed ?? fallback;\n    } catch {\n      return fallback;\n    }\n  }\n  return fallback;\n}\n\nconst rawImages = existing.images;\nconst rawLinks = existing.links;\nconst existing_images = parseJsonContainer(rawImages, []);\nconst existing_links = parseJsonContainer(rawLinks, []);\n\nreturn [{\n  json: {\n    ...current,\n    existing,\n    existing_images: Array.isArray(existing_images) ? existing_images : [],\n    existing_links: Array.isArray(existing_links) ? existing_links : [],\n    legacy_images_format: typeof rawImages === 'string',\n    legacy_links_format: typeof rawLinks === 'string',\n    source_id_lookup: existing.id || '00000000-0000-0000-0000-000000000000'\n  }\n}];"
+      },
+      "id": "53b67b77-421a-40a5-92e3-8878b41e2f11",
+      "name": "Normalize Source State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4000,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_id=eq.{{ $('Normalize Source State').first().json.source_id_lookup }}&select=id,metadata,audience&order=chunk_index.asc&limit=1",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2a0dbf98-5fad-49eb-8bf9-458c47c8f74e",
+      "name": "Check Existing SharePoint Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4224,
+        -304
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const state = $('Normalize Source State').first().json;\nconst raw = $input.first().json;\nconst chunkRows = Array.isArray(raw) ? raw : (raw?.id ? [raw] : []);\nconst chunk_exists = chunkRows.length > 0;\n\nconst existing = state.existing || {};\nconst is_new = !existing.id;\nconst content_changed = !is_new && existing.content_hash !== state.hash;\nconst missing_chunks = !is_new && !chunk_exists;\n\nconst existingFlowVersion = chunkRows[0]?.metadata?.rag_flow_version || null;\nconst flow_version_mismatch = !is_new && chunk_exists && existingFlowVersion !== state.flow_version;\n\nconst existingChunkAudience = chunkRows[0]?.audience || null;\nconst audience_changed =\n  !is_new &&\n  (\n    (existing.audience && existing.audience !== state.audience) ||\n    (chunk_exists && existingChunkAudience && existingChunkAudience !== state.audience)\n  );\n\nconst metadata_repair_required =\n  state.legacy_images_format ||\n  state.legacy_links_format ||\n  (Number(existing.word_count || 0) <= 1 && Number(state.word_count || 0) > 1);\n\nlet rebuild_reason = 'UNCHANGED';\nif (is_new) rebuild_reason = 'NEW_SOURCE';\nelse if (content_changed) rebuild_reason = 'CONTENT_CHANGED';\nelse if (missing_chunks) rebuild_reason = 'RECOVERY_MISSING_CHUNKS';\nelse if (audience_changed) rebuild_reason = 'AUDIENCE_CHANGED';\nelse if (flow_version_mismatch) rebuild_reason = 'FLOW_VERSION_UPGRADE';\nelse if (metadata_repair_required) rebuild_reason = 'METADATA_REPAIR';\n\nconst rebuild_required =\n  is_new ||\n  content_changed ||\n  missing_chunks ||\n  audience_changed ||\n  flow_version_mismatch ||\n  metadata_repair_required;\n\nconst crud_action = is_new ? 'INSERT' : (rebuild_required ? 'UPDATE' : 'TOUCH');\n\nreturn [{\n  json: {\n    ...state,\n    crud_action,\n    chunk_exists,\n    existing_flow_version: existingFlowVersion,\n    existing_chunk_audience: existingChunkAudience,\n    flow_version_mismatch,\n    audience_changed,\n    rebuild_required,\n    rebuild_reason\n  }\n}];"
+      },
+      "id": "a1f636d3-f14e-4d6b-8329-d786a74648ed",
+      "name": "Decide Rebuild Or Skip",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4448,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c-rebuild",
+              "leftValue": "={{ $json.rebuild_required }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e98ed7ed-a7a2-4da9-b8d3-6dcc8550d825",
+      "name": "IF Rebuild Required",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4672,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('Decide Rebuild Or Skip').first().json;\nconst existing = d.existing || {};\nconst now = new Date().toISOString();\n\nconst row = {\n  doc_id: d.doc_id,\n  drive_id: d.drive_id,\n  site_id: d.site_id,\n  site_url: d.site_url,\n  file_path: d.file_path,\n  file_name: d.filename,\n  file_extension: d.ext,\n  sharepoint_url: d.sharepoint_url,\n  content_text: d.content_text,\n  content_hash: existing.content_hash || null,\n  word_count: d.word_count,\n  images: d.existing_images || [],\n  links: d.existing_links || [],\n  author_name: d.author_name,\n  author_email: d.author_email,\n  last_modified_by: d.last_modified_by,\n  created_at_sp: d.created_at_sp,\n  last_modified_sp: d.last_modified_sp,\n  document_version: d.document_version,\n  content_type: d.content_type,\n  tags: d.tags || [],\n  department: d.department,\n  language: d.language || 'de',\n  sensitivity_label: d.sensitivity_label,\n  audience: d.audience,\n  ingested_at: existing.ingested_at || now,\n  last_ingested_at: now,\n  ingestion_count: Number(existing.ingestion_count || 0)\n};\n\nreturn [{ json: { row } }];"
+      },
+      "id": "5f3d19af-fa5f-4964-8cef-457cbbd33d1f",
+      "name": "Build Provisional Source Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4880,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?on_conflict=doc_id",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.row }}",
+        "options": {}
+      },
+      "id": "920538c9-a0b4-43af-b688-35319665d877",
+      "name": "Provisional Upsert SharePoint Source",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5104,
+        -400
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const decision = $('Decide Rebuild Or Skip').first().json;\nconst raw = $input.first().json;\nconst source = Array.isArray(raw) ? (raw[0] || {}) : (raw || {});\n\nif (!source.id) throw new Error('PROVISIONAL_SOURCE_ID_MISSING');\n\nreturn [{\n  json: {\n    ...decision,\n    source_id: source.id,\n    source_ref: decision.doc_id,\n    provisional_source: source\n  }\n}];"
+      },
+      "id": "d56eb0ae-ba80-45e3-83c8-3a35e91a63d2",
+      "name": "Build Source Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5328,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Build Source Context').first().json;\nconst rawImages = Array.isArray(ctx.raw_images) ? ctx.raw_images : [];\n\nfunction safeName(value) {\n  return String(value || 'image')\n    .replace(/[^a-zA-Z0-9._-]/g, '_')\n    .replace(/_+/g, '_')\n    .replace(/^_+|_+$/g, '')\n    .slice(0, 100) || 'image';\n}\nfunction extForMime(mime) {\n  const map = {\n    'image/png':'png',\n    'image/jpeg':'jpg',\n    'image/jpg':'jpg',\n    'image/webp':'webp',\n    'image/avif':'avif',\n    'image/gif':'gif',\n    'image/bmp':'bmp',\n    'image/tiff':'tif'\n  };\n  return map[String(mime || '').toLowerCase()] || 'png';\n}\n\nconst safeDoc = safeName(ctx.doc_id);\nconst hashPrefix = String(ctx.hash || '').slice(0, 16) || 'nohash';\nconst publicBase = ctx._config?.storagePublicBase || 'https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/public/rag/';\n\nconst images = rawImages.map((img, index) => {\n  const imageId = safeName(img.mistral_image_id || ('image-' + (index + 1)));\n  const extension = extForMime(img.image_mime);\n  const pageIndex = Number.isInteger(img.page_index) ? img.page_index : 0;\n  const storage_key = 'SHAREPOINT/' + safeDoc + '/' + hashPrefix + '/p' + pageIndex + '_' + String(index).padStart(4, '0') + '_' + imageId + '.' + extension;\n\n  return {\n    source_id: ctx.source_id,\n    source_ref: ctx.source_ref,\n    image_index: index,\n    image_chunk_index: 100000 + index,\n    page_index: pageIndex,\n    mistral_image_id: img.mistral_image_id || imageId,\n    image_base64_clean: img.image_base64_clean,\n    image_mime: img.image_mime || 'image/png',\n    annotation: img.annotation || {},\n    annotation_text: img.annotation_text || 'Keine belastbare Bildbeschreibung vorhanden.',\n    origin: img.origin || 'mistral_bbox',\n    storage_key,\n    image_file_name: storage_key.split('/').pop(),\n    public_url: publicBase + storage_key\n  };\n});\n\nreturn [{\n  json: {\n    has_images: images.length > 0,\n    image_count: images.length,\n    images\n  }\n}];"
+      },
+      "id": "6bbf7e7b-53d7-430f-a103-045597cf880c",
+      "name": "Build Image Upload Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5552,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c-img",
+              "leftValue": "={{ $json.has_images }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a5b45854-8aec-453c-b389-d07dbc057a2f",
+      "name": "IF Has Extracted Images",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5760,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const plan = $('Build Image Upload Plan').first().json;\nreturn (plan.images || []).map(image => ({ json: image }));"
+      },
+      "id": "c3f2f47d-e3ee-4006-b8ab-7191e0e9a6ee",
+      "name": "Expand Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5984,
+        -496
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "image_base64_clean",
+        "options": {
+          "fileName": "={{ $json.image_file_name }}",
+          "mimeType": "={{ $json.image_mime }}"
+        }
+      },
+      "id": "e0533995-5431-43bf-a34a-4e641b4f45f1",
+      "name": "Convert Extracted Image To Binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        6208,
+        -496
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const plan = $('Expand Images').all().map(item => item.json);\n\nreturn $input.all().map((item, index) => ({\n  json: { ...(plan[index] || {}) },\n  binary: item.binary\n}));"
+      },
+      "id": "69631041-2416-4c1d-8e19-7353edbac3fb",
+      "name": "Restore Image Metadata",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6432,
+        -496
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag/{{ $json.storage_key }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "={{ $json.image_mime }}"
+            },
+            {
+              "name": "x-upsert",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "3b091895-786b-4f70-9f17-927c9e5023ed",
+      "name": "Upload Extracted Image To Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6640,
+        -496
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput",
+      "notes": "Laeuft bei Fehler weiter, statt abzubrechen. Ein einzelner Netzabbruch beim Bildupload hat am 30.08. den gesamten naechtlichen Abgleich mitgerissen. Der Preis: ein verlorenes Bild faellt nicht auf, es gibt nur eine kuerzere Bildliste am Dokument."
+    },
+    {
+      "parameters": {
+        "jsCode": "const plan = $('Restore Image Metadata').all().map(item => item.json);\n\n// ============================================================\n// GESCHEITERTE UPLOADS AUSSORTIEREN\n// Der Upload-Node laeuft bei Fehler weiter, statt den ganzen Lauf zu\n// beenden - ein Netzabbruch bei einem einzelnen Bild hat sonst den\n// naechtlichen Abgleich mitgerissen. Er legt fuer das gescheiterte Bild\n// eine Zeile mit `error` in den Ausgang. Die wird hier verworfen, sonst\n// stuende im Chunk ein Speicherpfad, unter dem nichts liegt.\n// Erst abbilden, dann filtern - die Zuordnung ueber den Index bleibt so\n// erhalten.\n// ============================================================\nreturn $input.all().map((item, index) => {\n  const image = plan[index] || {};\n  const upload = item.json || {};\n\n  if (upload.error !== undefined && upload.error !== null) {\n    return null;\n  }\n\n  return {\n    json: {\n      image_name: image.image_file_name,\n      storage_path: image.storage_key,\n      public_url: image.public_url,\n      annotation: image.annotation || {},\n      annotation_text: image.annotation_text,\n      image_mime: image.image_mime,\n      page_index: image.page_index,\n      mistral_image_id: image.mistral_image_id,\n      image_index: image.image_index,\n      origin: image.origin,\n      upload_key: upload.Key || upload.key || image.storage_key\n    }\n  };\n}).filter(entry => entry !== null);"
+      },
+      "id": "3a1d482f-0062-46f7-a52d-becf9c513676",
+      "name": "Build Uploaded Image Metadata",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6864,
+        -496
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "images",
+        "options": {}
+      },
+      "id": "134c7d08-c07f-4de2-9c42-c606a8b1488c",
+      "name": "Collect Uploaded Images",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        7088,
+        -496
+      ],
+      "alwaysOutputData": true,
+      "notes": "alwaysOutputData, damit ein Dokument, dessen Bilder alle gescheitert sind, trotzdem seinen Text und seine Chunks bekommt."
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { images: [], image_count: 0 } }];"
+      },
+      "id": "826cc9ad-6cbb-4994-927e-8759439fb737",
+      "name": "No Extracted Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5984,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('Decide Rebuild Or Skip').first().json;\nconst now = new Date().toISOString();\n\nreturn [{\n  json: {\n    patch: {\n      last_ingested_at: now,\n      ingestion_count: Number(d.existing?.ingestion_count || 0) + 1\n    },\n    summary: {\n      ok: true,\n      status: 'DONE_NO_CHANGE',\n      crud_action: 'TOUCH',\n      doc_id: d.doc_id,\n      filename: d.filename,\n      audience: d.audience,\n      content_hash: d.hash,\n      rebuild_reason: d.rebuild_reason,\n      chunk_exists: d.chunk_exists,\n      finished_at: now\n    }\n  }\n}];"
+      },
+      "id": "43c305b1-d0c3-409b-b2c7-246a545772a7",
+      "name": "Build No Change Touch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4880,
+        -144
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Decide Rebuild Or Skip').first().json.doc_id) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.patch }}",
+        "options": {}
+      },
+      "id": "776b0a45-dcde-4af7-8f9e-6beef6b805d5",
+      "name": "Touch Unchanged Source",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5104,
+        -144
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $('Build No Change Touch').first().json.summary }];"
+      },
+      "id": "19bf111a-a8bd-4aef-b406-369bf0291fa9",
+      "name": "No Change Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5328,
+        -144
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Build Source Context').first().json;\nconst inputResult = $input.first().json || {};\nconst images = Array.isArray(inputResult.images) ? inputResult.images : [];\n\nconst CHUNK_SIZE = Number(ctx._config?.chunkSize || 1600);\nconst OVERLAP = Number(ctx._config?.chunkOverlap || 200);\nconst AUDIENCE = ctx.audience === 'public' ? 'public' : 'it_internal';\n\nfunction estimateTokens(text) {\n  return Math.ceil(String(text || '').length / 4);\n}\n\n// ============================================================\n// HARTER SPLIT: zerlegt einen zu langen Textblock zuverlaessig.\n// Wird auch auf Absaetze angewendet, die laenger als chunkSize sind\n// (OCR-Tabellen, Seiten ohne Leerzeile).\n// ============================================================\nfunction hardSplit(text, size, overlap) {\n  const t = String(text || '');\n  const parts = [];\n  let start = 0;\n\n  while (start < t.length) {\n    const idealEnd = Math.min(start + size, t.length);\n    let end = idealEnd;\n\n    if (end < t.length) {\n      const win = t.slice(start, idealEnd);\n      const minKeep = Math.floor(size * 0.6);\n\n      const candidates = [\n        win.lastIndexOf('\\n'),\n        win.lastIndexOf('. '),\n        win.lastIndexOf('! '),\n        win.lastIndexOf('? '),\n        win.lastIndexOf('; '),\n        win.lastIndexOf(', '),\n        win.lastIndexOf(' ')\n      ].filter(i => i > minKeep);\n\n      if (candidates.length) {\n        end = start + Math.max(...candidates) + 1;\n      }\n    }\n\n    const piece = t.slice(start, end).trim();\n\n    if (piece) {\n      parts.push(piece);\n    }\n\n    if (end >= t.length) {\n      break;\n    }\n\n    start = Math.max(start + 1, end - overlap);\n  }\n\n  return parts;\n}\n\nfunction splitToChunks(text, chunkSize, overlap) {\n  const normalized = String(text || '').trim();\n\n  if (!normalized) {\n    return [];\n  }\n\n  const size = Math.max(\n    200,\n    Number(chunkSize) || 1600\n  );\n\n  const ov = Math.min(\n    Math.max(0, Number(overlap) || 0),\n    Math.floor(size / 2)\n  );\n\n  // 1) Absaetze bilden.\n  // Ueberlange Absaetze SOFORT hart splitten.\n  const pieces = [];\n\n  for (const raw of normalized.split(/\\n\\n+/)) {\n    const p = raw.trim();\n\n    if (!p) {\n      continue;\n    }\n\n    if (p.length > size) {\n      pieces.push(...hardSplit(p, size, ov));\n    } else {\n      pieces.push(p);\n    }\n  }\n\n  // 2) Stuecke greedy zu Chunks packen, mit Overlap-Tail.\n  const chunks = [];\n  let current = '';\n\n  for (const piece of pieces) {\n    if (!current) {\n      current = piece;\n      continue;\n    }\n\n    if ((current + '\\n\\n' + piece).length <= size) {\n      current += '\\n\\n' + piece;\n      continue;\n    }\n\n    chunks.push(current.trim());\n\n    // Overlap-Tail auf Wortgrenze ziehen. Ein roher slice(-ov) schneidet mitten\n    // im Wort und laesst den Folge-Chunk mit einem Wortfragment beginnen.\n    // Der Tail wird durch die Korrektur nur kuerzer, nie laenger.\n    let tail = ov > 0\n      ? current.slice(-ov)\n      : '';\n\n    if (tail) {\n      const zeichenDavor = current.charAt(current.length - tail.length - 1);\n      if (zeichenDavor && !/\\s/.test(zeichenDavor)) {\n        const luecke = tail.search(/\\s/);\n        tail = luecke === -1 ? '' : tail.slice(luecke + 1);\n      }\n      tail = tail.trimStart();\n    }\n\n    const seeded = tail\n      ? tail + '\\n\\n' + piece\n      : piece;\n\n    current = seeded.length > size\n      ? piece\n      : seeded;\n  }\n\n  if (current.trim()) {\n    chunks.push(current.trim());\n  }\n\n  // 3) Sicherheitsnetz.\n  const result = [];\n\n  for (const c of chunks) {\n    if (c.length > size * 1.2) {\n      result.push(...hardSplit(c, size, ov));\n    } else {\n      result.push(c);\n    }\n  }\n\n  return result.filter(Boolean);\n}\n\n// ============================================================\n// KANONISCHE METADATEN\n// ============================================================\nconst baseMetadata = {\n  source_type: 'sharepoint',\n  source_ref: ctx.source_ref,\n  title: ctx.filename,\n  url: ctx.sharepoint_url || null,\n  updated_at: ctx.last_modified_sp || null,\n  content_hash: ctx.hash,\n  rag_flow_version: ctx.flow_version,\n  audience: AUDIENCE,\n\n  // SharePoint-spezifisch\n  doc_id: ctx.doc_id,\n  file_name: ctx.filename,\n  file_extension: ctx.ext,\n  file_path: ctx.file_path,\n  site_url: ctx.site_url,\n  sharepoint_url: ctx.sharepoint_url,\n  author_name: ctx.author_name,\n  author_email: ctx.author_email,\n  last_modified_by: ctx.last_modified_by,\n  last_modified_sp: ctx.last_modified_sp,\n  department: ctx.department,\n  document_version: ctx.document_version,\n  content_type: ctx.content_type,\n  language: ctx.language || 'de',\n  word_count: ctx.word_count,\n  tags: ctx.tags || [],\n  sensitivity_label: ctx.sensitivity_label || null,\n  extraction_model: ctx.extraction_model,\n  extraction_mode: ctx.extraction_mode,\n  sharepoint_event_action: ctx.sharepoint_event_action || null,\n  sharepoint_crud_intent: ctx.sharepoint_crud_intent || 'UPSERT'\n};\n\nconst chunks = [];\nlet textIndex = 0;\n\nconst header = [\n  '[SHAREPOINT] ' + ctx.filename,\n  'Dokument-ID: ' + ctx.doc_id,\n  'Format: ' + String(ctx.ext).toUpperCase(),\n  ctx.file_path ? 'Pfad: ' + ctx.file_path : '',\n  ctx.site_url ? 'Site: ' + ctx.site_url : '',\n  ctx.department ? 'Bereich: ' + ctx.department : '',\n  (ctx.tags && ctx.tags.length)\n    ? 'Tags: ' + ctx.tags.join(', ')\n    : '',\n  ctx.sharepoint_url\n    ? 'URL: ' + ctx.sharepoint_url\n    : ''\n].filter(Boolean).join('\\n');\n\nchunks.push({\n  source_id: ctx.source_id,\n  source_type: 'sharepoint',\n  source_ref: ctx.source_ref,\n  audience: AUDIENCE,\n  chunk_index: textIndex++,\n  chunk_text: header,\n  token_count: estimateTokens(header),\n  metadata: {\n    ...baseMetadata,\n    chunk_type: 'header'\n  }\n});\n\n// ============================================================\n// TEXT-CHUNKS\n// ============================================================\nconst textParts = splitToChunks(\n  ctx.content_text,\n  CHUNK_SIZE,\n  OVERLAP\n);\n\nfor (const part of textParts) {\n  const chunkText = (\n    ctx.filename +\n    '\\n\\n' +\n    part\n  ).trim();\n\n  chunks.push({\n    source_id: ctx.source_id,\n    source_type: 'sharepoint',\n    source_ref: ctx.source_ref,\n    audience: AUDIENCE,\n    chunk_index: textIndex++,\n    chunk_text: chunkText,\n    token_count: estimateTokens(chunkText),\n    metadata: {\n      ...baseMetadata,\n      chunk_type: 'content',\n      chunk_length: chunkText.length\n    }\n  });\n}\n\n// ============================================================\n// BILD-CHUNKS\n// Bildtexte ebenfalls mit der bestehenden Chunk-Logik teilen.\n// Die Einzelfelder decken die Annotation bereits vollstaendig ab;\n// annotation_text wiederholt exakt dieselben Felder und wird deshalb\n// nicht zusaetzlich in den Chunktext aufgenommen.\n// ============================================================\nlet imageChunkIndex = 100000;\n\nfor (const entry of images.entries()) {\n  const index = entry[0];\n  const image = entry[1];\n  const annotation = image.annotation || {};\n\n  const imageText = [\n    '[SHAREPOINT-BILD] ' + ctx.filename,\n    'Bild: ' + image.image_name,\n    'Seite: ' + (Number(image.page_index || 0) + 1),\n    'MIME: ' + (image.image_mime || ''),\n    'Bildtyp: ' + (annotation.image_type || ''),\n    'Kurzbeschreibung: ' + (annotation.short_description || ''),\n    'Detailbeschreibung: ' + (annotation.detailed_description || ''),\n    'Sichtbarer Text: ' + (annotation.visible_text || ''),\n    'Dokumentbezug: ' + (annotation.document_relevance || ''),\n    'Storage-Pfad: ' + (image.storage_path || ''),\n    'Bild-URL: ' + (image.public_url || '')\n  ]\n    .filter(\n      line =>\n        !line.endsWith(': ') &&\n        !line.endsWith(':\\n')\n    )\n    .join('\\n');\n\n  const imageParts = splitToChunks(\n    imageText,\n    CHUNK_SIZE,\n    OVERLAP\n  );\n\n  for (\n    let partIndex = 0;\n    partIndex < imageParts.length;\n    partIndex++\n  ) {\n    const chunkText = imageParts[partIndex];\n\n    chunks.push({\n      source_id: ctx.source_id,\n      source_type: 'sharepoint',\n      source_ref: ctx.source_ref,\n      audience: AUDIENCE,\n      chunk_index: imageChunkIndex++,\n      chunk_text: chunkText,\n      token_count: estimateTokens(chunkText),\n\n      metadata: {\n        ...baseMetadata,\n        chunk_type: 'image_attachment',\n        image_name: image.image_name,\n        storage_path: image.storage_path,\n        related_image_url: image.public_url,\n        annotation,\n        annotation_text: image.annotation_text,\n        image_mime: image.image_mime,\n        image_index: index,\n        image_part_index: partIndex,\n        image_part_count: imageParts.length,\n        page_index: image.page_index,\n        mistral_image_id: image.mistral_image_id,\n        origin: image.origin\n      }\n    });\n  }\n}\n\nif (!chunks.length) {\n  throw new Error('NO_SHAREPOINT_CHUNKS_CREATED');\n}\n\nconst expected_chunk_indices = chunks\n  .map(chunk => Number(chunk.chunk_index))\n  .filter(Number.isInteger)\n  .sort((a, b) => a - b);\n\nreturn chunks.map(chunk => ({\n  json: {\n    ...chunk,\n    current_images: images,\n    expected_chunk_indices\n  }\n}));"
+      },
+      "id": "50ee364c-a480-4be2-8ef9-d317ddddae17",
+      "name": "Build All SharePoint Chunk Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7264,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const allChunks = $input.all().map(item => item.json);\nconst ctx = $('Build Source Context').first().json;\nconst BATCH_SIZE = Number(ctx._config?.embeddingBatchSize || 50);\n\nif (!allChunks.length) throw new Error('SHAREPOINT_CHUNK_BATCH_EMPTY');\n\nconst expected_chunk_indices = Array.from(new Set(\n  allChunks.map(chunk => Number(chunk.chunk_index)).filter(Number.isInteger)\n)).sort((a, b) => a - b);\n\nconst current_images = allChunks[0].current_images || [];\nconst batches = [];\n\nfor (let start = 0; start < allChunks.length; start += BATCH_SIZE) {\n  const chunks = allChunks.slice(start, start + BATCH_SIZE).map(chunk => {\n    const row = { ...chunk };\n    delete row.current_images;\n    delete row.expected_chunk_indices;\n    return row;\n  });\n\n  batches.push({\n    chunks,\n    inputs: chunks.map(chunk => chunk.chunk_text),\n    batch_index: batches.length,\n    expected_chunk_indices,\n    current_images\n  });\n}\n\nreturn batches.map((batch, index) => ({\n  json: { ...batch, batch_count: batches.length, batch_number: index + 1 }\n}));"
+      },
+      "id": "2cf01209-d253-4e93-8d40-514d3b37aada",
+      "name": "Prepare Embedding Batches",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7472,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": "={{ $prevNode.name === 'Prepare Embedding Batches' }}"
+        }
+      },
+      "id": "b3c20a29-fcbb-4dcb-bc00-6fc214cd6509",
+      "name": "Embedding Batch Loop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        7760,
+        -304
+      ],
+      "notes": "Zuruecksetzen ist zwingend. Eine verschachtelte Schleife behaelt ihren Zustand ueber die aeussere Schleife hinweg: Ab dem zweiten Dokument gilt sie als fertig, schleift die neuen Batches nicht mehr durch und feuert nur den Fertig-Ausgang. Embedding und Upsert liefen dann gar nicht, das Dokument wurde aber abgeschlossen - ohne Chunks, ohne Fehlermeldung. Die Bedingung greift, wenn der Eingang von Prepare Embedding Batches kommt, also beim ersten Batch je Dokument, und nicht beim Ruecksprung aus der Schleife."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: $('Vorgaben').first().json._config.embeddingModel, input: $json.inputs } }}",
+        "options": {}
+      },
+      "id": "0672516d-7c62-40cf-b89b-2bfd51db6415",
+      "name": "OpenAI Embedding Batch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8032,
+        -288
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "jsCode": "const batch = $('Embedding Batch Loop').item.json;\nconst config = $('Vorgaben').first().json._config || {};\nconst expectedDimensions = Number(config.embeddingDimensions || 1536);\nconst response = $input.first().json || {};\nconst data = response.data || response.body?.data || [];\nconst chunks = batch.chunks || [];\n\nif (!Array.isArray(data)) throw new Error('SHAREPOINT_EMBEDDING_RESPONSE_DATA_MISSING');\nif (data.length !== chunks.length) {\n  throw new Error('SHAREPOINT_EMBEDDING_COUNT_MISMATCH: expected=' + chunks.length + ', actual=' + data.length);\n}\n\nconst embeddingByIndex = new Map();\nfor (const entry of data) {\n  if (Number.isInteger(entry?.index) && Array.isArray(entry?.embedding)) {\n    embeddingByIndex.set(entry.index, entry.embedding);\n  }\n}\n\nconst rows = chunks.map((chunk, index) => {\n  const embedding = embeddingByIndex.get(index) || data[index]?.embedding || null;\n  if (!Array.isArray(embedding)) throw new Error('SHAREPOINT_EMBEDDING_MISSING_AT_INDEX_' + index);\n  if (embedding.length !== expectedDimensions) {\n    throw new Error('SHAREPOINT_EMBEDDING_DIMENSION_MISMATCH_AT_' + index + ': ' + embedding.length);\n  }\n  return { ...chunk, embedding: '[' + embedding.join(',') + ']' };\n});\n\nreturn [{\n  json: {\n    rows,\n    batch_number: batch.batch_number,\n    batch_count: batch.batch_count,\n    chunk_count: rows.length\n  }\n}];"
+      },
+      "id": "3e839465-129a-4afa-b3e1-47abf304afa5",
+      "name": "Build Embedded Chunk Batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8256,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?on_conflict=source_id,chunk_index",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.rows }}",
+        "options": {}
+      },
+      "id": "1f6c81f9-baa2-4f44-9c79-8312f736707b",
+      "name": "Bulk Upsert SharePoint Chunk Batch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8464,
+        -288
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "jsCode": "const batch = $('Build Embedded Chunk Batch').item.json;\n\nreturn [{\n  json: {\n    status: 'BATCH_WRITTEN',\n    batch_number: batch.batch_number,\n    batch_count: batch.batch_count,\n    chunk_count: batch.chunk_count,\n    written_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "bc24b8b3-1609-44fb-91d0-889a90d3ffde",
+      "name": "Embedding Batch Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8688,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const batches = $('Prepare Embedding Batches').all().map(item => item.json);\nconst ctx = $('Build Source Context').first().json;\n\nconst expected = Array.from(new Set(\n  batches.flatMap(batch => batch.expected_chunk_indices || []).map(Number)\n)).filter(Number.isInteger).sort((a, b) => a - b);\n\nif (!ctx.source_id) throw new Error('SHAREPOINT_CLEANUP_SOURCE_ID_MISSING');\nif (!expected.length) throw new Error('SHAREPOINT_CLEANUP_EXPECTED_INDICES_EMPTY');\n\nconst current_images = batches.find(batch => Array.isArray(batch.current_images))?.current_images || [];\n\nreturn [{\n  json: {\n    source_id: ctx.source_id,\n    source_ref: ctx.source_ref,\n    expected_chunk_indices: expected,\n    expected_indices_csv: expected.join(','),\n    expected_chunk_count: expected.length,\n    current_images\n  }\n}];"
+      },
+      "id": "923d5fac-2b2e-4889-836f-d901fa444c6c",
+      "name": "Build Stale Chunk Cleanup Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8144,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_id=eq.{{ $json.source_id }}&chunk_index=not.in.({{ $json.expected_indices_csv }})",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d6839c33-7faf-40df-9e68-00d6e20f94b7",
+      "name": "Delete Stale SharePoint Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8368,
+        -656
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const decision = $('Decide Rebuild Or Skip').first().json;\nconst cleanup = $('Build Stale Chunk Cleanup Request').first().json;\nconst oldImages = Array.isArray(decision.existing_images) ? decision.existing_images : [];\nconst currentImages = Array.isArray(cleanup.current_images) ? cleanup.current_images : [];\n\nfunction pathFromImage(image) {\n  if (!image || typeof image !== 'object') return null;\n  if (image.storage_path) return String(image.storage_path);\n  if (image.storage_key) return String(image.storage_key);\n  if (image.image_name) return String(image.image_name);\n  if (image.public_url || image.url) {\n    const raw = String(image.public_url || image.url);\n    const marker = '/storage/v1/object/public/rag/';\n    const pos = raw.indexOf(marker);\n    if (pos >= 0) return decodeURIComponent(raw.slice(pos + marker.length));\n  }\n  return null;\n}\n\nconst currentSet = new Set(currentImages.map(pathFromImage).filter(Boolean));\nconst stale = Array.from(new Set(oldImages.map(pathFromImage).filter(Boolean)))\n  .filter(path => !currentSet.has(path));\n\nif (!stale.length) {\n  return [{ json: { has_stale_storage: false, storage_path: null, stale_storage_count: 0 } }];\n}\n\nreturn stale.map(path => ({\n  json: {\n    has_stale_storage: true,\n    storage_path: path,\n    storage_path_encoded: path.split('/').map(segment => encodeURIComponent(segment)).join('/'),\n    stale_storage_count: stale.length\n  }\n}));"
+      },
+      "id": "31224bbb-36a9-401d-9895-263a543c43be",
+      "name": "Plan SharePoint Storage Cleanup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8576,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c-stale",
+              "leftValue": "={{ $json.has_stale_storage }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "25e71502-ddb9-4105-a10d-7409c8f290db",
+      "name": "IF Has Stale Storage Objects",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        8800,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag/{{ $json.storage_path_encoded }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "options": {}
+      },
+      "id": "24fca0ae-2ee8-4de2-a979-0c0b3e8a046c",
+      "name": "Delete Stale SharePoint Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        9024,
+        -752
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "deleted_objects",
+        "options": {}
+      },
+      "id": "32c2d76e-1d7c-478a-aece-163b167801ea",
+      "name": "Collect Storage Delete Results",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        9248,
+        -752
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { deleted_objects: [], storage_deleted_count: 0 } }];"
+      },
+      "id": "19e8909d-8588-4a5e-b773-3ba25f22c01e",
+      "name": "No Storage Cleanup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9024,
+        -560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Build Source Context').first().json;\nconst decision = $('Decide Rebuild Or Skip').first().json;\nconst cleanup = $('Build Stale Chunk Cleanup Request').first().json;\nconst storageResult = $input.first().json || {};\nconst now = new Date().toISOString();\n\nconst current_images = Array.isArray(cleanup.current_images) ? cleanup.current_images : [];\nconst deleted_objects = Array.isArray(storageResult.deleted_objects) ? storageResult.deleted_objects : [];\nconst storage_deleted_count = Number(storageResult.storage_deleted_count || 0) || deleted_objects.length;\n\nconst row = {\n  doc_id: ctx.doc_id,\n  drive_id: ctx.drive_id,\n  site_id: ctx.site_id,\n  site_url: ctx.site_url,\n  file_path: ctx.file_path,\n  file_name: ctx.filename,\n  file_extension: ctx.ext,\n  sharepoint_url: ctx.sharepoint_url,\n  content_text: ctx.content_text,\n  content_hash: ctx.hash,\n  word_count: ctx.word_count,\n  images: current_images,\n  links: Array.isArray(ctx.links) ? ctx.links : [],\n  author_name: ctx.author_name,\n  author_email: ctx.author_email,\n  last_modified_by: ctx.last_modified_by,\n  created_at_sp: ctx.created_at_sp,\n  last_modified_sp: ctx.last_modified_sp,\n  document_version: ctx.document_version,\n  content_type: ctx.content_type,\n  tags: ctx.tags || [],\n  department: ctx.department,\n  language: ctx.language || 'de',\n  sensitivity_label: ctx.sensitivity_label,\n  audience: ctx.audience === 'public' ? 'public' : 'it_internal',\n  ingested_at: decision.existing?.ingested_at || now,\n  last_ingested_at: now,\n  ingestion_count: Number(decision.existing?.ingestion_count || 0) + 1\n};\n\nreturn [{ json: { row, storage_deleted_count } }];"
+      },
+      "id": "e14d966b-3f3e-4128-9f12-805ca3d6074c",
+      "name": "Build Final SharePoint Source Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9456,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?on_conflict=doc_id",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.row }}",
+        "options": {}
+      },
+      "id": "1decb5cf-b214-4d3c-bac3-834356f67da7",
+      "name": "Finalize SharePoint Source",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        9680,
+        -656
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Build Source Context').first().json;\nconst decision = $('Decide Rebuild Or Skip').first().json;\nconst cleanup = $('Build Stale Chunk Cleanup Request').first().json;\nconst batches = $('Prepare Embedding Batches').all().map(item => item.json);\nconst finalBuild = $('Build Final SharePoint Source Row').first().json;\nconst raw = $input.first().json;\nconst source = Array.isArray(raw) ? (raw[0] || {}) : (raw || {});\n\nconst indices = cleanup.expected_chunk_indices || [];\nconst imageCount = Array.isArray(cleanup.current_images) ? cleanup.current_images.length : 0;\nconst imageChunkCount = indices.filter(index => index >= 100000).length;\nconst textChunkCount = indices.filter(index => index < 100000).length;\n\nreturn [{\n  json: {\n    ok: true,\n    status: decision.crud_action === 'INSERT' ? 'DONE_INSERTED' : 'DONE_UPDATED',\n    crud_action: decision.crud_action,\n    doc_id: ctx.doc_id,\n    source_id: source.id || ctx.source_id,\n    filename: ctx.filename,\n    file_extension: ctx.ext,\n    route_group: ctx.route_group,\n    extraction_mode: ctx.extraction_mode,\n    audience: ctx.audience,\n    rebuild_reason: decision.rebuild_reason,\n    content_hash: ctx.hash,\n    word_count: ctx.word_count,\n    text_chunk_count: textChunkCount,\n    image_chunk_count: imageChunkCount,\n    image_count: imageCount,\n    expected_chunk_count: cleanup.expected_chunk_count,\n    embedding_batch_count: batches.length,\n    embedding_model: ctx._config?.embeddingModel || 'text-embedding-3-small',\n    embedding_dimensions: Number(ctx._config?.embeddingDimensions || 1536),\n    extraction_model: ctx.extraction_model,\n    rag_flow_version: ctx.flow_version,\n    storage_deleted_count: finalBuild.storage_deleted_count || 0,\n    finished_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "3454894c-cfc9-429c-b92c-6f1c55d89172",
+      "name": "Workflow Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9904,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst body = item.json?.body ?? item.json ?? {};\n\nfunction first(...values) {\n  for (const value of values) {\n    if (value !== undefined && value !== null && String(value).trim() !== '') return value;\n  }\n  return null;\n}\nfunction nullableString(value) {\n  if (value === undefined || value === null) return null;\n  const text = String(value).trim();\n  return text || null;\n}\n\nconst doc_id = nullableString(first(body.file_id, body.doc_id, body.id));\nif (!doc_id) throw new Error('SHAREPOINT_DELETE_DOC_ID_MISSING');\n\nreturn [{\n  json: {\n    doc_id,\n    file_id: doc_id,\n    filename: nullableString(first(body.filename, body.file_name)),\n    file_path: nullableString(body.file_path),\n    sharepoint_url: nullableString(first(body.sharepoint_url, body.webUrl, body.web_url)),\n    event_action: item.json?.grund || null,\n    crud_action: 'DELETE',\n    started_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "9721390a-6678-4b94-bf21-34614134d8e8",
+      "name": "Build Delete Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}&select=id,doc_id,file_name,file_path,sharepoint_url,images,content_hash,ingestion_count,last_ingested_at",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5beeee3b-3ad0-4a22-9b9b-e7d1a544303f",
+      "name": "Get Delete SharePoint Source",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1024,
+        1136
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_ref=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}&chunk_index=gte.100000&select=chunk_index,metadata",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "53ea056a-75e5-4635-996e-77ce6e844842",
+      "name": "Get Delete SharePoint Image Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1248,
+        1136
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Build Delete Context').first().json;\nconst sourceRaw = $('Get Delete SharePoint Source').first().json;\nconst source = Array.isArray(sourceRaw) ? (sourceRaw[0] || {}) : (sourceRaw || {});\nconst chunkRaw = $input.first().json;\nconst imageChunks = Array.isArray(chunkRaw) ? chunkRaw : (chunkRaw?.metadata ? [chunkRaw] : []);\n\nfunction parseJsonArray(value) {\n  if (Array.isArray(value)) return value;\n  if (typeof value === 'string') {\n    try {\n      const parsed = JSON.parse(value);\n      return Array.isArray(parsed) ? parsed : [];\n    } catch { return []; }\n  }\n  return [];\n}\nfunction pathFromValue(value) {\n  if (!value) return null;\n  const raw = String(value).trim();\n  if (!raw) return null;\n  const markers = [\n    '/storage/v1/object/public/rag/',\n    '/storage/v1/object/sign/rag/',\n    '/storage/v1/object/authenticated/rag/',\n    '/storage/v1/object/rag/'\n  ];\n  for (const marker of markers) {\n    const pos = raw.indexOf(marker);\n    if (pos >= 0) {\n      const path = raw.slice(pos + marker.length).split('?')[0];\n      try { return decodeURIComponent(path); } catch { return path; }\n    }\n  }\n  return raw.replace(/^\\/+/, '');\n}\nfunction pathFromImage(image) {\n  if (!image || typeof image !== 'object') return null;\n  return pathFromValue(\n    image.storage_path || image.storage_key || image.public_url || image.related_image_url || image.url || image.image_name\n  );\n}\n\nconst paths = new Set();\nfor (const image of parseJsonArray(source.images)) {\n  const path = pathFromImage(image);\n  if (path) paths.add(path);\n}\nfor (const row of imageChunks) {\n  const metadata = row?.metadata && typeof row.metadata === 'object' ? row.metadata : {};\n  const path = pathFromImage(metadata);\n  if (path) paths.add(path);\n}\n\nconst storagePaths = Array.from(paths).filter(Boolean).sort();\nconst base = {\n  doc_id: ctx.doc_id,\n  source_found: Boolean(source.id),\n  source_id: source.id || null,\n  source_file_name: source.file_name || ctx.filename || null,\n  planned_storage_delete_count: storagePaths.length\n};\n\nif (!storagePaths.length) {\n  return [{ json: { ...base, has_storage_to_delete: false, storage_path: null } }];\n}\n\nreturn storagePaths.map(storage_path => ({\n  json: {\n    ...base,\n    has_storage_to_delete: true,\n    storage_path,\n    storage_path_encoded: storage_path.split('/').map(segment => encodeURIComponent(segment)).join('/')\n  }\n}));"
+      },
+      "id": "8bc8f469-6d5c-4c2b-8766-212423a8a075",
+      "name": "Build Delete Storage Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        1136
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c-dstore",
+              "leftValue": "={{ $json.has_storage_to_delete }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f23e3935-68be-44f2-9b37-af0be9fee074",
+      "name": "IF Delete Has Storage",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1696,
+        1136
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/rag/{{ $json.storage_path_encoded }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "options": {}
+      },
+      "id": "24031ee9-6b86-4a7a-af32-331acb4a6289",
+      "name": "Delete SharePoint Storage Object",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1904,
+        1056
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "storage_delete_results",
+        "options": {}
+      },
+      "id": "3f7d3fd7-fffa-40c4-8592-26394068d70d",
+      "name": "Collect Delete Storage Results",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { storage_delete_results: [], storage_delete_skipped: true } }];"
+      },
+      "id": "999b016b-5626-493a-8e4d-4b55807b37da",
+      "name": "No Delete Storage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/document_chunks?source_type=eq.sharepoint&source_ref=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "865b06f9-0414-4993-8b06-31fe0b8df235",
+      "name": "Delete All SharePoint Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2352,
+        1136
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://zckaxkpycyyxaymmkmvu.supabase.co/rest/v1/sharepoint_documents?doc_id=eq.{{ encodeURIComponent($('Build Delete Context').first().json.doc_id) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "85463b05-e47f-48c5-8043-5bf63fd8c994",
+      "name": "Delete SharePoint Source",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2576,
+        1136
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Build Delete Context').first().json;\nconst planItems = $('Build Delete Storage Plan').all().map(item => item.json);\nconst sourceInfo = planItems[0] || {};\nconst chunksRaw = $('Delete All SharePoint Chunks').first().json;\nconst sourceRaw = $input.first().json;\nconst deletedChunks = Array.isArray(chunksRaw) ? chunksRaw : (chunksRaw?.id ? [chunksRaw] : []);\nconst deletedSources = Array.isArray(sourceRaw) ? sourceRaw : (sourceRaw?.id ? [sourceRaw] : []);\n\nreturn [{\n  json: {\n    ok: true,\n    status: 'DONE_DELETED',\n    crud_action: 'DELETE',\n    doc_id: ctx.doc_id,\n    filename: sourceInfo.source_file_name || ctx.filename || null,\n    source_existed_before_delete: Boolean(sourceInfo.source_found),\n    deleted_source_count: deletedSources.length,\n    deleted_chunk_count: deletedChunks.length,\n    planned_storage_delete_count: Number(sourceInfo.planned_storage_delete_count || 0),\n    delete_is_idempotent: true,\n    finished_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "e0816a39-4aed-4971-b5db-06850e6ff0aa",
+      "name": "Delete Workflow Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        1136
+      ]
+    }
+  ],
+  "nodeGroups": [],
+  "description": "Nimmt einen Auftrag je Datei, beschafft sie aus SharePoint, macht sie zu Text und schreibt sie in die Wissensbasis. Ein Ausgang: Ergebnis. Aufgerufen von RAG - SharePoint Steuerung."
+}

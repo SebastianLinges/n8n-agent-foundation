@@ -28,9 +28,11 @@ Sebastian Linges, Geschäftsführer KAPA Digital, arbeitet für RWG Rheinland eG
 Nicht aufwerfen, das ist geklärt:
 
 - **Graph läuft über den persönlichen Zugang `Sebastian.Linges`**, nicht über ein Dienstkonto. Bewusst so, bleibt so.
-- **Der ProzessHub-Flow (`Muss6GBGPuG9fjE2`) bleibt stillgelegt**, bis Sebastian ihn aktiviert. Er ist belegt funktionsfähig.
+- **Der ProzessHub-Flow (`Muss6GBGPuG9fjE2`) läuft aktiv**, nächtlich um 02 Uhr. Anlegen, Aktualisieren, Entfernen und Umbenennen sind belegt.
+- **Der Spiegel wird gegen den Ist-Bestand abgeglichen, nicht gegen das Gedächtnis.** Der Aufräumer entfernt in SharePoint, was nicht auf der Soll-Liste steht — gleich ob Umbenennung, abgebrochener Lauf oder von Hand Hineinkopiertes. Nicht per Wegwerfen und Neuanlegen: das würde jede Nacht alle geteilten Links, die Versionshistorie und die Item-IDs zerstören.
 - **Der Ablageordner des Contract Loaders heißt `DONE`**, nicht `Erledigt` — er bestand bereits und war gefüllt.
 - **Die Excel-Übersicht wird je Lauf neu erzeugt**, nicht fortgeschrieben, und enthält Fertiges wie Fehlerfälle mit `status` als erster Spalte.
+- **Der SharePoint-Ingest ist in Steuerung und Verarbeitung geschnitten.** Nichts Binäres über die Flowgrenze: Die Steuerung übergibt einen Auftrag je Datei, die Verarbeitung holt die Datei selbst. Kein Webhook, auch nicht als Rückweg. Begründung und Bauplan: [konzept-sharepoint-neubau.md](konzept-sharepoint-neubau.md).
 
 ## Teuer erkaufte technische Regeln
 
@@ -59,53 +61,53 @@ Nicht aufwerfen, das ist geklärt:
 - **Große Ausführungen sind per MCP nicht abrufbar** — `get_execution` mit `includeData` reißt bei OCR- und bildlastigen Läufen die Sitzung ab. Die Ursache steht stattdessen in der Ausführung des Fehler-Workflows `pMGm0LaxRTldvPKEkmkzC`.
 - **n8n weist Credentials automatisch zu**, wenn nur eine des Typs existiert. Bei zwei Datenbanken ist das gefährlich — nach jedem `create_workflow_from_code` die Zuordnung prüfen.
 - **Die MCP-Schnittstelle liest Credentials nicht aus.** `get_workflow_details` liefert bei jedem Node `credentials: null`, auch wenn eine zugewiesen ist. Daraus lässt sich also *nicht* schließen, dass eine fehlt — und man kann auch nicht sehen, welche dranhängt. Der einzige Weg ist, sie mit `setNodeCredential` ausdrücklich zu setzen.
+- **Ein aufgebrauchtes Mistral-Kontingent zeigt sich in zwei Gestalten.** Solange der Zugang nur pausiert ist, wirft die API die Verbindung weg, statt einen Fehlercode zu senden — `ECONNRESET` mit *„The connection to the server was closed unexpectedly"*, und die Wiederholungen laufen ins Leere. Ein Abrechnungsproblem sieht dadurch wie ein Netzabbruch aus. Ist das Abo abgelaufen, antwortet dieselbe Stelle sauber mit `402 Payment required`. Gesperrt wird dabei nicht nur der Chat-, sondern auch der Datei-Endpunkt — die OCR wird dann gar nicht mehr erreicht. Belegt in den Läufen 111062 und 111286.
 - **Wird ein Supabase-Projekt gelöscht, verschwindet auch sein Zugang aus n8n.** Jeder Flow, der ihn noch referenziert, scheitert ab dem nächsten Lauf mit `Credential with ID … does not exist`. Bei webhook- oder ereignisgetriebenen Flows fällt das sofort auf, bei Delta-Läufen ohne Änderungen erst Tage später — die betroffenen Nodes werden dann gar nicht angefasst. **Vor dem Löschen eines Projekts auf allen Flows den neuen Zugang setzen**, nicht nur die Adressen umstellen.
 
 ---
 
 ## Stand: die RWG-Wissensbasis
 
-Drei Ingest-Flows füllen dieselbe Tabelle `document_chunks`, unterschieden über `source_type`:
+Drei Ingest-Flows füllen dieselbe Tabelle `document_chunks`, unterschieden über `source_type`. Gemessen am 01.09. abends:
 
-| Quelle | Chunks | Dokumente |
-|---|---|---|
-| `jira` | 10 548 | 1 467 |
-| `sharepoint` | 7 287 | 253 |
-| `confluence` | 3 512 | 611 |
+| Quelle | Chunks |
+|---|---|
+| `jira` | 10 794 |
+| `sharepoint` | 8 302 |
+| `confluence` | 3 635 |
+| **gesamt** | **22 731**, davon 0 ohne Embedding |
 
-Dazu der Bucket `rag` mit rund 7 384 Bildern. Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
-
-Die Zahlen sind am 30.08. abends gemessen, **während der Abgleich noch lief** — sie sind inzwischen höher.
+Dazu 300 Zeilen in `sharepoint_documents` und der Bucket `rag` mit 7 764 Objekten. Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
 
 **Gesundheitsprüfung:** Flow `RWG Wartung - Funktionen pruefen` (`h4uVcnxF5jbRUPHZ`) beantwortet in einer halben Sekunde, ob die Wissensbasis intakt ist — Bestand, Embeddings, Indizes, Bucket und ob noch Verweise aufs alte Projekt existieren. Keine publizierte Fassung, im Manuell-Modus starten.
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Das Mistral-Abo ist abgelaufen und läuft ab dem 01.09.2026 wieder.** Die Abrechnungsmail nennt 100 Prozent der enthaltenen API-Nutzung erreicht, Zugriff pausiert. **Die Sperre zeigt sich in zwei Gestalten.** Solange die API nur pausiert war, warf sie die Verbindung weg, statt einen Fehlercode zu senden — der Knoten `Upload Source To Mistral` meldete `ECONNRESET` mit *„The connection to the server was closed unexpectedly"*, und die drei Wiederholungen liefen ins Leere; ein Abrechnungsproblem sah dadurch wie ein Netzabbruch aus. Seit dem Ablauf antwortet dieselbe Stelle sauber mit `402 Payment required` und *Check your subscription on admin.mistral.ai/subscription*. Belegt in den Läufen 111062 und 111286. **Gesperrt ist inzwischen auch der Datei-Upload**, nicht mehr nur der Chat-Endpunkt — der OCR-Endpunkt wird gar nicht mehr erreicht.
+1. **Die erste Nacht des neuen SharePoint-Ingests nachsehen.** Am 01.09. wurde der Ingest in zwei Flows geschnitten und um 18:25 umgeschaltet:
 
-   **Solange das gilt, kann der Ingest keine Datei einlesen, die durch die OCR muss.** Der nächtliche Abgleich läuft, findet Aufgaben und scheitert an der ersten. Das ist erwartet, kein Defekt.
+   | Flow | ID | Stand |
+   |---|---|---|
+   | `RAG - SharePoint Steuerung` | `PAqphQur0CTQRypM` | publiziert und aktiv, trägt beide Zeitpläne |
+   | `RAG - SharePoint Ingest` (die Verarbeitung) | `coDhu7pIaI2bpmGZ` | publiziert und aktiv |
+   | `RAG - SharePoint Ingest OLD` | `BBhGCRsQ8pdNSxTi` | umbenannt, deaktiviert |
 
-   **Was ohne Mistral trotzdem geht:** `.txt`, `.csv` (Textpfad) und `.xlsx` (Workbook-API). Nur PDF, Word und PowerPoint brauchen die OCR.
+   Das stündliche Delta läuft belegt (`113028`, `113035` — beide grün, rund eine Sekunde). Zu prüfen ist der Abgleich um 03:30: Status `success`, **15** Einlesungen (`maxJeLauf` steht seit dem 01.09. auf 15 statt 3), `anker_geschrieben: true`, keine Rückstellung. Eine Telegram-Meldung `[ZURUECKGESTELLT]` heißt, die OCR ist wieder zu. Der Rückweg ist der alte Flow — aktivieren, den neuen abschalten, **nie beide gleichzeitig**: gleiche Cron-Zeiten, gleicher Delta-Anker.
 
-   **Der Abgleich stirbt daran nicht mehr.** Fällt die OCR aus, stellt er die Aufgabe zurück, zählt sie in der Laufbilanz als `zurueckgestellt`, schreibt den Delta-Anker fort und meldet die liegengebliebenen Dateien per Telegram mit der Kopfzeile `[ZURUECKGESTELLT]`. Ein Lauf ohne Meldung und ohne Rückstellung ist ein sauberer Lauf.
+2. **Die Namen in n8n sind vertauscht worden.** Die neue Verarbeitung heißt dort `RAG - SharePoint Ingest`, der abgelöste Flow `RAG - SharePoint Ingest OLD`. Im Repo bleibt der Schnitt sprechend: `flows/rag-sharepoint-verarbeitung/` ist die Verarbeitung, `flows/rag-sharepoint-ingest/` der abgelöste Vorgänger. **Immer über die ID gehen, nie über den Namen.**
 
-2. **Sechs Altzeilen ohne Chunks sind nicht heilbar, sondern zu löschen.** Es sind Power-Automate-Zeilen mit `RWGID`-Kennung. Der Abgleich ordnet über die Graph-`doc_id` zu und findet keine Entsprechung — er liest die Datei stattdessen als **neue** ein und legt eine zweite Zeile an. Belegt an `16_ber_regaletiketten…`: Die Graph-Fassung hat jetzt 163 Chunks, die Altzeile steht weiter bei null.
-
-   Das widerlegt die Annahme in `offene-punkte.md`, eine über Graph neu eingelesene Datei ersetze ihre Altfassung. Sie stellt sich daneben. Betroffen sind potenziell alle **247** Zeilen, die Lauf `110947` als `rag_nicht_zuordenbar` zählte.
-
-   **Zu tun, sobald Mistral wieder läuft:** die fünf verbliebenen Regaletiketten einlesen, danach die sechs Altzeilen löschen — aber erst, wenn die jeweilige Graph-Fassung nachweislich Chunks trägt.
-
-3. **Ist der 01.09. erreicht?** Dann laufen die Mistral-Token wieder. Was dann in welcher Reihenfolge ansteht, steht unter „Morgen zuerst" in [offene-punkte.md](offene-punkte.md).
 3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
+
+Alles Weitere, nach Dringlichkeit sortiert, steht unter „Zuerst" in [offene-punkte.md](offene-punkte.md).
 
 ## Offene Themen
 
 Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
 
 **Wartet auf Sebastian**
+- **Wegwerfseite im ProzessHub löschen:** `470188033`, Titel `ZZ Testseite Umbenennung – bitte loeschen`. Rest aus dem Umbenennungstest vom 01.09.; sie wird nicht mehr gespiegelt. Über MCP gibt es kein Löschwerkzeug für Confluence-Seiten.
 - **Doubletten in SharePoint:** 17 überzählige Kopien in 15 Gruppen, zusammen 10 MB. Die vollständige Liste mit Ordnern steht in `offene-punkte.md`. Zwei davon liegen in einem Ordner `alt` und sollen weg — dafür fehlt ein Werkzeug, siehe unten. Die sieben Gruppen unter `/Lagerpläne/` bleiben ausdrücklich unangetastet.
-- **Beitragsprüfung im Content Studio testen.** Erzeugt echte Artefakte. Der Ablauf ist geklärt: `Freigabe erteilt` ist eine reine Maschinenprüfung auf `qa_passed`, es gibt **keinen menschlichen Freigabeschritt in n8n**. Geht der Beitrag durch, entstehen E-Mail, `content_packages`-Zeile und ein Buffer-Entwurf — die Freigabe passiert dann in Buffer. Fällt er durch, kommt **nur** eine Telegram-Meldung, sonst nichts. Für den Fehlerfall im Code-Node `Lesbarkeit pruefen` die Mindestwortzahl `30` vorübergehend hochsetzen, danach zurückstellen.
 - **Handwerks-Use-Cases.** Die Säule `handwerk` steht auf 0. Der Grund ist strukturell: `KI Daily - Collect [WF-1]` zieht nur aus GitHub, Tavily und Hacker News — angelsächsische Tech-Presse, aus der kein deutscher Handwerksprozess entstehen kann. Vorschlag: fünf bis acht Use-Cases von Hand setzen (das entsperrt den Dienstagsslot sofort), danach die Tavily-Abfrage um deutsche Quellen ergänzen — Mittelstand-Digital Zentren, Handwerkskammern Köln und Düsseldorf, ZDH. Welche davon brauchbare Feeds haben, ist **ungeprüft**.
+- **Lead Intake von der Website** (`HW170WdNT9yQGErU`): Die zwei Mails sind **kein Doppelversand**, sondern zwei Empfänger in einer Nachricht — `empfaengerIntern` trägt `info@kapa-digital.de` und `sebastian.linges@kapa-digital.de`. Zu entscheiden ist nur, ob die zweite Adresse bleibt. Der Spamverdacht kam vom Modell und war beim eingereichten Buchstabensalat vertretbar; offen ist die Beschriftung, nicht die Erkennung. Beides bleibt auf Sebastians Entscheidung unverändert. Der Entwurfsstand ist am 01.09. publiziert — er war zeichengleich mit der aktiven Fassung, ein Autosave ohne Änderung.
 
 **Was mir fehlt**
 - **Kein Werkzeug zum Löschen von SharePoint-Dateien.** Der einzige Weg wäre ein Wegwerf-Flow gegen die Graph-API mit Hash-Prüfung vor dem Löschen — so wie das Ordner-Werkzeug vom 30.08. Für zwei Dateien lohnt es kaum; wenn mehr wegsollen, ist es gebaut.
@@ -117,16 +119,17 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 
 **Der Umbau ist unveröffentlichter Entwurf.** Die alte Fassung ist noch die aktive.
 
-Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist die Extraktion**: Die Mistral-Token sind bis zum **01.09.2026** aufgebraucht. Inzwischen ist die ganze API gesperrt, nicht nur der Chat-Endpunkt — schon der Datei-Upload wird mit `402` abgewiesen.
+Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist allein die Extraktion.** Sie scheiterte am aufgebrauchten Mistral-Kontingent; das ist seit dem 01.09. keine Hürde mehr.
 
-**Zum Abarbeiten ab dem 01.09.:** Lauf anstoßen, Extraktion an den beiden liegengebliebenen Dokumenten prüfen, publizieren, danach Export ins Git. Vier Nodes sind noch ungetestet, alle hinter der Extraktion.
+**Vor dem Test aufräumen:** Die beiden Dokumente liegen nicht mehr im Eingang. In `vertraege` stehen sie auf `status = 'fehler'` mit `versuche = 3`, die Dateien sind nach `/IMPORTER/CONTRACT/FEHLER` gewandert. Sie müssen zurück in den Eingang und der Zähler zurückgesetzt werden, sonst wandern sie sofort wieder hinaus. Der `ocr_text` steht in beiden Zeilen — es kostet keine neue OCR. Danach: Lauf anstoßen, Extraktion prüfen, publizieren, Export ins Git. Vier Nodes sind noch ungetestet, alle hinter der Extraktion.
 
 **Technisch offen**
-- Erstbefüllung: **432** Dateien einzulesen, 30 je Nacht — etwa fünfzehn Nächte
-- **6 Altzeilen ohne Chunks** — Power-Automate-Leichen, siehe oben. Nicht heilbar, sondern zu löschen. Alle echten unvollständigen Einträge sind geheilt.
+- Erstbefüllung: rund **400** Dateien einzulesen, bei `maxJeLauf: 3` über 130 Nächte. Die Mengenbremse ist nach dem Umschalten neu auszuloten — das ist der Hebel.
+- **6 Altzeilen ohne Chunks** — Power-Automate-Leichen. Zwei davon sind jetzt löschbar, für vier fehlt noch die Graph-Fassung.
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
+- Beitragsprüfung im Content Studio: Absatzregel und Fremdprodukt-Befund sind gefixt und belegt (`111893`). Offen bleiben der Retry als Netz und der Zahlen-Check. **Die Bildstrecke ist weiterhin ungeprüft** — der nächste echte Lauf ist Mi 02.09. um 08:00.
 
 ## Was im Repo liegt
 
@@ -135,6 +138,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 | `README.md` | alle Flows mit n8n-ID, Datenbankzuordnung und Zusammenhängen |
 | `migration/` | Umzug: Befund, Abnahme, Struktur der alten Datenbank |
 | `offene-punkte.md` | was ansteht und was fehlt |
+| `konzept-sharepoint-neubau.md` | warum der SharePoint-Ingest in zwei Flows geschnitten ist, Zielbild und Etappen |
 | `konzept-ocr-schonen.md` | wie der SharePoint-Ingest Mistral schont, ohne Bilder zu verlieren |
 | `ideen.md` | was noch keine Aufgabe ist |
 | `referenz-dokumentationsbefunde.md` | offene Korrekturen an Confluence-Seiten und Jira-Vorgängen |

@@ -17,7 +17,9 @@ flows/<flow-name>/
 
 | Flow | Ordner | n8n-ID |
 |---|---|---|
-| RAG - SharePoint Ingest | `flows/rag-sharepoint-ingest/` | `BBhGCRsQ8pdNSxTi` |
+| RAG - SharePoint Steuerung | `flows/rag-sharepoint-steuerung/` | `PAqphQur0CTQRypM` |
+| RAG - SharePoint Ingest (die Verarbeitung) | `flows/rag-sharepoint-verarbeitung/` | `coDhu7pIaI2bpmGZ` |
+| RAG - SharePoint Ingest OLD | `flows/rag-sharepoint-ingest/` | `BBhGCRsQ8pdNSxTi` |
 | RAG-Confluence-Ingest | `flows/rag-confluence-ingest/` | `Ham6IDJxbqIydImp` |
 | RAG-JIRA-Ingest | `flows/rag-jira-ingest/` | `ESVtaoyTfaP3jm2G` |
 | RWG Sub - Wissenssuche | `flows/rwg-sub-wissenssuche/` | `GD256mxClPHHbngI` |
@@ -29,6 +31,8 @@ flows/<flow-name>/
 | KAPA Digital - KI Daily - Collect [WF-1] | `flows/kapa-ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
 | KAPA Digital - KI Daily - Analyze & Deliver [WF-2] | `flows/kapa-ki-daily-analyze/` | `objM2PQrcTpEzik7` |
 | KAPA Digital - Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |
+
+**Zu den drei SharePoint-Flows:** Der Ingest ist in Steuerung und Verarbeitung geschnitten. Die Verarbeitung trägt in n8n den Namen des Vorgängers, der Vorgänger heißt dort `… OLD`. Massgeblich ist die ID, nicht der Name. Bauplan: [konzept-sharepoint-neubau.md](konzept-sharepoint-neubau.md).
 
 ### Ohne eigenen Ordner
 
@@ -43,6 +47,7 @@ Auf der n8n-Leinwand dokumentiert, hier nur eingeordnet:
 | RWG Wartung - Funktionen pruefen | `h4uVcnxF5jbRUPHZ` | Gesundheitsprüfung der Wissensbasis in einer halben Sekunde | RWG RAG |
 | RWG Wartung - SharePoint Eingang pruefen | `UcEQSxTfn6pshNNI` | liest Bibliotheken und Ordnerinhalt der Site `rwgintranet` | keine |
 | RWG Wartung - SharePoint Bestand analysieren | `OQh5K8D1UrQK9fPQ` | wertet die Bibliothek `Schulungen` aus: leere Ordner, Doubletten, Typen, OCR-Bedarf | keine |
+| RWG Wartung - SharePoint Struktur | `Izrp4qA84wuAGN8O` | gibt die Bibliothek `Schulungen` als flache Strukturtabelle aus, eine Zeile je Ordner und Datei | keine |
 | RWG Monitor - Microsoft Graph & Teams | `1OcqfC4wTC9bj0wK` | Erreichbarkeitsprüfung alle 15 Minuten | keine |
 | RWG Contract Loader | `661BDwEditNicEc0` | Vertrags-PDF aus SharePoint per Mistral OCR nach `vertraege`, Ablage nach `DONE`, Excel-Übersicht | RWG RAG |
 | Telegram_Error_Info | `pMGm0LaxRTldvPKEkmkzC` | Fehler-Workflow für alle Flows | keine |
@@ -67,6 +72,8 @@ Die beiden KI-Daily-Flows gehören zusammen und müssen **auf denselben Wochenta
 Die drei Marketing-Flows bilden eine Kette: Collect sammelt, Analyze wertet aus und legt Use Cases und Marketing-Ideen ab, das Content Studio verbraucht sie. Das Studio läuft **einen Tag vor dem Posttag** — der `weekday` in `content_schedule` meint deshalb den Posttag, nicht den Lauftag.
 
 Auf der RWG-Seite füllen drei Ingest-Flows dieselbe Tabelle `document_chunks`, unterschieden über `source_type`. Wissenssuche, Jira-Agent und Teams-Agent lesen daraus. Der Teams-Agent ruft dabei vier Subflows: Wissenssuche, Jira Tickets, Identity Resolver und Teams Image Read.
+
+Der SharePoint-Ingest ist als einziger in zwei Flows geschnitten: Die Steuerung findet, was neu, geändert oder gelöscht ist, und ruft je Datei die Verarbeitung auf. Dasselbe Muster fährt `RWG Steuerung - Confluence Bereiche` gegen den Confluence-Ingest.
 
 ## Offene Punkte
 
