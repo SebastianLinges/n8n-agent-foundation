@@ -109,20 +109,6 @@ zuerst den Mistral-Verbrauch je Nacht kennen, nicht die Laufzeit.
 gesetzte Dauer überschreitet. Das ist ein Umbau, kein Parameter — erst sinnvoll, wenn die Stückzahl
 sich als untauglich erweist.
 
-### Vier Regaletiketten einlesen, dann zwei Altzeilen löschen
-
-Am 01.09. gemessen: In `sharepoint_documents` stehen **nur noch sechs** Zeilen ohne einen einzigen
-Chunk, alle mit Power-Automate-Kennung, alle Regaletiketten-PDFs. Die sieben bildreichen
-`Bereichsuebergreifend ….docx` sind geheilt.
-
-| Altzeile ohne Chunks | Graph-Fassung | Was zu tun ist |
-|---|---|---|
-| `00_lev…`, `16_ber…` | vorhanden, 150 bzw. 163 Chunks | **löschbar**, die Bedingung ist erfüllt |
-| `01_wip…`, `15_lin…`, `17_erk…`, `22_hei…` | fehlt | erst über Graph einlesen, dann löschen |
-
-Der Abgleich heilt sie nicht: Er ordnet über die Graph-`doc_id` zu, findet keine Entsprechung und legt
-die Datei **daneben** als neue Zeile an, statt die alte zu ersetzen.
-
 ### OCR schonen — drei Hebel liegen noch
 
 Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md):
@@ -245,13 +231,12 @@ Dazu der erste echte Kettenlauf `112961` mit drei eingelesenen Dokumenten.
    Rueckweg ist billig: alten Flow aktivieren, neuen abschalten - beide schreiben in dieselben
    Tabellen, kein Datenumbau. **Nie beide Steuerungen gleichzeitig aktiv**: gleiche Cron-Zeiten,
    gleicher Delta-Anker in `sharepoint_delta`.
-2. **`maxJeLauf` neu ausloten.** Steht auf 3, begruendet mit der 300-Sekunden-Grenze des
-   Task-Runners je Code-Node. Bei rund 400 fehlenden Dateien sind das rechnerisch ueber 130 Naechte.
-   Jetzt laeuft jede Datei in einer eigenen Ausfuehrung - wie weit die Grenze steigen kann, ist zu
-   **messen**, nicht zu schaetzen.
-3. **Danach aufraeumen:** Power-Automate-Flow in SharePoint entfernen (Ziel
-   `.../webhook/8e16e07b-d272-4147-a2a2-80694afd9007`), alten Flow archivieren, nach einer Woche
-   loeschen, `flows/rag-sharepoint-ingest/` aufloesen.
+2. **`maxJeLauf` im Betrieb bestaetigen.** Steht seit dem 01.09. auf 15, begrenzt durch das
+   Mistral-Kontingent, nicht durch die Technik - siehe
+   [Die Mengenbremse ist gemessen](#die-mengenbremse-ist-gemessen--3-ist-nicht-mehr-begründet).
+3. **Danach aufraeumen:** alten Flow archivieren, nach einer Woche loeschen,
+   `flows/rag-sharepoint-ingest/` aufloesen. Der Power-Automate-Flow in SharePoint ist am 01.09. von
+   Sebastian abgeschaltet.
 
 **Offen geblieben ist der Mehrbereichs-Fall.** Die Bereichsliste steht in `Startbereiche`, aber der
 `@odata.deltaLink` einer Antwortseite traegt selbst keine Laufwerkskennung - er wird dem Bereich
@@ -406,7 +391,9 @@ Die Wissensbasis traegt 29 Dateinamen mehrfach. Die Herkunft klaert das Bild:
 
 Von den 61 Zeilen hinter den 29 doppelten Namen tragen **60 eine Power-Automate-Kennung**. Es sind also keine Format- oder Fachdoubletten, sondern Mehrfachsendungen aus der Power-Automate-Zeit: dieselbe Datei kam unter verschiedenen Kennungen an.
 
-**Das loest sich nicht von selbst - diese Annahme ist widerlegt.** Eine ueber Graph neu eingelesene Datei ersetzt ihre Altfassung **nicht**, sie stellt sich daneben: Der Abgleich ordnet ueber die Graph-`doc_id` zu, findet zur Power-Automate-Kennung keine Entsprechung und legt eine zweite Zeile an. Belegt an `00_lev…` und `16_ber…`, die beide unter beiden Herkuenften stehen - die Graph-Fassung mit 150 bzw. 163 Chunks, die Altzeile weiter bei null. Die Altzeilen sind also von Hand zu loeschen, sobald die Graph-Fassung nachweislich Chunks traegt. Der Verwaist-Befund faengt sie nicht ab: Er ruehrt bewusst nichts an, was keine Graph-Item-ID traegt.
+**Das loest sich nicht von selbst - diese Annahme ist widerlegt.** Eine ueber Graph neu eingelesene Datei ersetzt ihre Altfassung **nicht**, sie stellt sich daneben: Der Abgleich ordnet ueber die Graph-`doc_id` zu, findet zur Power-Automate-Kennung keine Entsprechung und legt eine zweite Zeile an. Der Verwaist-Befund faengt sie nicht ab - er ruehrt bewusst nichts an, was keine Graph-Item-ID traegt. Altzeilen sind deshalb von Hand zu loeschen.
+
+**Die sechs leeren Altzeilen sind am 01.09. geloescht** (Migration `altzeilen_regaletiketten_ohne_chunks_entfernen`): Regaletiketten-PDFs mit 0 Chunks, 0 Bildern, `ingestion_count 0` und ohne `content_hash` - reine Huellen, an denen nichts hing. Die Dateien liegen weiter in SharePoint und werden von der Erstbefuellung regulaer gelesen. **Seither steht die Zahl der Dokumente ohne Chunks auf null.** Die verbliebenen 241 Power-Automate-Zeilen tragen alle Inhalt.
 
 Fachlich zu entscheiden bleibt allein, was in SharePoint selbst mehrfach liegt: 27 inhaltsgleiche Kopien und 63 namensgleiche mit verschiedenem Inhalt. Siehe den Abschnitt zur Erstbefuellung.
 

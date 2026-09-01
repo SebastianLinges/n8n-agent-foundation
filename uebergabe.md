@@ -73,11 +73,11 @@ Drei Ingest-Flows füllen dieselbe Tabelle `document_chunks`, unterschieden übe
 | Quelle | Chunks |
 |---|---|
 | `jira` | 10 794 |
-| `sharepoint` | 8 302 |
+| `sharepoint` | 8 343 |
 | `confluence` | 3 635 |
-| **gesamt** | **22 731**, davon 0 ohne Embedding |
+| **gesamt** | **22 772**, davon 0 ohne Embedding |
 
-Dazu 300 Zeilen in `sharepoint_documents` und der Bucket `rag` mit 7 764 Objekten. Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
+Dazu 304 Zeilen in `sharepoint_documents` — keine davon ohne Chunks — und der Bucket `rag` mit 7 764 Objekten. Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
 
 **Gesundheitsprüfung:** Flow `RWG Wartung - Funktionen pruefen` (`h4uVcnxF5jbRUPHZ`) beantwortet in einer halben Sekunde, ob die Wissensbasis intakt ist — Bestand, Embeddings, Indizes, Bucket und ob noch Verweise aufs alte Projekt existieren. Keine publizierte Fassung, im Manuell-Modus starten.
 
@@ -125,7 +125,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 
 **Technisch offen**
 - Erstbefüllung: rund **400** Dateien einzulesen, bei `maxJeLauf: 3` über 130 Nächte. Die Mengenbremse ist nach dem Umschalten neu auszuloten — das ist der Hebel.
-- **6 Altzeilen ohne Chunks** — Power-Automate-Leichen. Zwei davon sind jetzt löschbar, für vier fehlt noch die Graph-Fassung.
+- **Dokumente ohne Chunks: keine.** Die sechs leeren Power-Automate-Altzeilen sind am 01.09. gelöscht.
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
