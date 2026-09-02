@@ -32,6 +32,7 @@ Nicht aufwerfen, das ist geklärt:
 - **Der Spiegel wird gegen den Ist-Bestand abgeglichen, nicht gegen das Gedächtnis.** Der Aufräumer entfernt in SharePoint, was nicht auf der Soll-Liste steht — gleich ob Umbenennung, abgebrochener Lauf oder von Hand Hineinkopiertes. Nicht per Wegwerfen und Neuanlegen: das würde jede Nacht alle geteilten Links, die Versionshistorie und die Item-IDs zerstören.
 - **Der Ablageordner des Contract Loaders heißt `DONE`**, nicht `Erledigt` — er bestand bereits und war gefüllt.
 - **Die Excel-Übersicht wird je Lauf neu erzeugt**, nicht fortgeschrieben, und enthält Fertiges wie Fehlerfälle mit `status` als erster Spalte.
+- **maxJeLauf steht auf 15, nicht hoeher.** Nicht die technische Grenze - die laege deutlich hoeher, gemessen an Lauf 113044 mit 10 Dokumenten in 69 Sekunden. Es ist eine Kostenbremse: Sebastian hat begrenzt, damit das Mistral-Kontingent nicht verbrennt. Wer die Zahl anfassen will, muss zuerst den Verbrauch je Nacht kennen, nicht die Laufzeit.
 - **Der SharePoint-Ingest ist in Steuerung und Verarbeitung geschnitten.** Nichts Binäres über die Flowgrenze: Die Steuerung übergibt einen Auftrag je Datei, die Verarbeitung holt die Datei selbst. Kein Webhook, auch nicht als Rückweg. Begründung und Bauplan: [konzept-sharepoint-neubau.md](konzept-sharepoint-neubau.md).
 
 ## Teuer erkaufte technische Regeln
@@ -70,67 +71,67 @@ Nicht aufwerfen, das ist geklärt:
 
 ## Stand: die RWG-Wissensbasis
 
-Drei Ingest-Flows füllen dieselbe Tabelle `document_chunks`, unterschieden über `source_type`. Gemessen am 01.09. abends:
+Drei Ingest-Flows füllen dieselbe Tabelle `document_chunks`, unterschieden über `source_type`. Gemessen am 02.09. abends:
 
 | Quelle | Chunks |
 |---|---|
-| `jira` | 10 794 |
-| `sharepoint` | 8 343 |
-| `confluence` | 3 635 |
-| **gesamt** | **22 772**, davon 0 ohne Embedding |
+| `jira` | 10 855 |
+| `sharepoint` | 8 568 |
+| `confluence` | 3 641 |
+| **gesamt** | **23 064**, davon 0 ohne Embedding |
 
-Dazu 304 Zeilen in `sharepoint_documents` — keine davon ohne Chunks — und der Bucket `rag` mit 7 764 Objekten. Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
+Dazu 319 Zeilen in `sharepoint_documents` und der Bucket `rag`. Gelesen wird über `RWG Sub - Wissenssuche` (Hybrid aus Vektor- und deutscher Volltextsuche mit RRF und Cohere-Rerank), den Jira-Agenten und den Teams-Agenten.
 
 **Gesundheitsprüfung:** Flow `RWG Wartung - Funktionen pruefen` (`h4uVcnxF5jbRUPHZ`) beantwortet in einer halben Sekunde, ob die Wissensbasis intakt ist — Bestand, Embeddings, Indizes, Bucket und ob noch Verweise aufs alte Projekt existieren. Keine publizierte Fassung, im Manuell-Modus starten.
 
 ## Als Erstes in der neuen Sitzung
 
-1. **Die erste Nacht des neuen SharePoint-Ingests nachsehen.** Am 01.09. wurde der Ingest in zwei Flows geschnitten und um 18:25 umgeschaltet:
+**Das Thema ist gesetzt: das SQL-Konzept für Reporting, Controlling und Fibu.** Danach folgen Artikelabfragen und die Pflege von Artikeldaten. Beides ist im Repo noch nicht vorbereitet — die Fragen, die vor dem Bau zu klären sind, stehen unter „Zuerst" in [offene-punkte.md](offene-punkte.md).
 
-   | Flow | ID | Stand |
-   |---|---|---|
-   | `RAG - SharePoint Steuerung` | `PAqphQur0CTQRypM` | publiziert und aktiv, trägt beide Zeitpläne |
-   | `RAG - SharePoint Ingest` (die Verarbeitung) | `coDhu7pIaI2bpmGZ` | publiziert und aktiv |
-   | `RAG - SharePoint Ingest OLD` | `BBhGCRsQ8pdNSxTi` | umbenannt, deaktiviert |
+**Was dabei hilft und was nicht:**
 
-   Das stündliche Delta läuft belegt (`113028`, `113035` — beide grün, rund eine Sekunde). Zu prüfen ist der Abgleich um 03:30: Status `success`, **15** Einlesungen (`maxJeLauf` steht seit dem 01.09. auf 15 statt 3), `anker_geschrieben: true`, keine Rückstellung. Eine Telegram-Meldung `[ZURUECKGESTELLT]` heißt, die OCR ist wieder zu. Der Rückweg ist der alte Flow — aktivieren, den neuen abschalten, **nie beide gleichzeitig**: gleiche Cron-Zeiten, gleicher Delta-Anker.
+- Der **Contract Loader** zeigt den vollständigen Weg von Daten nach SharePoint samt Excel-Erzeugung. Das nächstliegende Vorbild.
+- Der Abschnitt **Tabellendaten abfragbar machen** enthält Vorarbeit zu rechnenden Abfragen neben der Vektorsuche. Er zielt auf Excel-Mappen, nicht auf den SQL Server — die Frage, wie ein Agent sicher aggregiert, ist aber dieselbe.
+- **Es gibt keine SQL-Server-Credential in n8n.** Die vorhandenen Postgres-Zugänge zeigen sämtlich auf Supabase. Der Zugang ist das Erste, was fehlt.
 
-2. **Die Namen in n8n sind vertauscht worden.** Die neue Verarbeitung heißt dort `RAG - SharePoint Ingest`, der abgelöste Flow `RAG - SharePoint Ingest OLD`. Im Repo bleibt der Schnitt sprechend: `flows/rag-sharepoint-verarbeitung/` ist die Verarbeitung, `flows/rag-sharepoint-ingest/` der abgelöste Vorgänger. **Immer über die ID gehen, nie über den Namen.**
+**Vor größeren Eingriffen** die Gesundheitsprüfung laufen lassen.
 
-3. **Gesundheitsprüfung** als Routine vor größeren Eingriffen.
+**Nur nachsehen, nicht anfassen** — vier Dinge laufen seit dem 02.09. und brauchen einen Blick, keine Arbeit:
 
-Alles Weitere, nach Dringlichkeit sortiert, steht unter „Zuerst" in [offene-punkte.md](offene-punkte.md).
+| Was | Worauf |
+|---|---|
+| Jira-Nachzügler, alle 30 Min | Bilanz `gefunden: 0`. Steht dort eine Zahl, zeigt sie vor dem Scharfschalten, welchen Vorgang er anfassen würde |
+| Contract Loader, stündlich | der erste Lauf mit einer **echten neuen Datei** unter `mistral-medium-latest` |
+| Content Studio, 04.09. | die Mengenangaben-Regel ist publiziert, aber im Flow nie gelaufen |
+| SharePoint-Abgleich, 03:30 | 15 Einlesungen, Rückstand danach rund 356 Dateien |
+
+Der SharePoint-Ingest läuft seit dem 01.09. im Neuschnitt: `RAG - SharePoint Steuerung` (`PAqphQur0CTQRypM`) trägt beide Zeitpläne und ruft je Datei `RAG - SharePoint Ingest` (`coDhu7pIaI2bpmGZ`). Der abgelöste Flow heißt in n8n `… OLD` (`BBhGCRsQ8pdNSxTi`) und ist deaktiviert. **Die Namen sind vertauscht — immer über die ID gehen, nie über den Namen.** Der Rückweg bleibt billig: alten Flow aktivieren, Steuerung abschalten, **nie beide gleichzeitig** (gleiche Cron-Zeiten, gleicher Delta-Anker).
 
 ## Offene Themen
 
-Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Dringlichkeit:
+Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md), nach Dringlichkeit sortiert. Hier nur, was ohne diese Datei nicht klar wäre.
 
-**Wartet auf Sebastian**
-- **Doubletten in SharePoint:** 17 überzählige Kopien in 15 Gruppen, zusammen 10 MB. Die vollständige Liste mit Ordnern steht in `offene-punkte.md`. Zwei davon liegen in einem Ordner `alt` und sollen weg — dafür fehlt ein Werkzeug, siehe unten. Die sieben Gruppen unter `/Lagerpläne/` bleiben ausdrücklich unangetastet.
-- **Handwerks-Use-Cases.** Die Säule `handwerk` steht auf 0. Der Grund ist strukturell: `KI Daily - Collect [WF-1]` zieht nur aus GitHub, Tavily und Hacker News — angelsächsische Tech-Presse, aus der kein deutscher Handwerksprozess entstehen kann. Vorschlag: fünf bis acht Use-Cases von Hand setzen (das entsperrt den Dienstagsslot sofort), danach die Tavily-Abfrage um deutsche Quellen ergänzen — Mittelstand-Digital Zentren, Handwerkskammern Köln und Düsseldorf, ZDH. Welche davon brauchbare Feeds haben, ist **ungeprüft**.
-- **Lead Intake von der Website** (`HW170WdNT9yQGErU`): Die zwei Mails sind **kein Doppelversand**, sondern zwei Empfänger in einer Nachricht — `empfaengerIntern` trägt `info@kapa-digital.de` und `sebastian.linges@kapa-digital.de`. Zu entscheiden ist nur, ob die zweite Adresse bleibt. Der Spamverdacht kam vom Modell und war beim eingereichten Buchstabensalat vertretbar; offen ist die Beschriftung, nicht die Erkennung. Beides bleibt auf Sebastians Entscheidung unverändert. Der Entwurfsstand ist am 01.09. publiziert — er war zeichengleich mit der aktiven Fassung, ein Autosave ohne Änderung.
+**Wartet auf Sebastian:** die 17 Doubletten in SharePoint, die fehlenden Handwerks-Use-Cases, die zweite Empfängeradresse im Lead Intake, der Testlead in Kapa-Core und die vertagten Tabellendaten.
 
-**Was mir fehlt**
-- **Löschen von SharePoint-Dateien.** Verschieben gibt es seit dem 02.09.: `RWG Wartung - SharePoint Datei verschieben` (`k5sofeyVNzEqOIZs`), mit Probelauf und einem Namensfilter, der leer nichts trifft. **Löschen bewusst nicht** — das kommt erst, wenn die Entscheidung über die 17 inhaltsgleichen Kopien gefallen ist.
-- **Redaction ist nicht verfügbar.** In den Workflow-Einstellungen sind `Redact production execution data` und `Redact manual execution data` ausgegraut und tragen ein `Upgrade`-Abzeichen. Damit bleibt der bekannte Klartext-Effekt bei HTTP-Fehlern bestehen. Gemessen: der **lebende** Zugang ist in keiner Ausführung gelandet — nur der Schlüssel des gelöschten Projekts, und der ist wertlos.
+**Was mir fehlt:**
 
-**Contract Loader: fertig**
+- **Ein SQL-Server-Zugang.** Für das kommende Hauptthema. n8n hat heute keinen.
+- **Löschen von SharePoint-Dateien.** Verschieben gibt es seit dem 02.09. (`RWG Wartung - SharePoint Datei verschieben`, `k5sofeyVNzEqOIZs`) mit Probelauf und einem Namensfilter, der leer nichts trifft und mehrere Namen als Kommaliste nimmt. **Löschen bewusst nicht** — das kommt erst, wenn die Entscheidung über die 17 Kopien gefallen ist.
+- **Ein Werkzeug für Data-Table-Zeilen.** Über MCP lassen sich Zeilen weder lesen noch löschen. Betrifft die rund 370 Null-Zeilen im `prozesshub_spiegel`.
+- **Redaction ist nicht verfügbar.** In den Workflow-Einstellungen ausgegraut mit `Upgrade`-Abzeichen. Der bekannte Klartext-Effekt bei HTTP-Fehlern bleibt. Gemessen: der **lebende** Zugang ist in keiner Ausführung gelandet.
 
-`RWG Contract Loader` (`661BDwEditNicEc0`) liest aus SharePoint `/IMPORTER/CONTRACT`, schreibt nach `public.vertraege`, legt die Datei nach `DONE` und erzeugt die Excel-Übersicht neu. Aufbau, Entscheidungen und Fallstricke: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
+**Der Stand der Flows nach dem 02.09.:**
 
-**Alle Knoten sind belegt.** Am 02.09. stehen alle zwölf Zeilen in `vertraege` auf `abgelegt`, alle zwölf mit gefülltem Vertragspartner, `status = fehler` ist 0, `/IMPORTER/CONTRACT/FEHLER` ist leer. Die vier Verträge, die dort monatelang lagen — darunter drei, die in keinem Bestand standen — sind verarbeitet.
+| Flow | Version | Zustand |
+|---|---|---|
+| `RWG Contract Loader` | `98c19d61` | alle 12 Zeilen in `vertraege` auf `abgelegt`, `FEHLER` leer |
+| `RWG_Jira-Agent` | `4654fda5` | Nachzügler-Zeitplan aktiv, **`probelauf` steht auf `true`** |
+| `RWG Teams Agent` | `432ee008` | Abo-Ereignisse fallen vor dem Claim heraus |
+| `KAPA Digital - Lead Intake` | `206a930b` | `spam_verdacht` ist im Prompt definiert |
 
-**Die Extraktion scheiterte am Modell, nicht an den Dokumenten.** Der Tarif trägt `mistral-large-latest` nicht verlässlich; unter `mistral-medium-latest` laufen vier Extraktionen in Folge sauber durch, einschließlich des 46-seitigen Vertrags mit 164 789 Zeichen OCR-Text. Die Diagnose steht oben unter den teuer erkauften Regeln.
+**Technisch offen**, alles kleinteilig und ohne Termin: Embeddings von 4 091 Bildchunks nach der Adressänderung (rund vier Cent), Dokumenteintrag vor den Chunks, der Retry als Netz im Content Studio, drei Alteinträge in `agent_requests`, das 404-Ausweichen im Jira-Agent.
 
-**Publiziert als `98c19d61`** am 02.09. — `versionId` und `activeVersionId` stimmen überein, 30 Nodes. Der Export liegt in [flows/rwg-contract-loader/workflow.json](flows/rwg-contract-loader/workflow.json).
-
-**Technisch offen**
-- Erstbefüllung: noch **371** Dateien einzulesen, bei `maxJeLauf: 15` rund 25 Nächte. Die 15 sind am 02.09. im Betrieb belegt (Nachtlauf 113217, 2 min 2 s) und als Kostenbremse gewählt, nicht als technische Grenze.
-- **Dokumente ohne Chunks: keine.** Die sechs leeren Power-Automate-Altzeilen sind am 01.09. gelöscht.
-- Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
-- Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
-- Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
-- Beitragsprüfung im Content Studio: Absatzregel und Fremdprodukt-Befund sind gefixt und belegt (`111893`). Der Zahlen-Check ist am 02.09. um die Mengenangaben ohne Beleg erweitert (`5573f917`). **Die Bildstrecke ist belegt** — Lauf `113375` am 02.09. hat ein Paket mit `visual_status: generated` erzeugt. Offen bleibt der Retry als Netz.
+**Die Erstbefüllung läuft nebenher:** noch rund 356 Dateien, bei `maxJeLauf: 15` etwa 24 Nächte.
 
 ## Was im Repo liegt
 
@@ -147,6 +148,8 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 | `sharepoint-struktur-schulungen.xlsx` | die Bibliothek Schulungen Ebene für Ebene, 1 650 Einträge mit Links |
 | `tests/laufprotokoll.csv` | jeder Lauf mit Execution-ID und Befund |
 | `flows/*/README.md` | je Flow: Aufbau, Entscheidungen, Fallstricke |
+
+Seit dem 02.09. neu: die Ordner `flows/rwg-contract-loader/`, `flows/rwg-wartung-sharepoint-datei-verschieben/` und `flows/kapa-lead-intake-website/` haben jetzt einen Export - vorher lagen dort nur READMEs oder gar nichts.
 
 ## Erster Schritt
 

@@ -2,267 +2,69 @@
 
 Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes wird gelöscht, nicht abgehakt — der Verlauf steht in `tests/laufprotokoll.csv` und in der Git-Historie.
 
-## Umzug der RWG-Datenbank
+## Zuerst: SQL-Konzept für Reporting, Controlling und Fibu
 
-**Abgeschlossen.** Das alte Projekt `zjabiweaihsezjjeycko` ist samt Zugang geloescht; die Gesundheitspruefung danach (Lauf 110871) trifft alle Erwartungswerte: 21 323 Chunks, 0 ohne Embedding, Bucket 7 384 Objekte, 0 Altverweise. Vorgehen und Abnahme stehen in [migration/README.md](migration/README.md).
+**Das ist ab der nächsten Sitzung das Hauptthema.** Bisher existiert dazu kein Konzept im Repo, nur die Richtung: SQL Server → n8n → SharePoint.
 
-Was daraus offen blieb:
+**Zu klären, bevor gebaut wird:**
 
-- **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geaendert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile - semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent, falls es sauber sein soll.
+1. **Welche Berichte?** Namen, Empfänger, Rhythmus. Ein Bericht, an dem sich der Weg zeigen lässt, ist der bessere Anfang als der Vollausbau.
+2. **Welche Quelle genau?** Welcher SQL Server, welche Datenbank, welche Tabellen oder Sichten. Gibt es bereits Auswertungen, die nur automatisiert werden sollen, oder wird fachlich neu geschnitten?
+3. **Welcher Zugang?** n8n hat heute **keine** Credential für einen SQL Server — die vorhandenen Postgres-Zugänge zeigen auf Supabase. Ein Lesezugang mit eigenem Konto, `statement_timeout` und Zeilenobergrenze ist der Anfang.
+4. **Wohin das Ergebnis?** Eine Excel je Lauf wie beim Contract Loader, eine fortgeschriebene Mappe, oder eine SharePoint-Liste. Das entscheidet den Bau.
+5. **Fibu getrennt betrachten.** Finanzdaten sind heikler als Controlling-Kennzahlen: Wer darf sie sehen, wo dürfen sie liegen, wie lange.
 
+**Was aus dem Bestand hilft:** Der Contract Loader zeigt den Weg von Daten nach SharePoint samt Excel-Erzeugung. Der Abschnitt [Tabellendaten abfragbar machen](#tabellendaten-abfragbar-machen---plan) enthält Vorarbeit zu strukturierten Daten neben der Vektorsuche — sie zielt auf Excel-Mappen aus SharePoint, nicht auf den SQL Server, überschneidet sich aber in der Frage, wie ein Agent rechnende Abfragen sicher stellt.
 
-## Zuerst
+## Danach: Artikeldaten
 
-**Stand am 02.09., vormittags.** Der Umbau vom 01.09. ist über Nacht durch den Betrieb gegangen — alle drei Nachtläufe grün:
+**Artikelabfragen sowie Bereinigung, Neuanlage und Update von Artikeldaten.** Folgt auf das SQL-Konzept.
 
-| Lauf | Ergebnis |
-|---|---|
-| ProzessHub 02:00 (`113204`) | grün, 14 s — erste Nacht mit dem Aufräumer ohne Aufsicht |
-| SharePoint-Abgleich 03:30 (`113217`) | grün, 2 min 2 s: **15 eingelesen**, 0 Fehler, 0 zurückgestellt, Anker geschrieben, 225 Chunks, 111 Bilder |
-| Content Studio 08:00 (`113375`) | grün, 60 s — Paket `cp_1788328820762` auf `ready_for_review`, `visual_status: generated` |
+**Noch nichts davon ist im Repo vorbereitet.** Zu klären, sobald das Thema dran ist: aus welchem System die Artikeldaten kommen, was „Bereinigung" fachlich heißt, und ob Schreibzugriffe in das führende System gehen sollen oder nur Vorschläge zur Freigabe.
 
-Damit ist die Mengenbremse 15 im Betrieb belegt (2 Minuten, weit unter der Stundengrenze) und **die Bildstrecke erstmals echt gelaufen** — der letzte nie belegte Teil der Content-Kette.
+**Zu beachten:** Ein Flow, der Stammdaten anlegt oder ändert, braucht dieselbe Sorgfalt wie das Verschiebe-Werkzeug — einen Probelauf, der nur zeigt was er täte, und einen Filter, der leer nichts trifft.
 
-**Rückstand der Erstbefüllung: 371 Dateien**, bei 15 je Nacht rund 25 Nächte.
+## In Beobachtung — die nächsten Tage
 
-**Am Nachmittag dazugekommen: der Contract Loader ist durch.** Die Extraktion scheiterte am Modell, nicht an den Dokumenten — `mistral-large-latest` wird vom Tarif nicht getragen. Unter `mistral-medium-latest` laufen vier Extraktionen in Folge sauber durch, die vier liegengebliebenen Verträge sind verarbeitet, `status = 'fehler'` ist 0 und der FEHLER-Ordner ist leer. Publiziert als `98c19d61`.
+Nichts davon ist zu tun, alles davon ist nachzusehen.
 
-**Als Nächstes:** den Mistral-Verbrauch ansehen, bevor die 15 dauerhaft stehen bleiben. Das ist die einzige Zahl, die noch fehlt.
-
-**Die OCR ist wieder offen.** Belegt in Lauf `112948` vom 01.09., 17:05: `Bestätigung persönliche
-Unterweisung Fahrer Pellets.pdf` (61 kB) lief in 7,5 Sekunden komplett durch — Upload, signierte URL,
-OCR, Chunks, Embedding, 198 Wörter, 3 Chunks, keiner ohne Embedding. Kein `402`, kein `ECONNRESET`.
-Der Lauf ging über die **neue** Verarbeitung; der alte Flow ist damit nicht gegengeprüft, nutzt aber
-dasselbe Credential (`tv4AxZ1FALgZCIVK`).
-
-**Die Rückstellung hat ihre erste Probe im Betrieb bestanden.** Der Nachtlauf `112030` um 03:30 lag
-noch vor der Freischaltung. Er ist **grün** geblieben und hat drei Dateien zurückgestellt — in
-`ingestion_errors` stehen sie um 03:30 mit `OCR-Strecke nicht verfuegbar: Payment required`. Vor dem
-31.08. hätte derselbe Fall den ganzen Lauf gerissen.
-
-### Der Neuschnitt ist live — eine Nacht beobachten
-
-**Am 01.09. um 18:25 umgeschaltet.** Der Wechsel ist vollzogen:
-
-| Flow | ID | Stand |
+| Was | Wann | Worauf |
 |---|---|---|
-| `RAG - SharePoint Ingest OLD` | `BBhGCRsQ8pdNSxTi` | umbenannt, **deaktiviert** seit 17:19 |
-| `RAG - SharePoint Ingest` (die Verarbeitung) | `coDhu7pIaI2bpmGZ` | publiziert und aktiv |
-| `RAG - SharePoint Steuerung` | `PAqphQur0CTQRypM` | **publiziert und aktiv**, beide Trigger registriert |
+| Jira-Nachzügler | alle 30 Min | Bilanzen mit `gefunden: 0`. Steht dort eine Zahl, zeigt sie vor dem Scharfschalten, welchen Vorgang er anfassen würde |
+| Contract Loader | stündlich | erster Lauf mit einer **echten neuen Datei** unter `mistral-medium-latest` — das ist der ausstehende Beleg |
+| Content Studio | 04.09. | die Mengenangaben-Regel (`5573f917`) ist publiziert, aber **im Flow noch nie gelaufen** |
+| SharePoint-Abgleich | 03:30 | 15 Einlesungen, Rückstand danach rund 356 Dateien |
 
-Genau eine Steuerung ist aktiv — der Vorgänger bleibt aus. Beide tragen dieselben Cron-Zeiten und
-denselben Delta-Anker; nie beide gleichzeitig. Der Rückweg bleibt billig: alten Flow aktivieren,
-Steuerung abschalten. Beide schreiben in dieselben Tabellen, kein Datenumbau.
+**Danach scharf schalten:** `probelauf` im Jira-Nachzügler auf `false`. Eine Zeile in `Nachzuegler Steuerung`. Solange er auf `true` steht, meldet der Zweig nur.
 
-**Das stündliche Delta läuft belegt.** Zwei planmäßige Läufe nach dem Umschalten: `113028` um 19:00
-in 1,6 Sekunden, `113035` um 20:00 in 1,0 Sekunden, beide grün. Ohne Änderungen in SharePoint ist der
-Delta-Lauf nach einer Sekunde fertig — der erwartete Normalfall.
+## Wartet auf eine Entscheidung
 
-**Was noch aussteht:**
+- **17 Doubletten in SharePoint**, 15 Gruppen, zusammen 10 MB. Zwei liegen in einem Ordner `alt` und sollen weg — dafür fehlt ein Löschwerkzeug, das bewusst nicht gebaut wurde. Die sieben Gruppen unter `/Lagerpläne/` bleiben ausdrücklich unangetastet.
+- **Handwerks-Use-Cases.** Die Säule `handwerk` steht auf 0, weil `KI Daily - Collect` nur aus GitHub, Tavily und Hacker News zieht — angelsächsische Tech-Presse, aus der kein deutscher Handwerksprozess entsteht. Vorschlag: fünf bis acht Use-Cases von Hand setzen, das entsperrt den Dienstagsslot sofort.
+- **Zweite Empfängeradresse im Lead Intake.** `empfaengerIntern` trägt `info@kapa-digital.de` **und** `sebastian.linges@kapa-digital.de`. Kein Doppelversand, sondern zwei Adressaten in einer Nachricht. Ob die zweite bleibt, ist offen.
+- **Testlead in Kapa-Core aufräumen.** Der Testlauf `113882` hat einen zweiten Lead zur echten Anfrage vom 02.09. erzeugt: `lead_id 4c80f3ec-e9a5-4368-8be5-e984485f6864`, `contact_id 671b1e04-21a3-40dd-86ad-89dae29b5672`, drei Aufgaben. Vor dem Löschen ansehen, welcher der beiden Datensätze der bessere ist — der zweite trägt die korrigierte Bewertung, der erste die richtige Eingangszeit. Braucht eine Freigabe für den Schreibzugriff.
+- **Tabellendaten** — vertagt, siehe unten. Sebastian erwägt einen eigenen SQL-Weg; nicht unaufgefordert weiterbauen.
 
-1. **Der Abgleich um 03:30.** Die erste vollständige Nacht der neuen Kette. Erwartet: Status
-   `success`, **15** Einlesungen (`maxJeLauf`), `anker_geschrieben: true`, keine Rückstellung. Kommt
-   eine Telegram-Meldung mit `[ZURUECKGESTELLT]`, ist die OCR wieder zu.
-2. **Die Mengenbremse steht jetzt auf 15** statt 3 — gemessen und publiziert, Einzelheiten unten
-   unter [Die Mengenbremse ist gemessen](#die-mengenbremse-ist-gemessen--3-ist-nicht-mehr-begründet).
-   Der Abgleich um 03:30 ist damit zugleich die erste Probe des neuen Werts: Erwartet werden **15**
-   Einlesungen statt drei.
+## Technische Restposten
 
-**Belegt vor dem Umschalten:** Handstart `112961` um 17:19 über die volle Kette — drei Dokumente
-eingelesen (`Handout Einführung in die Arbeitssicherheit.pdf` mit 5 Chunks, zweimal
-`Checkliste neue Mitarbeiter _ Praktikanten.docx` mit je 3), keines ohne Embedding.
+Kleinteilig, ohne Termin, keines davon dringend.
 
-### Die Mengenbremse ist gemessen — 3 ist nicht mehr begründet
+- **`Auto Leasing Vertrag.pdf`** liefert bei 718 Wörtern nur sieben Rohfelder — keine Laufzeit, kein Preis, kein Intervall. Für einen Leasingvertrag wenig; möglicherweise ist die Datei nur ein Deckblatt. Am `ocr_text` derselben Zeile in einer Minute zu klären.
+- **Drei Alteinträge in `agent_requests`** tragen eine Abo-ID statt einer Nachrichten-ID (unter 808 Zeilen, seit dem 15.07.). Wirkungslos — zu ihnen gehört keine Nachricht. Seit dem 02.09. entstehen keine neuen mehr.
+- **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geändert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile — semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent.
+- **Retry als Netz im Content Studio.** Der Prompt allein macht die Wortzahl nicht deterministisch. False-Route einmal zurück auf `COPY (Text)` mit den Befunden im Prompt, Zähler hart auf einen Versuch. **Fallstrick:** `COPY parsen` verwirft die Analysefelder (`kernaussage`, `gewaehlte_perspektive`, `kapa_bruecke`, `takeaway`) — der Retry-Node muss sie aus `$('Analyse parsen').first().json` zurückholen, sonst ist der zweite Versuch schlechter als der erste.
+- **`uc_1786422016792_0` ist nicht abgeschlossen.** `use_case abschliessen` hängt nur am Erfolgspfad. Die Zeile trägt die Säule `fertigung` bei Zielgruppe „Ingenieurbueros" — der Widerspruch aus dem Use-Case-Abschnitt steckt weiter darin.
+- **404 im Jira-Agent umgehen.** Bei fehlendem Anfragetyp auf `/rest/api/3/issue/{key}/comment` ausweichen statt auf die Service-Desk-Schnittstelle. **Vor dem Bau zu prüfen:** ob der Kommentar dann wirklich intern bleibt — der native Jira-Node kann die JSM-Sichtbarkeit nicht setzen, ein unbedachter Wechsel macht interne Kommentare für Anwender sichtbar. Betrifft rund ein bis zwei Tickets pro Woche.
 
-**Lauf `113044` am 01.09., 21:07.** Handstart im Entwurf mit `maxJeLauf: 10` und
-`zustandSchreiben: false`; die publizierte Fassung blieb bei 3, der Delta-Anker unangetastet.
+## Jira-Agent: was vom 02.09. übrig bleibt
 
-| | |
-|---|---|
-| 10 Dokumente gesamt | **69,4 s** |
-| davon Bestandsabgleich über 1 651 Einträge | 12,4 s (fester Aufschlag je Lauf) |
-| Summe der Teilläufe | 55,8 s |
-| je Dokument | min 3,6 s · **Mittel 5,6 s** · max 9,2 s |
+Aufbau, Nachzügler-Zweig und die Fallstricke stehen in [flows/rwg-jira-agent/README.md](flows/rwg-jira-agent/README.md). Hier nur, was noch offen ist.
 
-Alle zehn Teilläufe grün, alle zehn Dokumente mit Chunks in der Wissensbasis.
+**Die 45 hängengebliebenen Vorgänge bleiben liegen.** 20 auf `processing` (17.07.–27.08.), 25 auf `failed` (13.07.–28.08.). Die Entscheidung, sie nicht nachzuziehen, steht in der Flow-README und gilt weiter: Kunden bekämen sonst heute Antworten auf wochenalte Tickets. Der Nachzügler-Zweig hält sie über das 24-Stunden-Fenster bewusst draußen.
 
-**Die alte Begründung ist entfallen.** Die 3 stammten aus der 300-Sekunden-Grenze des Task-Runners je
-Code-Node — sie galt dem flowweiten Sammler im alten Ingest. Jede Datei läuft jetzt in einer eigenen
-Ausführung mit eigenem Zeitbudget. Bindend ist nur noch der Ausführungs-Timeout der Steuerung von
-**3 600 s**.
+**Eine latente Falle in der Maschinenticket-Weiche.** Das Muster `siem` steht in `Maschinen- oder Fachticket` ohne Wortgrenze in der Liste bekannter Systemmeldungen — es würde damit auch **Siemens** treffen und ein echtes Ticket aussortieren. In den 75 prüfbaren übersprungenen Tickets ist das bisher nicht passiert (74 echte Systemmeldungen, eines über das Absenderkonto erkannt). Die Falle ist gestellt, aber nicht zugeschnappt.
 
-**Was die Messung nicht hergibt.** Die Stichprobe trug ausschließlich kleine Dokumente, 162 bis
-1 107 Wörter. Der schwere Fall — Regaletiketten mit über 300 Chunks — war nicht dabei. Aus 5,6 s
-Mittel darf man deshalb **nicht** auf 600 Dokumente je Nacht schließen; die Obergrenze bestimmt der
-langsamste Fall, nicht der Durchschnitt.
-
-**Gesetzt ist 15**, publiziert am 01.09. Nicht die technische Grenze — die läge höher —, sondern die
-Kostenbremse: Sebastian hat auf 15 begrenzt, damit das Mistral-Kontingent nicht verbrennt. Aus rund
-390 fehlenden Dateien werden damit etwa **26 Nächte** statt 130. Der Wert steht in `Startbereiche`
-unter `vorgaben.maxJeLauf`, die Begründung als Kommentar daneben.
-
-**Begrenzend ist damit das Kontingent, nicht die Technik.** Wer die Zahl später anfassen will, muss
-zuerst den Mistral-Verbrauch je Nacht kennen, nicht die Laufzeit.
-
-**Sauberer als jede Stückzahl wäre ein Zeitbudget**: die Schleife bricht ab, wenn der Lauf eine
-gesetzte Dauer überschreitet. Das ist ein Umbau, kein Parameter — erst sinnvoll, wenn die Stückzahl
-sich als untauglich erweist.
-
-### OCR schonen — drei Hebel liegen noch
-
-Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md):
-
-- **Hebel 1, der OCR-Zwischenspeicher.** Der größte Hebel: Bei vier von sechs Rebuild-Gründen ist die Datei unverändert, und trotzdem läuft die komplette OCR erneut. **Keine neue Tabelle nötig** — `sharepoint_documents` trägt `content_hash`, `content_text` und `images` bereits für alle Dokumente; nachgeschlagen wird über den Hash. Damit entfällt auch die Supabase-Freigabe. Vor dem Bau zu prüfen: ob `content_text` reicht, um die Chunks identisch neu zu bauen. Der Fallstrick bleibt das Bucket-Aufräumen bei einem Treffer.
-- **Hebel 3, der native Textpfad** für die gemessenen 21 % bildloser Dokumente. Vor dem Bau zu messen, wie viele der fehlenden PDF eine Textebene tragen — die Gegenprobe braucht ein OCR-Ergebnis zum Vergleich. Seit dem 01.09. steht dem nichts mehr im Weg.
-- **Hebel 4, ein Seitendeckel** für Dokumente wie die Regaletiketten. Fachliche Entscheidung, keine technische.
-
-
-### Beitragsprüfung im Content Studio — Absatzregel gefixt, Retry offen
-Die Prüfung ist einmal gelaufen und hat den Lauf abgebrochen: **111258 am 31.08., 08:00, kein Buffer-Entwurf.** Harter Befund im Code-Node `Lesbarkeit pruefen`: „Antwortblock zu kurz (21 Woerter, mindestens 30)". Der vorgelagerte `Redaktions-Check` war grün.
-
-**Die Schwelle war unter dem damaligen COPY-Prompt nicht erreichbar.** Der System-Prompt von `COPY (Text)` forderte „Absaetze aus 1-2 Saetzen, Leerzeile dazwischen", ohne Ausnahme für den ersten Absatz. `Lesbarkeit pruefen` splittet am Doppel-Umbruch, meint also dieselbe Texteinheit, und verlangt dort 30 bis 80 Wörter. Bei gemessener Satzlänge 13,2 Wörter ergeben zwei Sätze rund 26 Wörter — die Obergrenze der Prompt-Regel lag unter der Untergrenze des Gates. Das Modell hat nicht versagt, es hat die falsche Anweisung befolgt.
-
-**Der Prompt ist korrigiert und publiziert** (31.08., Version `211428cf`). Die Regel „Absaetze aus 1-2 Saetzen" gilt jetzt ausdrücklich erst ab dem zweiten Absatz; der erste trägt die Kernaussage in 3 bis 4 Sätzen mit 30 bis 80 Wörtern. Der Selbsttest am Prompt-Ende fragt die Wortzahl zusätzlich ab. Das Gate blieb unverändert. Rechnerisch landen 3–4 Sätze × 13,2 Wörter bei 40–53 Wörtern, mittig im Band, und die 700–1300 Zeichen bleiben eingehalten.
-
-**Belegt in Lauf 111879** (Testlauf mit Pin-Daten auf allen Datenbank- und Netzzugriffen, Modelle liefen echt, Eingabe war derselbe Use-Case wie in 111258): `qa_antwortblock_woerter` **44** statt 21, Satzlänge 14,8, drei Absätze. Der Befund „Antwortblock zu kurz" ist weg. Nebenbefund: `CREATIVE (Bildidee)` und `Bild generieren` haben nicht ausgeführt — die Sperre sitzt belegt vor der Bilderzeugung.
-
-Der Lauf fiel dabei noch an einer zweiten Stelle durch — die ist inzwischen ebenfalls behoben, siehe den nächsten Abschnitt.
-
-### Fremdprodukt-Prüfung meldet, statt zu blockieren
-Der `Redaktions-Check` zerlegt `uc_technology` in Tokens und sucht jedes davon im Beitragstext. Alles, was nicht in einer STOP-Liste generischer Wörter steht, galt als Fremdprodukt und brach den Lauf ab.
-
-**Das trägt nicht.** Bei `uc_1786422016792_0` steht in `technology` „KI-gestützte Bildverarbeitung und maschinelles Lernen." — **kein einziger Produktname**, nur Allerweltsbegriffe. Zwei Testläufe haben das der Reihe nach vorgeführt: `111879` scheiterte an `KI-gestützte`, nach dem Entfernen des Bindestrichs aus dem Trennmuster scheiterte `111892` an `Bildverarbeitung`. Eine Liste generischer Wörter kann nie vollständig sein.
-
-**Der Befund meldet jetzt, er blockiert nicht mehr** — `soft` statt `issues`, umbenannt in „Begriff aus dem Technologiefeld im Text". Echte Marken hält weiterhin die Blocklist-Prüfung im selben Node hart auf (`Gesperrte Marke im Text`, gespeist aus `competitor`/`consulting`/`vendor_sales`). Der Bindestrich bleibt aus dem Trennmuster heraus, damit der Befund wenigstens an sinnvollen Tokens ansetzt.
-
-**Belegt in Lauf 111893:** `qa_passed: true`, `Freigabe erteilt` leitet auf Ausgang 0, `CREATIVE (Bildidee)` läuft, die `content_packages`-Zeile steht auf `ready_for_review`. Der Lauf endete rot an `Zuschnitt 1:1` — Artefakt der Pin-Daten, das gepinnte `Bild generieren` liefert keine Bilddatei. **Die Bildstrecke selbst ist damit weiter ungeprüft**, alles davor ist belegt.
-
-Publiziert als `eba7a53a`. Nebenwirkung des Weges über die MCP-Schnittstelle: die 28 Unicode-Escapes im Quelltext des Nodes stehen jetzt als echte Umlaute — in JavaScript gleichbedeutend, auf Zeichensalat gegengeprüft.
-
-**Nachgerechnet auf die vier Vorläufe** hätte die Regel ausnahmslos gegriffen: 100455 → 25 Wörter, 106294 → 19, 108062 → 27, 111258 → 21. Null von vier.
-
-`Lesbarkeit pruefen` und das IF `Freigabe erteilt` wurden zwischen dem 27. und 29.08. eingebaut — in den älteren Läufen fehlen beide in `runData`. 111258 ist der erste Produktivlauf durch das Gate.
-
-**Das Gate selbst bleibt richtig.** Vorher wurde `qa_passed` nirgends ausgewertet: 100455 und 108062 trugen den harten Befund „Fremdprodukt im Text genannt" und haben trotzdem einen Buffer-Entwurf erzeugt. Falsch ist nur die Kalibrierung.
-
-**`uc_1786422016792_0` ist weiter offen.** `use_case abschliessen` hängt nur am Erfolgspfad, der Use-Case wurde also nicht abgeschlossen und kein `content_package` geschrieben. Er wird am Mittwoch erneut gezogen — jetzt allerdings gegen den korrigierten Prompt. Zu beachten: Die Zeile trägt die Säule `fertigung` bei Zielgruppe „Ingenieurbueros", der Widerspruch aus dem Abschnitt [Use Cases](#use-cases-bestand-bereinigt-handwerk-bleibt-die-luecke) steckt also weiter darin.
-
-**Abzuarbeiten, ohne Termin:**
-
-1. **Retry als Netz.** Der Prompt allein macht die Wortzahl nicht deterministisch. False-Route einmal zurück auf `COPY (Text)` mit den Befunden im Prompt, Zähler hart auf einen Versuch, erst beim zweiten Fehlschlag an Telegram. **Fallstrick:** `COPY parsen` verwirft die Analysefelder (`kernaussage`, `gewaehlte_perspektive`, `kapa_bruecke`, `takeaway`). Ein naiver Rücksprung generiert mit leerem Analyseblock und wäre schlechter als der erste Versuch — der Retry-Node muss sie aus `$('Analyse parsen').first().json` zurückholen.
-2. **Mengenangaben ohne Beleg — erledigt am 02.09.** Der `Redaktions-Check` meldet jetzt weich, wenn ein Mengenwort (erheblich, deutlich, massiv …) nahe an einem messbaren Ziel steht und `belegte_zahlen` leer ist. Ein Mengenwort allein reicht nicht: „den Arbeitsalltag erheblich erleichtern" ist qualitativ. An 17 abgelegten Beiträgen gemessen — 3 Treffer, alle drei echte Behauptungen. Publiziert als `5573f917`. **Im Flow noch nicht gelaufen**, der reguläre Lauf am 04.09. ist der Beleg.
-
-Nach jeder Änderung publizieren, exportieren, Läufe ins `tests/laufprotokoll.csv`.
-
-
-### Contract Loader
-**Der Flow ist vollstaendig belegt.** Alle zwoelf Zeilen in `public.vertraege` stehen auf `abgelegt`, alle zwoelf mit gefuelltem Vertragspartner, `status = 'fehler'` ist **0**, und `/IMPORTER/CONTRACT/FEHLER` ist leer (Lauf `113777`). Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
-
-**Die Ursache der Fehlschlaege war das Modell, nicht das Dokument.** `mistral-large-latest` wird vom Tarif nicht verlaesslich getragen - rund drei von vier Anlaeufen kamen mit `Forbidden - perhaps check your credentials?` zurueck, im Feld `description` stand `This model is not available in your subscription tier`. Das sah dokumentabhaengig aus, weil nur die Zeile mit dem Fehler auffiel; tatsaechlich schaffte es dieselbe Datei beim vierten Anlauf (`RG Lichtwelle`, `versuche: 3`, trotzdem `abgelegt`).
-
-**`mistral-medium-latest` traegt.** Vier Extraktionen in Folge ohne einen einzigen `Forbidden` (Laeufe `113774` und `113776`) - unter der alten Abweisungsquote ein Zufall von unter zwei Prozent. Der Grenzfall ist mitgemessen: der Stadtsparkassen-Vertrag mit **164 789 Zeichen** OCR-Text und 46 Seiten laeuft durch. Damit ist auch die Groessen-These endgueltig erledigt; sie war schon an Lauf `113768` gescheitert.
-
-**Feldguete quergeprueft.** `Mietvertrag Domnick` liefert unter `medium` woertlich denselben Vertragspartner, den `large` beim Schwesterdokument `Mieterhoehung Domnick` extrahiert hatte. Die Stadtsparkasse ergibt Vertragsart `Abzahlungsdarlehen`, Vertragsnummer `6005666539` und eine korrekt zusammengefasste Mehrfach-Kuendigungsklausel; der Mietvertrag Beginn `01.05.2017`, `400,-- Euro` netto und den Verweis auf § 565 ff BGB.
-
-**Publiziert als `98c19d61`** am 02.09., Export liegt in [flows/rwg-contract-loader/workflow.json](flows/rwg-contract-loader/workflow.json).
-
-**Einmal nachsehen:** `Auto Leasing Vertrag.pdf` liefert bei 718 Woertern nur sieben Rohfelder - keine Laufzeit, kein Preis, kein Intervall. Fuer einen Leasingvertrag ist das wenig. Moeglich, dass die Datei nur ein Deckblatt ist; das laesst sich am `ocr_text` derselben Zeile in einer Minute klaeren.
-
-### Data Table `RWG Vertraege` geloescht
-Sebastian hat die Data Table `CEz5GXpTS7yHhjqS` am 02.09. entfernt. Sie war belegt redundant: kein Flow verwies noch darauf, zuletzt beschrieben am 20.03., und alle acht Dateien in `/IMPORTER/CONTRACT/DONE` haben eine Zeile in `public.vertraege`. Damit ist auch der frühere Punkt „Altbestand in DONE nachziehen" gegenstandslos - es gibt keinen Rueckstand.
-
-
-## Teams-Agent: Abo-Ereignisse werden vor dem Claim ausgesondert
-
-**Lauf `113483` am 02.09., 08:03:32** — der einzige Fehler unter 307 Laeufen. Microsoft Graph lieferte kein Chat-Ereignis, sondern eine Lebenszyklus-Meldung des Webhook-Abos:
-
-```json
-{ "@odata.type": "#microsoft.graph.subscription",
-  "@odata.id": "subscriptions/37558cbf-…", "id": "37558cbf-…" }
-```
-
-`Extract IDs` hatte das **richtig erkannt** und `hasIds: false` zurueckgegeben — nur wertete das niemand aus. `Load Chat Details` lief trotzdem los und scheiterte an `URL parameter cannot be empty`. Schlimmer noch: `Claim Message` hatte davor bereits einen Datensatz angelegt, mit der **Abo-ID** als `teams_message_id`.
-
-**Gebaut und publiziert am 02.09. als `432ee008`** (49 Nodes statt 47, Export in [flows/rwg-teams-agent/workflow.json](flows/rwg-teams-agent/workflow.json)): eine Weiche `Ist es eine Chatnachricht?` **vor** `Claim Message`, nicht hinter `Extract IDs`. Damit faellt nicht nur der Fehler weg, sondern auch der Pseudo-Eintrag in `agent_requests`.
-
-```
-Trigger → Ist es eine Chatnachricht? ─true→ Claim Message ⟶ (bestehende Kette)
-                                     └false→ Kein Chat-Ereignis
-```
-
-**Geprueft wird positiv**, nicht negativ:
-
-```
-String($json['@odata.type'] || '').toLowerCase().endsWith('chatmessage')
-```
-
-Auf `chatMessage` zu pruefen statt auf `subscription` faengt auch die uebrigen Lifecycle-Typen ab, die Graph ueber denselben Webhook schickt. Das `toLowerCase()` ist noetig, weil Graph die beiden Faelle **unterschiedlich schreibt** — `#Microsoft.Graph.chatMessage` gegen `#microsoft.graph.subscription`.
-
-**Belegt an beiden echten Nutzlasten:**
-
-| Lauf | Fall | Weg |
-|---|---|---|
-| `113871` | Abo-Ereignis aus `113483` | Ausgang 1 → `Kein Chat-Ereignis`. `Claim Message` erscheint gar nicht in `runData` |
-| `113872` | echte Nachricht aus `113379` | Ausgang 0 → `Claim Message` → Duplikat → `Ignore Duplicate` |
-
-**Warum der zweite Test eine bereits beanspruchte Nachricht nutzt:** Anders liesse sich der Durchlass nicht pruefen, ohne einem Anwender wirklich zu schreiben. `Claim Message` arbeitet mit `on conflict (teams_message_id) do nothing returning id` — bei einer bekannten Nachricht kommt nichts zurueck, `IF Message Claimed` geht auf Ausgang 1, und der Lauf endet bei `Ignore Duplicate`. Der Durchlass ist damit belegt, ohne dass eine Antwort das Haus verlaesst.
-
-**Offen:** In `agent_requests` stehen **3 Alteintraege** mit einer Abo-ID statt einer Nachrichten-ID (unter 808 Zeilen, seit dem 15.07.). Sie sind wirkungslos — zu ihnen gehoert keine Nachricht, und der Duplikatschutz greift nur auf die eigene ID. Aufraeumen waere ein Schreibzugriff auf Supabase und braucht eine Freigabe.
-
-## Jira-Agent: drei verschiedene Gruende, warum Tickets liegen bleiben
-
-Gemessen am 02.09. ueber alle 1 185 Zeilen in `jira_agent_events` (seit 12.07.).
-
-**1. 269 Maschinentickets — Absicht, sieht aber wie ein Fehler aus.** Die Weiche `Maschinen- oder Fachticket` sortiert automatisch erzeugte Vorgaenge aus (Absenderkonto, `[managed|monitoring]`, Autoreply-Betreffs, bekannte Systemmeldungen). Der Vermerk landet im Feld **`last_error`** — deshalb zaehlt jede Fehlerabfrage sie mit. Von den 75 pruefbaren waren 74 echte Systemmeldungen, einer ueber das Konto erkannt. Kein Fehlalarm gefunden.
-
-**Latent:** Das Muster `siem` steht ohne Wortgrenze in der Liste und wuerde auch **Siemens** treffen. In den vorhandenen Daten ist das bisher nicht passiert.
-
-**2. 45 Vorgaenge haengen — der Wiederaufgreifer laeuft im Probelauf.**
-
-| Status | Anzahl | Zeitraum |
-|---|---|---|
-| `processing` | 20 | 17.07. – 27.08. |
-| `failed` | 25 | 13.07. – 28.08. |
-
-Alle aelter als zwei Tage, also kein laufender Vorgang. 13 der `failed` stammen aus einem einzigen Vorfall am 28.08. (`Policy und Routing fehlgeschlagen`). Im Juli gab es dafuer eine Aufraeumung (`CONSISTENCY_CLEANUP_STALE_PROCESSING_2026-07-14`, 12 Zeilen) — seither keine mehr.
-
-**Die Wiederaufgriff-Logik war immer da, nur ohne Ausloeser.** `Claim Jira Event` greift ein Ereignis wieder auf, wenn es `failed` ist oder laenger als 30 Minuten auf `processing` steht. Der einzige Trigger war aber der Jira-Webhook, und ein `issue_created` kommt genau einmal. Es fehlte kein Umbau, sondern ein Zeitplan.
-
-**Gebaut am 02.09., sechs neue Nodes, kein bestehender angefasst:**
-
-```
-Zeitplan (30 Min) → Steuerung → Haengende Events lesen → Wirklich nachholen? ─true→ Als Ereignis aufbereiten → Set Event Context ⟶ (bestehende Kette)
-                                                                  └false→ Nachzuegler Bilanz
-```
-
-Der Zweig speist in `Set Event Context` ein. Das traegt, weil **kein einziger Node den Trigger rueckwaerts liest** — alle elf Rueckwaerts-Referenzen zeigen auf `Set Event Context`, und `Get Issue Fresh` holt das Ticket ohnehin neu. Geprueft, nicht angenommen.
-
-| Schalter | Wert | Grund |
-|---|---|---|
-| `fensterStunden` | 24 | Weckt keine Altfaelle. Ohne die Grenze bekaeme ein Kunde heute eine Antwort auf ein Ticket vom Juli |
-| Takt | 30 Minuten | Enger waere sinnlos: Die Claim-Bedingung gibt ein haengendes `processing` erst nach 30 Minuten frei |
-| `maxVersuche` | 3 | Was dreimal scheitert, ist ein Fall fuer einen Menschen |
-| `maxJeLauf` | 5 | Mengenbremse |
-| `probelauf` | **true** | Der Ernstfall schreibt in ein echtes Kundenticket |
-
-**Belegt:** Lauf `113839` faehrt die Kette durch und findet nichts — der erwartete Normalfall. Lauf `113840` mit einem auf 2000 Stunden geoeffneten Fenster meldet `gefunden: 5`, obwohl 45 in Frage kaemen: Abfrage, Sortierung und Mengenbremse sind damit gemessen, und der Probelauf hat nichts angefasst.
-
-**Publiziert als `4654fda5`** am 02.09. `triggerCount` steht von 1 auf **2** — n8n fuehrt den Zeitplan als registrierten Trigger. Export in [flows/rwg-jira-agent/workflow.json](flows/rwg-jira-agent/workflow.json).
-
-**Der Zeitplan laeuft.** Lauf `113841` am 02.09. um 18:00:00 - `mode: trigger`, gruen nach 0,4 Sekunden, `gefunden: 0`. Damit ist der Weg ueber den Zeitplan belegt und nicht nur der Handstart.
-
-**Offen bleibt allein der Scharfschalter.** `probelauf` steht auf `true`: Der Zweig laeuft alle 30 Minuten und meldet, was er holen wuerde — er holt nichts. Das Scharfschalten ist eine eigene Entscheidung, weil der Ernstfall in ein echtes Kundenticket schreibt.
-
-**3. 9 Tickets mit JSM-404 — Ursache belegt.** `The resource you are requesting could not be found` beim internen Kommentar. Der Grund ist **der fehlende Anfragetyp**, nachgewiesen an zwei Tickets:
-
-| Ticket | `customfield_10010` (Anfragetyp) | Ergebnis |
-|---|---|---|
-| SSD-9273 | `null` — direkt in Jira angelegt | **404** |
-| SSD-9272 | „Anfrage per E-Mail" (id 14), mit `servicedeskapi/request/50858` | durchgelaufen |
-
-Ohne Anfragetyp existiert der Vorgang fuer die Service-Desk-Schnittstelle nicht, und genau die spricht der Node an. Betroffen sind Tickets, die **von Hand direkt in Jira** erstellt werden statt ueber das Kundenportal. Bei den meisten der neun war die **oeffentliche Antwort schon raus** — nur der interne Kommentar bzw. der Statuswechsel scheiterte.
-
-**Zu entscheiden:** ob der Agent bei fehlendem Anfragetyp auf die normale Jira-Kommentar-Schnittstelle ausweichen soll (`/rest/api/3/issue/{key}/comment`) statt auf die Service-Desk-Schnittstelle.
+**Der Vermerk steht im falschen Feld.** Übersprungene Maschinentickets bekommen `last_error = 'skipped:machine_ticket'` — 269 von 305 „Fehlern" in `jira_agent_events` sind deshalb gar keine. Jede Fehlerabfrage zählt sie mit. Ein eigenes Feld oder ein Präfix wäre ehrlicher.
 
 ## ProzessHub nach SharePoint
 
@@ -292,48 +94,13 @@ Rund 370 Zeilen ohne `page_id` stehen in `prozesshub_spiegel` (`4akduDBG2tJrtKw4
 
 ## SharePoint Schulungen
 
-### Der Ingest ist in zwei Flows geschnitten - am 01.09. umgeschaltet
+### OCR schonen — drei Hebel liegen noch
 
-**Am 01.09. entschieden, gebaut und belegt.** Der Vorgaenger trug Scanner und Verarbeitung in
-einem Canvas: 109 Nodes, 46 Code-Nodes mit 2 475 Zeilen, `Config` von drei Stellen angesprungen,
-vier Rueckkanten in die Aufgabenschleife. Bauplan und Etappenstand:
-[konzept-sharepoint-neubau.md](konzept-sharepoint-neubau.md).
+Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md):
 
-| Flow in n8n | Ordner | ID | Nodes | Stand |
-|---|---|---|---|---|
-| RAG - SharePoint Steuerung | [rag-sharepoint-steuerung](flows/rag-sharepoint-steuerung/README.md) | `PAqphQur0CTQRypM` | 23 | publiziert, aktiv |
-| RAG - SharePoint Ingest | [rag-sharepoint-verarbeitung](flows/rag-sharepoint-verarbeitung/README.md) | `coDhu7pIaI2bpmGZ` | 82 | publiziert, aktiv |
-| RAG - SharePoint Ingest OLD | [rag-sharepoint-ingest](flows/rag-sharepoint-ingest/README.md) | `BBhGCRsQ8pdNSxTi` | 109 | deaktiviert |
-
-**Achtung bei den Namen:** Die Verarbeitung traegt in n8n den Namen des Vorgaengers
-(`RAG - SharePoint Ingest`), der Vorgaenger heisst jetzt `… OLD`. Massgeblich ist die ID, nicht der
-Name. Die Ordner im Repo behalten ihren Schnitt: `rag-sharepoint-verarbeitung` ist die Verarbeitung.
-
-**Belegt** (Laeufe im Protokoll): Trockenlauf-Gegenprobe gegen den alten Flow trifft alle Zahlen
-(1 411 Dateien, 922 falscher Typ, 39 Sperrdateien, 402 fehlend, 0 verwaist). PDF, Arbeitsmappe und
-Word ueber die PDF-Wandlung laufen durch und schreiben dieselben Ergebnisse wie der alte Flow.
-Der Loeschzweig ist mit Pin-Daten geprueft. **Der Inhaltshash ist zeichengleich geblieben** - belegt
-ueber zwei inhaltsgleiche Kopien mit identischem `content_hash`, die eine vom alten Flow, die andere
-von der neuen Kette. Damit gilt beim Umschalten kein Bestandsdokument faelschlich als geaendert.
-Dazu der erste echte Kettenlauf `112961` mit drei eingelesenen Dokumenten.
-
-**Was nach dem Umschalten bleibt:**
-
-1. **Eine Nacht beobachten** - siehe [Der Neuschnitt ist live](#der-neuschnitt-ist-live--eine-nacht-beobachten).
-   Rueckweg ist billig: alten Flow aktivieren, neuen abschalten - beide schreiben in dieselben
-   Tabellen, kein Datenumbau. **Nie beide Steuerungen gleichzeitig aktiv**: gleiche Cron-Zeiten,
-   gleicher Delta-Anker in `sharepoint_delta`.
-2. **`maxJeLauf` im Betrieb bestaetigen.** Steht seit dem 01.09. auf 15, begrenzt durch das
-   Mistral-Kontingent, nicht durch die Technik - siehe
-   [Die Mengenbremse ist gemessen](#die-mengenbremse-ist-gemessen--3-ist-nicht-mehr-begründet).
-3. **Danach aufraeumen:** alten Flow archivieren, nach einer Woche loeschen,
-   `flows/rag-sharepoint-ingest/` aufloesen. Der Power-Automate-Flow in SharePoint ist am 01.09. von
-   Sebastian abgeschaltet.
-
-**Offen geblieben ist der Mehrbereichs-Fall.** Die Bereichsliste steht in `Startbereiche`, aber der
-`@odata.deltaLink` einer Antwortseite traegt selbst keine Laufwerkskennung - er wird dem Bereich
-zugeordnet, dessen Eintraege auf derselben Seite lagen. Bei einem Bereich exakt, beim zweiten zu
-pruefen.
+- **Hebel 1, der OCR-Zwischenspeicher.** Der größte Hebel: Bei vier von sechs Rebuild-Gründen ist die Datei unverändert, und trotzdem läuft die komplette OCR erneut. **Keine neue Tabelle nötig** — `sharepoint_documents` trägt `content_hash`, `content_text` und `images` bereits für alle Dokumente; nachgeschlagen wird über den Hash. Damit entfällt auch die Supabase-Freigabe. Vor dem Bau zu prüfen: ob `content_text` reicht, um die Chunks identisch neu zu bauen. Der Fallstrick bleibt das Bucket-Aufräumen bei einem Treffer.
+- **Hebel 3, der native Textpfad** für die gemessenen 21 % bildloser Dokumente. Vor dem Bau zu messen, wie viele der fehlenden PDF eine Textebene tragen — die Gegenprobe braucht ein OCR-Ergebnis zum Vergleich. Seit dem 01.09. steht dem nichts mehr im Weg.
+- **Hebel 4, ein Seitendeckel** für Dokumente wie die Regaletiketten. Fachliche Entscheidung, keine technische.
 
 ### Dokumenteintrag vor den Chunks - Reihenfolge im Ingest
 Der Ingest legt den Dokumenteintrag an, **bevor** er die Chunks schreibt. Bricht ein Lauf dazwischen ab, bleibt ein Eintrag ohne Chunks stehen - in der Wissenssuche unsichtbar. Stand 30.08.: neun solcher Eintraege (Lauf 110771), acht davon bildreiche Regaletiketten-PDFs.
@@ -531,95 +298,3 @@ Bleibt liegen, bis diese Nodes ohnehin angefasst werden.
 
 ### Startseite der SharePoint-Site
 Ob eingeladene Nutzer die Bereiche samt Unterseiten dynamisch sehen, ließe sich über das Dokumentbibliothek-Webpart mit der Ansicht *Alle Dokumente ohne Ordner* lösen — ohne Code. Eine Navigation, die der Flow mitpflegt, gäbe es damit aber nicht; dafür müsste er zusätzlich eine Übersichtsseite schreiben.
-
-## Lead Intake von der Website: die zwei Mails sind zwei Empfaenger
-
-Flow `KAPA Digital - Lead Intake from Website`
-([HW170WdNT9yQGErU](https://n8n.srv1307521.hstgr.cloud/workflow/HW170WdNT9yQGErU)). Am 01.09.
-gemeldet und am selben Tag an Lauf `112933` untersucht.
-
-### Es gibt keinen Doppelversand - die Vermutung ist widerlegt
-
-`Interne Meldung per E-Mail` ist im Lauf **genau einmal** gelaufen: ein einziger Eintrag in den
-Laufdaten, eine `messageId` (`<fac67e10-…>`), eine SMTP-Quittung (`queued as 4hZ7fd6nCfzyc0`).
-
-Der Grund fuer zwei Mails im Postfach steht im Code-Node `Score berechnen und Wiedervorlage setzen`:
-
-```
-empfaengerIntern: 'info@kapa-digital.de, sebastian.linges@kapa-digital.de'
-```
-
-**Eine Nachricht an zwei Adressen** - der SMTP-Server hat beide angenommen
-(`accepted: [info@kapa-digital.de, sebastian.linges@kapa-digital.de]`). Sebastian liest beide
-Postfaecher und sieht deshalb dieselbe Mail zweimal, gleicher Betreff, gleiche Minute. Telegram geht
-dagegen an **eine** Chat-ID, daher genau eine Meldung. Kein Knoten laeuft doppelt, kein Item wird
-doppelt verarbeitet.
-
-**Zu entscheiden, keine Fehlersuche mehr:** Sollen beide Adressen die interne Meldung bekommen? Wenn
-`info@` ohnehin bei Sebastian landet, ist die zweite Adresse zu streichen - eine Zeile.
-
-### Fehlalarm: `spam_verdacht` ist dem Modell nie erklärt worden
-
-**Lauf `113875` am 02.09., 18:36** — die erste echte Anfrage über die live gegangene Website wurde als Spam eingestuft. Zu Unrecht.
-
-Das Modell setzte `spam_verdacht: true` mit dieser Begründung:
-
-> „Der Anfragetext enthält keine konkreten Angaben zum Anliegen oder Problem. Die E-Mail-Domain ist eine Freemail-Adresse und der Text wirkt unstrukturiert."
-
-**Keiner der drei Gründe ist ein Spam-Merkmal**, und alle drei sind bereits anderweitig abgebildet:
-
-| Genannter Grund | Was er wirklich ist |
-|---|---|
-| kein konkretes Anliegen | genau das Feld `problem_konkret: false` |
-| Freemail-Adresse | steht als `(Freemail)` im Prompt und ist ein Scoring-Merkmal |
-| unstrukturierter Text | Schreibstil, kein Betrugshinweis |
-
-**Die Ursache: Im gesamten Prompt steht nirgends, was `spam_verdacht` bedeutet.** Der Systemprompt erwähnt Spam mit keinem Wort, und das JSON-Schema führt das Feld nackt als `spam_verdacht: { type: 'boolean' }`. Im ganzen Schema gibt es **null** `description`-Felder. Das Modell musste raten und hat daraus „der Lead wirkt schwach" gemacht.
-
-**Bezeichnend:** Den einzigen echten Verdachtsmoment hat es *nicht* genannt — der Absender heißt laut Formular „Sebastian Linges", unterschreibt im Text aber mit „Müller Sebastian".
-
-**Zwei verschiedene Spam-Begriffe im selben Flow.** `Eingaben validieren` kennt einen harten, regelbasierten `pruefstatus = 'spam'` — bei gefülltem Honeypot oder fehlendem Relay. Der stand hier korrekt auf `ok`. Davon völlig getrennt urteilt das Modell über `spam_verdacht`. Nur der zweite ist undefiniert.
-
-**Die Wirkung ist hart.** In `Score berechnen und Wiedervorlage setzen` überschreibt `istSpam` die gesamte Punktebewertung:
-
-```
-if (istSpam) { priority = 'e_pruefen'; meldungGrund = 'spam'; }
-```
-
-Ergebnis: `score: 0`, `priority: e_pruefen`, Meldegrund `spam`.
-
-**Verloren ist nichts.** Der Lauf ging vollständig durch — Rohbeleg gesichert, Telegram-Sofortmeldung und interne E-Mail sind raus. Falsch ist die Beschriftung und die Priorität, nicht die Zustellung.
-
-**Behoben und publiziert am 02.09. als `206a930b`.** Vier Saetze im Systemprompt und `description`-Felder an `spam_verdacht`, `problem_konkret`, `nur_information` und `begruendung`. Belegt an Lauf `113882`: dieselbe Nutzlast, dasselbe Modell, `spam_verdacht` faellt auf `false`, `problem_konkret` bleibt richtig `false` und der Score bleibt 0 - schwach qualifiziert, aber kein Spam. Aufbau und Fallstricke jetzt in [flows/kapa-lead-intake-website/README.md](flows/kapa-lead-intake-website/README.md).
-
-**Offen aus dem Test:** `Lead Intake aufrufen` wurde beim Pinnen uebersehen und hat einen zweiten Lead zu derselben Anfrage angelegt - `lead_id 4c80f3ec-e9a5-4368-8be5-e984485f6864`, `contact_id 671b1e04-21a3-40dd-86ad-89dae29b5672`, drei Aufgaben. Aufraeumen braucht eine Freigabe fuer den Schreibzugriff auf Kapa-Core.
-
-**Die Definition, die jetzt im Prompt steht:** Spam ist Werbung, sind Backlink- und SEO-Angebote, Massenversand, sinnfreier Text und Kontaktdaten die nicht zusammenpassen — **nicht** ein frueher Interessent mit vagem Anliegen. „Ich wuerde mich gerne mal austauschen" ist der Normalfall einer Erstanfrage, nicht deren Ausschlusskriterium.
-
-### Der Spamverdacht kam vom Modell, nicht von einer Regel
-
-`istSpam` uebernimmt schlicht das Urteil der Analyse: `analyse.spam_verdacht === true`. Es gibt keine
-Stichwort- oder Themenliste, die zu breit greifen koennte.
-
-**Auf die eingereichten Daten gesehen war das Urteil vertretbar.** Der Freitext lautete
-`Das ist ein Test nfedehuwehdfwe dde Ende`; die Einschaetzung des Modells: „Der Freitext enthält
-keine relevanten Informationen und deutet auf eine Testanfrage hin." Bewertung 0, Einstufungsvorschlag
-`e_pruefen`. Es war tatsaechlich eine Testanfrage mit Buchstabensalat - das Modell hat sie als solche
-erkannt.
-
-**Offen ist damit nicht die Erkennung, sondern die Beschriftung.** Eine erkannte Testanfrage bekommt
-heute die Kopfzeile `SPAMVERDACHT - bitte pruefen`. Die Kategorie `unbewertet` gibt es im selben Code
-bereits; eine Testanfrage koennte dorthin laufen, statt als Spam ueberschrieben zu werden. Ob sich
-das lohnt, entscheidet sich an einem echten Fall - **ein einzelner Testlauf ist keine Messgrundlage.**
-
-### Entwurfsstand aufgeraeumt
-
-Der Flow trug einen nicht veroeffentlichten Entwurf. Der Vergleich gegen die aktive Fassung zeigte:
-**kein einziger Unterschied** - 31 Knoten, Verbindungen und Knotengruppen zeichengleich, auch die
-Positionen. Es war ein Autosave vom Oeffnen des Editors um 16:35, eine Minute nach dem Testlauf.
-
-Am 01.09. publiziert, damit `versionId` und `activeVersionId` wieder zusammenfallen. Am Verhalten
-aendert das nichts.
-
-**Kein Ordner im Repo.** Der Flow gehoert zu den KAPA-Digital-Flows ohne eigenen Ordner, es gibt also
-keinen Export. Wenn er weiter angefasst wird, gehoert einer angelegt.
