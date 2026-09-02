@@ -28,6 +28,7 @@ flows/<flow-name>/
 | RWG Sub - Jira Tickets | `flows/rwg-sub-jira-tickets/` | `HoCch7AkiSroyJBB` |
 | RWG_Jira-Feldpflege | `flows/rwg-jira-feldpflege/` | `k4SmnNrz7ASMdFwk` |
 | RWG ProzessHub nach SharePoint | `flows/rwg-prozesshub-sharepoint/` | `Muss6GBGPuG9fjE2` |
+| RWG Wartung - SharePoint Datei verschieben | `flows/rwg-wartung-sharepoint-datei-verschieben/` | `k5sofeyVNzEqOIZs` |
 | KAPA Digital - KI Daily - Collect [WF-1] | `flows/kapa-ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
 | KAPA Digital - KI Daily - Analyze & Deliver [WF-2] | `flows/kapa-ki-daily-analyze/` | `objM2PQrcTpEzik7` |
 | KAPA Digital - Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |

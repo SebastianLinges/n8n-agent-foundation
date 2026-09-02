@@ -170,6 +170,33 @@ Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen,
 
 Noch unbelegt sind vier Nodes, die nur hinter der Extraktion liegen: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die Umwandlungen in `Ergebnis auswerten` sind einzeln gegen Testwerte geprueft, die Spaltenliste des grossen `UPDATE` gegen `information_schema` und `jsonb_to_record`. Ein Lauf ersetzt das nicht.
 
+### Extraktion scheitert an grossen Vertraegen
+Belegt am 02.09. in Lauf `113384`: Die kleine Rechnung lief durch, die 46-seitige Stadtsparkassen-Datei brach ab. Die n8n-Meldung `Forbidden - perhaps check your credentials?` ist irrefuehrend - im Feld `description` steht der wahre Grund:
+
+> `This model is not available in your subscription tier`
+
+Es ist **kein Credential-Problem**: Sekunden zuvor lief dasselbe Modell mit derselben Credential fuer die kleine Datei. Der Unterschied ist die Groesse - die gescheiterte Anfrage war **173 924 Zeichen**, rund 45 000 Tokens; die erfolgreiche hatte 2 320 Prompt-Tokens.
+
+**Zu entscheiden, vier Wege:**
+
+| Weg | Was es bedeutet |
+|---|---|
+| **Eingabe deckeln** | nur die ersten rund 30 000 Zeichen an das Modell. Partner, Laufzeit und Kuendigung stehen meist vorn. Billigste Loesung, kann bei Anhaengen Felder verlieren |
+| Stueckeln | Text zerlegen, je Teil extrahieren, zusammenfuehren. Vollstaendig, mehr Aufrufe |
+| Anderes Modell | eines, das der Tarif in dieser Groesse zulaesst |
+| Tarif anheben | loest es, kostet Geld |
+
+Empfehlung: **Deckeln**, mit einem Vermerk in `fehler_text`, wenn gekuerzt wurde.
+
+### Drei Vertraege liegen unbemerkt in FEHLER
+Am 02.09. beim Bau des Verschiebe-Werkzeugs aufgefallen (Lauf `113711`): In `/IMPORTER/CONTRACT/FEHLER` liegen **vier** Dateien, nicht zwei. Drei davon haben **keine Zeile** in `public.vertraege` und stehen damit in keinem Bestand:
+
+- `2017_04_18 Mietvertrag Domnick.pdf` (2,3 MB)
+- `2025-10-09_TechSmith.pdf` (48 kB)
+- `Auto Leasing Vertrag.pdf` (896 kB)
+
+Sie stammen vermutlich aus der Zeit vor dem Umbau, als der Flow die Data Table `RWG Vertraege` fuehrte. **Zu entscheiden:** einlesen lassen oder aussortieren. Einlesen kostet OCR - alle drei sind klein, `TechSmith` mit 48 kB kaum messbar. Das Werkzeug zum Zurueckschieben steht: [flows/rwg-wartung-sharepoint-datei-verschieben](flows/rwg-wartung-sharepoint-datei-verschieben/README.md).
+
 ### Altbestand in DONE nachziehen
 Elf Dokumente liegen in `/IMPORTER/CONTRACT/DONE` und stehen nicht in `vertraege`. Ein Einmallauf ueber den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar. Bewusst zurueckgestellt, bis der Eingang belegt ist.
 

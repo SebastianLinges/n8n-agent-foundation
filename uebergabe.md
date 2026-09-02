@@ -109,7 +109,7 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 - **Lead Intake von der Website** (`HW170WdNT9yQGErU`): Die zwei Mails sind **kein Doppelversand**, sondern zwei Empfänger in einer Nachricht — `empfaengerIntern` trägt `info@kapa-digital.de` und `sebastian.linges@kapa-digital.de`. Zu entscheiden ist nur, ob die zweite Adresse bleibt. Der Spamverdacht kam vom Modell und war beim eingereichten Buchstabensalat vertretbar; offen ist die Beschriftung, nicht die Erkennung. Beides bleibt auf Sebastians Entscheidung unverändert. Der Entwurfsstand ist am 01.09. publiziert — er war zeichengleich mit der aktiven Fassung, ein Autosave ohne Änderung.
 
 **Was mir fehlt**
-- **Kein Werkzeug zum Löschen von SharePoint-Dateien.** Der einzige Weg wäre ein Wegwerf-Flow gegen die Graph-API mit Hash-Prüfung vor dem Löschen — so wie das Ordner-Werkzeug vom 30.08. Für zwei Dateien lohnt es kaum; wenn mehr wegsollen, ist es gebaut.
+- **Löschen von SharePoint-Dateien.** Verschieben gibt es seit dem 02.09.: `RWG Wartung - SharePoint Datei verschieben` (`k5sofeyVNzEqOIZs`), mit Probelauf und einem Namensfilter, der leer nichts trifft. **Löschen bewusst nicht** — das kommt erst, wenn die Entscheidung über die 17 inhaltsgleichen Kopien gefallen ist.
 - **Redaction ist nicht verfügbar.** In den Workflow-Einstellungen sind `Redact production execution data` und `Redact manual execution data` ausgegraut und tragen ein `Upgrade`-Abzeichen. Damit bleibt der bekannte Klartext-Effekt bei HTTP-Fehlern bestehen. Gemessen: der **lebende** Zugang ist in keiner Ausführung gelandet — nur der Schlüssel des gelöschten Projekts, und der ist wertlos.
 
 **Das größte offene Vorhaben: Contract Loader zu Ende belegen**
