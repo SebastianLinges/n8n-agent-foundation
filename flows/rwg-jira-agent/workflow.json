@@ -858,6 +858,68 @@
           }
         ]
       ]
+    },
+    "Nachzuegler Zeitplan": {
+      "main": [
+        [
+          {
+            "node": "Nachzuegler Steuerung",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nachzuegler Steuerung": {
+      "main": [
+        [
+          {
+            "node": "Haengende Events lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Haengende Events lesen": {
+      "main": [
+        [
+          {
+            "node": "Wirklich nachholen?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wirklich nachholen?": {
+      "main": [
+        [
+          {
+            "node": "Als Ereignis aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nachzuegler Bilanz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Als Ereignis aufbereiten": {
+      "main": [
+        [
+          {
+            "node": "Set Event Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "nodes": [
@@ -2795,6 +2857,148 @@
         -144
       ],
       "notes": "Faengt Ausfaelle der Policy-Sub-Nodes ab. Bei einem Fehler in Modell oder Parser reicht die Chain die Eingangsdaten durch, ohne output-Feld - dann fehlt nextAction und der Lauf wird als fehlgeschlagen vermerkt statt still als Erfolg zu enden."
+    },
+    {
+      "id": "b12b5200-40a6-4000-8441-aacde93e2c49",
+      "name": "Nachzuegler Zeitplan",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3008,
+        600
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/30 * * * *"
+            }
+          ]
+        }
+      },
+      "notes": "Sucht Vorgaenge, die angefangen und nie beendet wurden. Der Jira-Webhook liefert je Ticket genau ein Ereignis - bricht der Lauf mittendrin ab, stoesst ihn sonst nichts erneut an."
+    },
+    {
+      "id": "dd41d1e3-6dcb-4a02-b925-c71a99e831b2",
+      "name": "Nachzuegler Steuerung",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2848,
+        600
+      ],
+      "parameters": {
+        "jsCode": "// Alle Schalter an einer Stelle.\n//\n// probelauf steht bewusst auf true. Der Ernstfall schreibt in ein echtes\n// Kundenticket - erst ansehen, was er holen wuerde, dann scharf schalten.\nconst s = {\n  // Wie weit zurueck nachgeholt wird. Schuetzt davor, wochenalte Vorgaenge\n  // aufzuwecken: Ohne diese Grenze bekaeme ein Kunde heute eine Antwort auf\n  // ein Ticket vom Juli. Am 02.09. gemessen - 45 Vorgaenge waeren\n  // beanspruchbar, keiner davon juenger als 24 Stunden.\n  fensterStunden: 24,\n\n  // Was dreimal scheitert, ist ein Fall fuer einen Menschen und keine\n  // Endlosschleife. Claim Jira Event zaehlt bei jedem Aufgriff hoch.\n  maxVersuche: 3,\n\n  // Mengenbremse je Lauf.\n  maxJeLauf: 5,\n\n  probelauf: true\n};\n\nreturn [{ json: s }];"
+      },
+      "notes": "Fenster, Versuchsgrenze, Menge und der Probelauf-Schalter."
+    },
+    {
+      "id": "5dc2b1ca-f887-4ca9-ad76-ade83dc1b7ee",
+      "name": "Haengende Events lesen",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2688,
+        600
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT issue_id, issue_key, event_key, event_type, status, attempt_count, created_at\nFROM public.jira_agent_events\nWHERE (\n        status = 'failed'\n     OR (status = 'processing' AND claimed_at < now() - interval '30 minutes')\n      )\n  AND created_at > now() - ($1::int * interval '1 hour')\n  AND attempt_count < $2::int\nORDER BY created_at\nLIMIT $3::int;",
+        "options": {
+          "queryReplacement": "={{ [ $json.fensterStunden, $json.maxVersuche, $json.maxJeLauf ] }}",
+          "queryBatching": "independently"
+        }
+      },
+      "notes": "Die beiden ersten Bedingungen spiegeln genau die Claim-Bedingung. Was Claim Jira Event ohnehin abweisen wuerde, wird gar nicht erst geschickt. Keine Kommentare in der Abfrage - der Postgres-Node sucht auch dort nach Dollar-Platzhaltern.",
+      "alwaysOutputData": true
+    },
+    {
+      "id": "7abb4556-3a38-48e1-bd68-d6be0e951e70",
+      "name": "Wirklich nachholen?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2528,
+        600
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "n-live",
+              "leftValue": "={{ $('Nachzuegler Steuerung').first().json.probelauf }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "n-id",
+              "leftValue": "={{ $json.issue_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "notes": "Zwei Sicherungen: der Probelauf muss aus sein, und es muss wirklich eine Vorgangs-ID vorliegen. Das leere Item, das alwaysOutputData bei null Treffern erzeugt, faellt hier heraus."
+    },
+    {
+      "id": "a34c0304-e49f-4e65-be67-2a4c85d158e2",
+      "name": "Als Ereignis aufbereiten",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2368,
+        480
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "n-evt",
+              "name": "webhookEvent",
+              "value": "={{ $json.event_type }}",
+              "type": "string"
+            },
+            {
+              "id": "n-iss",
+              "name": "issue",
+              "value": "={{ { \"id\": $json.issue_id, \"key\": $json.issue_key } }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Baut die Form nach, die der Jira-Webhook liefert. Set Event Context liest webhookEvent und issue.id/issue.key - mehr braucht die Kette nicht, denn Get Issue Fresh holt das Ticket ohnehin neu."
+    },
+    {
+      "id": "f090472c-82c3-48ba-a29b-fac80d49f17d",
+      "name": "Nachzuegler Bilanz",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2368,
+        720
+      ],
+      "parameters": {
+        "jsCode": "const s = $('Nachzuegler Steuerung').first().json;\n\nlet zeilen = [];\ntry {\n  zeilen = $('Haengende Events lesen').all()\n    .map(i => i.json)\n    .filter(z => z && z.issue_id);\n} catch (e) {\n  zeilen = [];\n}\n\nreturn [{ json: {\n  probelauf: s.probelauf === true,\n  fenster_stunden: s.fensterStunden,\n  max_versuche: s.maxVersuche,\n  max_je_lauf: s.maxJeLauf,\n  gefunden: zeilen.length,\n  wuerde_nachholen: zeilen.map(z =>\n    String(z.issue_key) + ' (' + String(z.status) + ', Versuch ' + String(z.attempt_count) + ')'\n  ),\n  geprueft_um: $now.toISO()\n} }];"
+      },
+      "notes": "Ausgang des Probelaufs. Meldet, was der Lauf geholt haette, ohne etwas anzufassen.",
+      "executeOnce": true
     }
   ],
   "nodeGroups": [],

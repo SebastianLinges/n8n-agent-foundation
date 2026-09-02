@@ -1,10 +1,10 @@
 # RWG Teams Agent
 
-Workflow `RWG Teams Agent` (`BWswB3XA8S2gMwoT`), aktiv, 47 Nodes, Microsoft-Teams-Trigger auf neue Chatnachrichten.
+Workflow `RWG Teams Agent` (`BWswB3XA8S2gMwoT`), aktiv, 49 Nodes, Microsoft-Teams-Trigger auf neue Chatnachrichten.
 
 ## Aufbau
 
-Teams-spezifisch bis `Build Teams Context`: Duplikatschutz über `Claim Message`, Nachladen von Chat und Nachricht über Microsoft Graph, `Resolve Identity` für Identität und Sichtbarkeit, Lesebestätigung.
+Teams-spezifisch bis `Build Teams Context`: **Aussonderung von Nicht-Nachrichten über `Ist es eine Chatnachricht?`**, Duplikatschutz über `Claim Message`, Nachladen von Chat und Nachricht über Microsoft Graph, `Resolve Identity` für Identität und Sichtbarkeit, Lesebestätigung.
 
 Fachlich ab `Greeting-Gate`: Begrüßungsweiche, Bildzweig, `Agent-Eingabe bauen`, `AI Agent` mit sechs Werkzeugen (Semantische Wissenssuche, Volltextsuche, Jira-Tickets, Web-Recherche, Denkschritt, Confluence-Bereiche), `Output Guard`, `Format Reply for Teams`.
 
@@ -92,6 +92,22 @@ Das `active`-Flag steuert nur eigene Trigger. Ein Subflow, der über *Execute Su
 Der Subflow `RWG Sub - Wissenssuche` schickt im Node `Kandidaten reranken` die Trefferinhalte an `api.cohere.com` — Titel plus bis zu 2.000 Zeichen je Kandidat, bis zu 24 Kandidaten je Anfrage. Bei IT-Anfragen sind darunter `it_internal`-Inhalte; in Ticket-Chunks stecken Signaturblöcke mit Namen, Anschriften und Telefonnummern.
 
 **Entscheidung: bleibt so.** Die datenschutzrechtliche Bewertung wird bewusst zurückgestellt, nicht übersehen. Wird sie aufgenommen, ist dieser Node der Ansatzpunkt.
+
+## Nicht jedes Webhook-Ereignis ist eine Nachricht
+
+Microsoft Graph schickt über denselben Webhook auch Lebenszyklus-Meldungen des Abos. Dann steht in `@odata.type` nicht `#Microsoft.Graph.chatMessage`, sondern etwa `#microsoft.graph.subscription` — und es gibt weder Chat- noch Nachrichten-ID. Am 02.09. riss das den Lauf `113483` mit `URL parameter cannot be empty`; davor hatte `Claim Message` bereits einen Datensatz mit der **Abo-ID** angelegt.
+
+`Ist es eine Chatnachricht?` sitzt deshalb **vor** `Claim Message` und nicht hinter `Extract IDs`, wo `hasIds` schon richtig auf `false` stand: An der früheren Stelle fällt auch der Pseudo-Eintrag weg.
+
+```
+String($json['@odata.type'] || '').toLowerCase().endsWith('chatmessage')
+```
+
+**Positiv geprüft, nicht negativ** — Graph kennt weitere Lifecycle-Typen als nur `subscription`. Das `toLowerCase()` ist notwendig, weil Graph die beiden Fälle unterschiedlich schreibt: `#Microsoft.Graph.chatMessage` gegen `#microsoft.graph.subscription`.
+
+Belegt an beiden echten Nutzlasten: Lauf `113871` (Abo-Ereignis) endet bei `Kein Chat-Ereignis`, ohne dass `Claim Message` überhaupt läuft; Lauf `113872` (echte Nachricht) geht durch die Weiche und wird erst vom Duplikatschutz gestoppt. Der zweite Test nutzt bewusst eine bereits beanspruchte Nachricht — anders ließe sich der Durchlass nicht prüfen, ohne einem Anwender wirklich zu schreiben.
+
+In `agent_requests` stehen **3 Alteinträge** mit einer Abo-ID statt einer Nachrichten-ID (unter 808 Zeilen, seit dem 15.07.). Sie sind wirkungslos: Zu ihnen gehört keine Nachricht, und der Duplikatschutz greift nur auf die eigene ID.
 
 ## Offene Punkte
 

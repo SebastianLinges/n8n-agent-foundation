@@ -62,6 +62,7 @@ Nicht aufwerfen, das ist geklärt:
 - **n8n weist Credentials automatisch zu**, wenn nur eine des Typs existiert. Bei zwei Datenbanken ist das gefährlich — nach jedem `create_workflow_from_code` die Zuordnung prüfen.
 - **Die MCP-Schnittstelle liest Credentials nicht aus.** `get_workflow_details` liefert bei jedem Node `credentials: null`, auch wenn eine zugewiesen ist. Daraus lässt sich also *nicht* schließen, dass eine fehlt — und man kann auch nicht sehen, welche dranhängt. Der einzige Weg ist, sie mit `setNodeCredential` ausdrücklich zu setzen.
 - **Ein aufgebrauchtes Mistral-Kontingent zeigt sich in zwei Gestalten.** Solange der Zugang nur pausiert ist, wirft die API die Verbindung weg, statt einen Fehlercode zu senden — `ECONNRESET` mit *„The connection to the server was closed unexpectedly"*, und die Wiederholungen laufen ins Leere. Ein Abrechnungsproblem sieht dadurch wie ein Netzabbruch aus. Ist das Abo abgelaufen, antwortet dieselbe Stelle sauber mit `402 Payment required`. Gesperrt wird dabei nicht nur der Chat-, sondern auch der Datei-Endpunkt — die OCR wird dann gar nicht mehr erreicht. Belegt in den Läufen 111062 und 111286.
+- **`Forbidden - perhaps check your credentials?` von Mistral zeigt nicht auf die Credential.** Der wahre Grund steht im Feld `description` der Antwort — im Fall des Contract Loaders `This model is not available in your subscription tier`. Der Tarif trug `mistral-large-latest` nicht verlässlich und wies rund drei von vier Anläufen ab. **Der teure Teil war die Diagnose, nicht die Behebung:** Ein sporadischer Fehlschlag sieht wie ein dokumentabhängiger aus, weil immer nur die gescheiterte Zeile auffällt. Erst `versuche` verrät es — dieselbe Datei stand auf `versuche: 3` und war trotzdem `abgelegt`, hatte es also im vierten Anlauf geschafft. Auf dem Weg dahin wurde eine Größengrenze vermutet, gebaut und an Lauf `113768` widerlegt; der Wechsel auf `mistral-medium-latest` hat es dann gelöst. **Regel:** Bevor eine Fehlerursache am Inhalt festgemacht wird, erst die Fehlschlagquote über *alle* Zeilen zählen.
 - **Wird ein Supabase-Projekt gelöscht, verschwindet auch sein Zugang aus n8n.** Jeder Flow, der ihn noch referenziert, scheitert ab dem nächsten Lauf mit `Credential with ID … does not exist`. Bei webhook- oder ereignisgetriebenen Flows fällt das sofort auf, bei Delta-Läufen ohne Änderungen erst Tage später — die betroffenen Nodes werden dann gar nicht angefasst. **Vor dem Löschen eines Projekts auf allen Flows den neuen Zugang setzen**, nicht nur die Adressen umstellen.
 
 ---
@@ -112,20 +113,18 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 - **Löschen von SharePoint-Dateien.** Verschieben gibt es seit dem 02.09.: `RWG Wartung - SharePoint Datei verschieben` (`k5sofeyVNzEqOIZs`), mit Probelauf und einem Namensfilter, der leer nichts trifft. **Löschen bewusst nicht** — das kommt erst, wenn die Entscheidung über die 17 inhaltsgleichen Kopien gefallen ist.
 - **Redaction ist nicht verfügbar.** In den Workflow-Einstellungen sind `Redact production execution data` und `Redact manual execution data` ausgegraut und tragen ein `Upgrade`-Abzeichen. Damit bleibt der bekannte Klartext-Effekt bei HTTP-Fehlern bestehen. Gemessen: der **lebende** Zugang ist in keiner Ausführung gelandet — nur der Schlüssel des gelöschten Projekts, und der ist wertlos.
 
-**Das größte offene Vorhaben: Contract Loader zu Ende belegen**
+**Contract Loader: fertig**
 
-`RWG Contract Loader` (`661BDwEditNicEc0`) ist umgebaut: 30 Nodes statt 36, liest aus SharePoint `/IMPORTER/CONTRACT`, schreibt nach `public.vertraege`, legt die Datei nach `DONE` und erzeugt die Excel-Übersicht neu. Aufbau, Entscheidungen und Fallstricke: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
+`RWG Contract Loader` (`661BDwEditNicEc0`) liest aus SharePoint `/IMPORTER/CONTRACT`, schreibt nach `public.vertraege`, legt die Datei nach `DONE` und erzeugt die Excel-Übersicht neu. Aufbau, Entscheidungen und Fallstricke: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
 
-**Der Umbau ist publiziert und aktiv** — `versionId` und `activeVersionId` stimmen überein, 30 Nodes. Die Doku behauptete bis zum 01.09. das Gegenteil.
+**Alle Knoten sind belegt.** Am 02.09. stehen alle zwölf Zeilen in `vertraege` auf `abgelegt`, alle zwölf mit gefülltem Vertragspartner, `status = fehler` ist 0, `/IMPORTER/CONTRACT/FEHLER` ist leer. Die vier Verträge, die dort monatelang lagen — darunter drei, die in keinem Bestand standen — sind verarbeitet.
 
-Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist allein die Extraktion.** Sie scheiterte am aufgebrauchten Mistral-Kontingent; das ist seit dem 01.09. keine Hürde mehr.
+**Die Extraktion scheiterte am Modell, nicht an den Dokumenten.** Der Tarif trägt `mistral-large-latest` nicht verlässlich; unter `mistral-medium-latest` laufen vier Extraktionen in Folge sauber durch, einschließlich des 46-seitigen Vertrags mit 164 789 Zeichen OCR-Text. Die Diagnose steht oben unter den teuer erkauften Regeln.
 
-**Es fehlt nur die Datei im Eingang.** `Eingang lesen` holt die Kinder von `/IMPORTER/CONTRACT` und steigt nicht in Unterordner ab; die beiden Dokumente liegen in `/IMPORTER/CONTRACT/FEHLER`. Eine davon zurücklegen genügt.
-
-**`versuche` muss dabei nicht zurückgesetzt werden** — der Zähler wird nur auf dem Fehlerweg geprüft, nicht beim Aufgreifen. Und es kostet keine neue OCR: `hat_ocr` ist true, die `Weiche` leitet an der Erkennung vorbei direkt in die Extraktion. Genau dahinter liegen die vier nie gelaufenen Knoten.
+**Publiziert als `98c19d61`** am 02.09. — `versionId` und `activeVersionId` stimmen überein, 30 Nodes. Der Export liegt in [flows/rwg-contract-loader/workflow.json](flows/rwg-contract-loader/workflow.json).
 
 **Technisch offen**
-- Erstbefüllung: rund **400** Dateien einzulesen, bei `maxJeLauf: 3` über 130 Nächte. Die Mengenbremse ist nach dem Umschalten neu auszuloten — das ist der Hebel.
+- Erstbefüllung: noch **371** Dateien einzulesen, bei `maxJeLauf: 15` rund 25 Nächte. Die 15 sind am 02.09. im Betrieb belegt (Nachtlauf 113217, 2 min 2 s) und als Kostenbremse gewählt, nicht als technische Grenze.
 - **Dokumente ohne Chunks: keine.** Die sechs leeren Power-Automate-Altzeilen sind am 01.09. gelöscht.
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber

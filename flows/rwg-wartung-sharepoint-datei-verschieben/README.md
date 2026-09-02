@@ -26,9 +26,11 @@ Beide stehen nach jedem Einsatz wieder auf ihrem Vorgabewert.
 
 Der leere Filter ist der wichtigere der beiden. Ein Werkzeug, das ohne Angabe den ganzen Ordner verschiebt, ist eine Falle — wer es zum ersten Mal startet, erwartet keine Massenaktion. Läuft es ohne Filter, meldet es stattdessen, was im Quellordner liegt.
 
+**Der Filter nimmt mehrere Namensteile**, durch Komma getrennt: `TechSmith, Leasing, Domnick` trifft drei Dateien in einem Lauf und lässt die vierte im Ordner liegen. Getroffen wird, was **einen** der Teile enthält. Ohne das braucht jede Datei ihren eigenen Probe- und Ernstlauf.
+
 ## Ablauf
 
-1. In `Steuerung` `nurDatei` auf eine Teilzeichenkette des Dateinamens setzen (Groß- und Kleinschreibung egal)
+1. In `Steuerung` `nurDatei` auf eine Teilzeichenkette des Dateinamens setzen — oder auf mehrere, durch Komma getrennt (Groß- und Kleinschreibung egal)
 2. Starten — die Bilanz zeigt unter `wuerde_verschieben`, was getroffen würde
 3. Stimmt es, `probelauf` auf `false` und erneut starten
 4. **Danach beide Schalter zurücksetzen**
@@ -57,13 +59,13 @@ Die drei HTTP-Knoten brauchen sie ausdrücklich gesetzt — die MCP-Schnittstell
 | `113712` | Filter `Stadtspk`, Probelauf | genau **eine** Datei unter `wuerde_verschieben`, `verschoben: []` |
 | `113713` | Filter `Stadtspk`, Ernstfall | verschoben nach `/IMPORTER/CONTRACT`, Graph meldet `parentReference.name: CONTRACT` |
 | `113714` | Rückweg, Pfade getauscht | zurück nach `FEHLER` — beide Richtungen belegt, Stand unverändert |
+| `113771` | Kommaliste, Probelauf | genau **drei** Dateien unter `wuerde_verschieben`, die vierte im Ordner bleibt unberührt |
+| `113773` | Kommaliste, Ernstfall | alle drei nach `/IMPORTER/CONTRACT`, 4,8 s |
+| `113775` | Filter `Stadtspk`, Ernstfall | verschoben — `FEHLER` damit leer |
+| `113777` | Vorgabewerte, leerer Filter | `namen_im_quellordner: []` — der Ordner ist leer, das Werkzeug steht wieder auf beiden Sicherungen |
 
-## Nebenbefund aus Lauf 113711
+## Wozu es zuerst gebraucht wurde
 
-In `/IMPORTER/CONTRACT/FEHLER` liegen **vier** Dateien, nicht zwei. Drei davon haben **keine Zeile** in `public.vertraege` und sind damit in keinem Bestand:
+Lauf `113711` brachte einen Nebenbefund: In `/IMPORTER/CONTRACT/FEHLER` lagen **vier** Dateien, nicht zwei — drei davon ohne Zeile in `public.vertraege` und damit in keinem Bestand. Sie stammten aus der Zeit vor dem Umbau, als der Contract Loader die Data Table `RWG Vertraege` führte.
 
-- `2017_04_18 Mietvertrag Domnick.pdf` (2,3 MB)
-- `2025-10-09_TechSmith.pdf` (48 kB)
-- `Auto Leasing Vertrag.pdf` (896 kB)
-
-Sie stammen vermutlich aus der Zeit vor dem Umbau, als der Flow die Data Table `RWG Vertraege` führte. Was mit ihnen geschehen soll, ist offen.
+Alle vier sind am 02.09. über dieses Werkzeug zurück in den Eingang gegangen und vom Contract Loader verarbeitet worden. Der Ordner ist leer, alle zwölf Zeilen in `vertraege` stehen auf `abgelegt`.

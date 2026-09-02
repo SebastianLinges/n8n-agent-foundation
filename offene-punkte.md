@@ -25,6 +25,8 @@ Damit ist die Mengenbremse 15 im Betrieb belegt (2 Minuten, weit unter der Stund
 
 **Rückstand der Erstbefüllung: 371 Dateien**, bei 15 je Nacht rund 25 Nächte.
 
+**Am Nachmittag dazugekommen: der Contract Loader ist durch.** Die Extraktion scheiterte am Modell, nicht an den Dokumenten — `mistral-large-latest` wird vom Tarif nicht getragen. Unter `mistral-medium-latest` laufen vier Extraktionen in Folge sauber durch, die vier liegengebliebenen Verträge sind verarbeitet, `status = 'fehler'` ist 0 und der FEHLER-Ordner ist leer. Publiziert als `98c19d61`.
+
 **Als Nächstes:** den Mistral-Verbrauch ansehen, bevor die 15 dauerhaft stehen bleiben. Das ist die einzige Zahl, die noch fehlt.
 
 **Die OCR ist wieder offen.** Belegt in Lauf `112948` vom 01.09., 17:05: `Bestätigung persönliche
@@ -153,63 +155,114 @@ Publiziert als `eba7a53a`. Nebenwirkung des Weges über die MCP-Schnittstelle: d
 Nach jeder Änderung publizieren, exportieren, Läufe ins `tests/laufprotokoll.csv`.
 
 
-### Contract Loader zu Ende belegen - eine Datei muss zurueck in den Eingang
-**Der Umbau ist publiziert und aktiv**, `661BDwEditNicEc0` mit 30 Nodes; `versionId` und `activeVersionId` stimmen ueberein. Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
+### Contract Loader
+**Der Flow ist vollstaendig belegt.** Alle zwoelf Zeilen in `public.vertraege` stehen auf `abgelegt`, alle zwoelf mit gefuelltem Vertragspartner, `status = 'fehler'` ist **0**, und `/IMPORTER/CONTRACT/FEHLER` ist leer (Lauf `113777`). Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
 
-Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen, Mistral-Upload, signierte URL, OCR und das Sichern des OCR-Textes. Beide Dokumente vollstaendig gelesen - 46 Seiten mit 20630 Woertern und 1 Seite mit 190 Woertern. **Gescheitert ist allein die Extraktion**, damals am aufgebrauchten Mistral-Kontingent. Das ist seit dem 01.09. keine Huerde mehr.
+**Die Ursache der Fehlschlaege war das Modell, nicht das Dokument.** `mistral-large-latest` wird vom Tarif nicht verlaesslich getragen - rund drei von vier Anlaeufen kamen mit `Forbidden - perhaps check your credentials?` zurueck, im Feld `description` stand `This model is not available in your subscription tier`. Das sah dokumentabhaengig aus, weil nur die Zeile mit dem Fehler auffiel; tatsaechlich schaffte es dieselbe Datei beim vierten Anlauf (`RG Lichtwelle`, `versuche: 3`, trotzdem `abgelegt`).
 
-**Es fehlt nur die Datei im Eingang.** `Eingang lesen` holt die Kinder von `/IMPORTER/CONTRACT` und steigt nicht in Unterordner ab; die beiden Dokumente liegen aber in `/IMPORTER/CONTRACT/FEHLER`. Der Eingang ist seither leer, jeder stuendliche Lauf ist nach einer halben Sekunde fertig.
+**`mistral-medium-latest` traegt.** Vier Extraktionen in Folge ohne einen einzigen `Forbidden` (Laeufe `113774` und `113776`) - unter der alten Abweisungsquote ein Zufall von unter zwei Prozent. Der Grenzfall ist mitgemessen: der Stadtsparkassen-Vertrag mit **164 789 Zeichen** OCR-Text und 46 Seiten laeuft durch. Damit ist auch die Groessen-These endgueltig erledigt; sie war schon an Lauf `113768` gescheitert.
 
-**`versuche` muss nicht zurueckgesetzt werden.** Der Zaehler wird ausschliesslich auf dem Fehlerweg geprueft (`Zu viele Versuche?`), nicht beim Aufgreifen. `Zeile sichern` liefert `status`, `versuche` und `hat_ocr` zurueck, und `Weiche` entscheidet allein an `status_vorher` und `hat_ocr`. Eine Zeile mit `versuche = 3` wird also ganz normal verarbeitet - nur ein *erneuter* Fehlschlag schoebe sie sofort wieder nach `FEHLER`.
+**Feldguete quergeprueft.** `Mietvertrag Domnick` liefert unter `medium` woertlich denselben Vertragspartner, den `large` beim Schwesterdokument `Mieterhoehung Domnick` extrahiert hatte. Die Stadtsparkasse ergibt Vertragsart `Abzahlungsdarlehen`, Vertragsnummer `6005666539` und eine korrekt zusammengefasste Mehrfach-Kuendigungsklausel; der Mietvertrag Beginn `01.05.2017`, `400,-- Euro` netto und den Verweis auf § 565 ff BGB.
 
-**Der Testweg kostet keine OCR.** `hat_ocr` ist true, `Weiche` leitet auf Ausgang 1: `Vorhandenen OCR-Text laden` → `Extraktionsauftrag` → `Vertragsdaten extrahieren`. Genau dahinter liegen die vier nie gelaufenen Knoten.
+**Publiziert als `98c19d61`** am 02.09., Export liegt in [flows/rwg-contract-loader/workflow.json](flows/rwg-contract-loader/workflow.json).
 
-**Erledigt am 02.09.** Lauf `113384` mit `RG Lichtwelle Erkrath.pdf`: `status` steht auf `abgelegt`, `vertragspartner` Stadtwerke Erkrath GmbH, `vertragsnummer` 10030, die Datei liegt in `/IMPORTER/CONTRACT/DONE`. Damit haben alle vier zuvor nie gelaufenen Knoten gearbeitet - `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die leeren Vertragsfelder sind unverdaechtig: Eine Rechnung hat keine Laufzeit und keine Kuendigungsfrist.
+**Einmal nachsehen:** `Auto Leasing Vertrag.pdf` liefert bei 718 Woertern nur sieben Rohfelder - keine Laufzeit, kein Preis, kein Intervall. Fuer einen Leasingvertrag ist das wenig. Moeglich, dass die Datei nur ein Deckblatt ist; das laesst sich am `ocr_text` derselben Zeile in einer Minute klaeren.
 
-**Zur Mechanik**, nachtraeglich eingebaut (Lauf 110838): Steht `ocr_text` schon, wird die OCR uebersprungen - ohne das lief ein liegengebliebenes Dokument stuendlich erneut durch die Erkennung und wurde jedes Mal neu bezahlt. Der Zaehler `versuche` schiebt die Datei nach drei Fehlversuchen nach `/IMPORTER/CONTRACT/FEHLER`, den der Flow selbst anlegt. In der Excel stehen `status` und `versuche` vorn, Fertiges zuoberst.
+### Data Table `RWG Vertraege` geloescht
+Sebastian hat die Data Table `CEz5GXpTS7yHhjqS` am 02.09. entfernt. Sie war belegt redundant: kein Flow verwies noch darauf, zuletzt beschrieben am 20.03., und alle acht Dateien in `/IMPORTER/CONTRACT/DONE` haben eine Zeile in `public.vertraege`. Damit ist auch der frühere Punkt „Altbestand in DONE nachziehen" gegenstandslos - es gibt keinen Rueckstand.
 
-**Offen bleibt allein die Extraktion grosser Vertraege** - siehe den naechsten Abschnitt. An einem echten Vertrag mit Laufzeit, Kuendigungsfrist und Preisen ist die Extraktion damit noch nicht gemessen; die Rechnung belegt nur den Weg, nicht die Feldguete.
 
-### Extraktion scheitert an bestimmten Dokumenten - Ursache unbekannt
-Vier von zwoelf Dokumenten in `vertraege` scheitern reproduzierbar mit `Forbidden - perhaps check your credentials?`; im Feld `description` steht `This model is not available in your subscription tier`.
+## Teams-Agent: Abo-Ereignisse werden vor dem Claim ausgesondert
 
-**Es ist kein Credential-Problem** - dieselbe Credential verarbeitet im selben Lauf andere Dokumente klaglos.
+**Lauf `113483` am 02.09., 08:03:32** — der einzige Fehler unter 307 Laeufen. Microsoft Graph lieferte kein Chat-Ereignis, sondern eine Lebenszyklus-Meldung des Webhook-Abos:
 
-**Und es ist nicht die Groesse.** Am 02.09. an allen zwoelf Zeilen gemessen:
+```json
+{ "@odata.type": "#microsoft.graph.subscription",
+  "@odata.id": "subscriptions/37558cbf-…", "id": "37558cbf-…" }
+```
 
-| OCR-Zeichen | Status |
-|---|---|
-| 164 789 | fehler |
-| **78 725** | **abgelegt** |
-| 40 197 · 35 486 | abgelegt |
-| 24 830 | fehler |
-| 12 096 · 7 294 | abgelegt |
-| 6 655 | fehler |
-| 2 965 · 2 053 · 1 653 | abgelegt |
-| **496** | **fehler** |
+`Extract IDs` hatte das **richtig erkannt** und `hasIds: false` zurueckgegeben — nur wertete das niemand aus. `Load Chat Details` lief trotzdem los und scheiterte an `URL parameter cannot be empty`. Schlimmer noch: `Claim Message` hatte davor bereits einen Datensatz angelegt, mit der **Abo-ID** als `teams_message_id`.
 
-Ein Dokument mit 496 Zeichen scheitert, eines mit 78 725 laeuft durch. Im Lauf um 11:01 wechseln Erfolg und Fehlschlag einander ab - weder Groesse noch Zeitpunkt noch ein erschoepftes Kontingent erklaeren das.
+**Gebaut und publiziert am 02.09. als `432ee008`** (49 Nodes statt 47, Export in [flows/rwg-teams-agent/workflow.json](flows/rwg-teams-agent/workflow.json)): eine Weiche `Ist es eine Chatnachricht?` **vor** `Claim Message`, nicht hinter `Extract IDs`. Damit faellt nicht nur der Fehler weg, sondern auch der Pseudo-Eintrag in `agent_requests`.
 
-**Ein Deckel auf die Eingabe war der falsche Schluss.** Er wurde am 02.09. gebaut, an Lauf `113768` gemessen - und aenderte nichts. Die Aenderung ist zurueckgenommen, der Entwurf steht wieder auf der publizierten Fassung.
+```
+Trigger → Ist es eine Chatnachricht? ─true→ Claim Message ⟶ (bestehende Kette)
+                                     └false→ Kein Chat-Ereignis
+```
 
-**Naechster Schritt:** der kleinste Fehlschlag. `2025-10-09_TechSmith.pdf` hat 496 Zeichen OCR-Text; an dieser Anfrage laesst sich der komplette Rumpf ansehen und mit einer erfolgreichen vergleichen. Wenn die Anfragen sich nur im Text unterscheiden, liegt es am Inhalt - dann ist die naechste Frage, was Mistral daran stoert.
+**Geprueft wird positiv**, nicht negativ:
 
-**Betroffen sind:** Stadtsparkasse (46 S.), Mietvertrag Domnick (8 S.), Auto Leasing Vertrag (4 S.), TechSmith (1 S.).
+```
+String($json['@odata.type'] || '').toLowerCase().endsWith('chatmessage')
+```
 
-### Drei Vertraege liegen unbemerkt in FEHLER
-Am 02.09. beim Bau des Verschiebe-Werkzeugs aufgefallen (Lauf `113711`): In `/IMPORTER/CONTRACT/FEHLER` liegen **vier** Dateien, nicht zwei. Drei davon haben **keine Zeile** in `public.vertraege` und stehen damit in keinem Bestand:
+Auf `chatMessage` zu pruefen statt auf `subscription` faengt auch die uebrigen Lifecycle-Typen ab, die Graph ueber denselben Webhook schickt. Das `toLowerCase()` ist noetig, weil Graph die beiden Faelle **unterschiedlich schreibt** — `#Microsoft.Graph.chatMessage` gegen `#microsoft.graph.subscription`.
 
-- `2017_04_18 Mietvertrag Domnick.pdf` (2,3 MB)
-- `2025-10-09_TechSmith.pdf` (48 kB)
-- `Auto Leasing Vertrag.pdf` (896 kB)
+**Belegt an beiden echten Nutzlasten:**
 
-Sie stammen vermutlich aus der Zeit vor dem Umbau, als der Flow die Data Table `RWG Vertraege` fuehrte. **Zu entscheiden:** einlesen lassen oder aussortieren. Einlesen kostet OCR - alle drei sind klein, `TechSmith` mit 48 kB kaum messbar. Das Werkzeug zum Zurueckschieben steht: [flows/rwg-wartung-sharepoint-datei-verschieben](flows/rwg-wartung-sharepoint-datei-verschieben/README.md).
+| Lauf | Fall | Weg |
+|---|---|---|
+| `113871` | Abo-Ereignis aus `113483` | Ausgang 1 → `Kein Chat-Ereignis`. `Claim Message` erscheint gar nicht in `runData` |
+| `113872` | echte Nachricht aus `113379` | Ausgang 0 → `Claim Message` → Duplikat → `Ignore Duplicate` |
 
-### Altbestand in DONE nachziehen
-Elf Dokumente liegen in `/IMPORTER/CONTRACT/DONE` und stehen nicht in `vertraege`. Ein Einmallauf ueber den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar. Bewusst zurueckgestellt, bis der Eingang belegt ist.
+**Warum der zweite Test eine bereits beanspruchte Nachricht nutzt:** Anders liesse sich der Durchlass nicht pruefen, ohne einem Anwender wirklich zu schreiben. `Claim Message` arbeitet mit `on conflict (teams_message_id) do nothing returning id` — bei einer bekannten Nachricht kommt nichts zurueck, `IF Message Claimed` geht auf Ausgang 1, und der Lauf endet bei `Ignore Duplicate`. Der Durchlass ist damit belegt, ohne dass eine Antwort das Haus verlaesst.
 
-Offen bleibt daneben, ob der Bestand der alten Data Table `CEz5GXpTS7yHhjqS` (`RWG Vertraege`) uebernommen wird.
+**Offen:** In `agent_requests` stehen **3 Alteintraege** mit einer Abo-ID statt einer Nachrichten-ID (unter 808 Zeilen, seit dem 15.07.). Sie sind wirkungslos — zu ihnen gehoert keine Nachricht, und der Duplikatschutz greift nur auf die eigene ID. Aufraeumen waere ein Schreibzugriff auf Supabase und braucht eine Freigabe.
 
+## Jira-Agent: drei verschiedene Gruende, warum Tickets liegen bleiben
+
+Gemessen am 02.09. ueber alle 1 185 Zeilen in `jira_agent_events` (seit 12.07.).
+
+**1. 269 Maschinentickets — Absicht, sieht aber wie ein Fehler aus.** Die Weiche `Maschinen- oder Fachticket` sortiert automatisch erzeugte Vorgaenge aus (Absenderkonto, `[managed|monitoring]`, Autoreply-Betreffs, bekannte Systemmeldungen). Der Vermerk landet im Feld **`last_error`** — deshalb zaehlt jede Fehlerabfrage sie mit. Von den 75 pruefbaren waren 74 echte Systemmeldungen, einer ueber das Konto erkannt. Kein Fehlalarm gefunden.
+
+**Latent:** Das Muster `siem` steht ohne Wortgrenze in der Liste und wuerde auch **Siemens** treffen. In den vorhandenen Daten ist das bisher nicht passiert.
+
+**2. 45 Vorgaenge haengen — der Wiederaufgreifer laeuft im Probelauf.**
+
+| Status | Anzahl | Zeitraum |
+|---|---|---|
+| `processing` | 20 | 17.07. – 27.08. |
+| `failed` | 25 | 13.07. – 28.08. |
+
+Alle aelter als zwei Tage, also kein laufender Vorgang. 13 der `failed` stammen aus einem einzigen Vorfall am 28.08. (`Policy und Routing fehlgeschlagen`). Im Juli gab es dafuer eine Aufraeumung (`CONSISTENCY_CLEANUP_STALE_PROCESSING_2026-07-14`, 12 Zeilen) — seither keine mehr.
+
+**Die Wiederaufgriff-Logik war immer da, nur ohne Ausloeser.** `Claim Jira Event` greift ein Ereignis wieder auf, wenn es `failed` ist oder laenger als 30 Minuten auf `processing` steht. Der einzige Trigger war aber der Jira-Webhook, und ein `issue_created` kommt genau einmal. Es fehlte kein Umbau, sondern ein Zeitplan.
+
+**Gebaut am 02.09., sechs neue Nodes, kein bestehender angefasst:**
+
+```
+Zeitplan (30 Min) → Steuerung → Haengende Events lesen → Wirklich nachholen? ─true→ Als Ereignis aufbereiten → Set Event Context ⟶ (bestehende Kette)
+                                                                  └false→ Nachzuegler Bilanz
+```
+
+Der Zweig speist in `Set Event Context` ein. Das traegt, weil **kein einziger Node den Trigger rueckwaerts liest** — alle elf Rueckwaerts-Referenzen zeigen auf `Set Event Context`, und `Get Issue Fresh` holt das Ticket ohnehin neu. Geprueft, nicht angenommen.
+
+| Schalter | Wert | Grund |
+|---|---|---|
+| `fensterStunden` | 24 | Weckt keine Altfaelle. Ohne die Grenze bekaeme ein Kunde heute eine Antwort auf ein Ticket vom Juli |
+| Takt | 30 Minuten | Enger waere sinnlos: Die Claim-Bedingung gibt ein haengendes `processing` erst nach 30 Minuten frei |
+| `maxVersuche` | 3 | Was dreimal scheitert, ist ein Fall fuer einen Menschen |
+| `maxJeLauf` | 5 | Mengenbremse |
+| `probelauf` | **true** | Der Ernstfall schreibt in ein echtes Kundenticket |
+
+**Belegt:** Lauf `113839` faehrt die Kette durch und findet nichts — der erwartete Normalfall. Lauf `113840` mit einem auf 2000 Stunden geoeffneten Fenster meldet `gefunden: 5`, obwohl 45 in Frage kaemen: Abfrage, Sortierung und Mengenbremse sind damit gemessen, und der Probelauf hat nichts angefasst.
+
+**Publiziert als `4654fda5`** am 02.09. `triggerCount` steht von 1 auf **2** — n8n fuehrt den Zeitplan als registrierten Trigger. Export in [flows/rwg-jira-agent/workflow.json](flows/rwg-jira-agent/workflow.json).
+
+**Der Zeitplan laeuft.** Lauf `113841` am 02.09. um 18:00:00 - `mode: trigger`, gruen nach 0,4 Sekunden, `gefunden: 0`. Damit ist der Weg ueber den Zeitplan belegt und nicht nur der Handstart.
+
+**Offen bleibt allein der Scharfschalter.** `probelauf` steht auf `true`: Der Zweig laeuft alle 30 Minuten und meldet, was er holen wuerde — er holt nichts. Das Scharfschalten ist eine eigene Entscheidung, weil der Ernstfall in ein echtes Kundenticket schreibt.
+
+**3. 9 Tickets mit JSM-404 — Ursache belegt.** `The resource you are requesting could not be found` beim internen Kommentar. Der Grund ist **der fehlende Anfragetyp**, nachgewiesen an zwei Tickets:
+
+| Ticket | `customfield_10010` (Anfragetyp) | Ergebnis |
+|---|---|---|
+| SSD-9273 | `null` — direkt in Jira angelegt | **404** |
+| SSD-9272 | „Anfrage per E-Mail" (id 14), mit `servicedeskapi/request/50858` | durchgelaufen |
+
+Ohne Anfragetyp existiert der Vorgang fuer die Service-Desk-Schnittstelle nicht, und genau die spricht der Node an. Betroffen sind Tickets, die **von Hand direkt in Jira** erstellt werden statt ueber das Kundenportal. Bei den meisten der neun war die **oeffentliche Antwort schon raus** — nur der interne Kommentar bzw. der Statuswechsel scheiterte.
+
+**Zu entscheiden:** ob der Agent bei fehlendem Anfragetyp auf die normale Jira-Kommentar-Schnittstelle ausweichen soll (`/rest/api/3/issue/{key}/comment`) statt auf die Service-Desk-Schnittstelle.
 
 ## ProzessHub nach SharePoint
 
@@ -228,7 +281,11 @@ Was daneben offen bleibt:
 Sebastian hat die Bibliotheksansicht nach dem Neuaufbau als „besser" beschrieben. Ob sie damit **richtig** ist, ist nicht beantwortet. Zeigt noch ein Titel zerlegte Umlaute, reicht der BOM nicht, und es braucht zusätzlich ein `PATCH {site}/drive/items/{item-id}/listItem/fields` mit ausdrücklich gesetztem `Title`. Die `sp_item_id` je Seite steht seit dem 31.08. in der Data Table — der Nachtrag wäre billig.
 
 ### Null-Zeilen in der Data Table aufräumen
-Rund 370 Zeilen ohne `page_id` stehen in `prozesshub_spiegel` — Rückstand aus der Zeit, als `Bestand fortschreiben` in jede Spalte `null` schrieb. Wirkungslos, weil `Bestand laden` auf `space_key = ProzessHub` filtert und sie nicht findet. Aufzuräumen nur über die n8n-Oberfläche und **nicht** pauschal über alle Zeilen: die 175 echten stehen daneben.
+Rund 370 Zeilen ohne `page_id` stehen in `prozesshub_spiegel` (`4akduDBG2tJrtKw4`) — Rückstand aus der Zeit, als `Bestand fortschreiben` in jede Spalte `null` schrieb. Wirkungslos, weil `Bestand laden` auf `space_key = ProzessHub` filtert und sie nicht findet.
+
+**Sie lassen die Tabelle in der Oberfläche leer aussehen** — beim Draufschauen am 02.09. entstand deshalb der Eindruck, sie werde nicht mehr gebraucht. Sie wird: Der Nachtlauf `113204` meldet `unveraendert: 260`, und das ist nur möglich, wenn zu jeder dieser 260 Seiten ein Spiegeleintrag existiert. Wäre die Tabelle leer, stünde dort `neu: 260` und der Flow baute jedes Dokument neu.
+
+**Aufzuräumen nur über die n8n-Oberfläche** und **nicht** pauschal über alle Zeilen: die **260** echten (85 Gruppen, 175 Prozesse) stehen daneben. Über MCP geht es nicht — es gibt kein Werkzeug zum Löschen von Data-Table-Zeilen. Ein Wartungsflow mit dem Data-Table-Node könnte es gezielt über `page_id ist leer`, falls das Aufräumen von Hand zu mühsam wird.
 
 ### PDF-Layout beurteilen
 `pdfErzeugen` steht auf `false`, die beiden PDF-Nodes sind deaktiviert. Die Konvertierung funktioniert belegt (Lauf 110365: 173 KB aus 19 KB HTML), aber **wie das PDF aussieht, ist ungeprüft**. Offen ist, ob die `@media print`-Regeln des Templates im Renderer von SharePoint ankommen.

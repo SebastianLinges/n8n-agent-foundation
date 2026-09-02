@@ -1,0 +1,1084 @@
+{
+  "id": "661BDwEditNicEc0",
+  "name": "RWG Contract Loader",
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "timeSavedPerExecution": 15,
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "executionTimeout": 3600,
+    "timezone": "Europe/Berlin",
+    "binaryMode": "separate"
+  },
+  "connections": {
+    "Zeitplan": {
+      "main": [
+        [
+          {
+            "node": "Steuerung",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Steuerung": {
+      "main": [
+        [
+          {
+            "node": "Eingang lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nur PDF": {
+      "main": [
+        [
+          {
+            "node": "Je Datei",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Je Datei": {
+      "main": [
+        [
+          {
+            "node": "Liste holen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Datei holen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datei holen": {
+      "main": [
+        [
+          {
+            "node": "Hash bilden",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Je Datei",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hash bilden": {
+      "main": [
+        [
+          {
+            "node": "Zeile sichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zeile sichern": {
+      "main": [
+        [
+          {
+            "node": "Datei und Stand vereinen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datei zu Mistral": {
+      "main": [
+        [
+          {
+            "node": "Signierte URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fehler vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Signierte URL": {
+      "main": [
+        [
+          {
+            "node": "OCR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fehler vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR": {
+      "main": [
+        [
+          {
+            "node": "OCR-Text sichern",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fehler vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR-Text sichern": {
+      "main": [
+        [
+          {
+            "node": "OCR schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR schreiben": {
+      "main": [
+        [
+          {
+            "node": "Extraktionsauftrag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraktionsauftrag": {
+      "main": [
+        [
+          {
+            "node": "Vertragsdaten extrahieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vertragsdaten extrahieren": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis auswerten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fehler vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ergebnis auswerten": {
+      "main": [
+        [
+          {
+            "node": "Vertragsdaten schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vertragsdaten schreiben": {
+      "main": [
+        [
+          {
+            "node": "Nach DONE verschieben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nach DONE verschieben": {
+      "main": [
+        [
+          {
+            "node": "Ablage vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fehler vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ablage vermerken": {
+      "main": [
+        [
+          {
+            "node": "Je Datei",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Liste holen": {
+      "main": [
+        [
+          {
+            "node": "Als Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Als Excel": {
+      "main": [
+        [
+          {
+            "node": "Excel ablegen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eingang lesen": {
+      "main": [
+        [
+          {
+            "node": "Fehlerordner sichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fehlerordner sichern": {
+      "main": [
+        [
+          {
+            "node": "Nur PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datei und Stand vereinen": {
+      "main": [
+        [
+          {
+            "node": "Weiche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weiche": {
+      "main": [
+        [
+          {
+            "node": "Nach DONE verschieben",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Vorhandenen OCR-Text laden",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Datei zu Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vorhandenen OCR-Text laden": {
+      "main": [
+        [
+          {
+            "node": "Extraktionsauftrag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fehler vermerken": {
+      "main": [
+        [
+          {
+            "node": "Zu viele Versuche?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zu viele Versuche?": {
+      "main": [
+        [
+          {
+            "node": "Nach FEHLER verschieben",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Je Datei",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nach FEHLER verschieben": {
+      "main": [
+        [
+          {
+            "node": "Ablage FEHLER vermerken",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Je Datei",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ablage FEHLER vermerken": {
+      "main": [
+        [
+          {
+            "node": "Je Datei",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "75ae79c1-2597-446b-9a19-1a644926a1fb",
+      "name": "Zeitplan",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -944,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const steuerung = {\n  driveId: 'b!C2yhEx592Ei36yvay6U9n2886_vvW61LokJwBCKhlW_uiHYCBMlCRaEn9mGTdB1m',\n  driveName: 'Dokumente (Shared Documents) der Site rwgintranet',\n  eingangPfad: '/IMPORTER/CONTRACT',\n  ablageOrdner: 'DONE',\n  fehlerOrdner: 'FEHLER',\n  maxVersuche: 3,\n  excelName: 'Vertragsuebersicht.xlsx',\n  maxJeLauf: 10,\n  nurDatei: '',\n  ocrModell: 'mistral-ocr-latest',\n  extraktionsModell: 'mistral-medium-latest'\n};\n\nconst basis = 'https://graph.microsoft.com/v1.0/drives/' + steuerung.driveId;\n\nsteuerung.basis = basis;\nsteuerung.urlEingang = basis + '/root:' + steuerung.eingangPfad + ':/children?$top=500';\nsteuerung.urlOrdnerAnlegen = basis + '/root:' + steuerung.eingangPfad + ':/children';\nsteuerung.urlExcel = basis + '/root:' + steuerung.eingangPfad + '/' + steuerung.excelName + ':/content';\n\nreturn [{ json: { _steuerung: steuerung } }];"
+      },
+      "id": "217a82d2-a9b6-49b0-9049-9af1a1650260",
+      "name": "Steuerung",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json._steuerung.urlEingang }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "id": "4ac7dec5-142c-4630-b0df-80849273acbd",
+      "name": "Eingang lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -496,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $('Steuerung').first().json._steuerung;\nconst kinder = $('Eingang lesen').first().json.value || [];\nconst angelegt = $input.first().json;\n\nconst ablage = kinder.find(k => k.folder && k.name === s.ablageOrdner);\n\n// Der Fehlerordner wird vor der Schleife angelegt. Gab es ihn schon,\n// antwortet Graph mit einem Konflikt statt mit einer Kennung - dann\n// steht er in der Auflistung des Eingangs.\nconst fehlerAusListe = kinder.find(k => k.folder && k.name === s.fehlerOrdner);\nconst fehlerOrdnerId = (angelegt && angelegt.id) ? angelegt.id : (fehlerAusListe ? fehlerAusListe.id : null);\n\nconst dateien = kinder\n  .filter(k => k.file && /\\.pdf$/i.test(k.name))\n  .filter(k => !s.nurDatei || k.name.indexOf(s.nurDatei) !== -1)\n  .slice(0, s.maxJeLauf);\n\nreturn dateien.map(d => ({\n  json: {\n    item_id: d.id,\n    datei_name: d.name,\n    bytes_sharepoint: d.size,\n    sharepoint_url: d.webUrl,\n    sharepoint_pfad: s.eingangPfad + '/' + d.name,\n    ablage_ordner_id: ablage ? ablage.id : null,\n    ablage_pfad: s.eingangPfad + '/' + s.ablageOrdner,\n    fehler_ordner_id: fehlerOrdnerId,\n    fehler_pfad: s.eingangPfad + '/' + s.fehlerOrdner,\n    url_inhalt: s.basis + '/items/' + d.id + '/content',\n    url_verschieben: s.basis + '/items/' + d.id\n  }\n}));"
+      },
+      "id": "c46cfddc-0ccd-43ae-ba6a-56a89a517e48",
+      "name": "Nur PDF",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a84202df-243e-47ee-9ee8-c4e1e72beb79",
+      "name": "Je Datei",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        432,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url_inhalt }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          },
+          "timeout": 300000
+        }
+      },
+      "id": "f13c404c-77fc-41c4-ad3f-66a552b658e0",
+      "name": "Datei holen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        16
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\nconst kopf = $('Je Datei').first().json;\nconst puffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst hash = crypto.createHash('sha256').update(puffer).digest('hex');\n\nreturn [{\n  json: Object.assign({}, kopf, { datei_hash: hash, bytes: puffer.length }),\n  binary: $input.first().binary\n}];"
+      },
+      "id": "bde9868c-5b85-4214-99ca-667c2694dbe3",
+      "name": "Hash bilden",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.vertraege (datei_name, datei_hash, sharepoint_item_id, sharepoint_pfad, sharepoint_url, status)\nSELECT d.datei_name, d.datei_hash, d.sharepoint_item_id, d.sharepoint_pfad, d.sharepoint_url, 'neu'\nFROM jsonb_to_record($1::jsonb) AS d(datei_name text, datei_hash text, sharepoint_item_id text, sharepoint_pfad text, sharepoint_url text)\nON CONFLICT (datei_hash) DO UPDATE\nSET sharepoint_item_id = EXCLUDED.sharepoint_item_id,\n    sharepoint_pfad = EXCLUDED.sharepoint_pfad,\n    sharepoint_url = EXCLUDED.sharepoint_url,\n    geaendert_am = now()\nRETURNING id, status, datei_name, versuche, (ocr_text IS NOT NULL) AS hat_ocr",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ [ JSON.stringify({ datei_name: $json.datei_name, datei_hash: $json.datei_hash, sharepoint_item_id: $json.item_id, sharepoint_pfad: $json.sharepoint_pfad, sharepoint_url: $json.sharepoint_url }) ] }}"
+        }
+      },
+      "id": "3f559648-6e4b-4f94-a4d8-ef3f916530aa",
+      "name": "Zeile sichern",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1104,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const quelle = $('Hash bilden').first();\nconst stand = $input.first().json;\n\nreturn [{\n  json: Object.assign({}, quelle.json, {\n    id: stand.id,\n    status_vorher: stand.status,\n    hat_ocr: stand.hat_ocr === true,\n    versuche: stand.versuche || 0\n  }),\n  binary: quelle.binary\n}];"
+      },
+      "id": "c54181c9-4f19-4f37-b611-b9fcbc319779",
+      "name": "Datei und Stand vereinen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "purpose",
+              "value": "ocr"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "577969ef-1b0e-46df-a366-0c966aef7ac7",
+      "name": "Datei zu Mistral",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1904,
+        592
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiry",
+              "value": "24"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2acd5cb2-25f4-4442-aca0-e419e0e5290a",
+      "name": "Signierte URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2128,
+        432
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $(\"Steuerung\").first().json._steuerung.ocrModell, document: { type: 'document_url', document_url: $json.url }, table_format: 'markdown', include_image_base64: false }) }}",
+        "options": {
+          "timeout": 900000
+        }
+      },
+      "id": "10adb3e9-6020-467b-b04c-6cb8d61da724",
+      "name": "OCR",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2352,
+        336
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const kopf = $('Zeile sichern').first().json;\nconst s = $('Steuerung').first().json._steuerung;\nconst antwort = $input.first().json;\n\nconst seiten = Array.isArray(antwort.pages) ? antwort.pages : [];\n\nconst text = seiten\n  .map(seite => seite.markdown || seite.text || seite.content || '')\n  .filter(Boolean)\n  .join('\\n\\n--- SEITENWECHSEL ---\\n\\n');\n\nconst woerter = text ? text.split(/\\s+/).filter(Boolean).length : 0;\n\nreturn [{\n  json: {\n    id: kopf.id,\n    ocr_text: text,\n    seiten: seiten.length,\n    woerter: woerter,\n    ocr_modell: s.ocrModell\n  }\n}];"
+      },
+      "id": "09f0d5c2-deb3-4d65-a616-0bfb4de94c5f",
+      "name": "OCR-Text sichern",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.vertraege AS v\nSET ocr_text = d.ocr_text,\n    seiten = d.seiten,\n    woerter = d.woerter,\n    ocr_modell = d.ocr_modell,\n    status = 'ocr',\n    geaendert_am = now()\nFROM jsonb_to_record($1::jsonb) AS d(id uuid, ocr_text text, seiten integer, woerter integer, ocr_modell text)\nWHERE v.id = d.id\nRETURNING v.id, v.ocr_text, v.seiten, v.woerter",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ [ JSON.stringify($json) ] }}"
+        }
+      },
+      "id": "bdd58ac7-9e61-4bcc-8878-4850c0086e56",
+      "name": "OCR schreiben",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2768,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $('Steuerung').first().json._steuerung;\nconst quelle = $input.first().json;\nconst text = quelle.ocr_text || '';\n\nfunction normalisieren(wert) {\n  return String(wert || '')\n    .replace(/&amp;/g, '&')\n    .replace(/\\r/g, '')\n    .replace(/[ \\t]+/g, ' ')\n    .trim();\n}\n\n// Die drei internen Gesellschaften der RWG. Steht eine davon auf der\n// Kundenseite des Vertrags, ist sie der Mandant und niemals der\n// Vertragspartner. Die Voraberkennung ist nur ein Hinweis an das\n// Modell, keine Vorgabe.\nconst gesellschaften = [\n  { name: 'RWG Rheinland eG', muster: 'RWG Rheinland eG' },\n  { name: 'Obst und Gemüse GmbH', muster: 'Obst und Gemüse GmbH|O&G|Obst\\\\s*&\\\\s*Gemüse' },\n  { name: 'Baumarkt GmbH', muster: 'Baumarkt GmbH' }\n];\n\nconst kundenfelder = ['Kunde', 'Leasingnehmer', 'Besteller', 'Antragsteller'];\n\nfunction mandantErkennen(rohtext) {\n  const t = normalisieren(rohtext);\n  for (const g of gesellschaften) {\n    for (const feld of kundenfelder) {\n      const regel = new RegExp(feld + '[\\\\s\\\\S]{0,250}?(' + g.muster + ')', 'i');\n      if (regel.test(t)) return g.name;\n    }\n  }\n  return null;\n}\n\nconst mandantErkannt = mandantErkennen(text);\n\nconst felder = [\n  'Definition', 'Mandant', 'Vertragsart', 'Vertragspartner',\n  'Lieferantennummer', 'Vertragsnummer', 'Laufzeit Beginn', 'Laufzeit Ende',\n  'Intervalle', 'Verlängerung', 'Kündigungsfrist', 'Kündigung zum',\n  'Preis Netto', 'Preis Brutto', 'Kosten Jährlich', 'Sparte/Bereich',\n  'Standortinfo', 'Kostenstelle'\n];\n\nconst vorlage = '{\\n' + felder.map(f => '  \"' + f + '\": null').join(',\\n') + '\\n}';\n\nconst systemtext = [\n  'Du extrahierst Vertragsdaten aus OCR-Texten.',\n  'Antworte ausschließlich als valides JSON.',\n  'Wenn ein Wert nicht eindeutig vorhanden ist, setze ihn auf null.',\n  'Erfinde nichts.',\n  'Alle folgenden Felder sind Pflichtfelder der Extraktion und müssen aktiv gesucht werden: ' + felder.join(', ') + '.',\n  'Wichtige Fachregeln:',\n  '\"Mandant\" ist immer die interne Gesellschaft bzw. der interne Kunde auf RWG-Seite.',\n  '\"Vertragspartner\" ist immer die externe Gegenseite des Vertrags.',\n  'Wenn im Dokument ein Abschnitt wie \"Kunde\", \"Antragsteller\", \"Leasingnehmer\", \"Besteller\" oder \"Name\" auf der Kundenseite genannt wird, dann ist dies in der Regel der Mandant.',\n  'Wenn im Dokument eine externe Partei als \"Leasinggeber\", \"Vermieter\", \"Dienstleister\", \"Anbieter\", \"Versicherer\", \"Lieferant\", \"Verkäufer\" oder \"Auftragnehmer\" bezeichnet wird, dann ist dies in der Regel der Vertragspartner.',\n  'Spezielle Regeln für Mandant:',\n  'Steht bei \"Kunde\" oder vergleichbaren Kundenfeldern \"RWG Rheinland eG\", dann ist Mandant = \"RWG Rheinland eG\".',\n  'Steht dort \"Obst und Gemüse GmbH\", \"O&G\" oder eine ähnliche Schreibweise, dann ist Mandant = \"Obst und Gemüse GmbH\".',\n  'Steht dort \"Baumarkt GmbH\" oder eine ähnliche Schreibweise, dann ist Mandant = \"Baumarkt GmbH\".',\n  'Interne Gesellschaften wie RWG Rheinland eG, Obst und Gemüse GmbH oder Baumarkt GmbH dürfen nicht als Vertragspartner zurückgegeben werden, sofern sie im Dokument als Kunde, Leasingnehmer oder Besteller auftreten.',\n  'In Leasingverträgen ist der Leasinggeber in der Regel der externe Vertragspartner und der Kunde oder Leasingnehmer der Mandant.',\n  'Extrahiere Werte möglichst wörtlich aus dem Dokument und fasse nicht zusammen.',\n  '\"Definition\" soll möglichst die konkrete Dokumentbezeichnung oder den Vertragstitel enthalten, nicht eine inhaltliche Beschreibung.',\n  '\"Vertragsart\" soll möglichst den im Dokument genannten Vertragsbegriff enthalten.',\n  '\"Standortinfo\" soll möglichst die vollständige relevante Standortangabe enthalten, nicht nur den Ort.',\n  '\"Sparte/Bereich\" nur dann befüllen, wenn sie im Dokument eindeutig erkennbar ist. Nicht raten.',\n  '\"Lieferantennummer\" muss auch dann extrahiert werden, wenn sie im OCR unter Bezeichnungen wie \"Vermittelnder Betriebsr.\", \"Vermittelnder Betriebsnr.\", \"Betriebsnr.\", \"Lieferantennummer\" oder ähnlichen Schreibweisen steht.',\n  'Werte wie \"0183-20450\" sind gültige Lieferantennummern und sollen übernommen werden.',\n  '\"Vertragsnummer\" kann auch als \"Vertragsnr.\", \"Vertragsnummer\", \"Vertrags-Nr.\" oder ähnlich bezeichnet sein.',\n  '\"Kostenstelle\" kann als \"Kostenstelle\", \"KST\", \"Kostenst.\" oder \"Kostenträger\" bezeichnet sein. Nur übernehmen, wenn das Dokument sie ausdrücklich so benennt. Nicht mit der Vertragsnummer verwechseln.',\n  '\"Preis Netto\" ist der Netto-Betrag ohne Umsatzsteuer.',\n  '\"Preis Brutto\" ist nur zu füllen, wenn ein Bruttopreis explizit angegeben ist.',\n  '\"Kosten Jährlich\" ist nur zu füllen, wenn ein Jahresbetrag explizit genannt ist oder eindeutig berechnet werden kann.',\n  '\"Laufzeit Beginn\" und \"Laufzeit Ende\" nur füllen, wenn im Dokument etwas dazu steht. Steht dort eine Regel statt eines Datums, etwa \"bis auf Widerruf\" oder \"31.12. des Folgejahres\", dann gib genau diesen Wortlaut zurück statt null.',\n  '\"Intervalle\" soll etwa \"monatlich\", \"jährlich\" oder \"quartalsweise\" enthalten, wenn das aus dem Dokument eindeutig hervorgeht.',\n  '\"Verlängerung\", \"Kündigungsfrist\" und \"Kündigung zum\" nur übernehmen, wenn explizit genannt.'\n].join(' ');\n\nconst benutzertext = [\n  'Extrahiere aus dem folgenden Vertragstext exakt diese Felder und gib ausschließlich JSON zurück. Verwende genau diese Schlüssel:',\n  '',\n  vorlage,\n  '',\n  'Diese Felder müssen alle aktiv gesucht werden:',\n  felder.map(f => '- ' + f).join('\\n'),\n  '',\n  'Extraktionsregeln:',\n  '- \"Mandant\" = interne Gesellschaft, Kunde, Antragsteller oder Leasingnehmer auf RWG-Seite.',\n  '- \"Vertragspartner\" = externe Gegenseite.',\n  '- Steht im Text ein Abschnitt \"Kunde\" oder \"Name\" direkt unter dem Kundenblock, hat dieser Wert für Mandant Vorrang.',\n  '- Bei Leasingdokumenten ist der Leasinggeber typischerweise der Vertragspartner.',\n  '- Gib keine interne Gesellschaft als Vertragspartner zurück, wenn sie als Kunde oder Leasingnehmer genannt ist.',\n  '- Extrahiere Werte möglichst wörtlich und fasse nicht zusammen.',\n  '- \"Definition\" ist die Dokumentbezeichnung oder der Vertragstitel, keine inhaltliche Beschreibung.',\n  '- \"Sparte/Bereich\" nur befüllen, wenn eindeutig erkennbar. Nicht raten.',\n  '- \"Lieferantennummer\" steht oft unter \"Vermittelnder Betriebsr.\", \"Betriebsnr.\" oder ähnlich; eine Nummer wie \"0183-20450\" ist zu übernehmen.',\n  '- \"Kostenstelle\" nur übernehmen, wenn das Dokument sie ausdrücklich so benennt.',\n  '- \"Preis Brutto\" und \"Kosten Jährlich\" nur füllen, wenn explizit genannt oder eindeutig berechenbar.',\n  '- Bei Laufzeit- und Kündigungsangaben ohne konkretes Datum den Wortlaut zurückgeben, nicht null.',\n  '- Vorab erkannter Mandant: ' + (mandantErkannt || 'null'),\n  '- Passt die Voraberkennung plausibel zum OCR-Text, übernimm sie für Mandant.',\n  '',\n  'Vertragstext:',\n  '',\n  text\n].join('\\n');\n\nconst anfrage = {\n  model: s.extraktionsModell,\n  temperature: 0,\n  response_format: { type: 'json_object' },\n  messages: [\n    { role: 'system', content: systemtext },\n    { role: 'user', content: benutzertext }\n  ]\n};\n\nreturn [{\n  json: {\n    id: quelle.id,\n    mandant_erkannt: mandantErkannt,\n    anfrage: JSON.stringify(anfrage)\n  }\n}];"
+      },
+      "id": "4342a8fb-dfc3-4bed-ab78-84e2549f983b",
+      "name": "Extraktionsauftrag",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2992,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.anfrage }}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "4fdaeffe-85c0-4c3a-abf0-8b56bd6b195f",
+      "name": "Vertragsdaten extrahieren",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3216,
+        256
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const auftrag = $('Extraktionsauftrag').first().json;\nconst s = $('Steuerung').first().json._steuerung;\nconst antwort = $input.first().json;\n\nconst nachricht = (((antwort.choices || [])[0] || {}).message || {});\n\nlet roh = {};\ntry {\n  roh = JSON.parse(nachricht.content || '{}');\n} catch (e) {\n  roh = {};\n}\n\n// Klartext: was im Vertrag steht. Leerstring und die Zeichenkette\n// \"null\" gelten als nicht gefunden.\nfunction txt(wert) {\n  if (wert === null || wert === undefined) return null;\n  const v = String(wert).trim();\n  if (v === '' || v.toLowerCase() === 'null') return null;\n  return v;\n}\n\n// Ausgewertet: nur wo eindeutig. Ein Vertrag \"bis auf Widerruf\"\n// behaelt seinen Wortlaut in der Textspalte und bleibt hier null.\nfunction datum(wert) {\n  const v = txt(wert);\n  if (!v) return null;\n  let t = v.match(/(\\d{4})-(\\d{2})-(\\d{2})/);\n  if (t) {\n    return t[1] + '-' + t[2] + '-' + t[3];\n  }\n  t = v.match(/(\\d{1,2})\\s*[.\\/-]\\s*(\\d{1,2})\\s*[.\\/-]\\s*(\\d{4})/);\n  if (t) {\n    const tag = t[1].length === 1 ? '0' + t[1] : t[1];\n    const monat = t[2].length === 1 ? '0' + t[2] : t[2];\n    return t[3] + '-' + monat + '-' + tag;\n  }\n  return null;\n}\n\nfunction zahl(wert) {\n  const v = txt(wert);\n  if (!v) return null;\n  const t = v.match(/-?\\d[\\d.,\\s]*\\d|-?\\d/);\n  if (!t) return null;\n  let z = t[0].replace(/\\s/g, '');\n  if (z.indexOf(',') !== -1) {\n    z = z.replace(/\\./g, '').replace(',', '.');\n  } else if (/\\.\\d{3}(\\.|$)/.test(z)) {\n    z = z.replace(/\\./g, '');\n  }\n  const n = Number(z);\n  return Number.isFinite(n) ? n : null;\n}\n\nconst daten = {\n  id: auftrag.id,\n  definition: txt(roh['Definition']),\n  mandant: txt(roh['Mandant']),\n  vertragsart: txt(roh['Vertragsart']),\n  vertragspartner: txt(roh['Vertragspartner']),\n  lieferantennummer: txt(roh['Lieferantennummer']),\n  vertragsnummer: txt(roh['Vertragsnummer']),\n  laufzeit_beginn_text: txt(roh['Laufzeit Beginn']),\n  laufzeit_ende_text: txt(roh['Laufzeit Ende']),\n  intervalle: txt(roh['Intervalle']),\n  verlaengerung: txt(roh['Verlängerung']),\n  kuendigungsfrist: txt(roh['Kündigungsfrist']),\n  kuendigung_zum_text: txt(roh['Kündigung zum']),\n  preis_netto_text: txt(roh['Preis Netto']),\n  preis_brutto_text: txt(roh['Preis Brutto']),\n  kosten_jaehrlich_text: txt(roh['Kosten Jährlich']),\n  sparte_bereich: txt(roh['Sparte/Bereich']),\n  standortinfo: txt(roh['Standortinfo']),\n  kostenstelle: txt(roh['Kostenstelle']),\n  laufzeit_beginn: datum(roh['Laufzeit Beginn']),\n  laufzeit_ende: datum(roh['Laufzeit Ende']),\n  kuendigung_zum: datum(roh['Kündigung zum']),\n  preis_netto: zahl(roh['Preis Netto']),\n  preis_brutto: zahl(roh['Preis Brutto']),\n  kosten_jaehrlich: zahl(roh['Kosten Jährlich']),\n  rohdaten: roh,\n  extraktions_modell: s.extraktionsModell\n};\n\nconst gefuellt = Object.keys(daten).filter(k => {\n  if (k === 'id' || k === 'rohdaten' || k === 'extraktions_modell') return false;\n  return daten[k] !== null;\n});\n\nreturn [{\n  json: {\n    id: auftrag.id,\n    daten: daten,\n    felder_gefuellt: gefuellt.length,\n    felder_liste: gefuellt\n  }\n}];"
+      },
+      "id": "8a2d8278-e8c3-4a52-ad23-900413242847",
+      "name": "Ergebnis auswerten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3536,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.vertraege AS v\nSET definition = d.definition,\n    mandant = d.mandant,\n    vertragsart = d.vertragsart,\n    vertragspartner = d.vertragspartner,\n    lieferantennummer = d.lieferantennummer,\n    vertragsnummer = d.vertragsnummer,\n    laufzeit_beginn_text = d.laufzeit_beginn_text,\n    laufzeit_ende_text = d.laufzeit_ende_text,\n    intervalle = d.intervalle,\n    verlaengerung = d.verlaengerung,\n    kuendigungsfrist = d.kuendigungsfrist,\n    kuendigung_zum_text = d.kuendigung_zum_text,\n    preis_netto_text = d.preis_netto_text,\n    preis_brutto_text = d.preis_brutto_text,\n    kosten_jaehrlich_text = d.kosten_jaehrlich_text,\n    sparte_bereich = d.sparte_bereich,\n    standortinfo = d.standortinfo,\n    kostenstelle = d.kostenstelle,\n    laufzeit_beginn = d.laufzeit_beginn,\n    laufzeit_ende = d.laufzeit_ende,\n    kuendigung_zum = d.kuendigung_zum,\n    preis_netto = d.preis_netto,\n    preis_brutto = d.preis_brutto,\n    kosten_jaehrlich = d.kosten_jaehrlich,\n    rohdaten = d.rohdaten,\n    extraktions_modell = d.extraktions_modell,\n    status = 'extrahiert',\n    erkannt_am = now(),\n    fehler_text = NULL,\n    geaendert_am = now()\nFROM jsonb_to_record($1::jsonb) AS d(id uuid, definition text, mandant text, vertragsart text, vertragspartner text, lieferantennummer text, vertragsnummer text, laufzeit_beginn_text text, laufzeit_ende_text text, intervalle text, verlaengerung text, kuendigungsfrist text, kuendigung_zum_text text, preis_netto_text text, preis_brutto_text text, kosten_jaehrlich_text text, sparte_bereich text, standortinfo text, kostenstelle text, laufzeit_beginn date, laufzeit_ende date, kuendigung_zum date, preis_netto numeric, preis_brutto numeric, kosten_jaehrlich numeric, rohdaten jsonb, extraktions_modell text)\nWHERE v.id = d.id\nRETURNING v.id, v.datei_name, v.vertragspartner, v.status",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ [ JSON.stringify($json.daten) ] }}"
+        }
+      },
+      "id": "951524f9-bd63-4c23-bcac-c6139fccfeef",
+      "name": "Vertragsdaten schreiben",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3744,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $(\"Je Datei\").first().json.url_verschieben }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parentReference: { id: $(\"Je Datei\").first().json.ablage_ordner_id } }) }}",
+        "options": {}
+      },
+      "id": "5cbd4959-922e-43b8-bcec-efcdb7728c84",
+      "name": "Nach DONE verschieben",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4144,
+        -16
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.vertraege AS v\nSET status = 'abgelegt',\n    abgelegt_am = now(),\n    sharepoint_pfad = d.sharepoint_pfad,\n    sharepoint_url = d.sharepoint_url,\n    geaendert_am = now()\nFROM jsonb_to_record($1::jsonb) AS d(id uuid, sharepoint_pfad text, sharepoint_url text)\nWHERE v.id = d.id\nRETURNING v.id, v.datei_name, v.status",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ [ JSON.stringify({ id: $(\"Zeile sichern\").first().json.id, sharepoint_pfad: $(\"Je Datei\").first().json.ablage_pfad + \"/\" + $(\"Je Datei\").first().json.datei_name, sharepoint_url: $json.webUrl || $(\"Je Datei\").first().json.sharepoint_url }) ] }}"
+        }
+      },
+      "id": "166c2497-6cf0-43a6-8eeb-9e30760fe324",
+      "name": "Ablage vermerken",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4624,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.vertraege AS v\nSET status = 'fehler',\n    fehler_text = d.fehler_text,\n    versuche = v.versuche + 1,\n    geaendert_am = now()\nFROM jsonb_to_record($1::jsonb) AS d(id uuid, fehler_text text)\nWHERE v.id = d.id\nRETURNING v.id, v.datei_name, v.versuche, v.fehler_text",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ [ JSON.stringify({ id: $(\"Zeile sichern\").first().json.id, fehler_text: String($json.error && $json.error.message ? $json.error.message : JSON.stringify($json.error || {})).slice(0, 2000) }) ] }}"
+        }
+      },
+      "id": "aee0f587-8a77-4908-bb34-4a28d6aecaae",
+      "name": "Fehler vermerken",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4832,
+        624
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT status, versuche, datei_name, mandant, vertragsart, vertragspartner, lieferantennummer, vertragsnummer,\n       laufzeit_beginn_text, laufzeit_beginn, laufzeit_ende_text, laufzeit_ende,\n       intervalle, verlaengerung, kuendigungsfrist, kuendigung_zum_text, kuendigung_zum,\n       preis_netto_text, preis_netto, preis_brutto_text, preis_brutto,\n       kosten_jaehrlich_text, kosten_jaehrlich, sparte_bereich, standortinfo, kostenstelle,\n       definition, seiten, woerter, erkannt_am, abgelegt_am, fehler_text, sharepoint_url\nFROM public.vertraege\nORDER BY CASE status\n           WHEN 'abgelegt' THEN 0\n           WHEN 'extrahiert' THEN 1\n           WHEN 'ocr' THEN 2\n           WHEN 'neu' THEN 3\n           ELSE 4\n         END,\n         erkannt_am DESC NULLS LAST,\n         datei_name",
+        "options": {
+          "queryBatching": "independently"
+        }
+      },
+      "id": "3c09b296-590c-4b5a-8255-4b0f463193b1",
+      "name": "Liste holen",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        816,
+        -464
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "Vertragsuebersicht.xlsx",
+          "headerRow": true,
+          "sheetName": "Vertraege"
+        }
+      },
+      "id": "fad213dc-874d-4323-a97a-18ccdb4c7989",
+      "name": "Als Excel",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -464
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $(\"Steuerung\").first().json._steuerung.urlExcel }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "27ead301-4a39-49c9-a02e-d0ffd2397e6c",
+      "name": "Excel ablegen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1264,
+        -464
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Steuerung').first().json._steuerung.urlOrdnerAnlegen }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: $('Steuerung').first().json._steuerung.fehlerOrdner, folder: {}, '@microsoft.graph.conflictBehavior': 'fail' }) }}",
+        "options": {}
+      },
+      "id": "e630d100-cccb-476d-a539-ff25fa7d0e3a",
+      "name": "Fehlerordner sichern",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -272,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r-abgelegt",
+                    "leftValue": "={{ $json.status_vorher }}",
+                    "rightValue": "abgelegt",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r-ocr",
+                    "leftValue": "={{ $json.hat_ocr }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "neu"
+        }
+      },
+      "id": "d2b9559d-3ccc-4094-8248-a56a4c42b81b",
+      "name": "Weiche",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1568,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, ocr_text, seiten, woerter, ocr_modell\nFROM public.vertraege\nWHERE id = ($1)::uuid",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ [ $json.id ] }}"
+        }
+      },
+      "id": "8a7070b8-078c-47a6-852d-b19630ce5e47",
+      "name": "Vorhandenen OCR-Text laden",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2352,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "grenze",
+              "leftValue": "={{ $json.versuche }}",
+              "rightValue": "={{ $('Steuerung').first().json._steuerung.maxVersuche }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "caf2b743-bf21-4055-9bb2-e134aa10f694",
+      "name": "Zu viele Versuche?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5024,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $('Je Datei').first().json.url_verschieben }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parentReference: { id: $('Je Datei').first().json.fehler_ordner_id } }) }}",
+        "options": {}
+      },
+      "id": "e14a98e1-943c-4186-affb-773743c06ad0",
+      "name": "Nach FEHLER verschieben",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        5312,
+        624
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.vertraege AS v\nSET sharepoint_pfad = d.sharepoint_pfad,\n    sharepoint_url = d.sharepoint_url,\n    geaendert_am = now()\nFROM jsonb_to_record($1::jsonb) AS d(id uuid, sharepoint_pfad text, sharepoint_url text)\nWHERE v.id = d.id\nRETURNING v.id, v.datei_name, v.status, v.versuche",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ [ JSON.stringify({ id: $('Zeile sichern').first().json.id, sharepoint_pfad: $('Je Datei').first().json.fehler_pfad + '/' + $('Je Datei').first().json.datei_name, sharepoint_url: $json.webUrl || $('Je Datei').first().json.sharepoint_url }) ] }}"
+        }
+      },
+      "id": "6fe6c8b3-cc52-42c0-83d0-7cf5c620755d",
+      "name": "Ablage FEHLER vermerken",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5616,
+        640
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "nodeGroups": [],
+  "description": "Holt Vertrags-PDF aus SharePoint IMPORTER/CONTRACT, liest sie per Mistral OCR, extrahiert 18 Vertragsfelder, schreibt nach public.vertraege im Projekt RAG, legt die Datei nach DONE und erzeugt die Excel-Uebersicht neu."
+}

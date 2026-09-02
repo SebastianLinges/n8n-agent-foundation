@@ -29,6 +29,7 @@ flows/<flow-name>/
 | RWG_Jira-Feldpflege | `flows/rwg-jira-feldpflege/` | `k4SmnNrz7ASMdFwk` |
 | RWG ProzessHub nach SharePoint | `flows/rwg-prozesshub-sharepoint/` | `Muss6GBGPuG9fjE2` |
 | RWG Wartung - SharePoint Datei verschieben | `flows/rwg-wartung-sharepoint-datei-verschieben/` | `k5sofeyVNzEqOIZs` |
+| RWG Contract Loader | `flows/rwg-contract-loader/` | `661BDwEditNicEc0` |
 | KAPA Digital - KI Daily - Collect [WF-1] | `flows/kapa-ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
 | KAPA Digital - KI Daily - Analyze & Deliver [WF-2] | `flows/kapa-ki-daily-analyze/` | `objM2PQrcTpEzik7` |
 | KAPA Digital - Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |
@@ -50,7 +51,6 @@ Auf der n8n-Leinwand dokumentiert, hier nur eingeordnet:
 | RWG Wartung - SharePoint Bestand analysieren | `OQh5K8D1UrQK9fPQ` | wertet die Bibliothek `Schulungen` aus: leere Ordner, Doubletten, Typen, OCR-Bedarf | keine |
 | RWG Wartung - SharePoint Struktur | `Izrp4qA84wuAGN8O` | gibt die Bibliothek `Schulungen` als flache Strukturtabelle aus, eine Zeile je Ordner und Datei | keine |
 | RWG Monitor - Microsoft Graph & Teams | `1OcqfC4wTC9bj0wK` | Erreichbarkeitsprüfung alle 15 Minuten | keine |
-| RWG Contract Loader | `661BDwEditNicEc0` | Vertrags-PDF aus SharePoint per Mistral OCR nach `vertraege`, Ablage nach `DONE`, Excel-Übersicht | RWG RAG |
 | Telegram_Error_Info | `pMGm0LaxRTldvPKEkmkzC` | Fehler-Workflow für alle Flows | keine |
 | RWG_Reporter_BC | `v47TYgBcBQr6q04q` | Testaufbau, inaktiv, nicht über MCP erreichbar | ungeprüft |
 

@@ -74,11 +74,13 @@ nach der letzten Datei:  Liste holen -> Als Excel -> Excel ablegen
 
 ## Die Extraktion
 
-`mistral-large-latest`, `temperature: 0`, `response_format: json_object`. Achtzehn Felder, alle als Pflichtsuche benannt:
+`mistral-medium-latest`, `temperature: 0`, `response_format: json_object`. Achtzehn Felder, alle als Pflichtsuche benannt:
 
 Definition, Mandant, Vertragsart, Vertragspartner, Lieferantennummer, Vertragsnummer, Laufzeit Beginn, Laufzeit Ende, Intervalle, Verlängerung, Kündigungsfrist, Kündigung zum, Preis Netto, Preis Brutto, Kosten Jährlich, Sparte/Bereich, Standortinfo, **Kostenstelle**.
 
 **Kostenstelle ist neu.** Der alte Flow hatte die Spalte in seiner Data Table und schrieb sie beim Insert — aber der Prompt fragte das Feld nirgends ab. Der Wert war seit jeher leer.
+
+**Warum nicht `mistral-large-latest`.** Der Tarif trägt es nicht verlässlich. Rund drei von vier Anläufen kamen mit `Forbidden - perhaps check your credentials?` zurück; der wahre Grund steht nicht in der Meldung, sondern im Feld `description`: `This model is not available in your subscription tier`. Weil immer nur die gescheiterte Zeile auffiel, sah das dokumentabhängig aus — tatsächlich schaffte dieselbe Datei es beim vierten Anlauf (`RG Lichtwelle`, `versuche: 3`, trotzdem `abgelegt`). Unter `medium` laufen vier Extraktionen in Folge ohne einen einzigen `Forbidden` durch, darunter der 46-seitige Stadtsparkassen-Vertrag mit 164 789 Zeichen OCR-Text. Eine Größengrenze gibt es dabei nicht: Sie wurde vermutet, gebaut und an Lauf `113768` widerlegt.
 
 **Mandant und Vertragspartner sind die heikle Stelle.** Der Prompt trennt sie ausdrücklich: Mandant ist die interne Gesellschaft auf RWG-Seite (Kunde, Antragsteller, Leasingnehmer, Besteller), Vertragspartner die externe Gegenseite (Leasinggeber, Vermieter, Dienstleister, Versicherer, Lieferant). Eine Voraberkennung im Code sucht die drei internen Gesellschaften — RWG Rheinland eG, Obst und Gemüse GmbH, Baumarkt GmbH — in der Nähe eines Kundenfelds und gibt den Fund als Hinweis mit. Als Hinweis, nicht als Vorgabe.
 
@@ -124,9 +126,8 @@ Es gibt **zwei** Mistral-Zugänge in der Instanz. Die automatische Zuordnung gre
 
 ## Offen
 
-- **Die Extraktion ist noch nicht belegt.** Die Mistral-Token sind bis zum 01.09.2026 aufgebraucht, der Chat-Endpunkt antwortet `Forbidden`. Damit sind vier Nodes ungetestet: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`.
-- **Der Altbestand in `DONE`** (11 Dateien) ist nicht in `vertraege` übernommen. Ein Einmallauf über den Ordner holt das nach; der Hash-Schutz macht ihn gefahrlos wiederholbar.
-- **Die alte Data Table `CEz5GXpTS7yHhjqS`** (`RWG Vertraege`) hält den Bestand des Formular- und Webhook-Wegs. Ob er übernommen wird, ist offen.
+- **`Auto Leasing Vertrag.pdf` liefert bei 718 Wörtern nur sieben Rohfelder** — keine Laufzeit, kein Preis, kein Intervall. Für einen Leasingvertrag ist das wenig; möglich, dass die Datei nur ein Deckblatt ist. Am `ocr_text` derselben Zeile in einer Minute zu klären.
+
 Der Power-Automate-Flow `RWG_n8n_Trigg` überwachte denselben Ordner und ist am 30.08. gelöscht worden. Solange er lief, verschob er neu erzeugte Dateien nach `DONE` — auch die Excel des ersten Laufs — und legte in der Bibliothekswurzel einen gespiegelten Leerpfad `Shared Documents/IMPORTER/…` an. Beides steht als Aufräumpunkt in [offene-punkte.md](../../offene-punkte.md).
 
 **Woran man erkennt, wer geschrieben hat:** Graph vermerkt bei jedem Eintrag die App. Der Flow hier schreibt als `n8n-SharePoint` (`676b0b05-…`), Power Automate als `Microsoft Power Platform` (`7ab7862c-…`).

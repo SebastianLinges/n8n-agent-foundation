@@ -212,17 +212,6 @@
         ]
       ]
     },
-    "Microsoft Teams Trigger1": {
-      "main": [
-        [
-          {
-            "node": "Claim Message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Claim Message": {
       "main": [
         [
@@ -440,6 +429,35 @@
         [
           {
             "node": "Prep Save Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Teams Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Ist es eine Chatnachricht?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ist es eine Chatnachricht?": {
+      "main": [
+        [
+          {
+            "node": "Claim Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Kein Chat-Ereignis",
             "type": "main",
             "index": 0
           }
@@ -1482,6 +1500,51 @@
       ],
       "onError": "continueRegularOutput",
       "notes": "Nimmt die Arbeits-Reaktion nach dem Senden der Antwort wieder zurueck. reactionType muss exakt dem beim Setzen verwendeten Wert entsprechen. Terminaler Seitenzweig, beeinflusst das Speichern des Gedaechtnisses nicht."
+    },
+    {
+      "id": "2beffa76-82d7-4fe8-b630-de23f360dccd",
+      "name": "Ist es eine Chatnachricht?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2800,
+        800
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "t-chatmsg",
+              "leftValue": "={{ String($json['@odata.type'] || '').toLowerCase().endsWith('chatmessage') }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "notes": "Graph schickt ueber denselben Webhook auch Lebenszyklus-Meldungen des Abos - dann steht in @odata.type '#microsoft.graph.subscription' statt '#Microsoft.Graph.chatMessage', und es gibt weder Chat- noch Nachrichten-ID. Geprueft wird positiv auf chatMessage, nicht negativ auf subscription: Graph kennt weitere Lifecycle-Typen. Die Schreibweise unterscheidet sich zwischen beiden Faellen, deshalb toLowerCase."
+    },
+    {
+      "id": "277fcad2-a9a7-49f2-b4b7-b2426aa0e3ae",
+      "name": "Kein Chat-Ereignis",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -2672,
+        992
+      ],
+      "parameters": {},
+      "notes": "Abo- und Lebenszyklus-Meldungen enden hier. Kein Fehler, kein Claim, keine Telegram-Meldung - sie sind ein normaler Teil des Webhook-Betriebs."
     }
   ],
   "nodeGroups": [],

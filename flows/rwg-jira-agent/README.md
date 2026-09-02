@@ -70,6 +70,45 @@ Automatisch kommen sie nicht zurück: `jira:issue_created` feuert genau einmal. 
 
 **Entscheidung: kein Nachziehen.** Die betroffenen Vorgänge laufen im normalen Support weiter. Der Eingriff in `jira_agent_events` unterbleibt.
 
+**Diese Entscheidung gilt weiter.** Der Nachzügler-Zweig vom 02.09. (siehe unten) holt bewusst nur nach, was jünger als 24 Stunden ist — die Vorgänge vom 27./28.08. rührt er nicht an.
+
+## Der Nachzügler-Zweig: ein zweiter Eingang für Liegengebliebenes
+
+Ein Vorgang, der mittendrin abbricht, blieb bisher für immer liegen. Der Grund steht schon im Abschnitt darüber: `jira:issue_created` feuert genau einmal.
+
+**Die Wiederaufgriff-Logik war dabei immer vorhanden.** `Claim Jira Event` greift ein Ereignis wieder auf, wenn es auf `failed` steht oder länger als 30 Minuten auf `processing`:
+
+```sql
+WHERE status = 'failed'
+   OR (status = 'processing' AND claimed_at < now() - interval '30 minutes')
+```
+
+Es fehlte kein Umbau, sondern ein Auslöser. Den liefert seit dem 02.09. ein zweiter Trigger:
+
+```
+Nachzuegler Zeitplan (30 Min) → Nachzuegler Steuerung → Haengende Events lesen
+    → Wirklich nachholen? ─true→ Als Ereignis aufbereiten → Set Event Context ⟶ bestehende Kette
+                          └false→ Nachzuegler Bilanz
+```
+
+**Kein bestehender Node wurde angefasst.** Der Zweig speist in `Set Event Context` ein und läuft ab dort durch dieselbe Kette wie ein Webhook-Ereignis. Das trägt aus zwei geprüften Gründen: Kein einziger Node liest `$('Jira Trigger')` rückwärts — alle elf Rückwärts-Referenzen zeigen auf `Set Event Context` —, und `Get Issue Fresh` holt das Ticket ohnehin neu aus Jira. Der Zeitplan-Zweig muss deshalb nur `webhookEvent` und `issue.id`/`issue.key` nachbauen.
+
+| Schalter in `Nachzuegler Steuerung` | Wert | Grund |
+|---|---|---|
+| `fensterStunden` | 24 | **Respektiert die Entscheidung im Abschnitt darüber.** Ohne diese Grenze würden die Altfälle vom 27./28.08. aufgeweckt und Kunden bekämen Antworten auf wochenalte Tickets |
+| Takt | 30 Minuten | Enger wäre wirkungslos: Die Claim-Bedingung gibt ein hängendes `processing` erst nach 30 Minuten frei |
+| `maxVersuche` | 3 | Was dreimal scheitert, ist ein Fall für einen Menschen. `Claim Jira Event` zählt bei jedem Aufgriff hoch |
+| `maxJeLauf` | 5 | Mengenbremse — ein Störungstag soll nicht auf einen Schlag Modellaufrufe verbrennen |
+| `probelauf` | `true` | Der Ernstfall schreibt in ein echtes Kundenticket |
+
+**Warum ein Probelauf-Schalter.** Anders als beim Verschiebe-Werkzeug ist er hier nicht Bequemlichkeit, sondern notwendig: Ein Ernstfall-Test ließe sich nicht zurücknehmen, weil er einem Anwender schreibt. Steht der Schalter auf `true`, meldet `Nachzuegler Bilanz` nur, welche Vorgänge der Lauf geholt hätte.
+
+**Belegt:** Lauf `113839` fährt die Kette im Sollzustand durch und findet nichts — der erwartete Normalfall. Lauf `113840` mit einem auf 2 000 Stunden geöffneten Fenster meldet `gefunden: 5`, obwohl 45 Vorgänge in Frage kämen, und nennt die fünf ältesten. Damit sind Abfrage, Sortierung und Mengenbremse in einem Zug gemessen, ohne dass etwas angefasst wurde.
+
+**Zwei Fallstricke, die dabei zugeschnappt sind.** Die Postgres-Credential wurde beim Anlegen des Nodes **nicht** übernommen, obwohl sie im `addNode` mitgegeben war — sie musste per `setNodeCredential` nachgetragen werden. Und ein Handstart greift bei zwei Triggern automatisch den ersten, also den Jira-Webhook; der Zeitplan-Zweig lässt sich nur über `triggerNodeName` testen.
+
+**Die Ausgänge der Weiche wurden zurückgelesen.** Der bekannte Fallstrick, dass die MCP-Schnittstelle den Ausgangsindex ignoriert, ist hier nicht eingetreten — Ausgang 0 führt auf `Als Ereignis aufbereiten`, Ausgang 1 auf `Nachzuegler Bilanz`.
+
 ## Offen
 
 **Wirkung messen.** Der erste Lauf nach der Rücknahme der Responses-API ist durchgelaufen: Testticket SSD-9158, Lauf `110033`. `Policy-Modell` brauchte **einen** Aufruf statt vier, `Policy-Schema` zwei Versuche statt sechs, `Lauf als fehlgeschlagen vermerken` wurde gar nicht erst angesteuert.

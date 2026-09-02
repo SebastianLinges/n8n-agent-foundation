@@ -1,0 +1,157 @@
+{
+  "id": "k5sofeyVNzEqOIZs",
+  "name": "RWG Wartung - SharePoint Datei verschieben",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "errorWorkflow": "pMGm0LaxRTldvPKEkmkzC",
+    "timezone": "Europe/Berlin",
+    "saveDataErrorExecution": "all"
+  },
+  "connections": {
+    "Manueller Start": {
+      "main": [[{ "node": "Steuerung", "type": "main", "index": 0 }]]
+    },
+    "Steuerung": {
+      "main": [[{ "node": "Quelle lesen", "type": "main", "index": 0 }]]
+    },
+    "Quelle lesen": {
+      "main": [[{ "node": "Ziel lesen", "type": "main", "index": 0 }]]
+    },
+    "Ziel lesen": {
+      "main": [[{ "node": "Auftrag bauen", "type": "main", "index": 0 }]]
+    },
+    "Auftrag bauen": {
+      "main": [[{ "node": "Wirklich verschieben?", "type": "main", "index": 0 }]]
+    },
+    "Wirklich verschieben?": {
+      "main": [
+        [{ "node": "Verschieben", "type": "main", "index": 0 }],
+        [{ "node": "Bilanz", "type": "main", "index": 0 }]
+      ]
+    },
+    "Verschieben": {
+      "main": [[{ "node": "Bilanz", "type": "main", "index": 0 }]]
+    }
+  },
+  "nodes": [
+    {
+      "id": "1097f370-5468-4b9e-a09b-32eee1e55377",
+      "name": "Manueller Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 80],
+      "parameters": {}
+    },
+    {
+      "id": "43e1283d-add8-4341-8b21-b6aebf1a3f86",
+      "name": "Steuerung",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [224, 80],
+      "parameters": {
+        "jsCode": "// Ruhezustand. Beide Sicherungen stehen: leerer Namensfilter trifft\n// nichts, und probelauf zeigt nur, was er taete. Vor jedem Einsatz\n// erst den Filter setzen, dann probelauf abschalten.\nconst s = {\n  driveId: 'b!C2yhEx592Ei36yvay6U9n2886_vvW61LokJwBCKhlW_uiHYCBMlCRaEn9mGTdB1m',\n  driveName: 'Dokumente (Shared Documents) der Site rwgintranet',\n\n  quellPfad: '/IMPORTER/CONTRACT/FEHLER',\n  zielPfad: '/IMPORTER/CONTRACT',\n\n  // Mehrere Namensteile durch Komma getrennt. Leer trifft nichts.\n  nurDatei: '',\n\n  probelauf: true\n};\n\nconst basis = 'https://graph.microsoft.com/v1.0/drives/' + s.driveId;\ns.basis = basis;\ns.urlQuelle = basis + '/root:' + s.quellPfad + ':/children?$top=500';\ns.urlZiel = basis + '/root:' + s.zielPfad;\n\nreturn [{ json: { _steuerung: s } }];"
+      },
+      "notes": "Alle Schalter an einer Stelle. probelauf steht bewusst auf true - der erste Lauf zeigt nur, was er taete."
+    },
+    {
+      "id": "a95832a8-dd61-4276-bd5d-ad650d310a1d",
+      "name": "Quelle lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [448, 80],
+      "parameters": {
+        "url": "={{ $json._steuerung.urlQuelle }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "notes": "Kinder des Quellordners. Steigt nicht in Unterordner ab."
+    },
+    {
+      "id": "df70d5aa-a6a1-42b8-a122-3022c3ffc781",
+      "name": "Ziel lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [672, 80],
+      "parameters": {
+        "url": "={{ $('Steuerung').first().json._steuerung.urlZiel }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "notes": "Holt die Item-ID des Zielordners. Graph verschiebt ueber parentReference.id, nicht ueber den Pfad.",
+      "executeOnce": true
+    },
+    {
+      "id": "2ca71b1d-55d8-41e0-8ae9-cfb25f947589",
+      "name": "Auftrag bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [896, 80],
+      "parameters": {
+        "jsCode": "const s = $('Steuerung').first().json._steuerung;\nconst kinder = $('Quelle lesen').first().json.value || [];\nconst ziel = $('Ziel lesen').first().json || {};\nconst zielId = ziel.id ? String(ziel.id) : '';\n\nif (!zielId) {\n  throw new Error('ZIELORDNER_UNBEKANNT: ' + s.zielPfad + ' - Graph hat keine Item-ID geliefert.');\n}\n\nconst dateien = kinder.filter(k => k && k.file);\n\n// Mehrere Namensteile, durch Komma getrennt. Eine leere Liste trifft\n// nichts - Absicht, keine Luecke.\nconst filterListe = String(s.nurDatei || '')\n  .split(',')\n  .map(f => f.trim().toLowerCase())\n  .filter(Boolean);\n\nconst treffer = filterListe.length\n  ? dateien.filter(k => filterListe.some(f => String(k.name).toLowerCase().indexOf(f) !== -1))\n  : [];\n\nif (!treffer.length) {\n  return [{ json: {\n    aktion: 'nichts',\n    grund: filterListe.length\n      ? 'Kein Treffer fuer den Namensfilter: ' + filterListe.join(', ')\n      : 'Kein Namensfilter gesetzt - es wird nichts angefasst.',\n    quelle: s.quellPfad,\n    ziel: s.zielPfad,\n    dateien_im_quellordner: dateien.length,\n    namen_im_quellordner: dateien.map(k => k.name).slice(0, 20)\n  } }];\n}\n\nreturn treffer.map(k => ({ json: {\n  aktion: s.probelauf === true ? 'probelauf' : 'verschieben',\n  datei: k.name,\n  item_id: k.id,\n  bytes: Number(k.size || 0),\n  quelle: s.quellPfad,\n  ziel: s.zielPfad,\n  ziel_id: zielId,\n  url_verschieben: s.basis + '/items/' + k.id\n} }));"
+      }
+    },
+    {
+      "id": "d1c807bf-c6f4-43e6-8105-9dd7671399f4",
+      "name": "Wirklich verschieben?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1120, 80],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.aktion }}",
+              "operator": { "type": "string", "operation": "equals" },
+              "rightValue": "verschieben"
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "46b5cc10-4261-496a-8dc3-20556e8b5c0a",
+      "name": "Verschieben",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1344, 0],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $json.url_verschieben }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parentReference: { id: $json.ziel_id } }) }}",
+        "options": {}
+      },
+      "notes": "Graph verschiebt ueber PATCH auf das Item mit neuer parentReference. Dasselbe Muster wie im Contract Loader.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "dcc52c98-e7cb-46dd-830b-b3fa1901f700",
+      "name": "Bilanz",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1568, 80],
+      "parameters": {
+        "jsCode": "const s = $('Steuerung').first().json._steuerung;\nconst auftraege = $('Auftrag bauen').all().map(i => i.json);\n\nconst geplant = auftraege.filter(a => a.aktion === 'verschieben');\nconst probe = auftraege.filter(a => a.aktion === 'probelauf');\nconst leer = auftraege.filter(a => a.aktion === 'nichts');\n\nreturn [{ json: {\n  probelauf: s.probelauf === true,\n  quelle: s.quellPfad,\n  ziel: s.zielPfad,\n  namensfilter: s.nurDatei || '(leer)',\n  verschoben: geplant.map(a => a.datei),\n  wuerde_verschieben: probe.map(a => a.datei),\n  hinweis: leer.length ? leer[0].grund : null,\n  namen_im_quellordner: leer.length ? leer[0].namen_im_quellordner : undefined,\n  anzahl: geplant.length + probe.length\n} }];"
+      },
+      "executeOnce": true
+    }
+  ],
+  "nodeGroups": [],
+  "description": "Verschiebt Dateien zwischen zwei Ordnern derselben SharePoint-Bibliothek. Wartungswerkzeug mit Handstart, kein Zeitplan. Zwei Sicherungen: probelauf zeigt nur, was er taete, und ein leerer Namensfilter trifft absichtlich nichts. Kein Loeschen."
+}
