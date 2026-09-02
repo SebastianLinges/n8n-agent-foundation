@@ -33,6 +33,7 @@ flows/<flow-name>/
 | KAPA Digital - KI Daily - Collect [WF-1] | `flows/kapa-ki-daily-collect/` | `mzSLn4WzFQSv0cuX` |
 | KAPA Digital - KI Daily - Analyze & Deliver [WF-2] | `flows/kapa-ki-daily-analyze/` | `objM2PQrcTpEzik7` |
 | KAPA Digital - Content Studio [WF-3] | `flows/kapa-content-studio/` | `bBBybznNNCnU2nOJ` |
+| KAPA Digital - Lead Intake from Website | `flows/kapa-lead-intake-website/` | `HW170WdNT9yQGErU` |
 
 **Zu den drei SharePoint-Flows:** Der Ingest ist in Steuerung und Verarbeitung geschnitten. Die Verarbeitung trägt in n8n den Namen des Vorgängers, der Vorgänger heißt dort `… OLD`. Massgeblich ist die ID, nicht der Name. Bauplan: [konzept-sharepoint-neubau.md](konzept-sharepoint-neubau.md).
 
@@ -54,7 +55,7 @@ Auf der n8n-Leinwand dokumentiert, hier nur eingeordnet:
 | Telegram_Error_Info | `pMGm0LaxRTldvPKEkmkzC` | Fehler-Workflow für alle Flows | keine |
 | RWG_Reporter_BC | `v47TYgBcBQr6q04q` | Testaufbau, inaktiv, nicht über MCP erreichbar | ungeprüft |
 
-Die übrigen KAPA-Digital-Flows (Angebot, Belegeingang, CRM, Event Scout, Lead Intake, Lead Wiedervorlage, Website Assistent) hängen ausschließlich an den KAPA-Projekten `glhqajoxbscriskwzhbr` (Kapa-Core) und `ouccmqkwgdxjnplblnzk` (Marketing).
+Die übrigen KAPA-Digital-Flows (Angebot, Belegeingang, CRM, Event Scout, Lead Wiedervorlage, Website Assistent) hängen ausschließlich an den KAPA-Projekten `glhqajoxbscriskwzhbr` (Kapa-Core) und `ouccmqkwgdxjnplblnzk` (Marketing).
 
 ## Welcher Flow hängt an welcher Datenbank
 

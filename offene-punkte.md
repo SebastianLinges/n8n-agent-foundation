@@ -558,6 +558,44 @@ doppelt verarbeitet.
 **Zu entscheiden, keine Fehlersuche mehr:** Sollen beide Adressen die interne Meldung bekommen? Wenn
 `info@` ohnehin bei Sebastian landet, ist die zweite Adresse zu streichen - eine Zeile.
 
+### Fehlalarm: `spam_verdacht` ist dem Modell nie erklärt worden
+
+**Lauf `113875` am 02.09., 18:36** — die erste echte Anfrage über die live gegangene Website wurde als Spam eingestuft. Zu Unrecht.
+
+Das Modell setzte `spam_verdacht: true` mit dieser Begründung:
+
+> „Der Anfragetext enthält keine konkreten Angaben zum Anliegen oder Problem. Die E-Mail-Domain ist eine Freemail-Adresse und der Text wirkt unstrukturiert."
+
+**Keiner der drei Gründe ist ein Spam-Merkmal**, und alle drei sind bereits anderweitig abgebildet:
+
+| Genannter Grund | Was er wirklich ist |
+|---|---|
+| kein konkretes Anliegen | genau das Feld `problem_konkret: false` |
+| Freemail-Adresse | steht als `(Freemail)` im Prompt und ist ein Scoring-Merkmal |
+| unstrukturierter Text | Schreibstil, kein Betrugshinweis |
+
+**Die Ursache: Im gesamten Prompt steht nirgends, was `spam_verdacht` bedeutet.** Der Systemprompt erwähnt Spam mit keinem Wort, und das JSON-Schema führt das Feld nackt als `spam_verdacht: { type: 'boolean' }`. Im ganzen Schema gibt es **null** `description`-Felder. Das Modell musste raten und hat daraus „der Lead wirkt schwach" gemacht.
+
+**Bezeichnend:** Den einzigen echten Verdachtsmoment hat es *nicht* genannt — der Absender heißt laut Formular „Sebastian Linges", unterschreibt im Text aber mit „Müller Sebastian".
+
+**Zwei verschiedene Spam-Begriffe im selben Flow.** `Eingaben validieren` kennt einen harten, regelbasierten `pruefstatus = 'spam'` — bei gefülltem Honeypot oder fehlendem Relay. Der stand hier korrekt auf `ok`. Davon völlig getrennt urteilt das Modell über `spam_verdacht`. Nur der zweite ist undefiniert.
+
+**Die Wirkung ist hart.** In `Score berechnen und Wiedervorlage setzen` überschreibt `istSpam` die gesamte Punktebewertung:
+
+```
+if (istSpam) { priority = 'e_pruefen'; meldungGrund = 'spam'; }
+```
+
+Ergebnis: `score: 0`, `priority: e_pruefen`, Meldegrund `spam`.
+
+**Verloren ist nichts.** Der Lauf ging vollständig durch — Rohbeleg gesichert, Telegram-Sofortmeldung und interne E-Mail sind raus. Falsch ist die Beschriftung und die Priorität, nicht die Zustellung.
+
+**Behoben und publiziert am 02.09. als `206a930b`.** Vier Saetze im Systemprompt und `description`-Felder an `spam_verdacht`, `problem_konkret`, `nur_information` und `begruendung`. Belegt an Lauf `113882`: dieselbe Nutzlast, dasselbe Modell, `spam_verdacht` faellt auf `false`, `problem_konkret` bleibt richtig `false` und der Score bleibt 0 - schwach qualifiziert, aber kein Spam. Aufbau und Fallstricke jetzt in [flows/kapa-lead-intake-website/README.md](flows/kapa-lead-intake-website/README.md).
+
+**Offen aus dem Test:** `Lead Intake aufrufen` wurde beim Pinnen uebersehen und hat einen zweiten Lead zu derselben Anfrage angelegt - `lead_id 4c80f3ec-e9a5-4368-8be5-e984485f6864`, `contact_id 671b1e04-21a3-40dd-86ad-89dae29b5672`, drei Aufgaben. Aufraeumen braucht eine Freigabe fuer den Schreibzugriff auf Kapa-Core.
+
+**Die Definition, die jetzt im Prompt steht:** Spam ist Werbung, sind Backlink- und SEO-Angebote, Massenversand, sinnfreier Text und Kontaktdaten die nicht zusammenpassen — **nicht** ein frueher Interessent mit vagem Anliegen. „Ich wuerde mich gerne mal austauschen" ist der Normalfall einer Erstanfrage, nicht deren Ausschlusskriterium.
+
 ### Der Spamverdacht kam vom Modell, nicht von einer Regel
 
 `istSpam` uebernimmt schlicht das Urteil der Analyse: `analyse.spam_verdacht === true`. Es gibt keine
