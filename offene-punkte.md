@@ -164,11 +164,11 @@ Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen,
 
 **Der Testweg kostet keine OCR.** `hat_ocr` ist true, `Weiche` leitet auf Ausgang 1: `Vorhandenen OCR-Text laden` → `Extraktionsauftrag` → `Vertragsdaten extrahieren`. Genau dahinter liegen die vier nie gelaufenen Knoten.
 
-**Zum Abarbeiten:** eine Datei aus `FEHLER` zurueck nach `/IMPORTER/CONTRACT` legen, Lauf anstossen, die vier Knoten pruefen. Publiziert ist bereits, es geht nur noch um den Beleg.
+**Erledigt am 02.09.** Lauf `113384` mit `RG Lichtwelle Erkrath.pdf`: `status` steht auf `abgelegt`, `vertragspartner` Stadtwerke Erkrath GmbH, `vertragsnummer` 10030, die Datei liegt in `/IMPORTER/CONTRACT/DONE`. Damit haben alle vier zuvor nie gelaufenen Knoten gearbeitet - `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die leeren Vertragsfelder sind unverdaechtig: Eine Rechnung hat keine Laufzeit und keine Kuendigungsfrist.
 
 **Zur Mechanik**, nachtraeglich eingebaut (Lauf 110838): Steht `ocr_text` schon, wird die OCR uebersprungen - ohne das lief ein liegengebliebenes Dokument stuendlich erneut durch die Erkennung und wurde jedes Mal neu bezahlt. Der Zaehler `versuche` schiebt die Datei nach drei Fehlversuchen nach `/IMPORTER/CONTRACT/FEHLER`, den der Flow selbst anlegt. In der Excel stehen `status` und `versuche` vorn, Fertiges zuoberst.
 
-Noch unbelegt sind vier Nodes, die nur hinter der Extraktion liegen: `Ergebnis auswerten`, `Vertragsdaten schreiben`, `Nach DONE verschieben`, `Ablage vermerken`. Die Umwandlungen in `Ergebnis auswerten` sind einzeln gegen Testwerte geprueft, die Spaltenliste des grossen `UPDATE` gegen `information_schema` und `jsonb_to_record`. Ein Lauf ersetzt das nicht.
+**Offen bleibt allein die Extraktion grosser Vertraege** - siehe den naechsten Abschnitt. An einem echten Vertrag mit Laufzeit, Kuendigungsfrist und Preisen ist die Extraktion damit noch nicht gemessen; die Rechnung belegt nur den Weg, nicht die Feldguete.
 
 ### Extraktion scheitert an grossen Vertraegen
 Belegt am 02.09. in Lauf `113384`: Die kleine Rechnung lief durch, die 46-seitige Stadtsparkassen-Datei brach ab. Die n8n-Meldung `Forbidden - perhaps check your credentials?` ist irrefuehrend - im Feld `description` steht der wahre Grund:
