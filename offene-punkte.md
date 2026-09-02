@@ -170,23 +170,31 @@ Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen,
 
 **Offen bleibt allein die Extraktion grosser Vertraege** - siehe den naechsten Abschnitt. An einem echten Vertrag mit Laufzeit, Kuendigungsfrist und Preisen ist die Extraktion damit noch nicht gemessen; die Rechnung belegt nur den Weg, nicht die Feldguete.
 
-### Extraktion scheitert an grossen Vertraegen
-Belegt am 02.09. in Lauf `113384`: Die kleine Rechnung lief durch, die 46-seitige Stadtsparkassen-Datei brach ab. Die n8n-Meldung `Forbidden - perhaps check your credentials?` ist irrefuehrend - im Feld `description` steht der wahre Grund:
+### Extraktion scheitert an bestimmten Dokumenten - Ursache unbekannt
+Vier von zwoelf Dokumenten in `vertraege` scheitern reproduzierbar mit `Forbidden - perhaps check your credentials?`; im Feld `description` steht `This model is not available in your subscription tier`.
 
-> `This model is not available in your subscription tier`
+**Es ist kein Credential-Problem** - dieselbe Credential verarbeitet im selben Lauf andere Dokumente klaglos.
 
-Es ist **kein Credential-Problem**: Sekunden zuvor lief dasselbe Modell mit derselben Credential fuer die kleine Datei. Der Unterschied ist die Groesse - die gescheiterte Anfrage war **173 924 Zeichen**, rund 45 000 Tokens; die erfolgreiche hatte 2 320 Prompt-Tokens.
+**Und es ist nicht die Groesse.** Am 02.09. an allen zwoelf Zeilen gemessen:
 
-**Zu entscheiden, vier Wege:**
-
-| Weg | Was es bedeutet |
+| OCR-Zeichen | Status |
 |---|---|
-| **Eingabe deckeln** | nur die ersten rund 30 000 Zeichen an das Modell. Partner, Laufzeit und Kuendigung stehen meist vorn. Billigste Loesung, kann bei Anhaengen Felder verlieren |
-| Stueckeln | Text zerlegen, je Teil extrahieren, zusammenfuehren. Vollstaendig, mehr Aufrufe |
-| Anderes Modell | eines, das der Tarif in dieser Groesse zulaesst |
-| Tarif anheben | loest es, kostet Geld |
+| 164 789 | fehler |
+| **78 725** | **abgelegt** |
+| 40 197 · 35 486 | abgelegt |
+| 24 830 | fehler |
+| 12 096 · 7 294 | abgelegt |
+| 6 655 | fehler |
+| 2 965 · 2 053 · 1 653 | abgelegt |
+| **496** | **fehler** |
 
-Empfehlung: **Deckeln**, mit einem Vermerk in `fehler_text`, wenn gekuerzt wurde.
+Ein Dokument mit 496 Zeichen scheitert, eines mit 78 725 laeuft durch. Im Lauf um 11:01 wechseln Erfolg und Fehlschlag einander ab - weder Groesse noch Zeitpunkt noch ein erschoepftes Kontingent erklaeren das.
+
+**Ein Deckel auf die Eingabe war der falsche Schluss.** Er wurde am 02.09. gebaut, an Lauf `113768` gemessen - und aenderte nichts. Die Aenderung ist zurueckgenommen, der Entwurf steht wieder auf der publizierten Fassung.
+
+**Naechster Schritt:** der kleinste Fehlschlag. `2025-10-09_TechSmith.pdf` hat 496 Zeichen OCR-Text; an dieser Anfrage laesst sich der komplette Rumpf ansehen und mit einer erfolgreichen vergleichen. Wenn die Anfragen sich nur im Text unterscheiden, liegt es am Inhalt - dann ist die naechste Frage, was Mistral daran stoert.
+
+**Betroffen sind:** Stadtsparkasse (46 S.), Mietvertrag Domnick (8 S.), Auto Leasing Vertrag (4 S.), TechSmith (1 S.).
 
 ### Drei Vertraege liegen unbemerkt in FEHLER
 Am 02.09. beim Bau des Verschiebe-Werkzeugs aufgefallen (Lauf `113711`): In `/IMPORTER/CONTRACT/FEHLER` liegen **vier** Dateien, nicht zwei. Drei davon haben **keine Zeile** in `public.vertraege` und stehen damit in keinem Bestand:
