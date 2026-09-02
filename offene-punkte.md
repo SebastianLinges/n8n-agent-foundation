@@ -13,22 +13,19 @@ Was daraus offen blieb:
 
 ## Zuerst
 
-**Stand zum Feierabend am 01.09.** Drei Vorhaben sind an diesem Tag live gegangen, alle drei belegt:
+**Stand am 02.09., vormittags.** Der Umbau vom 01.09. ist über Nacht durch den Betrieb gegangen — alle drei Nachtläufe grün:
 
-| Was | Stand |
+| Lauf | Ergebnis |
 |---|---|
-| **SharePoint-Ingest neu geschnitten** | seit 18:25 live, beide Flows publiziert, Vorgänger abgeschaltet |
-| **Mengenbremse `maxJeLauf` 3 → 15** | gemessen an Lauf `113044`, publiziert |
-| **ProzessHub: Umbenennungen** | Ablageort wird vorn berechnet, Aufräumer gegen den Ist-Bestand, publiziert |
+| ProzessHub 02:00 (`113204`) | grün, 14 s — erste Nacht mit dem Aufräumer ohne Aufsicht |
+| SharePoint-Abgleich 03:30 (`113217`) | grün, 2 min 2 s: **15 eingelesen**, 0 Fehler, 0 zurückgestellt, Anker geschrieben, 225 Chunks, 111 Bilder |
+| Content Studio 08:00 (`113375`) | grün, 60 s — Paket `cp_1788328820762` auf `ready_for_review`, `visual_status: generated` |
 
-Nichts hängt in Arbeit. Was von allein weiterläuft: der neue SharePoint-Ingest stündlich und um 03:30,
-ProzessHub-Spiegelung nachts um 02, Contract Loader stündlich mit leerem Eingang. Der Content Studio
-läuft erst wieder am **Mi 02.09. um 08:00**; dort ist zu prüfen, ob ein Buffer-Entwurf entsteht und ob
-die Bildstrecke trägt, die bisher ungeprüft ist.
+Damit ist die Mengenbremse 15 im Betrieb belegt (2 Minuten, weit unter der Stundengrenze) und **die Bildstrecke erstmals echt gelaufen** — der letzte nie belegte Teil der Content-Kette.
 
-**Morgen früh zuerst:** der Abgleich um 03:30. Er ist die erste volle Nacht der neuen Ingest-Kette
-**und** die erste Nacht mit 15 statt 3 Einlesungen. Danach lohnt ein Blick auf den Mistral-Verbrauch,
-bevor die 15 stehen bleiben.
+**Rückstand der Erstbefüllung: 371 Dateien**, bei 15 je Nacht rund 25 Nächte.
+
+**Als Nächstes:** den Mistral-Verbrauch ansehen, bevor die 15 dauerhaft stehen bleiben. Das ist die einzige Zahl, die noch fehlt.
 
 **Die OCR ist wieder offen.** Belegt in Lauf `112948` vom 01.09., 17:05: `Bestätigung persönliche
 Unterweisung Fahrer Pellets.pdf` (61 kB) lief in 7,5 Sekunden komplett durch — Upload, signierte URL,
@@ -113,7 +110,7 @@ sich als untauglich erweist.
 
 Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md):
 
-- **Hebel 1, der OCR-Zwischenspeicher.** Der größte Hebel: Bei vier von sechs Rebuild-Gründen ist die Datei unverändert, und trotzdem läuft die komplette OCR erneut. **Braucht eine Freigabe für eine neue Supabase-Tabelle** und sorgfältige Behandlung des Bucket-Aufräumens.
+- **Hebel 1, der OCR-Zwischenspeicher.** Der größte Hebel: Bei vier von sechs Rebuild-Gründen ist die Datei unverändert, und trotzdem läuft die komplette OCR erneut. **Keine neue Tabelle nötig** — `sharepoint_documents` trägt `content_hash`, `content_text` und `images` bereits für alle Dokumente; nachgeschlagen wird über den Hash. Damit entfällt auch die Supabase-Freigabe. Vor dem Bau zu prüfen: ob `content_text` reicht, um die Chunks identisch neu zu bauen. Der Fallstrick bleibt das Bucket-Aufräumen bei einem Treffer.
 - **Hebel 3, der native Textpfad** für die gemessenen 21 % bildloser Dokumente. Vor dem Bau zu messen, wie viele der fehlenden PDF eine Textebene tragen — die Gegenprobe braucht ein OCR-Ergebnis zum Vergleich. Seit dem 01.09. steht dem nichts mehr im Weg.
 - **Hebel 4, ein Seitendeckel** für Dokumente wie die Regaletiketten. Fachliche Entscheidung, keine technische.
 
@@ -151,19 +148,23 @@ Publiziert als `eba7a53a`. Nebenwirkung des Weges über die MCP-Schnittstelle: d
 **Abzuarbeiten, ohne Termin:**
 
 1. **Retry als Netz.** Der Prompt allein macht die Wortzahl nicht deterministisch. False-Route einmal zurück auf `COPY (Text)` mit den Befunden im Prompt, Zähler hart auf einen Versuch, erst beim zweiten Fehlschlag an Telegram. **Fallstrick:** `COPY parsen` verwirft die Analysefelder (`kernaussage`, `gewaehlte_perspektive`, `kapa_bruecke`, `takeaway`). Ein naiver Rücksprung generiert mit leerem Analyseblock und wäre schlechter als der erste Versuch — der Retry-Node muss sie aus `$('Analyse parsen').first().json` zurückholen.
-2. **Zahlen-Check im `Redaktions-Check` erweitern.** Er prüft rein numerisch gegen `belegte_zahlen`. In 111258 stand „erhebliche Kosteneinsparungen" bei leerem Beleg-Feld — eine ausgeschriebene Mengenangabe, die der Prompt ausdrücklich verbietet, und im Effekt dasselbe Reputationsrisiko wie eine erfundene Zahl. Wortliste erheblich/deutlich/massiv/drastisch/signifikant/spürbar, aktiv nur bei leerem `belegte_zahlen`.
+2. **Mengenangaben ohne Beleg — erledigt am 02.09.** Der `Redaktions-Check` meldet jetzt weich, wenn ein Mengenwort (erheblich, deutlich, massiv …) nahe an einem messbaren Ziel steht und `belegte_zahlen` leer ist. Ein Mengenwort allein reicht nicht: „den Arbeitsalltag erheblich erleichtern" ist qualitativ. An 17 abgelegten Beiträgen gemessen — 3 Treffer, alle drei echte Behauptungen. Publiziert als `5573f917`. **Im Flow noch nicht gelaufen**, der reguläre Lauf am 04.09. ist der Beleg.
 
 Nach jeder Änderung publizieren, exportieren, Läufe ins `tests/laufprotokoll.csv`.
 
 
-### Contract Loader zu Ende belegen - die Dateien muessen erst zurueck in den Eingang
-**Der Umbau steht als unveroeffentlichter Entwurf** in `661BDwEditNicEc0`, 30 Nodes statt 36; aktiv ist weiter die alte Fassung. Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
+### Contract Loader zu Ende belegen - eine Datei muss zurueck in den Eingang
+**Der Umbau ist publiziert und aktiv**, `661BDwEditNicEc0` mit 30 Nodes; `versionId` und `activeVersionId` stimmen ueberein. Aufbau und Entscheidungen: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
 
 Belegt im Gesamtlauf 110831: SharePoint-Abruf, Download, SHA-256, Zeile anlegen, Mistral-Upload, signierte URL, OCR und das Sichern des OCR-Textes. Beide Dokumente vollstaendig gelesen - 46 Seiten mit 20630 Woertern und 1 Seite mit 190 Woertern. **Gescheitert ist allein die Extraktion**, damals am aufgebrauchten Mistral-Kontingent. Das ist seit dem 01.09. keine Huerde mehr.
 
-**Nur liegen die beiden Dokumente nicht mehr im Eingang.** In `vertraege` stehen sie auf `status = 'fehler'` mit `versuche = 3` - der Zaehler war voll, die Dateien sind nach `/IMPORTER/CONTRACT/FEHLER` gewandert. Der Eingang ist seither leer, jeder stuendliche Lauf ist nach einer halben Sekunde fertig (zuletzt `113012`).
+**Es fehlt nur die Datei im Eingang.** `Eingang lesen` holt die Kinder von `/IMPORTER/CONTRACT` und steigt nicht in Unterordner ab; die beiden Dokumente liegen aber in `/IMPORTER/CONTRACT/FEHLER`. Der Eingang ist seither leer, jeder stuendliche Lauf ist nach einer halben Sekunde fertig.
 
-**Zum Abarbeiten:** die beiden Dateien aus `FEHLER` zurueck in `/IMPORTER/CONTRACT` legen und `versuche` zuruecksetzen, sonst wandern sie sofort wieder hinaus. `ocr_text` steht in beiden Zeilen schon - die Erkennung laeuft nicht erneut, es kostet also keine OCR. Dann Lauf anstossen, die Extraktion pruefen, publizieren. Erst nach dem Publizieren geht der Export ins Git.
+**`versuche` muss nicht zurueckgesetzt werden.** Der Zaehler wird ausschliesslich auf dem Fehlerweg geprueft (`Zu viele Versuche?`), nicht beim Aufgreifen. `Zeile sichern` liefert `status`, `versuche` und `hat_ocr` zurueck, und `Weiche` entscheidet allein an `status_vorher` und `hat_ocr`. Eine Zeile mit `versuche = 3` wird also ganz normal verarbeitet - nur ein *erneuter* Fehlschlag schoebe sie sofort wieder nach `FEHLER`.
+
+**Der Testweg kostet keine OCR.** `hat_ocr` ist true, `Weiche` leitet auf Ausgang 1: `Vorhandenen OCR-Text laden` → `Extraktionsauftrag` → `Vertragsdaten extrahieren`. Genau dahinter liegen die vier nie gelaufenen Knoten.
+
+**Zum Abarbeiten:** eine Datei aus `FEHLER` zurueck nach `/IMPORTER/CONTRACT` legen, Lauf anstossen, die vier Knoten pruefen. Publiziert ist bereits, es geht nur noch um den Beleg.
 
 **Zur Mechanik**, nachtraeglich eingebaut (Lauf 110838): Steht `ocr_text` schon, wird die OCR uebersprungen - ohne das lief ein liegengebliebenes Dokument stuendlich erneut durch die Erkennung und wurde jedes Mal neu bezahlt. Der Zaehler `versuche` schiebt die Datei nach drei Fehlversuchen nach `/IMPORTER/CONTRACT/FEHLER`, den der Flow selbst anlegt. In der Excel stehen `status` und `versuche` vorn, Fertiges zuoberst.
 

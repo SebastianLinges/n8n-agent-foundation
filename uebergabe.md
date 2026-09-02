@@ -116,11 +116,13 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md). Nach Drin
 
 `RWG Contract Loader` (`661BDwEditNicEc0`) ist umgebaut: 30 Nodes statt 36, liest aus SharePoint `/IMPORTER/CONTRACT`, schreibt nach `public.vertraege`, legt die Datei nach `DONE` und erzeugt die Excel-Übersicht neu. Aufbau, Entscheidungen und Fallstricke: [flows/rwg-contract-loader/README.md](flows/rwg-contract-loader/README.md).
 
-**Der Umbau ist unveröffentlichter Entwurf.** Die alte Fassung ist noch die aktive.
+**Der Umbau ist publiziert und aktiv** — `versionId` und `activeVersionId` stimmen überein, 30 Nodes. Die Doku behauptete bis zum 01.09. das Gegenteil.
 
 Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-Upload, OCR, OCR-Text sichern — beide Dokumente vollständig gelesen. **Offen ist allein die Extraktion.** Sie scheiterte am aufgebrauchten Mistral-Kontingent; das ist seit dem 01.09. keine Hürde mehr.
 
-**Vor dem Test aufräumen:** Die beiden Dokumente liegen nicht mehr im Eingang. In `vertraege` stehen sie auf `status = 'fehler'` mit `versuche = 3`, die Dateien sind nach `/IMPORTER/CONTRACT/FEHLER` gewandert. Sie müssen zurück in den Eingang und der Zähler zurückgesetzt werden, sonst wandern sie sofort wieder hinaus. Der `ocr_text` steht in beiden Zeilen — es kostet keine neue OCR. Danach: Lauf anstoßen, Extraktion prüfen, publizieren, Export ins Git. Vier Nodes sind noch ungetestet, alle hinter der Extraktion.
+**Es fehlt nur die Datei im Eingang.** `Eingang lesen` holt die Kinder von `/IMPORTER/CONTRACT` und steigt nicht in Unterordner ab; die beiden Dokumente liegen in `/IMPORTER/CONTRACT/FEHLER`. Eine davon zurücklegen genügt.
+
+**`versuche` muss dabei nicht zurückgesetzt werden** — der Zähler wird nur auf dem Fehlerweg geprüft, nicht beim Aufgreifen. Und es kostet keine neue OCR: `hat_ocr` ist true, die `Weiche` leitet an der Erkennung vorbei direkt in die Extraktion. Genau dahinter liegen die vier nie gelaufenen Knoten.
 
 **Technisch offen**
 - Erstbefüllung: rund **400** Dateien einzulesen, bei `maxJeLauf: 3` über 130 Nächte. Die Mengenbremse ist nach dem Umschalten neu auszuloten — das ist der Hebel.
@@ -128,7 +130,7 @@ Belegt (Lauf 110831): SharePoint-Abruf, Download, Hash, Zeile anlegen, Mistral-U
 - Embeddings von 4 091 Bildchunks nach der Adressänderung nicht neu berechnet (rund vier Cent)
 - Dokumenteintrag vor den Chunks — abgefangen, aber unsauber
 - Tabellendaten abfragbar machen: **vertagt** — Sebastian erwägt einen eigenen SQL-Weg. Nicht unaufgefordert weiterbauen.
-- Beitragsprüfung im Content Studio: Absatzregel und Fremdprodukt-Befund sind gefixt und belegt (`111893`). Offen bleiben der Retry als Netz und der Zahlen-Check. **Die Bildstrecke ist weiterhin ungeprüft** — der nächste echte Lauf ist Mi 02.09. um 08:00.
+- Beitragsprüfung im Content Studio: Absatzregel und Fremdprodukt-Befund sind gefixt und belegt (`111893`). Der Zahlen-Check ist am 02.09. um die Mengenangaben ohne Beleg erweitert (`5573f917`). **Die Bildstrecke ist belegt** — Lauf `113375` am 02.09. hat ein Paket mit `visual_status: generated` erzeugt. Offen bleibt der Retry als Netz.
 
 ## Was im Repo liegt
 
