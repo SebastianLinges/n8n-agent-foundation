@@ -1,0 +1,6 @@
+{
+  "konten": "^(712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9|712020:2c41da01-c990-498c-814a-aa04c2a3db9f|60242eda988758006893fa52)$",
+  "personen": "(rwg_automate|rwg\\.automate|managed\\.monitoring|defender-noreply|defender)",
+  "praefix": "^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]",
+  "muster": "(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\\bsiem\\b|new vulnerabilities notification|microsoft 365 defender|microsoft defender for endpoint|microsoft defender xdr|^\\s*(informational|low|medium|high|critical) severity alert:)"
+}

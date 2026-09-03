@@ -1,6 +1,6 @@
 # RWG_Jira-Feldpflege
 
-Workflow `k4SmnNrz7ASMdFwk`, aktiv, 24 Nodes. Setzt in Jira SSD zwei Felder: **Priorität** und **Support-Level** (`customfield_10777`). Der alleinige Schreiber auf diese beiden Felder.
+Workflow `k4SmnNrz7ASMdFwk`, aktiv, 25 Nodes. Setzt in Jira SSD zwei Felder: **Priorität** und **Support-Level** (`customfield_10777`). Der alleinige Schreiber auf diese beiden Felder.
 
 ## Zwei Eingänge, die sich nicht überschneiden
 
@@ -33,7 +33,17 @@ Ein zweites Ereignis im Fenster sieht das gültige Schild und endet nach Millise
 
 Beides ist eine Entscheidung vom 03.09.2026 und **bewusst nicht ergebnisneutral**: Tickets, die vorher bewertet wurden, bleiben jetzt unbewertet.
 
-**Maschinentickets.** Monitoring (`[Managed | Monitoring]`), Defender, SIEM-Berichte, Intune- und Snipe-Checker, und Tickets mit RWG.Automate als Melder. `Ticketereignis pruefen` verwendet Konten und Token **wie `Filter Automated Ticket Creator` im RAG-JIRA-Ingest**, damit beide Flows dasselbe darunter verstehen: drei Konto-IDs, fünf Token in E-Mail oder Anzeigename von Melder und Ersteller, das Summary-Präfix und die Meldungsmuster. Zwei Abweichungen: `siem` nur als ganzes Wort — sonst träfe die Regel auch „Siemensring" — und ein eigener Satz **Defender-Muster** auf der Zusammenfassung (`Microsoft 365 Defender`, `Microsoft Defender for Endpoint`, `Microsoft Defender XDR`, `… severity alert:`).
+**Maschinentickets.** Monitoring (`[Managed | Monitoring]`), Defender, SIEM-Berichte, Intune- und Snipe-Checker, und Tickets mit RWG.Automate als Melder. Sie sortiert der native Filter-Node **`Maschinentickets aussortieren`** direkt hinter dem Trigger aus — die eine Stelle, an der neue Adressen ergänzt werden, ohne Code. Fünf Bedingungen, alle „trifft nicht" und mit UND verknüpft; ein Ticket bleibt nur, wenn keine greift:
+
+| Bedingung | prüft | Liste |
+|---|---|---|
+| Melder-Konto | `reporter.accountId` | RWG.Automate, managed.monitoring, defender-noreply |
+| Ersteller-Konto | `creator.accountId` | dieselben drei |
+| Melder und Ersteller als Text | E-Mail und Anzeigename, kleingeschrieben | `rwg_automate`, `rwg.automate`, `managed.monitoring`, `defender-noreply`, `defender` |
+| Zusammenfassung, Präfix | `summary`, kleingeschrieben | `[Managed \| Monitoring]` |
+| Zusammenfassung, Muster | `summary`, kleingeschrieben | Intune-/Snipe-Checker, SIEM (nur ganzes Wort), Aufgabenwarteschlangenprotokoll, und die Defender-Formulierungen `Microsoft 365 Defender`, `Microsoft Defender for Endpoint`, `Microsoft Defender XDR`, `… severity alert:` |
+
+Konten und Token entsprechen `Filter Automated Ticket Creator` im RAG-JIRA-Ingest, damit beide Flows dasselbe darunter verstehen. Die Muster liegen als Referenz in [m2-entwurf/filter_bedingungen.json](m2-entwurf/filter_bedingungen.json); `probe_ereignis.js` bildet die Bedingungen nach und prüft sie gegen 200 echte Tickets.
 
 **Warum die Defender-Muster nötig sind:** Bei Kommentarereignissen liefert Jira weder `reporter` noch `creator` mit — nur `summary`, `issuetype`, `project`, `assignee`, `priority` und `status`. Dort greifen ausschließlich die Regeln auf der Zusammenfassung. Gemessen an 200 Maschinentickets aus 60 Tagen (100 Defender, 81 Monitoring, 18 RWG.Automate): Mit den Ingest-Mustern allein rutschten 60 Defender-Tickets im Kommentarfall durch; mit den Defender-Mustern werden alle 199 allein über die Zusammenfassung erkannt, und ein menschliches Ticket, das „Defender" nur erwähnt („Defender blockiert unser Warenwirtschaftsprogramm"), bleibt unangetastet. Größenordnung aus der Sammelschließung vom 03.09.: 19 von 34 geschlossenen Tickets fielen unter diese Regel.
 

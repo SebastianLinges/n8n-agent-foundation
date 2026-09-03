@@ -3,11 +3,11 @@
   "name": "RWG_Jira-Feldpflege",
   "active": true,
   "isArchived": false,
-  "versionId": "faaa5404-ec26-4d4f-bc45-60a68b060240",
-  "activeVersionId": "faaa5404-ec26-4d4f-bc45-60a68b060240",
+  "versionId": "1e43e7b3-4d6e-4d68-8780-0e88187dc504",
+  "activeVersionId": "1e43e7b3-4d6e-4d68-8780-0e88187dc504",
   "triggerCount": 1,
   "createdAt": "2026-08-20T14:38:00.440Z",
-  "updatedAt": "2026-09-03T19:38:23.466Z",
+  "updatedAt": "2026-09-03T19:49:00.974Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -147,17 +147,6 @@
         ]
       ]
     },
-    "Jira Ticketereignis": {
-      "main": [
-        [
-          {
-            "node": "Ticketereignis pruefen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Kandidat und Konfiguration": {
       "main": [
         [
@@ -285,6 +274,28 @@
           }
         ]
       ]
+    },
+    "Jira Ticketereignis": {
+      "main": [
+        [
+          {
+            "node": "Maschinentickets aussortieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Maschinentickets aussortieren": {
+      "main": [
+        [
+          {
+            "node": "Ticketereignis pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "nodes": [
@@ -386,14 +397,14 @@
       "type": "n8n-nodes-base.jiraTrigger",
       "typeVersion": 1.1,
       "position": [
-        -1600,
+        -1840,
         0
       ],
       "webhookId": "79c3c665-03a3-4d93-b161-8d8f00beeb56"
     },
     {
       "parameters": {
-        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n//\n// Seit 03.09.2026 ausserdem verworfen, beides bewusst NICHT ergebnisneutral:\n// - Maschinentickets: Monitoring, Defender, SIEM, Intune- und Snipe-Checker,\n//   RWG.Automate als Melder. Konten und Token wie in \"Filter Automated Ticket\n//   Creator\" im RAG-JIRA-Ingest. Bei Kommentarereignissen liefert Jira weder\n//   reporter noch creator mit - dort greifen nur die Regeln auf der\n//   Zusammenfassung, deshalb sind die Defender-Formulierungen ausgeschrieben\n//   (gemessen an 100 Defender-Tickets aus 60 Tagen). \"siem\" nur als ganzes\n//   Wort, sonst traefe die Regel auch \"Siemensring\".\n// - Ereignisse an Tickets, die bereits in einem Done-Status stehen (ERLEDIGT,\n//   GESCHLOSSEN, ...). Das ist das letzte Ereignis, das dieser Workflow von\n//   einem Ticket sieht, denn der Trigger filtert auf statusCategory != Done.\n//   Es wird mit abschluss: true weitergegeben; \"Anspruch setzen\" traegt dann\n//   nur die Zeile aus jira_feldpflege_state aus und der Lauf endet.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\n\n// RWG.Automate, managed.monitoring, defender-noreply@microsoft.com\nconst MASCHINEN_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst MASCHINEN_TOKENS = [\"rwg_automate\", \"rwg.automate\", \"managed.monitoring\", \"defender-noreply\", \"defender\"];\nconst MASCHINEN_PRAEFIX = /^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]/i;\nconst MASCHINEN_MUSTER = /(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\\bsiem\\b|new vulnerabilities notification)/i;\nconst DEFENDER_MUSTER = /(microsoft 365 defender|microsoft defender for endpoint|microsoft defender xdr|^\\s*(informational|low|medium|high|critical) severity alert:)/i;\n\nfunction istMaschinenticket(fields) {\n  const leute = [fields.creator, fields.reporter];\n  for (const p of leute) {\n    if (!p) continue;\n    if (MASCHINEN_KONTEN.indexOf(String(p.accountId || \"\")) !== -1) return true;\n    const text = (String(p.emailAddress || \"\") + \" \" + String(p.displayName || \"\")).toLowerCase();\n    for (const t of MASCHINEN_TOKENS) { if (text.indexOf(t) !== -1) return true; }\n  }\n  const summary = String(fields.summary || \"\");\n  if (MASCHINEN_PRAEFIX.test(summary)) return true;\n  if (MASCHINEN_MUSTER.test(summary)) return true;\n  if (DEFENDER_MUSTER.test(summary)) return true;\n  return false;\n}\n\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  const fields = (e.issue && e.issue.fields) || {};\n  if (istMaschinenticket(fields)) continue;\n\n  const kategorie = String(((fields.status && fields.status.statusCategory) || {}).key || \"\").toLowerCase();\n  const abschluss = kategorie === \"done\";\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event, abschluss: abschluss } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \"), abschluss: abschluss } });\n}\n\nreturn out;"
+        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// Maschinentickets (Monitoring, Defender, SIEM, RWG.Automate als Melder)\n// sind hier NICHT mehr zu finden: sie sortiert der native Filter-Node\n// \"Maschinentickets aussortieren\" direkt hinter dem Trigger aus. Dort stehen\n// Konten, Adressen und Muster als Bedingungen in der Oberflaeche - die eine\n// Stelle, an der neue Adressen ergaenzt werden.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n//\n// Ereignisse an Tickets, die bereits in einem Done-Status stehen (ERLEDIGT,\n// GESCHLOSSEN, ...), werden mit abschluss: true weitergegeben. Es ist das\n// letzte Ereignis, das dieser Workflow von einem Ticket sieht, denn der\n// Trigger filtert auf statusCategory != Done. \"Anspruch setzen\" traegt dann\n// nur die Zeile aus jira_feldpflege_state aus und der Lauf endet - bewusst\n// nicht ergebnisneutral, Entscheidung vom 03.09.2026.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  const fields = (e.issue && e.issue.fields) || {};\n  const kategorie = String(((fields.status && fields.status.statusCategory) || {}).key || \"\").toLowerCase();\n  const abschluss = kategorie === \"done\";\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event, abschluss: abschluss } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \"), abschluss: abschluss } });\n}\n\nreturn out;"
       },
       "id": "06901308-4d12-4d1f-badf-bad748b32287",
       "name": "Ticketereignis pruefen",
@@ -653,9 +664,9 @@
     },
     {
       "parameters": {
-        "content": "## Zwei Eingaenge, die sich nicht ueberschneiden\n\n**Aufruf aus Jira-Agent** - genau einmal je Ticket, bei der Anlage. Der Agent uebergibt issueKey und die vier Betriebssignale; ein frisches Ticket hat keine neue Evidenz, deshalb faellt hier kein Modellaufruf an. Synchron: dieser Pfad wartet nie.\n\n**Jira Ticketereignis** - alles, was nach der Anlage passiert: Statuswechsel, Kommentare, Beschreibung, Zusammenfassung, Vorgangstyp. Der einzige Weg, auf dem sich das Support-Level je aendern kann.\n\nBewusst verworfen in **Ticketereignis pruefen**:\n- Aenderungen durch RWG.Automate und die Automation-for-Jira-Regel (sonst Rueckkopplung).\n- Bearbeiter, Labels, Komponenten, Prioritaet und Support-Level selbst - kein Level-Kriterium.\n- Seit 03.09.2026, bewusst nicht ergebnisneutral: **Maschinentickets** (Monitoring, Defender, SIEM, Intune-/Snipe-Checker, RWG.Automate als Melder; dieselbe Regel wie im RAG-JIRA-Ingest - bei Kommentaren nur ueber die Zusammenfassung, weil Jira dort keinen Melder mitschickt) und **Tickets in einem Done-Status** (das letzte Ereignis, das dieser Workflow sieht; Trigger filtert auf statusCategory != Done).\n\nKein Zeitplan. Ein Ticket, das sich nicht bewegt, hat keine neue Evidenz.",
+        "content": "## Zwei Eingaenge, die sich nicht ueberschneiden\n\n**Aufruf aus Jira-Agent** - genau einmal je Ticket, bei der Anlage. Der Agent uebergibt issueKey und die vier Betriebssignale; ein frisches Ticket hat keine neue Evidenz, deshalb faellt hier kein Modellaufruf an. Synchron: dieser Pfad wartet nie.\n\n**Jira Ticketereignis** - alles, was nach der Anlage passiert: Statuswechsel, Kommentare, Beschreibung, Zusammenfassung, Vorgangstyp. Der einzige Weg, auf dem sich das Support-Level je aendern kann.\n\n**Maschinentickets aussortieren** (seit 03.09.2026, bewusst nicht ergebnisneutral): Monitoring, Defender, SIEM, Intune-/Snipe-Checker und RWG.Automate als Melder werden hier ausgesortiert - Konten, Adressen und Muster stehen als Bedingungen im Node, das ist die eine Stelle fuer neue Adressen. Bei Kommentarereignissen schickt Jira keinen Melder mit, dort tragen allein die Muster auf der Zusammenfassung.\n\n**Ticketereignis pruefen** verwirft ausserdem: Aenderungen durch RWG.Automate und die Automation-for-Jira-Regel (sonst Rueckkopplung); Bearbeiter, Labels, Komponenten, Prioritaet und Support-Level selbst (kein Level-Kriterium). Tickets in einem Done-Status gehen mit abschluss: true weiter und enden am Anspruch - das letzte Ereignis, das dieser Workflow sieht.\n\nKein Zeitplan. Ein Ticket, das sich nicht bewegt, hat keine neue Evidenz.",
         "height": 620,
-        "width": 1080,
+        "width": 1320,
         "color": 4
       },
       "id": "78f7fc2a-c5a9-440b-b0e9-45ad6ee06636",
@@ -663,7 +674,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1640,
+        -1880,
         -900
       ]
     },
@@ -895,6 +906,76 @@
         "height": 340,
         "content": "## Sammelfenster und Zustandstabelle\n\nEreignisse kommen in Schwaermen, und nur der letzte Lauf zaehlt. Der erste Lauf je Ticket setzt in `public.jira_feldpflege_state` ein Schild (`claimed_until`), wartet `fensterMinuten` und laedt erst dann den frischen Stand. Jeder weitere Lauf im Fenster endet an **Anspruch erhalten?** - noetig, weil der Postgres-Node bei null Zeilen kein leeres Ergebnis liefert.\n\nSteht das Ticket schon in einem Done-Status (`abschluss: true`), traegt **Anspruch setzen** nur die Zeile aus und liefert nichts zurueck: kein Warten, keine Bewertung. Abgelaufen heisst unwirksam, nicht geloescht.\n\n`fensterMinuten` in **Sammelfenster** ist die einzige Stellschraube. Muss deutlich unter dem executionTimeout (300 s) bleiben. Nur der Webhook-Pfad - der Agentenaufruf wartet nie."
       }
+    },
+    {
+      "id": "3af4613f-7453-462d-bbdd-4943082fcc94",
+      "name": "Maschinentickets aussortieren",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -1600,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f-reporter",
+              "leftValue": "={{ String($json.issue?.fields?.reporter?.accountId ?? '') }}",
+              "rightValue": "^(712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9|712020:2c41da01-c990-498c-814a-aa04c2a3db9f|60242eda988758006893fa52)$",
+              "operator": {
+                "type": "string",
+                "operation": "notRegex"
+              }
+            },
+            {
+              "id": "f-creator",
+              "leftValue": "={{ String($json.issue?.fields?.creator?.accountId ?? '') }}",
+              "rightValue": "^(712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9|712020:2c41da01-c990-498c-814a-aa04c2a3db9f|60242eda988758006893fa52)$",
+              "operator": {
+                "type": "string",
+                "operation": "notRegex"
+              }
+            },
+            {
+              "id": "f-personen",
+              "leftValue": "={{ (String($json.issue?.fields?.reporter?.emailAddress ?? '') + ' ' + String($json.issue?.fields?.reporter?.displayName ?? '') + ' ' + String($json.issue?.fields?.creator?.emailAddress ?? '') + ' ' + String($json.issue?.fields?.creator?.displayName ?? '')).toLowerCase() }}",
+              "rightValue": "(rwg_automate|rwg\\.automate|managed\\.monitoring|defender-noreply|defender)",
+              "operator": {
+                "type": "string",
+                "operation": "notRegex"
+              }
+            },
+            {
+              "id": "f-praefix",
+              "leftValue": "={{ String($json.issue?.fields?.summary ?? '').toLowerCase() }}",
+              "rightValue": "^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]",
+              "operator": {
+                "type": "string",
+                "operation": "notRegex"
+              }
+            },
+            {
+              "id": "f-muster",
+              "leftValue": "={{ String($json.issue?.fields?.summary ?? '').toLowerCase() }}",
+              "rightValue": "(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\\bsiem\\b|new vulnerabilities notification|microsoft 365 defender|microsoft defender for endpoint|microsoft defender xdr|^\\s*(informational|low|medium|high|critical) severity alert:)",
+              "operator": {
+                "type": "string",
+                "operation": "notRegex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "notes": "Die eine Stelle fuer Maschinentickets: Konten, Adressen und Muster als Bedingungen. Alle Bedingungen sind 'trifft NICHT' und mit UND verknuepft - ein Ticket bleibt nur, wenn keine greift. Bei Kommentarereignissen schickt Jira weder reporter noch creator mit, dort tragen allein die Muster auf der Zusammenfassung. Neue Adresse: in die passende Liste eintragen."
     }
   ],
   "nodeGroups": [],
