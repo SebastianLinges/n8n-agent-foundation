@@ -34,6 +34,7 @@ Nichts davon ist zu tun, alles davon ist nachzusehen.
 | Contract Loader | stündlich | erster Lauf mit einer **echten neuen Datei** unter `mistral-medium-latest` — das ist der ausstehende Beleg |
 | Content Studio | 04.09. | die Mengenangaben-Regel (`5573f917`) ist publiziert, aber **im Flow noch nie gelaufen** |
 | SharePoint-Abgleich | 03:30 | 15 Einlesungen, Rückstand danach rund 356 Dateien |
+| Jira-Feldpflege | bei jedem Ticketereignis | Die Signaturbereinigung (`0337d1c6`) ist seit dem 03.09. live, **ohne vorherigen n8n-Testlauf**. Am Node `Ticketkontext aufbereiten` auf `bereinigung.verworfen` sehen — deutlich über null heißt, die Muster greifen nicht. Und ob eine Einstufung von der bisherigen abweicht |
 
 **Danach scharf schalten:** `probelauf` im Jira-Nachzügler auf `false`. Eine Zeile in `Nachzuegler Steuerung`. Solange er auf `true` steht, meldet der Zweig nur.
 
@@ -44,6 +45,8 @@ Nichts davon ist zu tun, alles davon ist nachzusehen.
 - **Zweite Empfängeradresse im Lead Intake.** `empfaengerIntern` trägt `info@kapa-digital.de` **und** `sebastian.linges@kapa-digital.de`. Kein Doppelversand, sondern zwei Adressaten in einer Nachricht. Ob die zweite bleibt, ist offen.
 - **Testlead in Kapa-Core aufräumen.** Der Testlauf `113882` hat einen zweiten Lead zur echten Anfrage vom 02.09. erzeugt: `lead_id 4c80f3ec-e9a5-4368-8be5-e984485f6864`, `contact_id 671b1e04-21a3-40dd-86ad-89dae29b5672`, drei Aufgaben. Vor dem Löschen ansehen, welcher der beiden Datensätze der bessere ist — der zweite trägt die korrigierte Bewertung, der erste die richtige Eingangszeit. Braucht eine Freigabe für den Schreibzugriff.
 - **Tabellendaten** — vertagt, siehe unten. Sebastian erwägt einen eigenen SQL-Weg; nicht unaufgefordert weiterbauen.
+- **Monitoring-Filter in der Jira-Feldpflege.** Entschieden ist, dass PRTG- und Automate-Tickets gar nicht mehr bewertet werden. Es fehlen zwei Angaben: woran ein Monitoring-Ticket sicher zu erkennen ist (Reporter-Konto, Request Type oder das Präfix `[Managed | Monitoring]` — kein Textmuster auf der Beschreibung), und ob „Automate" heißt, dass auch Tickets mit RWG.Automate als **Reporter** übersprungen werden. **Nicht ergebnisneutral:** ein PRTG-Ticket, das nach einem menschlichen Kommentar hochgestuft würde, bliebe unbewertet. Volumenanteil ist nicht gemessen. Einzelheiten in [flows/rwg-jira-feldpflege/uebergabe-kosten.md](flows/rwg-jira-feldpflege/uebergabe-kosten.md).
+- **Zustandstabelle für das Sammelfenster.** `CREATE TABLE public.jira_feldpflege_state` auf dem Postgres-Zugang `uEE8k2oPVj4Tnb4b`. Braucht eine Freigabe für den Schreibzugriff — ohne sie steht M-2 und damit auch der Inhaltshash M-3.
 
 ## Technische Restposten
 

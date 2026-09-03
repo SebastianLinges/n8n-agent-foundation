@@ -39,6 +39,23 @@ Ein einziger Modellaufruf liefert Support-Level-Bewertung und die vier Betriebss
 
 **Support-Level:** Der Normalfall ist eine Hochstufung. Eine Herabstufung verlangt eine im Ticket dokumentierte Rückgabe. Status `WARTEN AUF GWS` erzwingt 3rd-Lvl. Ein manuell gesetzter Wert bleibt ohne eindeutigen Beleg unangetastet.
 
+## Was das Modell zu sehen bekommt
+
+`Ticketkontext aufbereiten` bereinigt Beschreibung und Kommentartexte, bevor sie in den Prompt gehen. Entfernt wird, was die fachliche Bewertung nicht trägt: Grußformel samt Signaturblock, Kontaktzeilen, Postanschriften, rechtliche Fußzeilen und zitierte Vorgängermails. Der Schnitt setzt an der ersten erkannten Marke an, alles darunter fällt weg.
+
+Die Sicherung dagegen ist eine **absolute Zeichengrenze, kein Anteil**. Ein Anteil misst nur, wie lang die Signatur im Verhältnis war, nicht ob der Schnitt stimmt — bei einem Anliegen von zwei Sätzen und zehn Zeilen Signatur ist ein richtiger Schnitt zwangsläufig größer als die Hälfte. Zwei Grenzen, weil die Marken unterschiedlich sicher sind:
+
+| Konstante | Wert | Gilt für |
+|---|---|---|
+| `MIN_REST_ZEICHEN` | 40 | Schnitt an Grußformel oder Rechtshinweis |
+| `MIN_REST_ZEICHEN_ZITAT` | 120 | Schnitt an einem Zitat |
+
+Nach einer Grußformel folgt ein Signaturblock, der die Bewertung nie trägt. Nach einem Zitat kann Inhalt stehen, auf den sich der Text davor beruft — bleibt dort nur eine Verweiszeile wie „siehe unten" übrig, wird das Zitat behalten. Bleibt zu wenig übrig, gilt das Muster als unsicher erkannt und der Originaltext wird verwendet. Diese Fälle zählt `result.bereinigung`, das bis `Ergebnis` durchwandert, dort aber nicht ausgegeben wird.
+
+**Diese beiden Zahlen sind die einzigen Stellschrauben.** Wer sie ändert, ändert den Text, der ins Modell geht — und damit jeden künftigen Inhaltshash.
+
+Gemessen an den echten Texten aus SSD-9212: vier von vier Signaturfällen bereinigt, keiner verworfen, der fachliche Befundkommentar unangetastet, in Summe 40 Prozent weniger Zeichen.
+
 ## Schreibpfad
 
 `Schreiben erforderlich?` verlangt `shouldWrite === true` **und** `dryRun === false`, beides als strikte Booleans. Geschrieben wird ein `PUT` mit genau den zwei Feldern — nichts sonst. Aktueller Stand: `dryRun = false`, also scharf.
