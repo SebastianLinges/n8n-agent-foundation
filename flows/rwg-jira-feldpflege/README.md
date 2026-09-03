@@ -1,6 +1,6 @@
 # RWG_Jira-Feldpflege
 
-Workflow `k4SmnNrz7ASMdFwk`, aktiv, 25 Nodes. Setzt in Jira SSD zwei Felder: **Priorität** und **Support-Level** (`customfield_10777`). Der alleinige Schreiber auf diese beiden Felder.
+Workflow `k4SmnNrz7ASMdFwk`, aktiv, 24 Nodes. Setzt in Jira SSD zwei Felder: **Priorität** und **Support-Level** (`customfield_10777`). Der alleinige Schreiber auf diese beiden Felder.
 
 ## Zwei Eingänge, die sich nicht überschneiden
 
@@ -19,7 +19,7 @@ Der Webhook-Pfad bewertet deshalb nicht sofort. Vier Nodes liegen zwischen `Tick
 | Node | Aufgabe |
 |---|---|
 | `Sammelfenster` | die einzige Stellschraube: `fensterMinuten = 4` |
-| `Anspruch setzen` | atomares `INSERT … ON CONFLICT … RETURNING` auf `public.jira_feldpflege_state`. Kommt eine Zeile zurück, hält dieser Lauf den Anspruch; kommt keine, hält ihn ein anderer |
+| `Anspruch setzen` | atomares `INSERT … ON CONFLICT … RETURNING` auf `public.jira_feldpflege_state`. Kommt eine Zeile zurück, hält dieser Lauf den Anspruch; kommt keine, hält ihn ein anderer. Trägt bei `abschluss: true` stattdessen die Zeile aus und liefert nichts zurück (siehe unten) |
 | `Anspruch erhalten?` | endet den Lauf ohne Anspruch — nötig, weil der Postgres-Node bei null Zeilen `{ success: true }` liefert, kein leeres Ergebnis |
 | `Sammelfenster abwarten` | wartet `fensterMinuten`; erst danach lädt `Ticketdaten laden` den frischen Stand, alle Ereignisse des Schwarms sind dann in Jira |
 
@@ -29,11 +29,15 @@ Ein zweites Ereignis im Fenster sieht das gültige Schild und endet nach Millise
 
 **Das Schild hängt sich selbst ab.** `claimed_until` ist eine Uhrzeit, kein Ja/Nein: Stürzt der Anspruchsinhaber ab, ist das Ticket nach Fensterende wieder frei. Abgelaufen heißt unwirksam, nicht gelöscht — die Zeile bleibt, bis das Ticket abgeschlossen ist.
 
-## Abgeschlossene Tickets räumen ihre Zeile weg
+## Zwei Klassen werden nicht mehr bewertet
 
-Der Trigger filtert auf `statusCategory != Done`. Der Übergang Erledigt → Geschlossen erreicht diesen Workflow deshalb nie — gemessen: null Läufe während der automatischen Sammelschließung von 34 Tickets um 18:00 Uhr. Das letzte Ereignis, das er von einem Ticket sieht, ist das, bei dem das Ticket bereits in einem Done-Status steht — meist der abschließende Kommentar samt Übergang nach Erledigt.
+Beides ist eine Entscheidung vom 03.09.2026 und **bewusst nicht ergebnisneutral**: Tickets, die vorher bewertet wurden, bleiben jetzt unbewertet.
 
-`Ticketereignis pruefen` markiert solche Ereignisse mit `abschluss: true`, gelesen aus `issue.fields.status.statusCategory.key`. `Zustand bei Abschluss entfernen` löscht dann nach dem Sammelfenster die Zeile — in einem Statement, das den Kandidaten in jedem Fall unverändert weiterreicht, damit kein IF mit zwei Ausgängen nötig ist. Die Bewertung läuft bei diesem letzten Ereignis unverändert weiter; das ist bewusst so, weil der abschließende Kommentar oft die beste Evidenz für die endgültige Einstufung trägt.
+**Maschinentickets.** Monitoring (`[Managed | Monitoring]`), Defender, SIEM-Berichte, Intune- und Snipe-Checker, und Tickets mit RWG.Automate als Melder. `Ticketereignis pruefen` verwendet dafür **dieselbe Regel wie `Filter Automated Ticket Creator` im RAG-JIRA-Ingest**, damit beide Flows dasselbe darunter verstehen: drei Konto-IDs, fünf Token in E-Mail oder Anzeigename von Melder und Ersteller, das Summary-Präfix und sechs Meldungsmuster. Einzige Abweichung: `siem` nur als ganzes Wort — sonst träfe die Regel auch „Siemensring". Größenordnung aus der Sammelschließung vom 03.09.: 19 von 34 geschlossenen Tickets fielen unter diese Regel.
+
+**Bei Kommentarereignissen liefert Jira weder `reporter` noch `creator` mit** — nur `summary`, `issuetype`, `project`, `assignee`, `priority` und `status`. Dort greifen ausschließlich die Regeln auf der Zusammenfassung. Die Konto- und Token-Prüfung wirkt nur bei Feldänderungen.
+
+**Tickets in einem Done-Status.** Der Trigger filtert auf `statusCategory != Done`; der Übergang Erledigt → Geschlossen erreicht diesen Workflow nie (gemessen: null Läufe während der automatischen Sammelschließung von 34 Tickets um 18:00 Uhr). Das letzte Ereignis, das er von einem Ticket sieht, ist das, bei dem es bereits in einem Done-Status steht — meist der abschließende Kommentar samt Übergang nach Erledigt. Vorher wurde genau dieses Ereignis noch mit vollem Modellaufruf bewertet (Lauf 114800: `no_change`). Jetzt markiert `Ticketereignis pruefen` es mit `abschluss: true`, gelesen aus `issue.fields.status.statusCategory.key`, und `Anspruch setzen` trägt in demselben Statement nur noch die Zeile aus `jira_feldpflege_state` aus, ohne Anspruch — es kommt keine Zeile zurück, der Lauf endet an `Anspruch erhalten?`. Kein Warten, keine Bewertung.
 
 Wird ein abgeschlossenes Ticket wieder geöffnet, entsteht beim nächsten Ereignis einfach eine neue Zeile.
 

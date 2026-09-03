@@ -3,11 +3,11 @@
   "name": "RWG_Jira-Feldpflege",
   "active": true,
   "isArchived": false,
-  "versionId": "2cdcd5a6-acdc-4e72-afab-8831dc11816d",
-  "activeVersionId": "2cdcd5a6-acdc-4e72-afab-8831dc11816d",
+  "versionId": "8796340b-3e83-464d-bd82-ffcb15a47a4e",
+  "activeVersionId": "8796340b-3e83-464d-bd82-ffcb15a47a4e",
   "triggerCount": 1,
   "createdAt": "2026-08-20T14:38:00.440Z",
-  "updatedAt": "2026-09-03T19:06:15.133Z",
+  "updatedAt": "2026-09-03T19:27:26.109Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -279,17 +279,6 @@
       "main": [
         [
           {
-            "node": "Zustand bei Abschluss entfernen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Zustand bei Abschluss entfernen": {
-      "main": [
-        [
-          {
             "node": "Kandidat und Konfiguration",
             "type": "main",
             "index": 0
@@ -404,7 +393,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  // Steht das Ticket bereits in einem Done-Status (ERLEDIGT, GESCHLOSSEN, ...),\n  // ist dies das letzte Ereignis, das dieser Workflow dazu sieht - der Trigger\n  // filtert auf statusCategory != Done. Die Zeile in jira_feldpflege_state wird\n  // dann nach dem Sammelfenster entfernt. Die Bewertung selbst laeuft unveraendert.\n  const kategorie = String(((e.issue && e.issue.fields && e.issue.fields.status && e.issue.fields.status.statusCategory) || {}).key || \"\").toLowerCase();\n  const abschluss = kategorie === \"done\";\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event, abschluss: abschluss } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \"), abschluss: abschluss } });\n}\n\nreturn out;"
+        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n//\n// Seit 03.09.2026 ausserdem verworfen, beides bewusst NICHT ergebnisneutral:\n// - Maschinentickets (Monitoring, Defender, SIEM, RWG.Automate als Melder).\n//   Dieselbe Regel wie \"Filter Automated Ticket Creator\" im RAG-JIRA-Ingest,\n//   damit beide Flows dasselbe darunter verstehen. Einzige Abweichung: \"siem\"\n//   nur als ganzes Wort, sonst traefe die Regel auch \"Siemensring\".\n//   Bei Kommentarereignissen liefert Jira weder reporter noch creator mit -\n//   dort greifen nur die Regeln auf der Zusammenfassung.\n// - Ereignisse an Tickets, die bereits in einem Done-Status stehen (ERLEDIGT,\n//   GESCHLOSSEN, ...). Das ist das letzte Ereignis, das dieser Workflow von\n//   einem Ticket sieht, denn der Trigger filtert auf statusCategory != Done.\n//   Es wird mit abschluss: true weitergegeben; \"Anspruch setzen\" traegt dann\n//   nur die Zeile aus jira_feldpflege_state aus und der Lauf endet.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\n\nconst MASCHINEN_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst MASCHINEN_TOKENS = [\"rwg_automate\", \"rwg.automate\", \"managed.monitoring\", \"defender-noreply\", \"defender\"];\nconst MASCHINEN_PRAEFIX = /^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]/i;\nconst MASCHINEN_MUSTER = /(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\\bsiem\\b|new vulnerabilities notification)/i;\n\nfunction istMaschinenticket(fields) {\n  const leute = [fields.creator, fields.reporter];\n  for (const p of leute) {\n    if (!p) continue;\n    if (MASCHINEN_KONTEN.indexOf(String(p.accountId || \"\")) !== -1) return true;\n    const text = (String(p.emailAddress || \"\") + \" \" + String(p.displayName || \"\")).toLowerCase();\n    for (const t of MASCHINEN_TOKENS) { if (text.indexOf(t) !== -1) return true; }\n  }\n  const summary = String(fields.summary || \"\");\n  if (MASCHINEN_PRAEFIX.test(summary)) return true;\n  if (MASCHINEN_MUSTER.test(summary)) return true;\n  return false;\n}\n\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  const fields = (e.issue && e.issue.fields) || {};\n  if (istMaschinenticket(fields)) continue;\n\n  const kategorie = String(((fields.status && fields.status.statusCategory) || {}).key || \"\").toLowerCase();\n  const abschluss = kategorie === \"done\";\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event, abschluss: abschluss } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \"), abschluss: abschluss } });\n}\n\nreturn out;"
       },
       "id": "06901308-4d12-4d1f-badf-bad748b32287",
       "name": "Ticketereignis pruefen",
@@ -832,7 +821,7 @@
       ],
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO public.jira_feldpflege_state (issue_key, claimed_until)\nVALUES ($1, now() + ($2::int * interval '1 minute'))\nON CONFLICT (issue_key) DO UPDATE\n  SET claimed_until = now() + ($2::int * interval '1 minute')\n  WHERE public.jira_feldpflege_state.claimed_until IS NULL\n     OR public.jira_feldpflege_state.claimed_until < now()\nRETURNING issue_key AS \"issueKey\", $3::text AS \"source\", $4::text AS \"ausloeser\", $2::int AS \"fensterMinuten\", $5::boolean AS \"abschluss\";",
+        "query": "WITH abschluss AS (\n  DELETE FROM public.jira_feldpflege_state\n  WHERE issue_key = $1 AND $5::boolean\n  RETURNING issue_key\n),\nanspruch AS (\n  INSERT INTO public.jira_feldpflege_state (issue_key, claimed_until)\n  SELECT $1, now() + ($2::int * interval '1 minute')\n  WHERE NOT $5::boolean\n  ON CONFLICT (issue_key) DO UPDATE\n    SET claimed_until = now() + ($2::int * interval '1 minute')\n    WHERE public.jira_feldpflege_state.claimed_until IS NULL\n       OR public.jira_feldpflege_state.claimed_until < now()\n  RETURNING issue_key\n)\nSELECT issue_key AS \"issueKey\", $3::text AS \"source\", $4::text AS \"ausloeser\", $2::int AS \"fensterMinuten\"\nFROM anspruch;",
         "options": {
           "queryReplacement": "={{ [ $json.issueKey, $json.fensterMinuten, $json.source, $json.ausloeser, $json.abschluss === true ] }}",
           "queryBatching": "independently"
@@ -890,25 +879,6 @@
       },
       "notes": "Wartet genau so lange wie der Anspruch gilt. Danach laedt Ticketdaten laden den frischen Stand - alle Ereignisse des Schwarms sind dann in Jira.",
       "webhookId": "a4c04ee5-4a72-47cc-8074-93b51363f656"
-    },
-    {
-      "id": "9062764e-6b2e-4435-a94e-ec86f154ca0b",
-      "name": "Zustand bei Abschluss entfernen",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.6,
-      "position": [
-        -1120,
-        768
-      ],
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "WITH entfernt AS (\n  DELETE FROM public.jira_feldpflege_state\n  WHERE issue_key = $1 AND $5::boolean\n  RETURNING issue_key\n)\nSELECT $1::text AS \"issueKey\", $2::text AS \"source\", $3::text AS \"ausloeser\", $4::int AS \"fensterMinuten\", $5::boolean AS \"abschluss\",\n       (SELECT count(*)::int FROM entfernt) AS \"zeilenEntfernt\";",
-        "options": {
-          "queryReplacement": "={{ [ $json.issueKey, $json.source, $json.ausloeser, $json.fensterMinuten, $json.abschluss === true ] }}",
-          "queryBatching": "independently"
-        }
-      },
-      "notes": "Steht das Ticket in einem Done-Status, ist dies das letzte Ereignis, das der Workflow dazu sieht: die Zeile wird entfernt. Sonst passiert nichts. Liefert den Kandidaten in jedem Fall unveraendert weiter, ergaenzt um zeilenEntfernt."
     }
   ],
   "nodeGroups": [],

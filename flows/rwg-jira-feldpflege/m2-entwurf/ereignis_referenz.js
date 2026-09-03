@@ -10,6 +10,19 @@
 // schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-
 // Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde
 // unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.
+//
+// Seit 03.09.2026 ausserdem verworfen, beides bewusst NICHT ergebnisneutral:
+// - Maschinentickets (Monitoring, Defender, SIEM, RWG.Automate als Melder).
+//   Dieselbe Regel wie "Filter Automated Ticket Creator" im RAG-JIRA-Ingest,
+//   damit beide Flows dasselbe darunter verstehen. Einzige Abweichung: "siem"
+//   nur als ganzes Wort, sonst traefe die Regel auch "Siemensring".
+//   Bei Kommentarereignissen liefert Jira weder reporter noch creator mit -
+//   dort greifen nur die Regeln auf der Zusammenfassung.
+// - Ereignisse an Tickets, die bereits in einem Done-Status stehen (ERLEDIGT,
+//   GESCHLOSSEN, ...). Das ist das letzte Ereignis, das dieser Workflow von
+//   einem Ticket sieht, denn der Trigger filtert auf statusCategory != Done.
+//   Es wird mit abschluss: true weitergegeben; "Anspruch setzen" traegt dann
+//   nur die Zeile aus jira_feldpflege_state aus und der Lauf endet.
 
 const IGNORIERTE_KONTEN = [
   "712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9",
@@ -18,6 +31,30 @@ const IGNORIERTE_KONTEN = [
   "60242eda988758006893fa52"
 ];
 const RELEVANT = ["status", "description", "summary", "issuetype"];
+
+const MASCHINEN_KONTEN = [
+  "712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9",
+  "712020:2c41da01-c990-498c-814a-aa04c2a3db9f",
+  "60242eda988758006893fa52"
+];
+const MASCHINEN_TOKENS = ["rwg_automate", "rwg.automate", "managed.monitoring", "defender-noreply", "defender"];
+const MASCHINEN_PRAEFIX = /^\s*\[\s*managed\s*\|\s*monitoring\s*\]/i;
+const MASCHINEN_MUSTER = /(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\bsiem\b|new vulnerabilities notification)/i;
+
+function istMaschinenticket(fields) {
+  const leute = [fields.creator, fields.reporter];
+  for (const p of leute) {
+    if (!p) continue;
+    if (MASCHINEN_KONTEN.indexOf(String(p.accountId || "")) !== -1) return true;
+    const text = (String(p.emailAddress || "") + " " + String(p.displayName || "")).toLowerCase();
+    for (const t of MASCHINEN_TOKENS) { if (text.indexOf(t) !== -1) return true; }
+  }
+  const summary = String(fields.summary || "");
+  if (MASCHINEN_PRAEFIX.test(summary)) return true;
+  if (MASCHINEN_MUSTER.test(summary)) return true;
+  return false;
+}
+
 const out = [];
 
 for (const it of $input.all()) {
@@ -30,11 +67,10 @@ for (const it of $input.all()) {
   if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || "");
   if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;
 
-  // Steht das Ticket bereits in einem Done-Status (ERLEDIGT, GESCHLOSSEN, ...),
-  // ist dies das letzte Ereignis, das dieser Workflow dazu sieht - der Trigger
-  // filtert auf statusCategory != Done. Die Zeile in jira_feldpflege_state wird
-  // dann nach dem Sammelfenster entfernt. Die Bewertung selbst laeuft unveraendert.
-  const kategorie = String(((e.issue && e.issue.fields && e.issue.fields.status && e.issue.fields.status.statusCategory) || {}).key || "").toLowerCase();
+  const fields = (e.issue && e.issue.fields) || {};
+  if (istMaschinenticket(fields)) continue;
+
+  const kategorie = String(((fields.status && fields.status.statusCategory) || {}).key || "").toLowerCase();
   const abschluss = kategorie === "done";
 
   if (event.indexOf("comment") !== -1) {

@@ -1,71 +1,86 @@
-# RWG_Jira-Feldpflege — OpenAI-Kosten senken, Fortschreibung
+# RWG_Jira-Feldpflege — OpenAI-Kosten senken, Abschluss
 
 **Workflow:** RWG_Jira-Feldpflege — `k4SmnNrz7ASMdFwk`
 **Link:** https://n8n.srv1307521.hstgr.cloud/workflow/k4SmnNrz7ASMdFwk
-**Stand:** 03.09.2026, abends
+**Stand:** 03.09.2026, spät abends — Bauphase abgeschlossen
 **Umfang:** ausschließlich dieser Flow.
 
-Diese Datei schreibt die große Übergabe zum Thema fort. Der aktuelle Aufbau steht in der [README](README.md); hier steht nur, was noch offen ist und was bei der Umsetzung gelernt wurde.
+Der aktuelle Aufbau steht in der [README](README.md). Hier steht, was aus dem Auftrag wurde, was bei der Umsetzung gelernt wurde und was noch zu beobachten ist.
 
 ---
 
 ## 0. Einstieg in drei Sätzen
 
-**M-5 und M-2 sind live**, aktive Version `2cdcd5a6`: Signaturbereinigung, Sammelfenster mit Anspruch je Ticket, und die Zeile in `jira_feldpflege_state` verschwindet, sobald das Ticket in einem Done-Status ist. Offen bleiben der Monitoring-Filter und M-3.
+**Alles ist live**, aktive Version `8796340b`: Signaturbereinigung, Sammelfenster mit Anspruch je Ticket, und zwei Klassen werden gar nicht mehr bewertet — Maschinentickets und Tickets in einem Done-Status. Die Bauphase ist damit beendet; offen ist nur noch M-3, und der lohnt sich erst, wenn die Messung nach einer Woche es hergibt.
 
-**Erster Arbeitsschritt:** Die ersten echten Schwärme ansehen — Läufe unter 100 ms mit `lastNodeExecuted: Anspruch erhalten?` sind die eingesparten Aufrufe. Das ist der einzige Beleg, der noch fehlt: die Probeläufe kamen über einen manuellen Auslöser, nicht über den Jira-Trigger.
+**Erster Arbeitsschritt der nächsten Sitzung:** nicht bauen, sondern messen (Abschnitt 4).
 
 ---
 
-## 1. Stand der Maßnahmen
+## 1. Was aus dem Auftrag wurde
 
-| Maßnahme | Zustand |
-|---|---|
-| **M-5 Signaturbereinigung** | live, an echten Texten belegt |
-| **M-2 Sammelfenster** | live, belegt in den Läufen 114915/114916 (Anspruch, Warten, zweiter Lauf endet nach 38 ms) |
-| **Zeile bei Abschluss entfernen** | live, belegt in 114925 (Ja-Fall, `zeilenEntfernt: 1`) und 114930 (Nein-Fall, `zeilenEntfernt: 0`) |
-| **Monitoring-Filter** | offen, Erkennungsmerkmal bekannt (Abschnitt 3) |
-| **M-3 Inhaltshash** | offen, die Tabelle trägt die Spalten dafür schon |
-| **M-1 Autorenfilter** | entfällt, im Bestand bereits gebaut |
+| Maßnahme | Ergebnisneutral | Zustand |
+|---|---|---|
+| **M-5 Signaturbereinigung** | ja | live, an echten Texten belegt |
+| **M-2 Sammelfenster** | ja | live, belegt (114915/114916) |
+| **Maschinentickets nicht bewerten** | **nein — Entscheidung Sebastian** | live, belegt (114932) |
+| **Tickets in Done-Status nicht bewerten** | **nein — Entscheidung Sebastian** | live, belegt (114932) |
+| **Zeile bei Abschluss austragen** | ja | live, belegt (114925, 114932) |
+| **M-1 Autorenfilter** | — | entfällt, war im Bestand |
+| **M-3 Inhaltshash** | ja | offen, Tabelle vorbereitet |
+
+Die beiden nicht neutralen Punkte sind bewusst so entschieden: Maschinentickets haben keine fachlich verwertbare Einstufung, und ein abgeschlossenes Ticket braucht keine mehr. Das Abbruchkriterium aus Abschnitt 10 der großen Übergabe gilt für diese beiden Klassen nicht mehr — für alle übrigen Tickets unverändert.
 
 ---
 
 ## 2. Was bei der Umsetzung gelernt wurde
 
-**Erledigt → Geschlossen erreicht die Feldpflege nie.** Der Trigger filtert auf `statusCategory != Done`, und eine Automatisierung schließt jeden Abend um 18:00 alle erledigten Tickets in einem Schwung (34 Stück am 03.09.). Gemessen: null Läufe der Feldpflege in diesem Fenster. Der Wunsch, beim Archivieren nichts zu tun, war damit von vornherein erfüllt — nur eine Zeile ließ sich an diesem Ereignis nicht löschen. Deshalb greift die Entfernung beim letzten Ereignis, das der Workflow sieht: dem, bei dem das Ticket bereits in einem Done-Status steht.
+**Erledigt → Geschlossen erreicht die Feldpflege nie.** Eine Automatisierung schließt jeden Abend um 18:00 alle erledigten Tickets in einem Schwung (34 am 03.09.). Der Trigger filtert auf `statusCategory != Done` — null Läufe in diesem Fenster. Der Übergang **nach** Erledigt kommt dagegen an, meist als abschließender Kommentar (SSD-9240, Lauf 114800), und wurde bis heute mit vollem Modellaufruf bewertet.
 
-**Der Übergang nach Erledigt kommt dagegen an** (SSD-9240, Lauf 114800) — meist als abschließender Kommentar, und die Feldpflege bewertet ihn mit vollem Modellaufruf. Im gemessenen Fall `no_change`. Die Bewertung bei diesem Ereignis abzuschalten wäre ein weiterer Hebel, aber **nicht ergebnisneutral**: der abschließende Kommentar trägt oft die beste Evidenz für die endgültige Einstufung. Nicht umgesetzt, nicht entschieden.
+**Bei Kommentarereignissen liefert Jira weder `reporter` noch `creator` mit.** Nur `summary`, `issuetype`, `project`, `assignee`, `priority`, `status`. Der Maschinenfilter greift bei Kommentaren deshalb nur über die Zusammenfassung. Gefunden an der echten Nutzlast von Lauf 114800 — ohne diesen Blick wäre die Konto-Prüfung bei Kommentaren stillschweigend wirkungslos gewesen.
 
-**Drei Korrekturen an der großen Übergabe:**
+**Der Ingest-Filter trifft „Siemensring".** `Filter Automated Ticket Creator` prüft `siem` ohne Wortgrenze. Die Feldpflege verwendet dieselbe Regel mit `\bsiem\b`; der Ingest sollte nachziehen — steht in `offene-punkte.md`.
 
-1. Die Postgres-Credential `uEE8k2oPVj4Tnb4b` existiert nicht mehr. Es gibt genau eine, `awcN6ePCJHieBrzb`.
-2. Das Anspruchs-Statement der Übergabe hätte bei `claimed_until = NULL` nie gegriffen. Die Bedingung lautet `claimed_until IS NULL OR claimed_until < now()`.
-3. Der Postgres-Node liefert bei null Zeilen `{ success: true }`, kein leeres Ergebnis. Deshalb das IF hinter dem Anspruch — und deshalb ist die Zeilenentfernung als ein Statement gebaut, das immer genau eine Zeile zurückgibt, statt als Verzweigung.
+**Drei Korrekturen an der großen Übergabe:** Die Postgres-Credential `uEE8k2oPVj4Tnb4b` existiert nicht mehr (es gibt nur `awcN6ePCJHieBrzb`). Das Anspruchs-Statement hätte bei `claimed_until = NULL` nie gegriffen. Der Postgres-Node liefert bei null Zeilen eines INSERT … RETURNING `{ success: true }`, kein leeres Ergebnis — bei einem CTE mit SELECT dagegen leer. Beides fängt `Anspruch erhalten?` ab.
 
-**n8n arbeitet parallele Zweige nacheinander ab.** Zwei Probezweige an einem manuellen Auslöser laufen nicht gleichzeitig; der erste läuft bis zum Ende, ein Fehler dort beendet den Lauf, bevor der zweite beginnt. Für zwei Testfälle braucht es zwei Läufe.
+**n8n arbeitet parallele Zweige nacheinander ab**, und ein Fehler im ersten beendet den Lauf vor dem zweiten. Für mehrere Testfälle in einem Lauf müssen die fehlerfreien Zweige vorn liegen.
 
 ---
 
-## 3. Monitoring-Filter — Erkennungsmerkmal gefunden
+## 3. Belege
 
-Der Node `Filter Automated Ticket Creator` in `RAG-JIRA-Ingest` (`ESVtaoyTfaP3jm2G`) prüft im Betrieb Reporter und Ersteller gegen drei Konto-IDs, die Token `rwg_automate`, `rwg.automate`, `managed.monitoring`, `defender-noreply`, `defender`, das Summary-Präfix `[Managed | Monitoring]` und die Muster `intune-checker`, `snipe-checker`, `bericht zu kritischen events`, `aufgabenwarteschlangenprotokoll`, `siem`, `new vulnerabilities notification`. Erprobt.
+| Lauf | Was | Ergebnis |
+|---|---|---|
+| 114915 | Anspruch, 4 Minuten warten, Kandidat weitergereicht | bestanden |
+| 114916 | zweiter Lauf im Schwarm | endet nach 38 ms am IF |
+| 114925 | Zeile bei Abschluss ausgetragen | `zeilenEntfernt: 1` |
+| 114930 | Zeile bleibt sonst | `zeilenEntfernt: 0` |
+| 114932 | Monitoring verworfen, Abschluss trägt Zeile aus und endet, normales Ticket beansprucht und wartet | alle drei Zweige wie entworfen |
 
-Er gehört in `Ticketereignis pruefen` direkt hinter `IGNORIERTE_KONTEN`; der Webhook liefert Reporter und Summary mit. Kein neuer Node.
+Dazu elf lokale Fälle in [m2-entwurf/probe_ereignis.js](m2-entwurf/probe_ereignis.js) gegen den Code, wie er im Node steht — darunter die echte Nutzlast aus 114800 und der Siemensring-Fall.
 
-**Noch offen:** ob „Automate" heißt, dass auch Tickets mit RWG.Automate als Reporter übersprungen werden. Der Filter ist **nicht ergebnisneutral**, der Volumenanteil ist nicht gemessen — aus der Sammelschließung vom 03.09. lässt er sich abschätzen: von 34 geschlossenen Tickets trugen 19 ein Monitoring- oder Defender-Muster.
+**Noch nicht belegt:** ein Schwarm aus echten Jira-Ereignissen. Alle Probeläufe kamen über einen manuellen Auslöser.
 
 ---
 
-## 4. M-3 Inhaltshash
+## 4. Messung in einer Woche
 
-Die Tabelle trägt `content_hash`, `last_evaluated_at`, `last_level`, `last_priority` bereits. M-5 ist final, solange die Zeichengrenzen 40/120 stehen. Schattenlauf über mindestens 20 Ereignisse bleibt Voraussetzung. Zu beachten: Die Zeile wird bei Abschluss gelöscht — ein wiedereröffnetes Ticket wird einmal neu bewertet, das ist gewollt.
+Am 10.09. gegen die Ausgangsmessung vergleichen — Referenzwerte: Median Prompt 2.668 Tokens, Anteil `no_change` 91 Prozent, Modellquote 58 Prozent, rund 240 Läufe pro Tag.
+
+Worauf zu achten ist:
+
+- **Läufe unter 100 ms** mit `lastNodeExecuted: Ticketereignis pruefen` oder `Anspruch erhalten?` — das sind die vermiedenen Aufrufe, nach Klasse getrennt sichtbar.
+- **`bereinigung.verworfen`** am Node `Ticketkontext aufbereiten` — deutlich über null heißt, die Signaturmuster greifen nicht.
+- **`jira_feldpflege_state`** sollte nur Tickets in Bearbeitung enthalten.
+- **Zehn Tickets mit Feldänderung**: ist die Einstufung dieselbe wie vorher? Gilt für alle Tickets außer den zwei ausgeschlossenen Klassen.
+- **Die OpenAI-Nutzungsseite nach Modell**, vorher und nachher. Die einzige Zahl, die zeigt, ob die Feldpflege oder der Jira-Agent der größere Posten war.
 
 ---
 
-## 5. Reihenfolge für die nächste Sitzung
+## 5. Was danach noch möglich wäre
 
-1. **Erste echte Schwärme ansehen** — Läufe unter 100 ms am IF, `zeilenEntfernt` bei Abschlussereignissen, Tabelle nur mit Tickets in Bearbeitung.
-2. **Monitoring-Filter:** die Automate-Frage klären, dann bauen.
-3. Danach M-3 mit Schattenlauf.
+**M-3 Inhaltshash** — nur, wenn die Feldpflege nach der Woche noch dominiert. Tabelle und Spalten sind da, M-5 ist final, solange die Grenzen 40/120 stehen. Schattenlauf über mindestens 20 Ereignisse bleibt Voraussetzung.
 
-Eine Woche nach dem 03.09. gegen die Ausgangsmessung vergleichen: Median Prompt 2.668 Tokens, Anteil `no_change` 91 Prozent, Modellquote 58 Prozent, rund 240 Läufe pro Tag.
+**Jira-Agent** — als Kostenthema abgehakt: rund 36.500 Tokens je Lauf auf gpt-5.4, aber die Struktur ist knapp und die Evidenz wird gebraucht. Die Fehlläufe sind Jira-Schreibfehler nach der Modellarbeit und ein Qualitätsthema (404-Punkt in `offene-punkte.md`).
+
+**Jira-Ingest** — beide Caches arbeiten und wärmen sich von selbst. Ein Befund liegt vor: Die Sammelschließung um 18:00 entwertet den Lösungscache, weil `status` im Schlüssel steht. Steht in `offene-punkte.md`, Sprengweite 115 Chunks.
