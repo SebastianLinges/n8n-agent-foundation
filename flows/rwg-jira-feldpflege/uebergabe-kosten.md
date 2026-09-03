@@ -11,7 +11,7 @@ Der aktuelle Aufbau steht in der [README](README.md). Hier steht, was aus dem Au
 
 ## 0. Einstieg in drei Sätzen
 
-**Alles ist live**, aktive Version `8796340b`: Signaturbereinigung, Sammelfenster mit Anspruch je Ticket, und zwei Klassen werden gar nicht mehr bewertet — Maschinentickets und Tickets in einem Done-Status. Die Bauphase ist damit beendet; offen ist nur noch M-3, und der lohnt sich erst, wenn die Messung nach einer Woche es hergibt.
+**Alles ist live**, aktive Version `faaa5404`: Signaturbereinigung, Sammelfenster mit Anspruch je Ticket, und zwei Klassen werden gar nicht mehr bewertet — Maschinentickets und Tickets in einem Done-Status. Die Bauphase ist damit beendet; offen ist nur noch M-3, und der lohnt sich erst, wenn die Messung nach einer Woche es hergibt.
 
 **Erster Arbeitsschritt der nächsten Sitzung:** nicht bauen, sondern messen (Abschnitt 4).
 
@@ -39,6 +39,8 @@ Die beiden nicht neutralen Punkte sind bewusst so entschieden: Maschinentickets 
 
 **Bei Kommentarereignissen liefert Jira weder `reporter` noch `creator` mit.** Nur `summary`, `issuetype`, `project`, `assignee`, `priority`, `status`. Der Maschinenfilter greift bei Kommentaren deshalb nur über die Zusammenfassung. Gefunden an der echten Nutzlast von Lauf 114800 — ohne diesen Blick wäre die Konto-Prüfung bei Kommentaren stillschweigend wirkungslos gewesen.
 
+**Die Ingest-Muster reichen für Defender nicht.** Von 200 Maschinentickets aus 60 Tagen (100 Defender, 81 Monitoring, 18 RWG.Automate) rutschten mit den Ingest-Mustern im Kommentarfall 60 Defender-Tickets durch — dort kommt kein Melder mit, und nur „New vulnerabilities notification" stand als Muster. Die Feldpflege hat deshalb eigene Defender-Muster auf der Zusammenfassung; damit werden alle 199 erkannt, ein menschliches Ticket, das Defender nur erwähnt, bleibt. Belegt in Lauf 114936. Der Ingest sieht die Tickets mit Melder und ist davon nicht betroffen.
+
 **Der Ingest-Filter trifft „Siemensring".** `Filter Automated Ticket Creator` prüft `siem` ohne Wortgrenze. Die Feldpflege verwendet dieselbe Regel mit `\bsiem\b`; der Ingest sollte nachziehen — steht in `offene-punkte.md`.
 
 **Drei Korrekturen an der großen Übergabe:** Die Postgres-Credential `uEE8k2oPVj4Tnb4b` existiert nicht mehr (es gibt nur `awcN6ePCJHieBrzb`). Das Anspruchs-Statement hätte bei `claimed_until = NULL` nie gegriffen. Der Postgres-Node liefert bei null Zeilen eines INSERT … RETURNING `{ success: true }`, kein leeres Ergebnis — bei einem CTE mit SELECT dagegen leer. Beides fängt `Anspruch erhalten?` ab.
@@ -56,6 +58,7 @@ Die beiden nicht neutralen Punkte sind bewusst so entschieden: Maschinentickets 
 | 114925 | Zeile bei Abschluss ausgetragen | `zeilenEntfernt: 1` |
 | 114930 | Zeile bleibt sonst | `zeilenEntfernt: 0` |
 | 114932 | Monitoring verworfen, Abschluss trägt Zeile aus und endet, normales Ticket beansprucht und wartet | alle drei Zweige wie entworfen |
+| 114936 | Defender-Kommentar ohne Melder | verworfen nach 8 ms |
 
 Dazu elf lokale Fälle in [m2-entwurf/probe_ereignis.js](m2-entwurf/probe_ereignis.js) gegen den Code, wie er im Node steht — darunter die echte Nutzlast aus 114800 und der Siemensring-Fall.
 

@@ -12,12 +12,13 @@
 // unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.
 //
 // Seit 03.09.2026 ausserdem verworfen, beides bewusst NICHT ergebnisneutral:
-// - Maschinentickets (Monitoring, Defender, SIEM, RWG.Automate als Melder).
-//   Dieselbe Regel wie "Filter Automated Ticket Creator" im RAG-JIRA-Ingest,
-//   damit beide Flows dasselbe darunter verstehen. Einzige Abweichung: "siem"
-//   nur als ganzes Wort, sonst traefe die Regel auch "Siemensring".
-//   Bei Kommentarereignissen liefert Jira weder reporter noch creator mit -
-//   dort greifen nur die Regeln auf der Zusammenfassung.
+// - Maschinentickets: Monitoring, Defender, SIEM, Intune- und Snipe-Checker,
+//   RWG.Automate als Melder. Konten und Token wie in "Filter Automated Ticket
+//   Creator" im RAG-JIRA-Ingest. Bei Kommentarereignissen liefert Jira weder
+//   reporter noch creator mit - dort greifen nur die Regeln auf der
+//   Zusammenfassung, deshalb sind die Defender-Formulierungen ausgeschrieben
+//   (gemessen an 100 Defender-Tickets aus 60 Tagen). "siem" nur als ganzes
+//   Wort, sonst traefe die Regel auch "Siemensring".
 // - Ereignisse an Tickets, die bereits in einem Done-Status stehen (ERLEDIGT,
 //   GESCHLOSSEN, ...). Das ist das letzte Ereignis, das dieser Workflow von
 //   einem Ticket sieht, denn der Trigger filtert auf statusCategory != Done.
@@ -32,6 +33,7 @@ const IGNORIERTE_KONTEN = [
 ];
 const RELEVANT = ["status", "description", "summary", "issuetype"];
 
+// RWG.Automate, managed.monitoring, defender-noreply@microsoft.com
 const MASCHINEN_KONTEN = [
   "712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9",
   "712020:2c41da01-c990-498c-814a-aa04c2a3db9f",
@@ -40,6 +42,7 @@ const MASCHINEN_KONTEN = [
 const MASCHINEN_TOKENS = ["rwg_automate", "rwg.automate", "managed.monitoring", "defender-noreply", "defender"];
 const MASCHINEN_PRAEFIX = /^\s*\[\s*managed\s*\|\s*monitoring\s*\]/i;
 const MASCHINEN_MUSTER = /(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\bsiem\b|new vulnerabilities notification)/i;
+const DEFENDER_MUSTER = /(microsoft 365 defender|microsoft defender for endpoint|microsoft defender xdr|^\s*(informational|low|medium|high|critical) severity alert:)/i;
 
 function istMaschinenticket(fields) {
   const leute = [fields.creator, fields.reporter];
@@ -52,6 +55,7 @@ function istMaschinenticket(fields) {
   const summary = String(fields.summary || "");
   if (MASCHINEN_PRAEFIX.test(summary)) return true;
   if (MASCHINEN_MUSTER.test(summary)) return true;
+  if (DEFENDER_MUSTER.test(summary)) return true;
   return false;
 }
 

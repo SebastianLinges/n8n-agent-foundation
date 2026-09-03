@@ -3,11 +3,11 @@
   "name": "RWG_Jira-Feldpflege",
   "active": true,
   "isArchived": false,
-  "versionId": "8796340b-3e83-464d-bd82-ffcb15a47a4e",
-  "activeVersionId": "8796340b-3e83-464d-bd82-ffcb15a47a4e",
+  "versionId": "faaa5404-ec26-4d4f-bc45-60a68b060240",
+  "activeVersionId": "faaa5404-ec26-4d4f-bc45-60a68b060240",
   "triggerCount": 1,
   "createdAt": "2026-08-20T14:38:00.440Z",
-  "updatedAt": "2026-09-03T19:27:26.109Z",
+  "updatedAt": "2026-09-03T19:38:23.466Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -316,8 +316,8 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.2,
       "position": [
-        -1360,
-        -320
+        -1600,
+        -260
       ]
     },
     {
@@ -329,8 +329,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1120,
-        -320
+        -1360,
+        -260
       ]
     },
     {
@@ -365,8 +365,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -864,
-        -176
+        -160,
+        0
       ]
     },
     {
@@ -386,22 +386,22 @@
       "type": "n8n-nodes-base.jiraTrigger",
       "typeVersion": 1.1,
       "position": [
-        -1360,
-        -64
+        -1600,
+        0
       ],
       "webhookId": "79c3c665-03a3-4d93-b161-8d8f00beeb56"
     },
     {
       "parameters": {
-        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n//\n// Seit 03.09.2026 ausserdem verworfen, beides bewusst NICHT ergebnisneutral:\n// - Maschinentickets (Monitoring, Defender, SIEM, RWG.Automate als Melder).\n//   Dieselbe Regel wie \"Filter Automated Ticket Creator\" im RAG-JIRA-Ingest,\n//   damit beide Flows dasselbe darunter verstehen. Einzige Abweichung: \"siem\"\n//   nur als ganzes Wort, sonst traefe die Regel auch \"Siemensring\".\n//   Bei Kommentarereignissen liefert Jira weder reporter noch creator mit -\n//   dort greifen nur die Regeln auf der Zusammenfassung.\n// - Ereignisse an Tickets, die bereits in einem Done-Status stehen (ERLEDIGT,\n//   GESCHLOSSEN, ...). Das ist das letzte Ereignis, das dieser Workflow von\n//   einem Ticket sieht, denn der Trigger filtert auf statusCategory != Done.\n//   Es wird mit abschluss: true weitergegeben; \"Anspruch setzen\" traegt dann\n//   nur die Zeile aus jira_feldpflege_state aus und der Lauf endet.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\n\nconst MASCHINEN_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst MASCHINEN_TOKENS = [\"rwg_automate\", \"rwg.automate\", \"managed.monitoring\", \"defender-noreply\", \"defender\"];\nconst MASCHINEN_PRAEFIX = /^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]/i;\nconst MASCHINEN_MUSTER = /(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\\bsiem\\b|new vulnerabilities notification)/i;\n\nfunction istMaschinenticket(fields) {\n  const leute = [fields.creator, fields.reporter];\n  for (const p of leute) {\n    if (!p) continue;\n    if (MASCHINEN_KONTEN.indexOf(String(p.accountId || \"\")) !== -1) return true;\n    const text = (String(p.emailAddress || \"\") + \" \" + String(p.displayName || \"\")).toLowerCase();\n    for (const t of MASCHINEN_TOKENS) { if (text.indexOf(t) !== -1) return true; }\n  }\n  const summary = String(fields.summary || \"\");\n  if (MASCHINEN_PRAEFIX.test(summary)) return true;\n  if (MASCHINEN_MUSTER.test(summary)) return true;\n  return false;\n}\n\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  const fields = (e.issue && e.issue.fields) || {};\n  if (istMaschinenticket(fields)) continue;\n\n  const kategorie = String(((fields.status && fields.status.statusCategory) || {}).key || \"\").toLowerCase();\n  const abschluss = kategorie === \"done\";\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event, abschluss: abschluss } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \"), abschluss: abschluss } });\n}\n\nreturn out;"
+        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n//\n// Seit 03.09.2026 ausserdem verworfen, beides bewusst NICHT ergebnisneutral:\n// - Maschinentickets: Monitoring, Defender, SIEM, Intune- und Snipe-Checker,\n//   RWG.Automate als Melder. Konten und Token wie in \"Filter Automated Ticket\n//   Creator\" im RAG-JIRA-Ingest. Bei Kommentarereignissen liefert Jira weder\n//   reporter noch creator mit - dort greifen nur die Regeln auf der\n//   Zusammenfassung, deshalb sind die Defender-Formulierungen ausgeschrieben\n//   (gemessen an 100 Defender-Tickets aus 60 Tagen). \"siem\" nur als ganzes\n//   Wort, sonst traefe die Regel auch \"Siemensring\".\n// - Ereignisse an Tickets, die bereits in einem Done-Status stehen (ERLEDIGT,\n//   GESCHLOSSEN, ...). Das ist das letzte Ereignis, das dieser Workflow von\n//   einem Ticket sieht, denn der Trigger filtert auf statusCategory != Done.\n//   Es wird mit abschluss: true weitergegeben; \"Anspruch setzen\" traegt dann\n//   nur die Zeile aus jira_feldpflege_state aus und der Lauf endet.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\n\n// RWG.Automate, managed.monitoring, defender-noreply@microsoft.com\nconst MASCHINEN_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst MASCHINEN_TOKENS = [\"rwg_automate\", \"rwg.automate\", \"managed.monitoring\", \"defender-noreply\", \"defender\"];\nconst MASCHINEN_PRAEFIX = /^\\s*\\[\\s*managed\\s*\\|\\s*monitoring\\s*\\]/i;\nconst MASCHINEN_MUSTER = /(intune-checker|snipe-checker|bericht zu kritischen events|aufgabenwarteschlangenprotokoll|\\bsiem\\b|new vulnerabilities notification)/i;\nconst DEFENDER_MUSTER = /(microsoft 365 defender|microsoft defender for endpoint|microsoft defender xdr|^\\s*(informational|low|medium|high|critical) severity alert:)/i;\n\nfunction istMaschinenticket(fields) {\n  const leute = [fields.creator, fields.reporter];\n  for (const p of leute) {\n    if (!p) continue;\n    if (MASCHINEN_KONTEN.indexOf(String(p.accountId || \"\")) !== -1) return true;\n    const text = (String(p.emailAddress || \"\") + \" \" + String(p.displayName || \"\")).toLowerCase();\n    for (const t of MASCHINEN_TOKENS) { if (text.indexOf(t) !== -1) return true; }\n  }\n  const summary = String(fields.summary || \"\");\n  if (MASCHINEN_PRAEFIX.test(summary)) return true;\n  if (MASCHINEN_MUSTER.test(summary)) return true;\n  if (DEFENDER_MUSTER.test(summary)) return true;\n  return false;\n}\n\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  const fields = (e.issue && e.issue.fields) || {};\n  if (istMaschinenticket(fields)) continue;\n\n  const kategorie = String(((fields.status && fields.status.statusCategory) || {}).key || \"\").toLowerCase();\n  const abschluss = kategorie === \"done\";\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event, abschluss: abschluss } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \"), abschluss: abschluss } });\n}\n\nreturn out;"
       },
       "id": "06901308-4d12-4d1f-badf-bad748b32287",
       "name": "Ticketereignis pruefen",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1120,
-        -64
+        -1360,
+        0
       ]
     },
     {
@@ -425,8 +425,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -624,
-        -176
+        80,
+        0
       ],
       "retryOnFail": true,
       "maxTries": 3,
@@ -441,8 +441,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -448,
-        -176
+        320,
+        0
       ]
     },
     {
@@ -454,8 +454,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        416,
-        -176
+        1280,
+        0
       ]
     },
     {
@@ -477,8 +477,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        16,
-        -352
+        800,
+        -320
       ],
       "retryOnFail": true,
       "maxTries": 2,
@@ -503,8 +503,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        16,
-        -144
+        720,
+        -140
       ]
     },
     {
@@ -516,8 +516,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        160,
-        -144
+        900,
+        -140
       ]
     },
     {
@@ -529,8 +529,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        592,
-        -176
+        1520,
+        0
       ]
     },
     {
@@ -542,8 +542,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        752,
-        -176
+        1760,
+        0
       ]
     },
     {
@@ -584,8 +584,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        912,
-        -176
+        2000,
+        0
       ]
     },
     {
@@ -617,8 +617,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1152,
-        -304
+        2240,
+        -200
       ],
       "onError": "continueRegularOutput",
       "retryOnFail": true,
@@ -634,8 +634,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1392,
-        -304
+        2480,
+        -200
       ]
     },
     {
@@ -647,15 +647,15 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1152,
-        -48
+        2240,
+        200
       ]
     },
     {
       "parameters": {
-        "content": "## Zwei Eingaenge, die sich nicht ueberschneiden\n\n**Aufruf aus Jira-Agent**\nGenau einmal je Ticket, bei der Anlage. Der Agent uebergibt issueKey und die vier Betriebssignale. Weil ein frisches Ticket keine neue Evidenz hat und die Signale mitkommen, faellt hier kein Modellaufruf an. Praktisch wird nur die Prioritaet gesetzt, denn das Support-Level steht bei Anlage immer auf 1st-Lvl.\n\n**Jira Ticketereignis**\nAlles, was nach der Anlage passiert. Der Agent selbst sieht ein Ticket nur bei Anlage, deshalb ist dies der einzige Weg, auf dem sich das Support-Level je aendern kann. 2nd-Lvl. und 3rd-Lvl. entstehen ausschliesslich spaeter.\n\nAusgewertet werden Statuswechsel, neue und geaenderte Kommentare, Beschreibung, Zusammenfassung und Vorgangstyp.\n\nBewusst verworfen:\n- Aenderungen durch RWG.Automate und die Automation-for-Jira-Regel. Sonst laeuft direkt nach dem Agentenaufruf ein zweiter Lauf, ausgeloest durch die automatische Bearbeiterzuweisung.\n- Bearbeiter, Labels und Komponenten. Das Regelwerk schliesst sie als Level-Kriterium aus, ein Modellaufruf darauf kann nie zu einer Aenderung fuehren.\n- Aenderungen an Prioritaet und Support-Level selbst. Das sind die Felder dieses Workflows oder eine bewusste manuelle Korrektur.\n\nKein Zeitplan. Ein Ticket, das sich nicht bewegt, hat keine neue Evidenz.",
-        "height": 844,
-        "width": 1000,
+        "content": "## Zwei Eingaenge, die sich nicht ueberschneiden\n\n**Aufruf aus Jira-Agent** - genau einmal je Ticket, bei der Anlage. Der Agent uebergibt issueKey und die vier Betriebssignale; ein frisches Ticket hat keine neue Evidenz, deshalb faellt hier kein Modellaufruf an. Synchron: dieser Pfad wartet nie.\n\n**Jira Ticketereignis** - alles, was nach der Anlage passiert: Statuswechsel, Kommentare, Beschreibung, Zusammenfassung, Vorgangstyp. Der einzige Weg, auf dem sich das Support-Level je aendern kann.\n\nBewusst verworfen in **Ticketereignis pruefen**:\n- Aenderungen durch RWG.Automate und die Automation-for-Jira-Regel (sonst Rueckkopplung).\n- Bearbeiter, Labels, Komponenten, Prioritaet und Support-Level selbst - kein Level-Kriterium.\n- Seit 03.09.2026, bewusst nicht ergebnisneutral: **Maschinentickets** (Monitoring, Defender, SIEM, Intune-/Snipe-Checker, RWG.Automate als Melder; dieselbe Regel wie im RAG-JIRA-Ingest - bei Kommentaren nur ueber die Zusammenfassung, weil Jira dort keinen Melder mitschickt) und **Tickets in einem Done-Status** (das letzte Ereignis, das dieser Workflow sieht; Trigger filtert auf statusCategory != Done).\n\nKein Zeitplan. Ein Ticket, das sich nicht bewegt, hat keine neue Evidenz.",
+        "height": 620,
+        "width": 1080,
         "color": 4
       },
       "id": "78f7fc2a-c5a9-440b-b0e9-45ad6ee06636",
@@ -663,15 +663,15 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1920,
-        -768
+        -1640,
+        -900
       ]
     },
     {
       "parameters": {
         "content": "## Schreibschalter\n\n`dryRun` in **Kandidat und Konfiguration** ist der einzige Schalter dieses Workflows.\n\n- `false` = scharf. Ermittelte Aenderungen werden per PUT nach Jira geschrieben.\n- `true` = Probelauf. Es wird alles berechnet und zurueckgemeldet, aber nichts geschrieben. Der Schreibstatus lautet dann dry_run.\n\nDer aufrufende Jira-Agent wertet den Schreibstatus aus. Nur bei written meldet er im internen Kommentar eine tatsaechliche Aenderung. Im Probelauf schreibt er stattdessen, dass die Zielprioritaet nur ermittelt wurde.\n\nAktueller Stand: scharf.",
-        "height": 860,
-        "width": 368,
+        "height": 460,
+        "width": 400,
         "color": 5
       },
       "id": "a7c6ae10-2dab-4034-836d-b138dba6aa06",
@@ -679,15 +679,15 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -880,
-        -768
+        -200,
+        -760
       ]
     },
     {
       "parameters": {
         "content": "## Entscheidungslogik\n\nEin einziger Modellaufruf liefert beides: die Support-Level-Bewertung und die vier Betriebssignale fuer die Prioritaet. Danach wird deterministisch verrechnet.\n\nREGELN VOR DER BEWERTUNG\n- Status WARTEN AUF GWS (10373) erzwingt 3rd-Lvl.\n- Manuell gesetzter Wert ohne nachfolgende Level-Uebergabe bleibt unangetastet\n\nGRUNDANNAHME SUPPORT-LEVEL\nJedes SSD-Ticket startet auf 1st-Lvl. und behaelt diesen Default. Der Normalfall ist eine Hochstufung.\nEine Herabstufung erfordert eine im Ticket dokumentierte Rueckgabe.\nOhne confidence HIGH und ohne woertliche Fundstelle wird nicht geschrieben, sondern im Ergebnis zur manuellen Pruefung markiert.\n\nGRUNDSATZ PRIORITAET\nUnterhalb von Medium liegen ausschliesslich planbare Anfragen (SERVICE_REQUEST).\nJede echte Stoerung ist mindestens Medium, auch bei nur einem betroffenen Anwender. Wer nicht arbeiten kann, ist unternehmerisch ein Schaden.\nSignale UNKNOWN lassen die Prioritaet unangetastet. Bestehende hohe Prioritaeten werden nie automatisch gesenkt.\n\nFeld-IDs: Support-Level = customfield_10777, 1st = 10354, 2nd = 10355, 3rd = 10356.\nPrioritaeten: 1 Sehr Hoch, 2 Hoch, 3 Medium, 4 Niedrig, 5 Sehr Niedrig.",
-        "height": 580,
-        "width": 1108,
+        "height": 420,
+        "width": 1100,
         "color": 6
       },
       "id": "ca6d3fe7-7f2c-4b57-b726-c9a8e3b02f60",
@@ -695,15 +695,15 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -256,
-        -976
+        560,
+        -800
       ]
     },
     {
       "parameters": {
-        "content": "## Zustandslos\n\nKeine eigene Datenhaltung. Der Workflow liest Jira, entscheidet und schreibt nach Jira zurueck. Die Aenderungshistorie ist die Changelog des Tickets.\n\n**Ergebnis** gibt die Bewertung strukturiert zurueck: an den aufrufenden Jira-Agent und lesbar im Ausfuehrungsprotokoll. Enthalten sind Vorher- und Nachher-Werte beider Felder, die Begruendung, die woertliche Fundstelle und der Schreibstatus.\n\nUnsichere Faelle traegt das Ergebnis als `manuellePruefungNoetig` aus - gespeist aus `levelUnsicher` in **Support-Level festlegen**. Das Feld stand frueher fest auf false, sodass diese Faelle nie sichtbar wurden.\n\nOffen: Einen eigenen Meldekanal gibt es dafuer weiterhin nicht. Die Faelle sind nur im Ausfuehrungsprotokoll und im Rueckgabewert an den Agenten sichtbar; der Agent rendert sie derzeit nicht in den internen Kommentar.",
-        "height": 624,
-        "width": 340,
+        "content": "## Ergebnis\n\n**Ergebnis** gibt die Bewertung strukturiert zurueck: an den aufrufenden Jira-Agent und lesbar im Ausfuehrungsprotokoll. Enthalten sind Vorher- und Nachher-Werte beider Felder, die Begruendung, die woertliche Fundstelle und der Schreibstatus.\n\nUnsichere Faelle traegt das Ergebnis als `manuellePruefungNoetig` aus - gespeist aus `levelUnsicher` in **Support-Level festlegen**.\n\nOffen: Einen eigenen Meldekanal gibt es dafuer nicht. Die Faelle sind nur im Ausfuehrungsprotokoll und im Rueckgabewert sichtbar; der Agent rendert sie derzeit nicht in den internen Kommentar.\n\nEigene Datenhaltung gibt es nur fuer das Sammelfenster (Notiz unter dem Webhook-Pfad).",
+        "height": 420,
+        "width": 480,
         "color": 7
       },
       "id": "cdbe5439-497c-426a-8afc-d5994138c048",
@@ -711,8 +711,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1808,
-        -832
+        2440,
+        -760
       ]
     },
     {
@@ -724,8 +724,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1840,
-        -160
+        2720,
+        0
       ]
     },
     {
@@ -757,8 +757,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -256,
-        -176
+        560,
+        0
       ]
     },
     {
@@ -781,8 +781,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        80,
-        48
+        800,
+        200
       ]
     },
     {
@@ -792,7 +792,7 @@
       "typeVersion": 3.4,
       "position": [
         -1120,
-        128
+        0
       ],
       "parameters": {
         "assignments": {
@@ -816,8 +816,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -1120,
-        288
+        -880,
+        0
       ],
       "parameters": {
         "operation": "executeQuery",
@@ -835,8 +835,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -1120,
-        448
+        -640,
+        0
       ],
       "parameters": {
         "conditions": {
@@ -869,8 +869,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -1120,
-        608
+        -400,
+        0
       ],
       "parameters": {
         "resume": "timeInterval",
@@ -879,6 +879,22 @@
       },
       "notes": "Wartet genau so lange wie der Anspruch gilt. Danach laedt Ticketdaten laden den frischen Stand - alle Ereignisse des Schwarms sind dann in Jira.",
       "webhookId": "a4c04ee5-4a72-47cc-8074-93b51363f656"
+    },
+    {
+      "id": "def37f86-4f76-4ea5-85e8-c569f9c3079a",
+      "name": "Sticky Note Sammelfenster",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1160,
+        180
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1000,
+        "height": 340,
+        "content": "## Sammelfenster und Zustandstabelle\n\nEreignisse kommen in Schwaermen, und nur der letzte Lauf zaehlt. Der erste Lauf je Ticket setzt in `public.jira_feldpflege_state` ein Schild (`claimed_until`), wartet `fensterMinuten` und laedt erst dann den frischen Stand. Jeder weitere Lauf im Fenster endet an **Anspruch erhalten?** - noetig, weil der Postgres-Node bei null Zeilen kein leeres Ergebnis liefert.\n\nSteht das Ticket schon in einem Done-Status (`abschluss: true`), traegt **Anspruch setzen** nur die Zeile aus und liefert nichts zurueck: kein Warten, keine Bewertung. Abgelaufen heisst unwirksam, nicht geloescht.\n\n`fensterMinuten` in **Sammelfenster** ist die einzige Stellschraube. Muss deutlich unter dem executionTimeout (300 s) bleiben. Nur der Webhook-Pfad - der Agentenaufruf wartet nie."
+      }
     }
   ],
   "nodeGroups": [],
