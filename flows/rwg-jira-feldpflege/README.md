@@ -1,6 +1,6 @@
 # RWG_Jira-Feldpflege
 
-Workflow `k4SmnNrz7ASMdFwk`, aktiv, 20 Nodes. Setzt in Jira SSD zwei Felder: **Priorität** und **Support-Level** (`customfield_10777`). Der alleinige Schreiber auf diese beiden Felder.
+Workflow `k4SmnNrz7ASMdFwk`, aktiv, 25 Nodes. Setzt in Jira SSD zwei Felder: **Priorität** und **Support-Level** (`customfield_10777`). Der alleinige Schreiber auf diese beiden Felder.
 
 ## Zwei Eingänge, die sich nicht überschneiden
 
@@ -9,6 +9,35 @@ Workflow `k4SmnNrz7ASMdFwk`, aktiv, 20 Nodes. Setzt in Jira SSD zwei Felder: **P
 `Jira Ticketereignis` deckt alles danach ab: Statuswechsel, Kommentare, Beschreibung, Zusammenfassung, Vorgangstyp. Da der Agent ein Ticket nur bei Anlage sieht, ist dies der einzige Weg, auf dem sich das Support-Level je ändern kann.
 
 Kein Zeitplan — ein Ticket, das sich nicht bewegt, hat keine neue Evidenz.
+
+## Sammelfenster vor der Bewertung
+
+Ereignisse an einem Ticket kommen in Schwärmen — Kommentar, Statuswechsel, Antwort innerhalb von Sekunden. Jedes wäre ein eigener Modellaufruf, und nur der letzte zählt: gemessen viermal in 50 Sekunden an SSD-9212, 7 von 22 Modellaufrufen in der Stichprobe.
+
+Der Webhook-Pfad bewertet deshalb nicht sofort. Vier Nodes liegen zwischen `Ticketereignis pruefen` und `Kandidat und Konfiguration`:
+
+| Node | Aufgabe |
+|---|---|
+| `Sammelfenster` | die einzige Stellschraube: `fensterMinuten = 4` |
+| `Anspruch setzen` | atomares `INSERT … ON CONFLICT … RETURNING` auf `public.jira_feldpflege_state`. Kommt eine Zeile zurück, hält dieser Lauf den Anspruch; kommt keine, hält ihn ein anderer |
+| `Anspruch erhalten?` | endet den Lauf ohne Anspruch — nötig, weil der Postgres-Node bei null Zeilen `{ success: true }` liefert, kein leeres Ergebnis |
+| `Sammelfenster abwarten` | wartet `fensterMinuten`; erst danach lädt `Ticketdaten laden` den frischen Stand, alle Ereignisse des Schwarms sind dann in Jira |
+
+Ein zweites Ereignis im Fenster sieht das gültige Schild und endet nach Millisekunden, ohne zu warten und ohne zu bewerten. Das Ergebnis ist dasselbe wie vorher beim letzten Lauf des Schwarms; es entfallen nur die Zwischenläufe. Der Agentenpfad ist unberührt — der Aufruf aus dem Jira-Agent ist synchron und darf nicht warten.
+
+**Warum vier Minuten:** `executionTimeout` steht auf 300 Sekunden, und nach dem Warten muss der Lauf noch laden, bewerten und schreiben. Der längste gemessene Abstand innerhalb eines Schwarms lag bei 72 Sekunden.
+
+**Das Schild hängt sich selbst ab.** `claimed_until` ist eine Uhrzeit, kein Ja/Nein: Stürzt der Anspruchsinhaber ab, ist das Ticket nach Fensterende wieder frei. Abgelaufen heißt unwirksam, nicht gelöscht — die Zeile bleibt, bis das Ticket abgeschlossen ist.
+
+## Abgeschlossene Tickets räumen ihre Zeile weg
+
+Der Trigger filtert auf `statusCategory != Done`. Der Übergang Erledigt → Geschlossen erreicht diesen Workflow deshalb nie — gemessen: null Läufe während der automatischen Sammelschließung von 34 Tickets um 18:00 Uhr. Das letzte Ereignis, das er von einem Ticket sieht, ist das, bei dem das Ticket bereits in einem Done-Status steht — meist der abschließende Kommentar samt Übergang nach Erledigt.
+
+`Ticketereignis pruefen` markiert solche Ereignisse mit `abschluss: true`, gelesen aus `issue.fields.status.statusCategory.key`. `Zustand bei Abschluss entfernen` löscht dann nach dem Sammelfenster die Zeile — in einem Statement, das den Kandidaten in jedem Fall unverändert weiterreicht, damit kein IF mit zwei Ausgängen nötig ist. Die Bewertung läuft bei diesem letzten Ereignis unverändert weiter; das ist bewusst so, weil der abschließende Kommentar oft die beste Evidenz für die endgültige Einstufung trägt.
+
+Wird ein abgeschlossenes Ticket wieder geöffnet, entsteht beim nächsten Ereignis einfach eine neue Zeile.
+
+Die Tabelle gehört ausschließlich diesem Workflow: eine Zeile je Ticket in Bearbeitung, sechs Spalten, DDL in [m2-entwurf/tabelle.sql](m2-entwurf/tabelle.sql), Postgres-Zugang `awcN6ePCJHieBrzb` (Projekt RAG). Die Spalten `content_hash`, `last_evaluated_at`, `last_level`, `last_priority` sind für den Inhaltshash vorgesehen und noch unbenutzt.
 
 ## Schleifensicherung, doppelt
 

@@ -3,11 +3,11 @@
   "name": "RWG_Jira-Feldpflege",
   "active": true,
   "isArchived": false,
-  "versionId": "0337d1c6-3a8c-48b4-8670-cd4f21fcaacf",
-  "activeVersionId": "0337d1c6-3a8c-48b4-8670-cd4f21fcaacf",
+  "versionId": "2cdcd5a6-acdc-4e72-afab-8831dc11816d",
+  "activeVersionId": "2cdcd5a6-acdc-4e72-afab-8831dc11816d",
   "triggerCount": 1,
   "createdAt": "2026-08-20T14:38:00.440Z",
-  "updatedAt": "2026-09-03T16:03:26.009Z",
+  "updatedAt": "2026-09-03T19:06:15.133Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -147,17 +147,6 @@
         ]
       ]
     },
-    "Ticketereignis pruefen": {
-      "main": [
-        [
-          {
-            "node": "Kandidat und Konfiguration",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Jira Ticketereignis": {
       "main": [
         [
@@ -236,6 +225,72 @@
         [
           {
             "node": "Prioritaet ableiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticketereignis pruefen": {
+      "main": [
+        [
+          {
+            "node": "Sammelfenster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sammelfenster": {
+      "main": [
+        [
+          {
+            "node": "Anspruch setzen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anspruch setzen": {
+      "main": [
+        [
+          {
+            "node": "Anspruch erhalten?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anspruch erhalten?": {
+      "main": [
+        [
+          {
+            "node": "Sammelfenster abwarten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sammelfenster abwarten": {
+      "main": [
+        [
+          {
+            "node": "Zustand bei Abschluss entfernen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zustand bei Abschluss entfernen": {
+      "main": [
+        [
+          {
+            "node": "Kandidat und Konfiguration",
             "type": "main",
             "index": 0
           }
@@ -349,7 +404,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \") } });\n}\n\nreturn out;"
+        "jsCode": "// Verwirft Ereignisse, die fachlich keine Neubewertung rechtfertigen.\n//\n// RELEVANT enthaelt bewusst NICHT assignee, labels und components.\n// Das Governance-Regelwerk schliesst diese als Kriterium aus: eine reine\n// personelle Zuweisung ist keine fachliche Weitergabe, Standort und Komponente\n// sind keine Level-Kriterien. Ein Modellaufruf darauf koennte per Definition\n// nie zu einer Aenderung fuehren.\n//\n// Ausserdem verworfen: Aenderungen durch RWG.Automate selbst (dieser Workflow\n// schreibt nach Jira, sonst Rueckkopplung) und durch die Automation-for-Jira-\n// Regel, die bei Anlage Bearbeiter und Faelligkeit setzt. Letztere wuerde\n// unmittelbar nach dem Aufruf aus dem Jira-Agent einen zweiten Lauf ausloesen.\n\nconst IGNORIERTE_KONTEN = [\n  \"712020:86b7f975-90a6-40c7-9e3b-aff4c9013cb9\",\n  \"557058:f58131cb-b67d-43c7-b30d-6b58d40bd077\",\n  \"712020:2c41da01-c990-498c-814a-aa04c2a3db9f\",\n  \"60242eda988758006893fa52\"\n];\nconst RELEVANT = [\"status\", \"description\", \"summary\", \"issuetype\"];\nconst out = [];\n\nfor (const it of $input.all()) {\n  const e = it.json || {};\n  const event = String(e.webhookEvent || \"\");\n  const key = String((e.issue && e.issue.key) || \"\").trim().toUpperCase();\n  if (!key) continue;\n\n  let actor = String((e.user && e.user.accountId) || \"\");\n  if (!actor && e.comment && e.comment.author) actor = String(e.comment.author.accountId || \"\");\n  if (IGNORIERTE_KONTEN.indexOf(actor) !== -1) continue;\n\n  // Steht das Ticket bereits in einem Done-Status (ERLEDIGT, GESCHLOSSEN, ...),\n  // ist dies das letzte Ereignis, das dieser Workflow dazu sieht - der Trigger\n  // filtert auf statusCategory != Done. Die Zeile in jira_feldpflege_state wird\n  // dann nach dem Sammelfenster entfernt. Die Bewertung selbst laeuft unveraendert.\n  const kategorie = String(((e.issue && e.issue.fields && e.issue.fields.status && e.issue.fields.status.statusCategory) || {}).key || \"\").toLowerCase();\n  const abschluss = kategorie === \"done\";\n\n  if (event.indexOf(\"comment\") !== -1) {\n    out.push({ json: { issueKey: key, source: \"kommentar\", ausloeser: event, abschluss: abschluss } });\n    continue;\n  }\n\n  const changes = (e.changelog && Array.isArray(e.changelog.items)) ? e.changelog.items : [];\n  if (changes.length === 0) continue;\n\n  const felder = [];\n  for (const c of changes) {\n    const fid = String((c && (c.fieldId || c.field)) || \"\").toLowerCase();\n    if (RELEVANT.indexOf(fid) !== -1) felder.push(fid);\n  }\n  if (felder.length === 0) continue;\n\n  out.push({ json: { issueKey: key, source: \"feldaenderung\", ausloeser: felder.join(\", \"), abschluss: abschluss } });\n}\n\nreturn out;"
       },
       "id": "06901308-4d12-4d1f-badf-bad748b32287",
       "name": "Ticketereignis pruefen",
@@ -740,6 +795,120 @@
         80,
         48
       ]
+    },
+    {
+      "id": "f1d3c83a-52a6-4bda-adc7-c7b6234c8e5d",
+      "name": "Sammelfenster",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1120,
+        128
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sf-min",
+              "name": "fensterMinuten",
+              "type": "number",
+              "value": 4
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "notes": "Einzige Stellschraube fuer Anspruch UND Wartezeit. Muss deutlich unter dem executionTimeout von 300 s bleiben, sonst bricht der Lauf nach dem Warten ab und das Ticket bleibt bis Fensterende blockiert."
+    },
+    {
+      "id": "894a7916-d2d2-4f9c-862e-ccd2e58541c7",
+      "name": "Anspruch setzen",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1120,
+        288
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.jira_feldpflege_state (issue_key, claimed_until)\nVALUES ($1, now() + ($2::int * interval '1 minute'))\nON CONFLICT (issue_key) DO UPDATE\n  SET claimed_until = now() + ($2::int * interval '1 minute')\n  WHERE public.jira_feldpflege_state.claimed_until IS NULL\n     OR public.jira_feldpflege_state.claimed_until < now()\nRETURNING issue_key AS \"issueKey\", $3::text AS \"source\", $4::text AS \"ausloeser\", $2::int AS \"fensterMinuten\", $5::boolean AS \"abschluss\";",
+        "options": {
+          "queryReplacement": "={{ [ $json.issueKey, $json.fensterMinuten, $json.source, $json.ausloeser, $json.abschluss === true ] }}",
+          "queryBatching": "independently"
+        }
+      },
+      "notes": "Atomarer Anspruch je Ticket. Kommt eine Zeile zurueck, haelt dieser Lauf den Anspruch. Kommt keine, haelt ihn ein anderer Lauf und dieser endet still. RETURNING gibt den Kandidaten in derselben Form weiter wie Ticketereignis pruefen."
+    },
+    {
+      "id": "47d8e44b-ed22-4798-86af-c754638d3010",
+      "name": "Anspruch erhalten?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1120,
+        448
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c-claim",
+              "leftValue": "={{ $json.issueKey }}",
+              "operator": {
+                "operation": "exists",
+                "singleValue": true,
+                "type": "string"
+              }
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "notes": "Sicherung gegen ein leeres Item. Ohne Anspruch endet der Lauf hier."
+    },
+    {
+      "id": "7de9ac30-6a8f-4684-aa2c-af81ec9f9b05",
+      "name": "Sammelfenster abwarten",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1120,
+        608
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": "={{ $json.fensterMinuten }}",
+        "unit": "minutes"
+      },
+      "notes": "Wartet genau so lange wie der Anspruch gilt. Danach laedt Ticketdaten laden den frischen Stand - alle Ereignisse des Schwarms sind dann in Jira.",
+      "webhookId": "a4c04ee5-4a72-47cc-8074-93b51363f656"
+    },
+    {
+      "id": "9062764e-6b2e-4435-a94e-ec86f154ca0b",
+      "name": "Zustand bei Abschluss entfernen",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1120,
+        768
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH entfernt AS (\n  DELETE FROM public.jira_feldpflege_state\n  WHERE issue_key = $1 AND $5::boolean\n  RETURNING issue_key\n)\nSELECT $1::text AS \"issueKey\", $2::text AS \"source\", $3::text AS \"ausloeser\", $4::int AS \"fensterMinuten\", $5::boolean AS \"abschluss\",\n       (SELECT count(*)::int FROM entfernt) AS \"zeilenEntfernt\";",
+        "options": {
+          "queryReplacement": "={{ [ $json.issueKey, $json.source, $json.ausloeser, $json.fensterMinuten, $json.abschluss === true ] }}",
+          "queryBatching": "independently"
+        }
+      },
+      "notes": "Steht das Ticket in einem Done-Status, ist dies das letzte Ereignis, das der Workflow dazu sieht: die Zeile wird entfernt. Sonst passiert nichts. Liefert den Kandidaten in jedem Fall unveraendert weiter, ergaenzt um zeilenEntfernt."
     }
   ],
   "nodeGroups": [],

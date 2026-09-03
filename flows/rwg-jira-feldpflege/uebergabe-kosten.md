@@ -2,115 +2,70 @@
 
 **Workflow:** RWG_Jira-Feldpflege — `k4SmnNrz7ASMdFwk`
 **Link:** https://n8n.srv1307521.hstgr.cloud/workflow/k4SmnNrz7ASMdFwk
-**Stand:** 03.09.2026
+**Stand:** 03.09.2026, abends
 **Umfang:** ausschließlich dieser Flow.
 
-Diese Datei schreibt die große Übergabe zum Thema fort. Auftrag, Messergebnisse und Rahmenbedingungen (Abschnitte 1 bis 6 dort) gelten weiter, mit den unten vermerkten Korrekturen.
+Diese Datei schreibt die große Übergabe zum Thema fort. Der aktuelle Aufbau steht in der [README](README.md); hier steht nur, was noch offen ist und was bei der Umsetzung gelernt wurde.
 
 ---
 
 ## 0. Einstieg in drei Sätzen
 
-**M-5 ist live.** Aktive Version `0337d1c6`, publiziert am 03.09.2026. Offen sind der Monitoring-Filter, M-2 und das daran hängende M-3.
+**M-5 und M-2 sind live**, aktive Version `2cdcd5a6`: Signaturbereinigung, Sammelfenster mit Anspruch je Ticket, und die Zeile in `jira_feldpflege_state` verschwindet, sobald das Ticket in einem Done-Status ist. Offen bleiben der Monitoring-Filter und M-3.
 
-**Erster Arbeitsschritt:** Die ersten Produktivläufe ansehen — `result.bereinigung` am Node `Ticketkontext aufbereiten` und die Prompt-Tokens am Modellaufruf.
-
----
-
-## 1. Gefallene Entscheidungen
-
-| Punkt | Entscheidung | Zustand |
-|---|---|---|
-| **M-5 Sicherung** | absolute Zeichengrenze statt Anteil | **live** |
-| **PRTG** | kein Textmuster, sondern Bewertung ganz überspringen bei Monitoring- und Automate-Tickets | offen |
-| **Sammelfenster** | 4 Minuten, Timeout bleibt 300 s | offen |
-| **M-1 Autorenfilter** | entfällt, im Bestand bereits gebaut | erledigt |
+**Erster Arbeitsschritt:** Die ersten echten Schwärme ansehen — Läufe unter 100 ms mit `lastNodeExecuted: Anspruch erhalten?` sind die eingesparten Aufrufe. Das ist der einzige Beleg, der noch fehlt: die Probeläufe kamen über einen manuellen Auslöser, nicht über den Jira-Trigger.
 
 ---
 
-## 2. M-5 Signaturbereinigung — live
+## 1. Stand der Maßnahmen
 
-Geändert ist genau ein Node: `Ticketkontext aufbereiten`. Keine neuen Nodes, keine Verbindungsänderungen, keine Einstellungsänderungen. Was der Code tut und warum die Grenzen so gewählt sind, steht in der [README](README.md) unter „Was das Modell zu sehen bekommt" — dort ist der aktuelle Stand, hier nur der Weg dorthin.
-
-### Was belegt ist
-
-**An echten Texten gemessen** (SSD-9212, über die Jira-API geholt, Bereinigung ausgeführt mit dem Code, der aus n8n zurückgelesen wurde):
-
-| Text | roh | neu | Wirkung |
-|---|---|---|---|
-| Beschreibung | 294 | 46 | bereinigt |
-| Kommentar 60811 | 328 | 80 | bereinigt |
-| Kommentar 60805, Rueckfrage | 188 | 157 | bereinigt |
-| Kommentar 60814, kurz | 115 | 84 | bereinigt |
-| Kommentar 60818, Befund | 482 | 482 | unverändert |
-| **Summe** | **1.407** | **849** | **40 % weniger Zeichen** |
-
-Vier von vier Signaturfällen bereinigt, keiner verworfen, der fachliche Befundkommentar unangetastet. Damit ist die Kritik aus Abschnitt 6.4 der großen Übergabe erledigt — die dortige Tabelle galt für die verworfene Schwelle 0,5 und ist hinfällig.
-
-*Einschränkung:* Die Texte kamen als Markdown aus der Jira-API, der Node bekommt ADF und wandelt mit `adfText`. Die Zeilenstruktur ist gleichwertig, die Zeichenzahlen können um wenige Zeichen abweichen.
-
-**Übertragung geprüft:** Nach dem `update_workflow` frisch abgerufen und gegen die Referenzdatei gediffed — byte-identisch. `node --check` auf dem zurückgelesenen Code sauber, der Prüfstand über sieben Fälle grün.
-
-**Der offene Diff aus Abschnitt 7.4 ist geschlossen:** Der Entwurf vom 02.09. enthielt genau die Passage aus Abschnitt 7.3, `\\?\\?` in der `KONTAKT`-Regex intakt. Und die aktive Version war byte-identisch zum Repo-Export — der Ausgangsstand war belastbar.
-
-### Was nicht belegt ist
-
-**Es gab keinen n8n-Testlauf vor dem Publizieren.** Der Code ist statisch geprüft und an echten Texten gerechnet, aber der Node ist nie mit echten Ticketdaten durch n8n gelaufen. Die ersten Produktivläufe sind der Test. Bewusst so entschieden.
-
-**Worauf zu achten ist:** `result.bereinigung` am Node `Ticketkontext aufbereiten`. Steht dort `verworfen` deutlich über null, greifen die Muster nicht wie gedacht. Und ob eine Einstufung von der bisherigen abweicht — das Abbruchkriterium aus Abschnitt 10 gilt unverändert.
-
-### Werkzeug
-
-In [m5-entwurf/](m5-entwurf/) liegen die Referenzfassung, die Ausgangsversion, der Patch mit Ankerprüfung und der Prüfstand `probe.js`. Er schneidet den M-5-Block aus dem Node heraus, statt ihn abzuschreiben — wer die Grenzen ändert, prüft damit gegen den echten Code.
-
-Der Lauf über die echten SSD-9212-Texte war einmalig und liegt **nicht** im Repo: die Testdatei enthielt eine vollständige Signatur mit Name, Dienstanschrift, Telefonnummer und E-Mail. Das Ergebnis steht in der Tabelle oben, wiederholen lässt er sich jederzeit über die Jira-API.
+| Maßnahme | Zustand |
+|---|---|
+| **M-5 Signaturbereinigung** | live, an echten Texten belegt |
+| **M-2 Sammelfenster** | live, belegt in den Läufen 114915/114916 (Anspruch, Warten, zweiter Lauf endet nach 38 ms) |
+| **Zeile bei Abschluss entfernen** | live, belegt in 114925 (Ja-Fall, `zeilenEntfernt: 1`) und 114930 (Nein-Fall, `zeilenEntfernt: 0`) |
+| **Monitoring-Filter** | offen, Erkennungsmerkmal bekannt (Abschnitt 3) |
+| **M-3 Inhaltshash** | offen, die Tabelle trägt die Spalten dafür schon |
+| **M-1 Autorenfilter** | entfällt, im Bestand bereits gebaut |
 
 ---
 
-## 3. Monitoring-Filter — Stelle steht, zwei Angaben fehlen
+## 2. Was bei der Umsetzung gelernt wurde
 
-Er gehört **in den bestehenden Node `Ticketereignis pruefen`**, direkt hinter die Prüfung auf `IGNORIERTE_KONTEN`. Der Webhook liefert dort bereits `e.issue`, es braucht keinen neuen Node und keine Verbindungsänderung — und damit auch keine Berührung mit dem unzuverlässigen `sourceOutput`. Der Lauf endet vor `Ticketdaten laden`, spart also auch den Jira-Aufruf.
+**Erledigt → Geschlossen erreicht die Feldpflege nie.** Der Trigger filtert auf `statusCategory != Done`, und eine Automatisierung schließt jeden Abend um 18:00 alle erledigten Tickets in einem Schwung (34 Stück am 03.09.). Gemessen: null Läufe der Feldpflege in diesem Fenster. Der Wunsch, beim Archivieren nichts zu tun, war damit von vornherein erfüllt — nur eine Zeile ließ sich an diesem Ereignis nicht löschen. Deshalb greift die Entfernung beim letzten Ereignis, das der Workflow sieht: dem, bei dem das Ticket bereits in einem Done-Status steht.
 
-**Was fehlt und nicht zu raten ist:**
+**Der Übergang nach Erledigt kommt dagegen an** (SSD-9240, Lauf 114800) — meist als abschließender Kommentar, und die Feldpflege bewertet ihn mit vollem Modellaufruf. Im gemessenen Fall `no_change`. Die Bewertung bei diesem Ereignis abzuschalten wäre ein weiterer Hebel, aber **nicht ergebnisneutral**: der abschließende Kommentar trägt oft die beste Evidenz für die endgültige Einstufung. Nicht umgesetzt, nicht entschieden.
 
-1. **Woran ein Monitoring-Ticket sicher zu erkennen ist.** Die accountId der Monitoring-Mailbox als Reporter, der Request Type, oder ob das Summary-Präfix `[Managed | Monitoring]` stabil ist. Ein Textmuster auf der Beschreibung scheidet laut Auftrag aus.
-2. **Was „Automate" heißen soll.** Ereignisse *durch* RWG.Automate und Automation for Jira werden bereits verworfen. Neu wäre, Tickets zu überspringen, deren **Reporter** eines dieser Konten ist — also auch dann, wenn ein Mensch darauf kommentiert.
+**Drei Korrekturen an der großen Übergabe:**
 
-**Nicht ergebnisneutral, ausdrücklich so entschieden.** Ein PRTG-Ticket, das heute nach einem menschlichen Kommentar hochgestuft würde, bliebe danach unbewertet. Der Volumenanteil ist **nicht gemessen** — er lässt sich über `search_executions` zählen.
+1. Die Postgres-Credential `uEE8k2oPVj4Tnb4b` existiert nicht mehr. Es gibt genau eine, `awcN6ePCJHieBrzb`.
+2. Das Anspruchs-Statement der Übergabe hätte bei `claimed_until = NULL` nie gegriffen. Die Bedingung lautet `claimed_until IS NULL OR claimed_until < now()`.
+3. Der Postgres-Node liefert bei null Zeilen `{ success: true }`, kein leeres Ergebnis. Deshalb das IF hinter dem Anspruch — und deshalb ist die Zeilenentfernung als ein Statement gebaut, das immer genau eine Zeile zurückgibt, statt als Verzweigung.
 
----
-
-## 4. M-2 Anspruch und Sammelfenster — 4 Minuten
-
-Anspruchsfenster und Wait-Dauer bekommen dieselbe Konstante von 4 Minuten aus einer Stelle. Der Execution-Timeout bleibt bei 300 s, es ist keine Einstellungsänderung nötig und der Agentenpfad bleibt unberührt.
-
-Tabelle, atomares Anspruchs-Statement und die Fehlerpfade stehen unverändert in M-2 der großen Übergabe. Es blockiert nur noch **eine Freigabe für `CREATE TABLE public.jira_feldpflege_state`** — ein Schreibvorgang auf die Datenbank, und die Regel dafür lautet „nur nach Freigabe und Quercheck".
-
-Nicht vergessen: der Anspruch muss auch dann zurückgesetzt werden, wenn M-3 den Lauf wegen unverändertem Hash abbricht, sonst blockiert das Ticket bis Fensterende.
+**n8n arbeitet parallele Zweige nacheinander ab.** Zwei Probezweige an einem manuellen Auslöser laufen nicht gleichzeitig; der erste läuft bis zum Ende, ein Fehler dort beendet den Lauf, bevor der zweite beginnt. Für zwei Testfälle braucht es zwei Läufe.
 
 ---
 
-## 5. M-3 Inhaltshash — hängt an M-2
+## 3. Monitoring-Filter — Erkennungsmerkmal gefunden
 
-**M-5 ist jetzt final**, damit ist die Abhängigkeit aufgelöst — solange `MIN_REST_ZEICHEN` und `MIN_REST_ZEICHEN_ZITAT` stehen bleiben. Wer sie ändert, entwertet alle Hashes auf einen Schlag.
+Der Node `Filter Automated Ticket Creator` in `RAG-JIRA-Ingest` (`ESVtaoyTfaP3jm2G`) prüft im Betrieb Reporter und Ersteller gegen drei Konto-IDs, die Token `rwg_automate`, `rwg.automate`, `managed.monitoring`, `defender-noreply`, `defender`, das Summary-Präfix `[Managed | Monitoring]` und die Muster `intune-checker`, `snipe-checker`, `bericht zu kritischen events`, `aufgabenwarteschlangenprotokoll`, `siem`, `new vulnerabilities notification`. Erprobt.
 
-Der Schattenlauf über mindestens 20 Ereignisse bleibt Voraussetzung fürs Scharfschalten.
+Er gehört in `Ticketereignis pruefen` direkt hinter `IGNORIERTE_KONTEN`; der Webhook liefert Reporter und Summary mit. Kein neuer Node.
+
+**Noch offen:** ob „Automate" heißt, dass auch Tickets mit RWG.Automate als Reporter übersprungen werden. Der Filter ist **nicht ergebnisneutral**, der Volumenanteil ist nicht gemessen — aus der Sammelschließung vom 03.09. lässt er sich abschätzen: von 34 geschlossenen Tickets trugen 19 ein Monitoring- oder Defender-Muster.
 
 ---
 
-## 6. Reihenfolge für die nächste Sitzung
+## 4. M-3 Inhaltshash
 
-1. **Erste Produktivläufe ansehen** — `bereinigung`-Zähler, Prompt-Tokens, und ob eine Einstufung abweicht.
-2. **Zwei Angaben zum Monitoring-Filter klären** (Abschnitt 3), Volumenanteil messen, dann bauen.
-3. **Freigabe für die Zustandstabelle** einholen, dann M-2 mit 4 Minuten.
-4. Erst danach M-3 mit Schattenlauf.
+Die Tabelle trägt `content_hash`, `last_evaluated_at`, `last_level`, `last_priority` bereits. M-5 ist final, solange die Zeichengrenzen 40/120 stehen. Schattenlauf über mindestens 20 Ereignisse bleibt Voraussetzung. Zu beachten: Die Zeile wird bei Abschluss gelöscht — ein wiedereröffnetes Ticket wird einmal neu bewertet, das ist gewollt.
+
+---
+
+## 5. Reihenfolge für die nächste Sitzung
+
+1. **Erste echte Schwärme ansehen** — Läufe unter 100 ms am IF, `zeilenEntfernt` bei Abschlussereignissen, Tabelle nur mit Tickets in Bearbeitung.
+2. **Monitoring-Filter:** die Automate-Frage klären, dann bauen.
+3. Danach M-3 mit Schattenlauf.
 
 Eine Woche nach dem 03.09. gegen die Ausgangsmessung vergleichen: Median Prompt 2.668 Tokens, Anteil `no_change` 91 Prozent, Modellquote 58 Prozent, rund 240 Läufe pro Tag.
-
----
-
-## 7. Zwei Notizen zum Werkzeug
-
-**Ein Bash-Heredoc verkürzt Backslashes.** Beim Schreiben der Regexe wurde `\\?\\?` still zu `\?\?`. Der Code blieb syntaktisch gültig und hätte anders gematcht. Code-Nodes über den Write-Weg schreiben, nicht über Heredocs — und danach zurücklesen.
-
-**Für n8n reicht der claude.ai-Konnektor.** Er ist bereits authentifiziert und deckt alles ab. Ein zusätzlicher `n8n-mcp`-Eintrag in `.mcp.json` lief in eine Zeitüberschreitung nach 30 Sekunden und ist überflüssig.
