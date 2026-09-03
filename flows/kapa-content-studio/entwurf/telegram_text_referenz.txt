@@ -1,0 +1,20 @@
+=<b>Beitrag nicht freigegeben</b>
+
+<b>Thema:</b> {{ $json.topic || $json.uc_name || 'unbekannt' }}
+<b>Saeule:</b> {{ $json.pillar || '-' }}
+<b>Quelle:</b> {{ $json.source_mode || '-' }}
+<b>Eignung:</b> {{ $json.eignung }}
+
+<b>Befunde ({{ $json.qa_issue_count }}):</b>
+{{ String($json.qa_issues || '').split(' | ').map(function(s){ return '- ' + s; }).join('\n') }}
+
+<b>Kennzahlen:</b>
+Antwortblock {{ $json.qa_antwortblock_woerter }} Woerter (30 bis 80)
+Satzlaenge {{ $json.qa_satzlaenge_schnitt }} im Schnitt
+{{ $json.qa_absaetze }} Absaetze
+Text {{ String($json.linkedin_text || '').length }} Zeichen
+
+<b>Wochenvorschau:</b>
+{{ $('Thema waehlen').first().json.slot_vorschau_text }}
+
+Es wurde kein Buffer-Entwurf angelegt.
