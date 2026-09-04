@@ -304,25 +304,60 @@ Beide entsprechen 08:00 und 06:20 **Ortszeit**. Die Instanz steht also bereits a
 
 ---
 
-## 11. Jira-Feldpflege: das Bewertungsmodell ist die Rechnung
+## 11. Jira-Feldpflege: das Bewertungsmodell war die Rechnung
 
-**Neu am 04.09.2026 und damit der größte Hebel überhaupt — zwei Drittel der OpenAI-Rechnung hängen an diesem einen Knoten.**
+**Zwei Drittel der OpenAI-Rechnung hingen an diesem einen Knoten. Am 04.09. nachgemessen: die Aenderungen vom 03.09. haben den Verbrauch dort um rund Faktor 8 gesenkt — der Punkt erledigt sich womoeglich von selbst.**
 
 Die Feldpflege bewertet Support-Level und Betriebssignale mit `gpt-4o`, bei rund 167 Modellaufrufen am Tag und rund 4.000 Eingabetoken je Aufruf. Drei Hebel, aufsteigend nach Risiko:
 
-### 11a. Erst messen, was der Maschinenfilter schon gebracht hat
+### 11a. Was der Filter schon gebracht hat — am 04.09. gemessen
 
-**Kein Umbau, nur nachsehen.** Seit dem 03.09. abends sortiert ein nativer Filter Maschinentickets aus, und Tickets in einem Done-Status werden nicht mehr bewertet. Der gemessene Lauf `114784` war eine Defender-Meldung — genau diese Klasse. Wie viele der 167 täglichen Aufrufe dadurch entfallen, steht in den Läufen der letzten Tage: Läufe unter 100 ms mit `lastNodeExecuted: Maschinentickets aussortieren`.
+**Ergebnis: rund Faktor 8. Damit ist 11c wahrscheinlich hinfällig und 11b nur noch klein.**
 
-Diese Zahl entscheidet, ob 11b und 11c überhaupt noch nötig sind.
+Zwei Wirkungen greifen zusammen, beide seit dem 03.09. abends live: der Maschinenfilter am Eingang und das Sammelfenster, das mehrere Ereignisse zum selben Ticket zu einem Anspruch zusammenzieht.
 
-### 11b. Die Safelinks-URLs aus der Beschreibung werfen
+**Wie viele Läufe überhaupt noch ein Modell erreichen.** Läufe, die über das Sammelfenster gehen, dauern rund 244 Sekunden und rufen danach das Modell; früh beendete liegen unter einer Sekunde. Damit lassen sie sich ohne Einzelabruf zählen.
+
+| Fenster | Läufe | mit Modellaufruf |
+|---|---|---|
+| 03.09., 14:45–16:00 Ortszeit (Stichprobe 40) | 40 | 31 — **78 %** |
+| 04.09., 08:18–09:50 Ortszeit (vollständig) | 57 | 7 — **12 %** |
+
+**Was ein Aufruf noch verbraucht.** Gemessen an zwei echten Läufen:
+
+| Lauf | Ticket | Eingabe | Ausgabe |
+|---|---|---|---|
+| `114784`, 03.09. | SSD-9297, Defender-Schwachstellenmeldung | 3.962 | 152 |
+| `115293`, 04.09. | SSD-9312, echtes Anwenderticket | 2.112 | 157 |
+
+Das ist der zweite Effekt, und er war nicht geplant: **Die teuren Fälle waren gerade die, die der Filter jetzt aussortiert.** Maschinentickets schleppen Safelinks-URLs von je 800 bis 1.000 Zeichen mit; ein von Hand geschriebenes Ticket hat das nicht.
+
+**Hochgerechnet je Tag**, grob und aus einem Fenster von anderthalb Stunden:
+
+- vorher rund 167 Aufrufe × 3.962 Token ≈ 660.000 Eingabetoken
+- nachher rund 39 Aufrufe × 2.112 Token ≈ 82.000 Eingabetoken
+
+**Verhältnis rund 8 zu 1.** Auf die Rechnung übertragen hieße das: die 46,34 $ auf `gpt-4o` fielen in die Größenordnung von 6 $ im Monat.
+
+**Vorsicht mit dieser Zahl.** Sie stammt aus anderthalb Stunden an einem Vormittag. Ticketaufkommen schwankt über den Tag und über die Woche, und der 03.09. war der Tag der abendlichen Sammelschließung. Belastbar wird das erst mit einem vollen Tag und, endgültig, mit der nächsten Monatsabrechnung.
+
+**Was daraus folgt:**
+
+- **11b (Safelinks kürzen)** wirkt jetzt nur noch auf echte Tickets, und die tragen kaum solche URLs. Der Hebel ist von „ein erheblicher Teil von 4.000 Token" auf „wenig" geschrumpft. Zurückgestellt.
+- **11c (kleineres Modell)** war der Vorschlag, weil zwei Drittel der Rechnung an diesem Knoten hingen. Wenn daraus 6 $ im Monat werden, steht das Qualitätsrisiko in keinem Verhältnis mehr. **Vorschlag: nicht machen.**
+- Stattdessen: **eine Woche laufen lassen und die Abrechnung erneut ansehen.** Wenn `gpt-4o` dann tatsächlich einstellig ist, ist das Kostenthema an dieser Stelle erledigt und die nächstgrößte Position ist `gpt-4.1-mini` im Jira-Ingest mit 9,56 $.
+
+### 11b. Die Safelinks-URLs aus der Beschreibung werfen — zurueckgestellt
+
+**Nach der Messung in 11a nur noch ein kleiner Hebel.** Die Beschreibung unten stammt vom Stand vor der Messung.
 
 **Geringes Risiko, sofort machbar.** Im gemessenen Aufruf besteht ein erheblicher Teil der 3.962 Eingabetoken aus drei Outlook-Safelinks-URLs von je rund 800 bis 1.000 Zeichen prozentkodiertem Text. Für die Bewertung von Support-Level und Betriebssignalen trägt keine davon etwas bei.
 
 `Ticketkontext aufbereiten` bereinigt bereits Signaturen. Dieselbe Stelle könnte URLs auf ihren Host kürzen oder ganz ersetzen. Das ist dieselbe Bauart von Änderung, die für die Signaturen schon belegt ist — inklusive der Kennzahl `bereinigung.verworfen`, an der sich die Wirkung ablesen lässt.
 
-### 11c. Modellwechsel auf ein kleines Modell
+### 11c. Modellwechsel auf ein kleines Modell — nicht empfohlen
+
+**Nach der Messung in 11a entfaellt die Begruendung.** Wenn aus 46 $ rund 6 $ werden, steht das Qualitaetsrisiko in keinem Verhaeltnis. Die Ueberlegung bleibt hier stehen, falls die Zahlen sich anders entwickeln.
 
 **Der große Hebel, mit echtem Qualitätsrisiko.** Die Aufgabe ist eine Einstufung nach festen Regeln mit festem Ausgabeschema — keine freie Textproduktion. Genau dafür sind die kleinen Modelle gedacht, und sie kosten je Token um eine Größenordnung weniger.
 
@@ -348,15 +383,16 @@ Damit die Liste nicht suggeriert, es sei nichts passiert:
 
 ## Reihenfolge, wenn nichts dazwischenkommt
 
-Am 04.09. nach der Abrechnung neu geordnet.
+Am 04.09. zweimal neu geordnet: erst nach der Abrechnung, dann nach der Messung in 11a.
 
-1. **Punkt 11a** — messen, was der Maschinenfilter der Feldpflege schon gebracht hat. Kein Umbau. Diese Zahl entscheidet den Rest.
-2. **Punkt 11b** — Safelinks-URLs aus dem Bewertungskontext werfen. Geringes Risiko, wirkt auf zwei Drittel der Rechnung.
-3. **Punkt 11c** — Modellwechsel auf ein kleines Modell, aber nur nach einem Vergleich an zwanzig bis dreissig echten Tickets. Der grosse Hebel mit dem echten Risiko.
-4. **Punkt 9** — Mistral-Abrechnung ansehen. Der einzige groessere Posten, der noch gar nicht beziffert ist.
-5. **Punkt 4 Rest** — messen, wie oft der Loesungscache jetzt greift, und danach ueber Erledigt/Geschlossen entscheiden.
-6. **Punkt 1b und 1c** — Reranker und Denkschritte im Jira-Agenten. Zielen auf neun Prozent; erst wenn oben nichts mehr geht.
-7. **Punkt 2** — Systemtext des Agenten. Dasselbe Neuntel, mehr Aufwand, mehr Risiko. Vorerst zurueckgestellt.
-8. Der Rest nach Lage.
+1. **Nichts bauen, eine Woche laufen lassen.** Die Aenderungen vom 03.09. haben den groessten Posten laut Messung um rund Faktor 8 gesenkt. Das ist an anderthalb Stunden gemessen und muss sich an einem vollen Monat bestaetigen.
+2. **Danach die Abrechnung erneut ansehen.** Ist `gpt-4o` dann einstellig, ist das Kostenthema an der Feldpflege erledigt.
+3. **Punkt 9 — Mistral-Abrechnung.** Der einzige groessere Posten, der noch gar nicht beziffert ist. Unabhaengig von allem anderen.
+4. **Punkt 4 Rest** — messen, wie oft der Loesungscache jetzt greift, danach ueber Erledigt/Geschlossen entscheiden. Zielt auf die 9,56 $ bei `gpt-4.1-mini`, die dann die groesste Position waeren.
+5. **Punkt 1b und 1c** — Reranker und Denkschritte im Jira-Agenten, 9 % der Rechnung.
+6. **Punkt 2** — Systemtext des Agenten. Dasselbe Neuntel, mehr Aufwand, mehr Risiko. Zurueckgestellt.
+7. Der Rest nach Lage.
 
-**Erledigt und aus der Liste genommen:** Punkt 0 (Abrechnung), Punkt 3 (Caching greift bereits), Punkt 6 (Lizenz fuer `rwg_automate@rwg-r.de` ist erteilt).
+**Erledigt und aus der Liste genommen:** Punkt 0 (Abrechnung), Punkt 3 (Caching greift bereits), Punkt 6 (Lizenz erteilt), Punkt 1a (`matchType` behoben), Punkt 4 Nachtrag (Schluessel gesetzt).
+
+**Nicht empfohlen:** Punkt 11c, Modellwechsel an der Feldpflege. Die Begruendung ist mit 11a entfallen.
