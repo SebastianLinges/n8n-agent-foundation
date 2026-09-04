@@ -1,0 +1,6 @@
+=Redaktionell ausgewaehlte Meldungen des Tages (JSON, bereits Blocklist-gefiltert):
+{{ $json.payload }}
+
+Anzahl: {{ $json.count }}
+
+Antworte ausschliesslich mit JSON.
