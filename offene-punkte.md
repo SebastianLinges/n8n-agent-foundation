@@ -59,12 +59,13 @@ Die 43 offenen Use Cases im Pool stammen damit saemtlich aus der Zeit vor dem 20
 
 Der Engpass sitzt also in **WF-2 (`KI Daily - Analyze & Deliver`, `objM2PQrcTpEzik7`)**, wo der Business Scout aus Meldungen Use Cases macht.
 
-**Zu pruefen, in dieser Reihenfolge:**
+**Am 04.09. geklaert. Es ist kein Fehler, sondern eine Nebenwirkung.**
 
-1. Laeuft der Business-Scout-Zweig ueberhaupt noch? WF-2 feuert Mo/Mi/Fr und ist gelaufen - aber schreibt der Zweig, oder endet er vorher?
-2. Der Takt hat sich geaendert. Bis zum 20.08. entstanden **taeglich** Use Cases, WF-2 laeuft heute Mo/Mi/Fr. Der Wechsel faellt zeitlich mit dem Versiegen zusammen.
-3. WF-2 wurde am 30.08. zuletzt geaendert. Was hat sich dabei am Scout-Zweig geaendert?
-4. Die 14-Tage-Themendedup vor der Redaktion: Verwirft sie inzwischen alles, weil der Bestand zu aehnlich ist?
+Gemessen am Lauf `113285` vom 02.09.: `Redaktionsauswahl aufbereiten` gab sauber 5 Kandidaten aus, der Business Scout lief mit 1.219 Eingabe- und **5 Ausgabetoken** und antwortete `[]`. Das Modell hat korrekt entschieden - seine fuenf Kandidaten waren ein Forschungsprojekt zur Kunststoffsortierung, ein Datenartikel, eine Siemens-Meldung zur EU-Regulierung, ein ERP-Anbieterbeitrag und ein Magazinstueck. Daraus laesst sich kein Anwendungsfall bauen.
+
+Die Ursache steht als Kommentar im Flow: Seit einer Aenderung sehen die Scouts **nur noch die redaktionell ausgewaehlten Meldungen** statt des Top-40-Rohpools. Die Redaktion waehlt nach Nachrichtenwert, der Scout braucht beschriebene Arbeitsschritte - zwei verschiedene Massstaebe, und die Menge fiel von 40 auf 5.
+
+**Der ausgearbeitete Plan mit vier Arbeitspaketen, Messwerten und offenen Entscheidungen steht in [flows/kapa-ki-daily-analyze/auftrag-scout-versorgung.md](flows/kapa-ki-daily-analyze/auftrag-scout-versorgung.md).** Kurzfassung der Reihenfolge: sechs Handwerk-Use-Cases als Sofortmassnahme, dann eine Bilanzzeile im Knoten `use_cases aufbereiten` (heute verschluckt ein `catch` jeden Parserfehler still), dann die breitere Versorgung des Scouts, dann die Ankerregel in seinem Prompt.
 
 **Erst danach ueber neue Quellen reden.** Mehr Feeds fuellen ein Rohr, das weiter unten verstopft ist. Die Kammer-Idee steht in [ideen.md](ideen.md) und bleibt dort, bis dieser Punkt geklaert ist.
 
