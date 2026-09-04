@@ -2,7 +2,7 @@
 
 Stand 04.09.2026. Aufgenommen, nachdem Feldpflege und Content Studio abgearbeitet waren und die Frage aufkam, wo insgesamt noch Modellkosten entstehen.
 
-Die Liste ist nach **gemessenem Verbrauch** sortiert, nicht nach Bauchgefühl. Wo etwas geschätzt ist, steht es dabei.
+Die Liste ist nach **gemessenen Kosten** sortiert. Bis zum 04.09. stand sie nach Tokenmenge — das war richtig gezaehlt und trotzdem falsch gewichtet. Die Abrechnung in Punkt 0 hat die Rangfolge umgeworfen. Wo etwas geschaetzt ist, steht es dabei.
 
 ## Was diese Zahlen sind — und was nicht
 
@@ -14,13 +14,42 @@ Zweite Einschränkung: Die Instanz hält nur rund **5.000 Ausführungen** vor, �
 
 ---
 
-## 0. Zuerst: die Rechnung neben die Messung legen
+## 0. Die Abrechnung — beantwortet am 04.09.2026
 
-**Aufwand: 20 Minuten. Kein Umbau.**
+**Damit ist die Rangfolge dieser Liste umgeworfen.** Sie stand vorher nach Tokenmenge. Die Tokenmengen waren richtig gezählt, aber falsch gewichtet.
 
-Die Tagesbeträge aus dem OpenAI-Dashboard (nach Modell aufgeschlüsselt) und aus der Mistral-Abrechnung neben die Laufzahlen unten legen. Erst dann ist entschieden, ob die Arbeit in den Jira-Agenten oder in das SharePoint-OCR gehört.
+OpenAI, Organisation RWG, 30 Tage vom 05.08. bis 04.09., **67,59 $ gesamt**, 50,97 Mio. Token, 11.598 Anfragen. Nach Modell aufgeschlüsselt (Eingabe, zwischengespeicherte Eingabe und Ausgabe zusammengezogen):
 
-Ohne diesen Schritt optimieren wir an der Tokenzahl statt an der Rechnung. Die beiden müssen nicht dasselbe sagen: `gpt-5.4` kostet je Token ein Vielfaches von `gpt-4.1-mini`, und Mistral-OCR rechnet nach Seiten statt nach Token.
+| Modell | Kosten | Anteil |
+|---|---|---|
+| **gpt-4o** | **46,34 $** | **69 %** |
+| gpt-4.1-mini | 9,56 $ | 14 % |
+| gpt-5.4 | 6,16 $ | 9 % |
+| gpt-4o-mini | 2,21 $ | 3 % |
+| gpt-image-1 | 1,51 $ | 2 % |
+| gpt-5.4-mini | 0,91 $ | 1 % |
+| Websuche | 0,61 $ | 1 % |
+| text-embedding-3-small | 0,29 $ | 0,4 % |
+
+Die Summe stimmt auf den Cent mit der Dashboard-Angabe überein.
+
+### Drei Befunde
+
+**1. Zwei Drittel der Rechnung sind ein einziges Modell an einer einzigen Stelle.** `gpt-4o` nutzen laut Inventur vier Knoten: drei im Content Studio und einer in `KI Daily - Analyze` — die laufen dreimal die Woche und fallen nicht ins Gewicht — und das **Bewertungsmodell der Jira-Feldpflege**, das bei rund 317 Ticketereignissen am Tag hängt.
+
+Gegengerechnet: 27,29 $ nicht zwischengespeicherte Eingabe plus 11,31 $ zwischengespeicherte ergeben rund 20 Mio. Eingabetoken in 30 Tagen. Bei rund 4.000 Token je Aufruf sind das etwa 5.000 Aufrufe, also **rund 167 am Tag** — gut die Hälfte der Ticketereignisse. Das passt zur Beobachtung, dass die meisten Läufe 2 bis 5 Sekunden dauern.
+
+**Gemessen am Lauf `114784` vom 03.09.:** Ticket SSD-9297, `Bewertungsmodell` auf `gpt-4o`, **3.962 Eingabe- und 152 Ausgabetoken**. Das Ticket war eine Defender-Schwachstellenmeldung — also genau die Klasse, die der Maschinenfilter seit dem 03.09. abends aussortiert. Wie viel das bereits gebracht hat, zeigt erst die Messung.
+
+**2. Der Jira-Agent, an dem ich zwei Tage gemessen habe, ist neun Prozent.** Die 55.924 Eingabetoken je Ticketlauf sind real, aber es sind nur elf Läufe am Tag. Die Feldpflege ruft ein Fünfzehntel davon je Lauf, aber fünfzehnmal so oft — und `gpt-4o` kostet je Token ein Vielfaches von dem, was diese Rechnung an `gpt-5.4` zeigt, weil dort der Löwenanteil im Cache landet.
+
+**3. Prompt-Caching ist bereits aktiv.** 11,89 $ der Rechnung entfallen auf zwischengespeicherte Eingabe, verteilt über `gpt-4o`, `gpt-5.4`, `gpt-5.4-mini`, `gpt-4.1-mini` und `gpt-4o-mini`. Der frühere Punkt 3 dieser Liste — „Caching prüfen" — ist damit erledigt: Es greift, ohne dass etwas zu tun wäre.
+
+### Was diese Zahlen nicht beantworten
+
+- **Mistral fehlt.** Das nächtliche SharePoint-OCR und der Contract Loader rechnen dort ab, nach Seiten statt nach Token. Punkt 9 bleibt offen, bis die Mistral-Abrechnung danebenliegt.
+- **Ob die KAPA-Flows in dieselbe Abrechnung laufen.** Die Auswertung ist die Organisation RWG. Sollte das Content Studio auf einem eigenen Zugang liegen, ist `gpt-4o` hier praktisch ausschließlich die Feldpflege — und der Hebel noch eindeutiger.
+- **Die Wirkung der Änderungen vom 03.09.** Der Maschinenfilter lief erst am Abend an; die 30 Tage decken fast nur die Zeit davor ab.
 
 ---
 
@@ -149,7 +178,7 @@ Zum Vergleich: Der Teams-Agent trägt 10.457 Zeichen (~2.600 Token) im Systemtex
 
 ---
 
-## 3. Prompt-Caching prüfen
+## 3. ~~Prompt-Caching prüfen~~ — erledigt, es greift bereits
 
 **Aufwand: eine Stunde Prüfung. Wenn es greift, der billigste Hebel von allen — ohne jede inhaltliche Änderung.**
 
@@ -216,15 +245,13 @@ Erst wenn feststeht, wie viele Ereignisse wirklich ein Modell erreichen, lohnt d
 
 ---
 
-## 6. Der Monitor-Flow scheitert alle 15 Minuten
+## 6. ~~Der Monitor-Flow scheitert alle 15 Minuten~~ — erledigt
 
-**Aufwand: 15 Minuten Ansehen. Kostet keine Token, aber es ist der lauteste Abfall in der Instanz.**
+`RWG Monitor - Microsoft Graph & Teams` (`1OcqfC4wTC9bj0wK`) meldete bei jedem Lauf einen Fehler und zog jedes Mal `Telegram_Error_Info` hinterher — 96 Meldungen am Tag.
 
-`RWG Monitor - Microsoft Graph & Teams` (`1OcqfC4wTC9bj0wK`) endet bei **jedem** Lauf mit Fehler und zieht jedes Mal `Telegram_Error_Info` hinterher. In den vorgehaltenen Ausführungen: 43 gescheiterte Läufe, davon 33 allein zwischen dem 03.09. abends und dem 04.09. früh, im 15-Minuten-Takt.
+Er war nicht defekt, sondern hat seine Aufgabe erfüllt: Dem Automatisierungskonto `rwg_automate@rwg-r.de` fehlte die Office-365-Lizenz, `GET /me/chats` antwortete mit HTTP 403. **Am 04.09. hat das Konto eine Lizenz bekommen.** Der Alarm sollte damit von selbst aufhören.
 
-Der Flow hat keinen Export im Repo und keine Beschreibung. Zu klären: Wird er noch gebraucht? Wenn ja, reparieren; wenn nein, abschalten. Solange er läuft, verrauscht er die Fehlermeldungen, in denen echte Störungen stehen sollten.
-
----
+**Nachzusehen:** ob seither noch Fehlläufe entstehen. Wenn ja, ist es doch ein zweites Problem.
 
 ## 7. Content Studio: die fünf offenen Entscheidungen
 
@@ -277,6 +304,34 @@ Beide entsprechen 08:00 und 06:20 **Ortszeit**. Die Instanz steht also bereits a
 
 ---
 
+## 11. Jira-Feldpflege: das Bewertungsmodell ist die Rechnung
+
+**Neu am 04.09.2026 und damit der größte Hebel überhaupt — zwei Drittel der OpenAI-Rechnung hängen an diesem einen Knoten.**
+
+Die Feldpflege bewertet Support-Level und Betriebssignale mit `gpt-4o`, bei rund 167 Modellaufrufen am Tag und rund 4.000 Eingabetoken je Aufruf. Drei Hebel, aufsteigend nach Risiko:
+
+### 11a. Erst messen, was der Maschinenfilter schon gebracht hat
+
+**Kein Umbau, nur nachsehen.** Seit dem 03.09. abends sortiert ein nativer Filter Maschinentickets aus, und Tickets in einem Done-Status werden nicht mehr bewertet. Der gemessene Lauf `114784` war eine Defender-Meldung — genau diese Klasse. Wie viele der 167 täglichen Aufrufe dadurch entfallen, steht in den Läufen der letzten Tage: Läufe unter 100 ms mit `lastNodeExecuted: Maschinentickets aussortieren`.
+
+Diese Zahl entscheidet, ob 11b und 11c überhaupt noch nötig sind.
+
+### 11b. Die Safelinks-URLs aus der Beschreibung werfen
+
+**Geringes Risiko, sofort machbar.** Im gemessenen Aufruf besteht ein erheblicher Teil der 3.962 Eingabetoken aus drei Outlook-Safelinks-URLs von je rund 800 bis 1.000 Zeichen prozentkodiertem Text. Für die Bewertung von Support-Level und Betriebssignalen trägt keine davon etwas bei.
+
+`Ticketkontext aufbereiten` bereinigt bereits Signaturen. Dieselbe Stelle könnte URLs auf ihren Host kürzen oder ganz ersetzen. Das ist dieselbe Bauart von Änderung, die für die Signaturen schon belegt ist — inklusive der Kennzahl `bereinigung.verworfen`, an der sich die Wirkung ablesen lässt.
+
+### 11c. Modellwechsel auf ein kleines Modell
+
+**Der große Hebel, mit echtem Qualitätsrisiko.** Die Aufgabe ist eine Einstufung nach festen Regeln mit festem Ausgabeschema — keine freie Textproduktion. Genau dafür sind die kleinen Modelle gedacht, und sie kosten je Token um eine Größenordnung weniger.
+
+Das ist **nicht** nebenbei zu entscheiden. Die Einstufung schreibt in echte Jira-Tickets, und `confidence HIGH` verlangt eine wörtliche Fundstelle als Beleg — das ist genau die Art Anforderung, an der kleinere Modelle scheitern können.
+
+**Vorgehen, wenn überhaupt:** Zwanzig bis dreißig echte Tickets mit bekannter Einstufung durch beide Modelle schicken, ohne zu schreiben, und die Ergebnisse Feld für Feld vergleichen — `level`, `confidence`, `scope`, `businessImpact`, `securityRisk`. Erst wenn das kleine Modell dieselben Einstufungen mit derselben Belegqualität liefert, ist der Wechsel vertretbar. Weicht es ab, bleibt es bei `gpt-4o`, und 11a plus 11b sind das Erreichbare.
+
+---
+
 ## Was schon erledigt ist
 
 Damit die Liste nicht suggeriert, es sei nichts passiert:
@@ -287,25 +342,21 @@ Damit die Liste nicht suggeriert, es sei nichts passiert:
 | 03.09. | Content Studio: Videostrang entfernt | ein `gpt-4o-mini`-Aufruf je Lauf, auch vor jeder Ablehnung |
 | 03.09. | Content Studio: Ankerfilter vor der Themenwahl | kein Modellaufruf für Themen, die die eigene Prüfung nicht bestehen können |
 | 04.09. | Jira-Agent: `matchType` in `Jira-Altfall lesen` | das Werkzeug liefert wieder den angefragten Vorgang statt eines zufälligen fremden |
+| 04.09. | Lizenz für `rwg_automate@rwg-r.de` erteilt | der 15-Minuten-Alarm des Healthchecks sollte aufhören |
 | 04.09. | Jira-Ingest: Lösungsschlüssel für 1.274 Chunks nachgetragen | der Cache kann überhaupt erst greifen; Wirkung noch nachzumessen |
 | 02.09. | Contract Loader auf `mistral-medium` | Beleg mit echter neuer Datei steht noch aus |
 
 ## Reihenfolge, wenn nichts dazwischenkommt
 
-Am 04.09. neu geordnet, nachdem zwei Befunde dazugekommen sind, die nicht warten sollten.
+Am 04.09. nach der Abrechnung neu geordnet.
 
-**Zuerst, weil es Fehler sind und keine Sparmaßnahmen:**
+1. **Punkt 11a** — messen, was der Maschinenfilter der Feldpflege schon gebracht hat. Kein Umbau. Diese Zahl entscheidet den Rest.
+2. **Punkt 11b** — Safelinks-URLs aus dem Bewertungskontext werfen. Geringes Risiko, wirkt auf zwei Drittel der Rechnung.
+3. **Punkt 11c** — Modellwechsel auf ein kleines Modell, aber nur nach einem Vergleich an zwanzig bis dreissig echten Tickets. Der grosse Hebel mit dem echten Risiko.
+4. **Punkt 9** — Mistral-Abrechnung ansehen. Der einzige groessere Posten, der noch gar nicht beziffert ist.
+5. **Punkt 4 Rest** — messen, wie oft der Loesungscache jetzt greift, und danach ueber Erledigt/Geschlossen entscheiden.
+6. **Punkt 1b und 1c** — Reranker und Denkschritte im Jira-Agenten. Zielen auf neun Prozent; erst wenn oben nichts mehr geht.
+7. **Punkt 2** — Systemtext des Agenten. Dasselbe Neuntel, mehr Aufwand, mehr Risiko. Vorerst zurueckgestellt.
+8. Der Rest nach Lage.
 
-1. ~~**Punkt 1a** — `matchType` in `Jira-Altfall lesen`.~~ **Erledigt am 04.09.**, publiziert als `23b634fd`.
-2. **Punkt 6** — Lizenz für `rwg_automate@rwg-r.de`. Der Healthcheck meldet seit Tagen korrekt, dass sie fehlt.
-
-**Dann, weil sie die Reihenfolge des Restes bestimmen:**
-
-3. **Punkt 0** — Abrechnung neben die Messung legen, mit dem Blick auf zwischengespeicherte Eingabetoken (das beantwortet zugleich Punkt 3).
-
-**Dann die eigentlichen Sparmaßnahmen:**
-
-4. ~~**Punkt 4** — Lösungsschlüssel nachtragen.~~ **Erledigt am 04.09.** Jetzt messen, wie viele der abendlichen Läufe noch extrahieren.
-5. **Punkt 1b und 1c** — Reranker von 8 auf 5, Zahl der Denkschritte prüfen.
-6. **Punkt 2** — Systemtext kürzen.
-7. Der Rest nach Lage.
+**Erledigt und aus der Liste genommen:** Punkt 0 (Abrechnung), Punkt 3 (Caching greift bereits), Punkt 6 (Lizenz fuer `rwg_automate@rwg-r.de` ist erteilt).
