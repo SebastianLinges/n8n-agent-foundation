@@ -167,7 +167,7 @@ Das Ticket war seit dem 27.08. gelöst. Der Statuswechsel Erledigt → Geschloss
 
 Nach dem Stand vom 03.09. haben **115 von 1.389** Lösungschunks einen Schlüssel. Die übrigen 1.274 lösen bei **jeder** Berührung eine Neuextraktion aus.
 
-**Stand 04.09.: geprüft, SQL liegt vor, wartet auf Freigabe.**
+**Stand 04.09.: erledigt.** UPDATE 1274, Lauf 115140. Alle 1.390 Lösungschunks tragen jetzt einen Schlüssel, keiner mehr ohne.
 Alles Folgende ist lesend an der Wissensbasis gemessen; geschrieben wurde nichts.
 
 - 1.389 Lösungschunks, **115 mit Schlüssel, 1.274 ohne**. Alle 1.274 tragen `content_hash`, `status` und `resolution` in den Metadaten — der Schlüssel ist also rechnerisch ableitbar.
@@ -179,7 +179,9 @@ Alles Folgende ist lesend an der Wissensbasis gemessen; geschrieben wurde nichts
 
 Eine Korrektur zur ersten Annahme: Die 1.274 sind **nicht** einfach „die älteren". Beide Gruppen überlappen zeitlich. Die 115 sind die, die seit Einführung der Cache-Logik einmal angefasst wurden.
 
-Das vorbereitete SQL mit Probelauf, Nachweis und Rücknahme steht in [flows/rag-jira-ingest/loesungsschluessel-nachtrag.sql](flows/rag-jira-ingest/loesungsschluessel-nachtrag.sql). Es ändert ausschließlich zwei Schlüssel innerhalb von `metadata`; `chunk_text` und `embedding` bleiben unberührt.
+Das SQL mit Probelauf, Nachweis und Rücknahme steht in [flows/rag-jira-ingest/loesungsschluessel-nachtrag.sql](flows/rag-jira-ingest/loesungsschluessel-nachtrag.sql). Geändert wurden ausschließlich Schlüssel innerhalb von `metadata`; `chunk_text` und `embedding` blieben unberührt.
+
+**Nachweis nach dem Lauf:** Die Gegenprobe über den gesamten Bestand reproduziert jeden Schlüssel exakt — 116 ursprüngliche und 1.274 nachgetragene, null Abweichungen. Das Statement ist zudem selbstbegrenzend: Ein zweiter Lauf träfe null Zeilen.
 
 **Danach:** messen, wie viele der abendlichen Läufe noch extrahieren. **Erst dann** entscheiden, ob Erledigt → Geschlossen den Chunk überhaupt neu erzeugen soll — möglicherweise erledigt sich die Frage von selbst.
 
@@ -271,6 +273,7 @@ Damit die Liste nicht suggeriert, es sei nichts passiert:
 | 03.09. | Feldpflege: Maschinentickets als nativer Filter am Eingang, Sammelfenster, keine Bewertung bei Done-Status | verhindert `gpt-4o`-Aufrufe, Wirkung noch nachzumessen |
 | 03.09. | Content Studio: Videostrang entfernt | ein `gpt-4o-mini`-Aufruf je Lauf, auch vor jeder Ablehnung |
 | 03.09. | Content Studio: Ankerfilter vor der Themenwahl | kein Modellaufruf für Themen, die die eigene Prüfung nicht bestehen können |
+| 04.09. | Jira-Ingest: Lösungsschlüssel für 1.274 Chunks nachgetragen | der Cache kann überhaupt erst greifen; Wirkung noch nachzumessen |
 | 02.09. | Contract Loader auf `mistral-medium` | Beleg mit echter neuer Datei steht noch aus |
 
 ## Reihenfolge, wenn nichts dazwischenkommt
@@ -288,7 +291,7 @@ Am 04.09. neu geordnet, nachdem zwei Befunde dazugekommen sind, die nicht warten
 
 **Dann die eigentlichen Sparmaßnahmen:**
 
-4. **Punkt 4** — Lösungsschlüssel nachtragen. SQL liegt vor, geprüft, wartet nur auf die Ausführung.
+4. ~~**Punkt 4** — Lösungsschlüssel nachtragen.~~ **Erledigt am 04.09.** Jetzt messen, wie viele der abendlichen Läufe noch extrahieren.
 5. **Punkt 1b und 1c** — Reranker von 8 auf 5, Zahl der Denkschritte prüfen.
 6. **Punkt 2** — Systemtext kürzen.
 7. Der Rest nach Lage.

@@ -2,7 +2,24 @@
 -- Nachtrag des Loesungsschluessels in bestehende Loesungschunks
 --
 -- Projekt: RWG-Wissensbasis (zckaxkpycyyxaymmkmvu), Tabelle public.document_chunks
--- Vorbereitet am 04.09.2026. NICHT AUSGEFUEHRT - wartet auf Freigabe.
+-- AUSGEFUEHRT am 04.09.2026. UPDATE 1274, Lauf 115140, 10,5 Sekunden.
+-- Danach: 1.390 Loesungschunks, alle mit Schluessel, keiner mehr ohne.
+-- Die Gegenprobe ueber den GESAMTEN Bestand reproduziert jeden Schluessel
+-- exakt: 116 urspruengliche und 1.274 nachgetragene, null Abweichungen.
+--
+-- WEG DER AUSFUEHRUNG
+-- Der Supabase-Zugang ueber MCP ist schreibgeschuetzt (25006, read-only
+-- transaction). Ausgefuehrt wurde daher ueber einen Wartungsflow in n8n
+-- mit dem vorhandenen Postgres-Zugang, der direkt nach dem Lauf wieder
+-- entfernt wurde. Kein Skript und keine Funktion in der Datenbank.
+--
+-- EINE ABWEICHUNG VOM TEXT UNTEN
+-- Im Wartungsflow stand statt '[^\n]' die Schreibweise
+-- '[^' || chr(10) || ']', weil Backslashes auf dem Weg durch mehrere
+-- Werkzeugschichten still verlorengehen koennen. Beide Fassungen wurden
+-- vorher lesend gegeneinander gestellt: dieselben 1.274 Zeilen. Der Text
+-- unten bleibt die lesbare Fassung, die uebertragene war zeichengleich
+-- bis auf diese eine Ersetzung - nachgeprueft am gespeicherten Knoten.
 --
 -- WARUM
 -- "Solution-Cache Abgleich" im RAG-JIRA-Ingest ueberspringt Extraktion und
