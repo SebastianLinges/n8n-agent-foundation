@@ -85,7 +85,7 @@ Die Folgen wiegen schwerer als die Token: Der Agent stützt seine Analyse auf ei
 
 **Die Behebung ist ein Parameter:** `matchType: "allFilters"`.
 
-**Stand 04.09.: nachgewiesen und im Entwurf gesetzt, noch nicht publiziert.** An einem Wegwerfflow (Lauf `115205`, vier unabhängige Zweige, danach archiviert) wurde die Filterkombination mit festen Werten nachgebaut:
+**Stand 04.09.: behoben und publiziert** als `23b634fd`, Rueckfallpunkt `4654fda5`. An einem Wegwerfflow (Lauf `115205`, vier unabhängige Zweige, danach archiviert) wurde die Filterkombination mit festen Werten nachgebaut:
 
 | Fall | Einstellung | Gefragt | Ergebnis |
 |---|---|---|---|
@@ -96,7 +96,7 @@ Die Folgen wiegen schwerer als die Token: Der Agent stützt seine Analyse auf ei
 
 Fall D liefert exakt dasselbe falsche Ticket wie der echte Agentenlauf `114645`. Der Fehler ist damit reproduziert, nicht vermutet.
 
-Der Entwurf `23b634fd` unterscheidet sich von der aktiven Fassung `4654fda5` in genau einer Sache: `matchType` von nicht gesetzt auf `allFilters`. 81 Knoten in beiden, Verbindungen identisch, Filterbedingungen byte-identisch. Rückfallpunkt ist `4654fda5`.
+Publiziert wurde genau ein Unterschied: `matchType` von nicht gesetzt auf `allFilters`. 81 Knoten vorher wie nachher, Verbindungen identisch, Filterbedingungen byte-identisch. In der Live-Fassung nachgeprueft.
 
 ### 1b. Die Wissenssuche schickt zu jedem Treffer den kompletten Metadatenblock mit
 
@@ -286,6 +286,7 @@ Damit die Liste nicht suggeriert, es sei nichts passiert:
 | 03.09. | Feldpflege: Maschinentickets als nativer Filter am Eingang, Sammelfenster, keine Bewertung bei Done-Status | verhindert `gpt-4o`-Aufrufe, Wirkung noch nachzumessen |
 | 03.09. | Content Studio: Videostrang entfernt | ein `gpt-4o-mini`-Aufruf je Lauf, auch vor jeder Ablehnung |
 | 03.09. | Content Studio: Ankerfilter vor der Themenwahl | kein Modellaufruf für Themen, die die eigene Prüfung nicht bestehen können |
+| 04.09. | Jira-Agent: `matchType` in `Jira-Altfall lesen` | das Werkzeug liefert wieder den angefragten Vorgang statt eines zufälligen fremden |
 | 04.09. | Jira-Ingest: Lösungsschlüssel für 1.274 Chunks nachgetragen | der Cache kann überhaupt erst greifen; Wirkung noch nachzumessen |
 | 02.09. | Contract Loader auf `mistral-medium` | Beleg mit echter neuer Datei steht noch aus |
 
@@ -295,7 +296,7 @@ Am 04.09. neu geordnet, nachdem zwei Befunde dazugekommen sind, die nicht warten
 
 **Zuerst, weil es Fehler sind und keine Sparmaßnahmen:**
 
-1. **Punkt 1a** — `matchType` in `Jira-Altfall lesen`. **Nachgewiesen, im Entwurf gesetzt, wartet auf das Publizieren.**
+1. ~~**Punkt 1a** — `matchType` in `Jira-Altfall lesen`.~~ **Erledigt am 04.09.**, publiziert als `23b634fd`.
 2. **Punkt 6** — Lizenz für `rwg_automate@rwg-r.de`. Der Healthcheck meldet seit Tagen korrekt, dass sie fehlt.
 
 **Dann, weil sie die Reihenfolge des Restes bestimmen:**

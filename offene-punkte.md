@@ -38,6 +38,8 @@ Nichts davon ist zu tun, alles davon ist nachzusehen.
 | SharePoint-Abgleich | 03:30 | 15 Einlesungen, Rückstand danach rund 356 Dateien |
 | Jira-Feldpflege | bei jedem Ticketereignis | Seit dem 03.09. abends live (`1e43e7b3`): Signaturbereinigung, Sammelfenster, und Maschinentickets wie Tickets in einem Done-Status werden nicht mehr bewertet (beides bewusst nicht ergebnisneutral). Vier Dinge nachsehen: Läufe unter 100 ms mit `lastNodeExecuted: Ticketereignis pruefen` — das sind die verworfenen Klassen; `bereinigung.verworfen` am Node `Ticketkontext aufbereiten` (deutlich über null heißt, die Muster greifen nicht); Läufe unter 100 ms mit `lastNodeExecuted: Anspruch erhalten?` — das sind die eingesparten Schwarm-Aufrufe, der Beleg dafür, dass das Fenster im Echtbetrieb wirkt; und ob eine Einstufung von der bisherigen abweicht. Die Tabelle `jira_feldpflege_state` sollte nur Tickets in Bearbeitung enthalten |
 
+| Jira-Agent | nächster Ticketlauf | Seit dem 04.09. live (`23b634fd`): `Jira-Altfall lesen` filtert mit `allFilters` statt mit der ODER-Vorgabe. Nachzusehen ist am nächsten Lauf, in dem der Agent das Werkzeug ruft: Kommt der Vorgang zurück, nach dem er gefragt hat? Vorher kam ein beliebiger. Zu finden über `get_execution` am Knoten `Jira-Altfall lesen` - der angefragte `ticket_key` steht im `inputOverride`, der gelieferte in der Ausgabe |
+
 **Danach scharf schalten:** `probelauf` im Jira-Nachzügler auf `false`. Eine Zeile in `Nachzuegler Steuerung`. Solange er auf `true` steht, meldet der Zweig nur.
 
 ## Wartet auf eine Entscheidung

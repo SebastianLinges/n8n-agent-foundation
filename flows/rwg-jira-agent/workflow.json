@@ -2,6 +2,12 @@
   "id": "QXCWIsTzDEmfwPwK",
   "name": "RWG_Jira-Agent",
   "active": true,
+  "isArchived": false,
+  "versionId": "23b634fd-5fb5-4f91-9209-2114b8a93b1f",
+  "activeVersionId": "23b634fd-5fb5-4f91-9209-2114b8a93b1f",
+  "triggerCount": 2,
+  "createdAt": "2026-07-19T13:13:30.872Z",
+  "updatedAt": "2026-09-04T06:23:54.201Z",
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": true,
@@ -1656,7 +1662,8 @@
               "keyValue": "={{ $(\"Ticketkontext aufbereiten\").first().json.ticketKey }}"
             }
           ]
-        }
+        },
+        "matchType": "allFilters"
       },
       "id": "1b781a71-f608-486f-9188-5f6fd7e12dc5",
       "name": "Jira-Altfall lesen",
@@ -3002,5 +3009,12 @@
     }
   ],
   "nodeGroups": [],
+  "tags": [],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true
+  },
+  "parentFolderId": null,
   "description": "Beantwortet neu angelegte SSD-Tickets. Maschinenticket-Filter, Recherchepflicht ueber semantische Suche, Volltextsuche und Herstellerrecherche, Public-Retrieval mit Evidenzschranke, Redundanzpruefung der Rueckfragen. Je Ticket eine Aktion."
 }

@@ -2,6 +2,51 @@
 
 Workflow `RWG_Jira-Agent` (`QXCWIsTzDEmfwPwK`), aktiv, 75 Nodes, Jira-Trigger auf `Project = SSD`, Ereignis `jira:issue_created`.
 
+## Behoben am 04.09.2026: `Jira-Altfall lesen` gab das falsche Ticket zurueck
+
+Das Werkzeug soll genau einen Altfall vollstaendig lesen, den der Agent zuvor
+in der Wissenssuche gefunden hat. Es hat stattdessen ein beliebiges fremdes
+Ticket geliefert.
+
+Der Knoten traegt zwei Bedingungen auf derselben Spalte:
+
+```
+ticket_key eq   {{ $fromAI("ticket_key", ...) }}
+ticket_key neq  {{ $("Ticketkontext aufbereiten").first().json.ticketKey }}
+```
+
+Gemeint ist: lies genau diesen Altfall, aber niemals den gerade bearbeiteten
+Vorgang. Es fehlte jedoch `matchType`, und dessen Vorgabe im Supabase-Knoten
+ist `anyFilter` - also ODER. Wirksam war damit "gleich dem angefragten ODER
+ungleich dem aktuellen". Die zweite Haelfte trifft auf fast jede Zeile der
+Tabelle zu; zusammen mit `limit: 1` und ohne Sortierung kam eine beliebige
+zurueck.
+
+**Gemessen am Lauf `114645` vom 03.09.:** Der Agent fragte nach SSD-9291 und
+bekam SSD-8227 - einen TUEV-Mangel an einem Lastenaufzug, mitten in einem Fall
+ueber Mailverteiler. Er hat damit weitergearbeitet. Es gab keine Fehlermeldung.
+
+**Nachgewiesen** an einem Wegwerfflow (Lauf `115205`, danach archiviert), der
+die Filterkombination mit festen Werten nachbaut:
+
+| Fall | Einstellung | Gefragt | Ergebnis |
+|---|---|---|---|
+| A | `allFilters` | SSD-9291 | SSD-9291 - richtig |
+| B | `allFilters` | das aktuelle Ticket | leer - richtig |
+| C | `allFilters` | Nummer gibt es nicht | leer - richtig |
+| D | ohne `matchType` | SSD-9291 | SSD-8227 - der Fehler |
+
+Fall D liefert dasselbe falsche Ticket wie der echte Lauf. Behoben durch
+`matchType: "allFilters"`, publiziert als `23b634fd`, Rueckfallpunkt
+`4654fda5`. Sonst wurde nichts geaendert.
+
+**Was noch offen ist:** seit wann der Fehler bestand und wie viele Antworten
+er beruehrt hat. Das aendert an der Behebung nichts, sagt aber, ob aeltere
+Antworten des Agenten mit anderen Augen zu lesen sind.
+
+**Merksatz fuer aehnliche Knoten:** Zwei Bedingungen auf derselben Spalte ohne
+gesetztes `matchType` sind fast immer ein Fehler. Die Vorgabe ist ODER.
+
 ## Absicherung der Policy-Ausgabe
 
 Die Policy entscheidet über Routing und Betriebssignale und liefert dafür ein JSON mit zwölf Feldern und zwei verschachtelten Objektarrays — aus einem Regelwerk von rund 10.000 Zeichen. Diese Ausgabe ist der empfindlichste Punkt des Workflows und deshalb dreifach abgesichert.
