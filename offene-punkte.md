@@ -2,6 +2,8 @@
 
 Was ansteht, warum es ansteht, und was zum Abarbeiten gebraucht wird. Erledigtes wird gelöscht, nicht abgehakt — der Verlauf steht in `tests/laufprotokoll.csv` und in der Git-Historie.
 
+**Modellkosten haben eine eigene Liste:** [konzept-token-sparen.md](konzept-token-sparen.md) — alle Flows, nach gemessenem Tokenverbrauch sortiert, Stand 04.09.2026.
+
 ## Zuerst: SQL-Konzept für Reporting, Controlling und Fibu
 
 **Das ist ab der nächsten Sitzung das Hauptthema.** Bisher existiert dazu kein Konzept im Repo, nur die Richtung: SQL Server → n8n → SharePoint.
@@ -57,7 +59,7 @@ Kleinteilig, ohne Termin, keines davon dringend.
 - **Drei Alteinträge in `agent_requests`** tragen eine Abo-ID statt einer Nachrichten-ID (unter 808 Zeilen, seit dem 15.07.). Wirkungslos — zu ihnen gehört keine Nachricht. Seit dem 02.09. entstehen keine neuen mehr.
 - **Embeddings der Bildchunks.** Beim Umschreiben der Adressen wurde der Text geändert, der Vektor nicht. Betrifft 4 091 Chunks, nur die Adresszeile — semantisch unerheblich. Eine Neuberechnung kostet rund vier Cent.
 - **Retry als Netz im Content Studio.** Der Prompt allein macht die Wortzahl nicht deterministisch. False-Route einmal zurück auf `COPY (Text)` mit den Befunden im Prompt, Zähler hart auf einen Versuch. **Fallstrick:** `COPY parsen` verwirft die Analysefelder (`kernaussage`, `gewaehlte_perspektive`, `kapa_bruecke`, `takeaway`) — der Retry-Node muss sie aus `$('Analyse parsen').first().json` zurückholen, sonst ist der zweite Versuch schlechter als der erste.
-- **Zeitzone im Content Studio nicht gesetzt.** Der Workflow erbt die der Instanz. Für `0 8 * * 1,3,4` und die Wochentagsrechnung in `Saeule bestimmen` ist das um 08:00 unkritisch, aber ausdrücklich ist besser. **Vorsicht:** Steht die Instanz auf UTC, verschiebt `Europe/Berlin` die Auslösezeit um zwei Stunden nach vorn - deshalb nicht nebenbei bei einem anderen Publish mitändern.
+- **Zeitzone in den Workflows nicht gesetzt.** Die Flows erben die der Instanz, und die steht auf `Europe/Berlin` — am 04.09. an zwei Crons nachgemessen. Ausdrücklich setzen ist deshalb wirkungsfrei und gefahrlos; es schützt nur davor, dass eine Änderung der Instanzvorgabe alle Zeitpläne still verschiebt. Betrifft Content Studio und die übrigen Zeitplan-Flows.
 - **`uc_1786422016792_0` ist nicht abgeschlossen.** `use_case abschliessen` hängt nur am Erfolgspfad. Die Zeile trägt die Säule `fertigung` bei Zielgruppe „Ingenieurbueros" — der Widerspruch aus dem Use-Case-Abschnitt steckt weiter darin.
 - **404 im Jira-Agent umgehen.** Bei fehlendem Anfragetyp auf `/rest/api/3/issue/{key}/comment` ausweichen statt auf die Service-Desk-Schnittstelle. **Vor dem Bau zu prüfen:** ob der Kommentar dann wirklich intern bleibt — der native Jira-Node kann die JSM-Sichtbarkeit nicht setzen, ein unbedachter Wechsel macht interne Kommentare für Anwender sichtbar. Betrifft rund ein bis zwei Tickets pro Woche.
 

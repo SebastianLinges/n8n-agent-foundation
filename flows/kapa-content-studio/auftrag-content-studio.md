@@ -279,4 +279,4 @@ Beide Testtreiber führen den **echten** Node-Code aus (`entwurf/probe_thema_wae
 - Ein Produktionslauf mit `get_execution` als Beleg. Der nächste Lauf ist Montag, 07.09.2026, 08:00 für den Posttag Dienstag.
 - Die Messung nach zwei Wochen gemäß Abschnitt 5.
 - Die fünf Entscheidungen aus Abschnitt 6 stehen unverändert.
-- Die Workflow-Zeitzone ist nicht gesetzt; der Flow erbt die der Instanz. Für `0 8 * * 1,3,4` und die Wochentagsrechnung ist das um 08:00 unkritisch, sollte aber bei nächster Gelegenheit ausdrücklich auf `Europe/Berlin` gestellt werden — das verschiebt die Auslösezeit, wenn die Instanz auf UTC steht, und gehört deshalb nicht in einen Publish nebenbei.
+- Die Workflow-Zeitzone ist nicht gesetzt; der Flow erbt die der Instanz. **Nachgemessen am 04.09.:** Die Instanz steht bereits auf `Europe/Berlin` — der Cron `0 8 * * 1,3,4` feuerte am 03.09. um 06:00 UTC, also 08:00 Ortszeit. Die Zeitzone ausdrücklich zu setzen ist damit wirkungsfrei und gefahrlos; meine ursprüngliche Warnung vor einer Verschiebung war falsch. Siehe [konzept-token-sparen.md](../../konzept-token-sparen.md), Punkt 10.
