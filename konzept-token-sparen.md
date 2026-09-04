@@ -2,6 +2,8 @@
 
 Stand 04.09.2026. Aufgenommen, nachdem Feldpflege und Content Studio abgearbeitet waren und die Frage aufkam, wo insgesamt noch Modellkosten entstehen.
 
+**Stand am Abend des 04.09.: das Kostenthema ist im Wesentlichen abgeschlossen.** Die Abrechnung liegt vor (Punkt 0), der groesste Posten ist durch die Aenderungen vom 03.09. um rund Faktor 8 gefallen (Punkt 11a), Prompt-Caching greift bereits (Punkt 3) und Mistral kostet nichts (Punkt 9). Was bleibt, ist eine Woche abwarten und die naechste Abrechnung dagegenhalten. Gebaut werden muss dafuer nichts.
+
 Die Liste ist nach **gemessenen Kosten** sortiert. Bis zum 04.09. stand sie nach Tokenmenge — das war richtig gezaehlt und trotzdem falsch gewichtet. Die Abrechnung in Punkt 0 hat die Rangfolge umgeworfen. Wo etwas geschaetzt ist, steht es dabei.
 
 ## Was diese Zahlen sind — und was nicht
@@ -279,17 +281,11 @@ Das ist gewollt gewesen — Screenshots sollen durchsuchbar sein. Ob sie auch al
 
 ---
 
-## 9. SharePoint-OCR: der Rückstand ist der Kostentreiber
+## 9. ~~SharePoint-OCR: der Rückstand ist der Kostentreiber~~ — kostenfrei
 
-**Erst nach Punkt 0 zu bewerten.**
+**Am 04.09. geklärt: Mistral läuft auf dem kostenfreien Abo.** Damit entstehen für OCR und `mistral-medium` keine Kosten, und der letzte unbezifferte Posten ist weg. Die gesamte Modellrechnung ist die OpenAI-Rechnung aus Punkt 0.
 
-`RAG - SharePoint Ingest` lief in der Nacht zum 04.09. zwischen 01:30 und 01:44 in **14 Teilläufen** von 10 bis 50 Sekunden. Jeder davon kann eine Mistral-OCR-Verarbeitung sein. Nach `offene-punkte.md` steht ein Rückstand von rund **356 Dateien**.
-
-Mistral-OCR rechnet nach Seiten, nicht nach Token — in keiner Tokenmessung sichtbar, aber möglicherweise der größte Posten der Nachtrechnung. Ohne Punkt 0 ist das nicht zu entscheiden.
-
-Bereits vorhanden: [konzept-ocr-schonen.md](konzept-ocr-schonen.md).
-
----
+Der Rückstand von rund 356 Dateien bleibt als **Betriebsthema** bestehen — er entscheidet, wie vollständig die Wissensbasis ist, nicht was sie kostet. Er steht in `offene-punkte.md`, nicht mehr hier. Zu beachten ist allein das Kontingent des kostenfreien Abos: Es begrenzt, wie schnell der Rückstand abgearbeitet werden kann.
 
 ## 10. Kleinigkeit: Zeitzone ausdrücklich setzen
 
