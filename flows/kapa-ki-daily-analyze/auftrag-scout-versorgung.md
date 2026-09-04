@@ -3,7 +3,8 @@
 **Flow:** KI Daily - Analyze & Deliver [WF-2] — `objM2PQrcTpEzik7`
 **Link:** https://n8n.srv1307521.hstgr.cloud/workflow/objM2PQrcTpEzik7
 **Mitbetroffen:** Content Studio [WF-3] `bBBybznNNCnU2nOJ` (verbraucht die Use Cases), KI Daily - Collect [WF-1] `mzSLn4WzFQSv0cuX` (liefert die Meldungen)
-**Aufgenommen:** 04.09.2026. Nichts geaendert, nichts publiziert.
+**Aufgenommen:** 04.09.2026.
+**Stand:** A1 und A2 sind am 04.09.2026 publiziert (`c12ddfb3`, Rueckfallpunkt `57e371ca`). Die sechs Handwerk-Use-Cases sind angelegt. A3 und A4 stehen aus. Der erste Lauf mit den Aenderungen ist **Montag, 07.09.2026, 06:20**.
 
 ---
 
@@ -126,11 +127,14 @@ Zu pruefen, wenn A2 laeuft: ob die Handwerksbeitraege es ueberhaupt in die erwei
 
 ## 4. Reihenfolge und Abnahme
 
-1. **Sechs Handwerk-Use-Cases anlegen** — Sofortmassnahme, unabhaengig vom Rest, entsperrt den Dienstagsslot.
-2. **A1, Bilanz** — muss vor A2 liegen, sonst ist die Wirkung nicht messbar.
-3. **A2, breitere Versorgung** — einen Lauf abwarten, Bilanz lesen, dann ueber die Menge entscheiden.
-4. **A3, Ankerregel im Prompt** — erst wenn wieder Use Cases entstehen, sonst misst man nichts.
-5. **A4, Handwerk** — nach zwei Laeufen mit A2.
+1. ~~**Sechs Handwerk-Use-Cases anlegen**~~ — **erledigt am 04.09.**, Lauf `115642`. Pruefsummen Feld fuer Feld gegen die gepruefte Datei: alle sechs byte-identisch.
+2. ~~**A1, Bilanz**~~ — **publiziert am 04.09.** Lokal an fuenf Faellen geprueft, der Filter an einem Wegwerfflow nachgewiesen.
+3. ~~**A2, breitere Versorgung**~~ — **publiziert am 04.09.**, 20 Kandidaten. `payload` fuer den Marketing Scout zeichengleich zur Altfassung.
+4. **Montag, 07.09., 06:20: den ersten Lauf lesen.** Die Bilanzzeile beantwortet in einem Zug beide Fragen — wie viele Kandidaten ankamen und wie viele Use Cases daraus wurden.
+5. **A3, Ankerregel im Prompt** — erst wenn wieder Use Cases entstehen, sonst misst man nichts.
+6. **A4, Handwerk** — nach zwei Laeufen mit A2.
+
+**Abweichung vom eigenen Grundsatz, offengelegt:** Oben steht "ein Paket je Publish, jedes erst nach einem Lauf mit Beleg". A1 und A2 sind zusammen publiziert worden. Grund: WF-2 laeuft nur Mo/Mi/Fr, getrennte Publishes haetten eine Woche gekostet, und die Bilanzzeile aus A1 macht die Wirkung von A2 im ersten Lauf lesbar. Das Risiko ist gering, weil A1 nachweislich nicht beeinflusst, wie viele Use Cases entstehen — die Gegenprobe gegen die Altfassung liegt vor.
 
 **Nicht anfassen, bevor A1 und A2 gewirkt haben:** neue Quellen. Die Kammer-Idee in `ideen.md` fuellt ein Rohr, das weiter unten verstopft ist — Handwerksblatt beweist das mit 39 Beitraegen und einem Use Case.
 
