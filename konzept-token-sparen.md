@@ -128,11 +128,21 @@ Das Ticket war seit dem 27.08. gelöst. Der Statuswechsel Erledigt → Geschloss
 
 Nach dem Stand vom 03.09. haben **115 von 1.389** Lösungschunks einen Schlüssel. Die übrigen 1.274 lösen bei **jeder** Berührung eine Neuextraktion aus.
 
-**Was zu tun ist:**
+**Stand 04.09.: geprüft, SQL liegt vor, wartet auf Freigabe.**
+Alles Folgende ist lesend an der Wissensbasis gemessen; geschrieben wurde nichts.
 
-1. Den Lösungsschlüssel für die bestehenden Chunks einmalig nachtragen — aus dem Text, der ohnehin gespeichert ist. Kein Modellaufruf nötig.
-2. Danach messen, wie viele der abendlichen Läufe noch extrahieren.
-3. **Erst danach** entscheiden, ob Erledigt → Geschlossen den Chunk überhaupt neu erzeugen soll. Möglicherweise erledigt sich die Frage von selbst.
+- 1.389 Lösungschunks, **115 mit Schlüssel, 1.274 ohne**. Alle 1.274 tragen `content_hash`, `status` und `resolution` in den Metadaten — der Schlüssel ist also rechnerisch ableitbar.
+- **Gegenprobe:** Die Ableitung auf die 115 vorhandenen Schlüssel angewandt ergibt **115 von 115 exakte Treffer, null Abweichungen.** Die Formel ist damit an echten Daten belegt.
+- Bei allen 1.274 stimmen `status`, `resolution` und `resolved_at` in den Metadaten mit dem überein, was im Chunktext wörtlich steht. Die Metadaten beschreiben denselben Stand wie der Text.
+- Alle 1.389 stammen vom selben Modell und derselben Flow-Fassung. Beide Gruppen sind strukturell gleich — sechs Abschnitte in 100 Prozent der Fälle, Durchschnittslänge 821 gegen 818 Zeichen. Der Extraktions-Prompt wurde zwischen ihnen nicht geändert.
+- Alle 1.274 Tickets sind auffindbar, Status und Resolution haben sich seither nicht bewegt; 1.264 sind bereits geschlossen.
+- Probelauf: 1.274 Zeilen, 1.274 verschiedene Schlüssel, keine Kollision.
+
+Eine Korrektur zur ersten Annahme: Die 1.274 sind **nicht** einfach „die älteren". Beide Gruppen überlappen zeitlich. Die 115 sind die, die seit Einführung der Cache-Logik einmal angefasst wurden.
+
+Das vorbereitete SQL mit Probelauf, Nachweis und Rücknahme steht in [flows/rag-jira-ingest/loesungsschluessel-nachtrag.sql](flows/rag-jira-ingest/loesungsschluessel-nachtrag.sql). Es ändert ausschließlich zwei Schlüssel innerhalb von `metadata`; `chunk_text` und `embedding` bleiben unberührt.
+
+**Danach:** messen, wie viele der abendlichen Läufe noch extrahieren. **Erst dann** entscheiden, ob Erledigt → Geschlossen den Chunk überhaupt neu erzeugen soll — möglicherweise erledigt sich die Frage von selbst.
 
 **Größenordnung ehrlich:** Die abendliche Sammelschließung erzeugte am 03.09. **35 Ingest-Läufe in 40 Sekunden**, davon rund zehn mit 13 bis 15 Sekunden Laufzeit — das sind die mit Extraktion. Bei rund 2.000 Token je Extraktion auf `gpt-4.1-mini` ist das je Abend eine kleine Summe. Der Punkt steht hier nicht wegen des Betrags, sondern weil er billig zu beheben ist und die Zahl bei jedem Nachladen der Wissensbasis mitwächst.
 
