@@ -44,42 +44,81 @@ Aus den 18 Exporten im Repo. Ein Flow ohne Modellknoten steht nicht in der Tabel
 
 ---
 
-## 1. Jira-Agent: die Trefferliste wird viermal bezahlt
+## 1. Jira-Agent: ein defektes Werkzeug, ein zu breiter Treffer, ein Selbstgespräch
 
-**Der größte gemessene Hebel. Aufwand: ein halber Tag. Qualitätsrisiko: gering, wenn entdoppelt statt blind gekürzt wird.**
+**Der größte gemessene Hebel — und ein Fehler, der unabhängig von den Kosten behoben gehört. Aufwand: die Fehlerbehebung eine halbe Stunde, der Rest ein halber Tag.**
 
 Gemessen an Lauf `114645` vom 03.09., 12:18 Uhr (Ticket SSD-9299, eine gewöhnliche Verteileranfrage):
 
-| Schritt | Eingabe | Ausgabe |
-|---|---|---|
-| 1 | 4.338 | 81 |
-| 2 | 4.620 | 57 |
-| 3 | 10.694 | 132 |
-| 4 | 10.844 | 102 |
-| 5 | 12.567 | 226 |
-| 6 | 12.861 | 1.146 |
-| **Summe** | **55.924** | **1.744** |
+| Schritt | Eingabe | Ausgabe | was davor kam |
+|---|---|---|---|
+| 1 | 4.338 | 81 | — |
+| 2 | 4.620 | 57 | `Denkschritt` |
+| 3 | 10.694 | 132 | **`Semantische Wissenssuche`: +6.074** |
+| 4 | 10.844 | 102 | — |
+| 5 | 12.567 | 226 | **`Jira-Altfall lesen`: +1.723** |
+| 6 | 12.861 | 1.146 | `Denkschritt` |
+| **Summe** | **55.924** | **1.744** | |
 
-Sechs Modellschritte auf `gpt-5.4` für ein Ticket. Entscheidend ist die Bauart eines Agentenzyklus: **jeder Schritt schickt den gesamten bisherigen Verlauf erneut mit.** Was einmal im Kontext liegt, wird bis zum Ende jedes Mal neu bezahlt.
+Sechs Modellschritte auf `gpt-5.4` für ein Ticket. Entscheidend ist die Bauart eines Agentenzyklus: **jeder Schritt schickt den gesamten bisherigen Verlauf erneut mit.** Was einmal im Kontext liegt, wird bis zum Ende jedes Mal neu bezahlt. Die 6.074 Token aus Schritt 3 stehen deshalb auch in 4, 5 und 6 — rund 24.000 der 55.924 Eingabetoken.
 
-Zwischen Schritt 2 und 3 wächst die Eingabe um **6.074 Token**. Das ist die Rückgabe von `Public Wissen hybrid abrufen`: **24 Kandidaten mit vollem Chunktext**. Diese 6.074 Token stehen danach auch in den Schritten 4, 5 und 6 — rund **24.000 der 55.924 Eingabetoken, also 43 Prozent des Laufs, für eine einzige Trefferliste.**
+### 1a. `Jira-Altfall lesen` liefert das falsche Ticket — ein Fehler, kein Kostenpunkt
 
-Zwei Dinge machen die Liste unnötig groß:
+Der Agent fragte nach **SSD-9291**. Zurück kam **SSD-8227**, ein Ticket über einen TÜV-Mangel an einem Lastenaufzug, mitten in einem Fall über Mailverteiler.
 
-**Doppelte Chunks desselben Tickets.** In dem Lauf erscheint SSD-9291 viermal (`solution`, `comment`, `content`, `image_attachment`), SSD-8394 dreimal, vier weitere Tickets doppelt. Von 24 Kandidaten sind es 15 verschiedene Tickets. Eine Entdopplung nach `sourceRef` halbiert die Liste fast, ohne dass eine Erkenntnis verloren geht — die Zusammenfassung eines Tickets steht ohnehin im `solution`-Chunk.
+Die Ursache steht im Knoten. Er hat zwei Bedingungen auf derselben Spalte:
 
-**Bildanalyse-Chunks.** Der `image_attachment`-Chunk zu SSD-9291 ist allein rund 1.900 Zeichen lang und enthält die vollständige Mitgliederliste eines Mailverteilers mit zehn Namen und dienstlichen E-Mail-Adressen. Das ist teuer und geht als Personendatensatz an OpenAI. Ob solche Chunks in die Trefferliste eines Agenten gehören, ist keine reine Kostenfrage — siehe Punkt 8.
+```
+ticket_key eq   {{ $fromAI("ticket_key", …) }}
+ticket_key neq  {{ $("Ticketkontext aufbereiten").first().json.ticketKey }}
+```
 
-**Was zu tun ist:**
+Gemeint ist offensichtlich: „lies genau dieses eine Altticket, aber niemals das gerade bearbeitete". Es fehlt jedoch der Parameter `matchType`, und dessen Vorgabe im Supabase-Knoten ist laut Typdefinition **`anyFilter`**, also ODER. Wirksam ist damit:
 
-1. Trefferliste nach `sourceRef` entdoppeln, bevor sie an das Modell geht.
-2. Auf die besten sechs bis acht Tickets begrenzen statt auf 24 Chunks.
-3. Je Kandidat nur das mitgeben, was der Agent zum Bewerten braucht: Titel, Lösungsabschnitt, Quelle. Nicht die kompletten `TICKETDATEN`-Blöcke, die Status, Resolution und Lösungsdatum ein zweites Mal wiederholen — die stehen schon im Text darüber.
-4. `image_attachment` aus der Kandidatenliste ausschließen.
+```
+ticket_key = <angefragt>   ODER   ticket_key <> <aktuelles Ticket>
+```
+
+Die zweite Hälfte trifft auf jedes Ticket außer dem aktuellen zu. Zusammen mit `limit: 1` und ohne Sortierung liefert der Knoten eine beliebige Zeile. **Das Werkzeug hat in dieser Form nie funktioniert.**
+
+Die Folgen wiegen schwerer als die Token: Der Agent stützt seine Analyse auf einen zufälligen fremden Vorgang. Nebenbei landet dessen vollständiger Rohdatensatz im Kontext — Beschreibung mit Signaturblock, vier Kommentare mit Signaturen, zwei Safelinks-URLs von je rund 400 Zeichen, Telefonnummern und E-Mail-Adressen. Das sind die 1.723 Token in Schritt 5, danach dreimal mitbezahlt.
+
+**Die Behebung ist ein Parameter:** `matchType: "allFilters"`. Danach prüfen, ob das Werkzeug wirklich den angefragten Vorgang liefert und bei einem unbekannten Key leer zurückkommt statt irgendetwas.
+
+### 1b. Die Wissenssuche schickt zu jedem Treffer den kompletten Metadatenblock mit
+
+`Semantische Wissenssuche` holt `topK: 20` und lässt den Cohere-Reranker auf `topN: 8` kürzen. Zurück gehen acht Dokumente, jedes als JSON aus `pageContent` **und dem vollständigen Metadatenobjekt** der Zeile.
+
+In diesen Metadaten steht unter anderem: `content_hash`, `loesung_schluessel`, `analyse_schluessel` (je 64 Zeichen Hexadezimal), `storage_path`, `storage_bucket`, `related_image_url`, `normalized_size_bytes`, `original_mime_type`, `normalized_mime_type`, `vision_model`, `vision_prompt_version`, `solution_model`, `solution_prompt_version`, `rag_flow_version`, `noise_filter`, `attachment_id`, `comment_id`, `part`, leere `labels`- und `components`-Listen. **Nichts davon hilft dem Modell beim Denken.** Gebraucht werden Titel, Ticketschlüssel, Status, Resolution, `chunk_type`, `audience` und die URL.
+
+Dazu kommt die Trefferqualität: Von den acht Dokumenten trafen bei einer Frage nach Mailverteilern nur drei das Thema. Die übrigen waren eine Bildanalyse zu einem Exchange-Zustellfehler, eine Word-Serienbrief-Anleitung und eine zweite Bildanalyse zu Connector-Fehlern.
+
+**Einschränkung, ehrlich:** Was der Vektorspeicher-Knoten zurückgibt, kommt aus der Datenbankfunktion `funktion_match_document_chunks`. Den Metadatenblock dort zu beschneiden hieße, diese Funktion zu ändern — das ist ausdrücklich ausgeschlossen. Ohne Eingriff in die Datenbank bleiben zwei Wege: `topN` im Reranker von 8 auf 5 senken, oder den Vektorspeicher-Knoten durch ein eigenes Werkzeug ersetzen, das nur die gebrauchten Felder zurückgibt. Der erste Weg ist sofort machbar, der zweite ist ein kleiner Umbau.
+
+### 1c. `Denkschritt` kostet zwei von sechs Modellschritten
+
+`Denkschritt` ist ein `toolThink`-Knoten: Er gibt zurück, was hineingeht. Im gemessenen Lauf wurde er zweimal gerufen — einmal vor den Suchen, einmal danach — und lieferte beide Male den Text des Modells wortgleich zurück.
+
+Zwei der sechs Schritte dienen also dem Selbstgespräch. Fachlich hat das einen Zweck: Es zwingt den Agenten, seine Suchabsicht zu formulieren und die Treffer danach zu bewerten, und genau das steht so in der Recherchepflicht des Systemtextes. Es kostet aber zwei vollständige Runden mit dem gesamten Verlauf.
+
+**Nicht ohne Messung streichen.** Zu prüfen wäre, ob ein Denkschritt statt zwei reicht — der zweite, der die Treffer bewertet, trägt mehr als der erste. Vorher/nachher an denselben Tickets vergleichen.
+
+### Reihenfolge innerhalb von Punkt 1
+
+1. `matchType` in `Jira-Altfall lesen` — Fehlerbehebung, sofort, unabhängig von allem anderen.
+2. `topN` im Reranker von 8 auf 5.
+3. Denkschritt-Zahl prüfen.
+4. Erst danach der Umbau des Wissenssuche-Werkzeugs, falls die Messung ihn noch rechtfertigt.
 
 **Vorher/nachher belegen:** derselbe Ticketinhalt, Tokenzahl je Schritt aus dem Lauf, und die fachliche Bewertung des Agenten vergleichen. Nicht publizieren, bevor drei Tickets zeigen, dass die Antwort gleich gut bleibt.
 
-**Kein Hebel:** Am 03.09. hatte ich vermutet, die Ergebnislänge sei über die 1800-Zeichen-Kappung zu drücken, und das nach einer Messung verworfen — in jenem Lauf hatten die Werkzeuge **null** Treffer geliefert, die Kappung griff also nirgends. Diese Messung war nicht falsch, aber nicht aussagekräftig: an einem Lauf mit Treffern sieht die Sache genau umgekehrt aus.
+### Was ich am 04.09. korrigiert habe
+
+Die erste Fassung dieser Liste schrieb den Sprung in Schritt 3 der Rückgabe von `Public Wissen hybrid abrufen` zu — „24 Kandidaten mit vollem Chunktext". Das war falsch. Dieser Knoten hängt gar nicht am Agenten: Er läuft in der Hauptkette **nach** ihm und speist über die `Evidenzschranke` die Policy-Stufe auf `gpt-5.4-mini`. Seine 24 Kandidaten waren nie im `gpt-5.4`-Kontext.
+
+Am Agenten hängen genau vier Werkzeuge: `Semantische Wissenssuche`, `Volltextsuche Wissensbasis` (lieferte in diesem Lauf null Treffer), `Jira-Altfall lesen` und `Denkschritt`. Die Ursache des Sprungs war also eine andere — und die Entdopplung nach `sourceRef`, die ich vorgeschlagen hatte, greift an der falschen Stelle. Der Reranker liefert bereits acht verschiedene Dokumente.
+
+**Kein Hebel:** Am 03.09. hatte ich vermutet, die Ergebnislänge sei über die 1800-Zeichen-Kappung zu drücken, und das nach einer Messung verworfen — in jenem Lauf hatten die Werkzeuge null Treffer geliefert, die Kappung griff also nirgends. Die Messung war nicht falsch, aber nicht aussagekräftig.
 
 ---
 
@@ -194,7 +233,7 @@ Der Videostrang und drei Bildformate sind am 03.09. entfallen; der Ankerfilter v
 
 Die Bildanalyse-Chunks des Jira-Ingest enthalten, was auf dem Screenshot stand. Im gemessenen Lauf war das die Mitgliederliste eines Mailverteilers: zehn Namen mit dienstlichen E-Mail-Adressen, als Kandidat an `gpt-5.4` geschickt.
 
-Das ist gewollt gewesen — Screenshots sollen durchsuchbar sein. Ob sie auch als Trefferkandidaten an ein Modell gehen sollen, ist eine eigene Entscheidung. Punkt 1 würde sie nebenbei aus der Kandidatenliste nehmen; das wäre dann kein Zufall, sondern sollte bewusst so festgehalten werden.
+Das ist gewollt gewesen — Screenshots sollen durchsuchbar sein. Ob sie auch als Trefferkandidaten an ein Modell gehen sollen, ist eine eigene Entscheidung. Im gemessenen Lauf kamen sie ueber zwei Wege in den Kontext: als Bildanalyse-Treffer der semantischen Wissenssuche und als Rohdatensatz des falsch gelieferten Alttickets (Punkt 1a). Der zweite Weg entfaellt mit der Fehlerbehebung. Fuer den ersten ist zu entscheiden, ob Bildanalysen ueberhaupt Trefferkandidaten sein sollen.
 
 ---
 
@@ -236,6 +275,20 @@ Damit die Liste nicht suggeriert, es sei nichts passiert:
 
 ## Reihenfolge, wenn nichts dazwischenkommt
 
-**Punkt 0** (Abrechnung ansehen) → **Punkt 3** (Caching prüfen, weil es ohne inhaltliche Änderung wirkt) → **Punkt 1** (Trefferliste) → **Punkt 4** (Schlüssel nachtragen) → **Punkt 2** (Systemtext) → der Rest nach Lage.
+Am 04.09. neu geordnet, nachdem zwei Befunde dazugekommen sind, die nicht warten sollten.
 
-Punkt 6 (Monitor-Flow) dazwischen, sobald jemand 15 Minuten hat — er blockiert nichts, aber er verdeckt echte Fehler.
+**Zuerst, weil es Fehler sind und keine Sparmaßnahmen:**
+
+1. **Punkt 1a** — `matchType` in `Jira-Altfall lesen`. Das Werkzeug liefert ein zufälliges fremdes Ticket, auf das der Agent seine Analyse stützt. Ein Parameter, eine halbe Stunde mit Gegenprobe.
+2. **Punkt 6** — Lizenz für `rwg_automate@rwg-r.de`. Der Healthcheck meldet seit Tagen korrekt, dass sie fehlt.
+
+**Dann, weil sie die Reihenfolge des Restes bestimmen:**
+
+3. **Punkt 0** — Abrechnung neben die Messung legen, mit dem Blick auf zwischengespeicherte Eingabetoken (das beantwortet zugleich Punkt 3).
+
+**Dann die eigentlichen Sparmaßnahmen:**
+
+4. **Punkt 4** — Lösungsschlüssel nachtragen. SQL liegt vor, geprüft, wartet nur auf die Ausführung.
+5. **Punkt 1b und 1c** — Reranker von 8 auf 5, Zahl der Denkschritte prüfen.
+6. **Punkt 2** — Systemtext kürzen.
+7. Der Rest nach Lage.
