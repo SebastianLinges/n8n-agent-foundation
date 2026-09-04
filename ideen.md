@@ -19,3 +19,17 @@ Der Reiz liegt im Vorrang: Der Scout liefert Themen, die überall stehen. Eine I
 Zu klären: Ob der Bot zurückfragt, wenn die Idee zu dünn für einen Beitrag ist — Zielgruppe, benannter Arbeitsschritt, Problem. Genau die Felder, an denen der Redaktions-Check später hart prüft. Eine Rückfrage im Moment der Idee ist billiger als eine Ablehnung drei Tage später.
 
 Zugang ausschließlich für die Geschäftsführung von KAPA Digital. Der Bot schreibt in die Marketingdatenbank, das ist keine offene Tür.
+
+## Kammern als Themenquelle statt angelsaechsischer Tech-Presse
+
+Aufgekommen am 04.09.2026. Zielt auf die Ursache der Handwerk-Luecke, nicht auf das Symptom.
+
+**Das Problem:** `KI Daily - Collect` zieht aus GitHub, Tavily und Hacker News. Daraus entsteht angelsaechsische Tech-Presse. 14 von 22 Ausloesern waren Herstellermeldungen, und die Saeule `handwerk` stand deshalb auf null. Von Hand nachgelegte Use-Cases beheben das fuer ein paar Wochen, nicht dauerhaft.
+
+**Die Idee:** Handwerkskammern, IHKs und die Mittelstand-Digital-Zentren als Quelle. Die veroeffentlichen genau das, was der Ankerfilter sucht - deutschsprachige Beschreibungen konkreter Arbeitsschritte in kleinen Betrieben - und sie veroeffentlichen **belegte Zahlen** aus eigenen Umfragen. Genau die fehlen dem COPY-Prompt heute, der ohne Beleg keine Mengenangabe schreiben darf.
+
+**Warum das technisch klein sein duerfte:** Tavily haengt bereits in WF-1 und kennt einen Domainfilter; die CRM-Anreicherung nutzt ihn schon fuer linkedin.com. Eine zweite Tavily-Abfrage mit einer Liste von Kammer- und Zentrendomains waere kein neuer Flow, sondern ein Knoten mehr. **Vor dem Bau zu pruefen:** was WF-1 heute genau abfragt, ob die Domains ergiebig sind, und ob die Trefferqualitaet den Ankerfilter tatsaechlich besteht.
+
+**Was ausdruecklich NICHT automatisiert werden sollte:** das Kommentieren unter fremden Beitraegen. Ein Firmenkonto, das automatisch unter Kammerbeitraegen kommentiert, ist ein Reputationsrisiko und widerspricht der eigenen Redaktionslogik - der ganze Aufwand mit Ankern, Belegpflicht und Mengenwoertern existiert, weil eine Maschine unter dem Firmennamen leicht Unsinn schreibt. Unter einem fremden Beitrag faellt das direkt auf den Absender zurueck.
+
+**Sinnvoll dagegen:** Kammerinhalte als Eingang fuer eigene Beitraege, mit Quellenangabe. Und eine gepflegte Liste relevanter Kammer- und Zentrenkonten, unter denen sich das Mitreden lohnt - das bleibt Handarbeit und Beziehungsarbeit.
