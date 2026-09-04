@@ -43,6 +43,31 @@ Nichts davon ist zu tun, alles davon ist nachzusehen.
 
 **Danach scharf schalten:** `probelauf` im Jira-Nachzügler auf `false`. Eine Zeile in `Nachzuegler Steuerung`. Solange er auf `true` steht, meldet der Zweig nur.
 
+## Zuerst im Marketing: der Business Scout schreibt seit dem 20.08. keine Use Cases mehr
+
+**Am 04.09.2026 beim Nachzaehlen aufgefallen. Groesser als die Handwerk-Luecke, die nur ein Symptom davon ist.**
+
+| Zeitraum | neue Use Cases |
+|---|---|
+| 10.08. bis 20.08. | taeglich 4 bis 12 |
+| **21.08. bis 03.09.** | **null, vierzehn Tage lang** |
+| 04.09. | 2, Saeule `fertigung` |
+
+Die 43 offenen Use Cases im Pool stammen damit saemtlich aus der Zeit vor dem 20.08. Das Content Studio arbeitet seit zwei Wochen auf Altbestand.
+
+**Es liegt nicht an den Quellen.** In denselben 30 Tagen lieferte `handwerksblatt.de` **39 Beitraege mit Durchschnittsscore 9,4**, alle 39 ueber der Schwelle, zuletzt am 04.09. Das ist die beste Quelle im ganzen Bestand. Aus allen 39 wurde **ein** Use Case. Auch `konstruktionspraxis` (86 Beitraege, 9,2) und `maschinenmarkt` (82, 9,1) laufen weiter.
+
+Der Engpass sitzt also in **WF-2 (`KI Daily - Analyze & Deliver`, `objM2PQrcTpEzik7`)**, wo der Business Scout aus Meldungen Use Cases macht.
+
+**Zu pruefen, in dieser Reihenfolge:**
+
+1. Laeuft der Business-Scout-Zweig ueberhaupt noch? WF-2 feuert Mo/Mi/Fr und ist gelaufen - aber schreibt der Zweig, oder endet er vorher?
+2. Der Takt hat sich geaendert. Bis zum 20.08. entstanden **taeglich** Use Cases, WF-2 laeuft heute Mo/Mi/Fr. Der Wechsel faellt zeitlich mit dem Versiegen zusammen.
+3. WF-2 wurde am 30.08. zuletzt geaendert. Was hat sich dabei am Scout-Zweig geaendert?
+4. Die 14-Tage-Themendedup vor der Redaktion: Verwirft sie inzwischen alles, weil der Bestand zu aehnlich ist?
+
+**Erst danach ueber neue Quellen reden.** Mehr Feeds fuellen ein Rohr, das weiter unten verstopft ist. Die Kammer-Idee steht in [ideen.md](ideen.md) und bleibt dort, bis dieser Punkt geklaert ist.
+
 ## Wartet auf eine Entscheidung
 
 - **17 Doubletten in SharePoint**, 15 Gruppen, zusammen 10 MB. Zwei liegen in einem Ordner `alt` und sollen weg — dafür fehlt ein Löschwerkzeug, das bewusst nicht gebaut wurde. Die sieben Gruppen unter `/Lagerpläne/` bleiben ausdrücklich unangetastet.
