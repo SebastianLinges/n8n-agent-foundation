@@ -83,7 +83,20 @@ Die zweite Hälfte trifft auf jedes Ticket außer dem aktuellen zu. Zusammen mit
 
 Die Folgen wiegen schwerer als die Token: Der Agent stützt seine Analyse auf einen zufälligen fremden Vorgang. Nebenbei landet dessen vollständiger Rohdatensatz im Kontext — Beschreibung mit Signaturblock, vier Kommentare mit Signaturen, zwei Safelinks-URLs von je rund 400 Zeichen, Telefonnummern und E-Mail-Adressen. Das sind die 1.723 Token in Schritt 5, danach dreimal mitbezahlt.
 
-**Die Behebung ist ein Parameter:** `matchType: "allFilters"`. Danach prüfen, ob das Werkzeug wirklich den angefragten Vorgang liefert und bei einem unbekannten Key leer zurückkommt statt irgendetwas.
+**Die Behebung ist ein Parameter:** `matchType: "allFilters"`.
+
+**Stand 04.09.: nachgewiesen und im Entwurf gesetzt, noch nicht publiziert.** An einem Wegwerfflow (Lauf `115205`, vier unabhängige Zweige, danach archiviert) wurde die Filterkombination mit festen Werten nachgebaut:
+
+| Fall | Einstellung | Gefragt | Ergebnis |
+|---|---|---|---|
+| A | `allFilters` | SSD-9291 | **SSD-9291** — richtig |
+| B | `allFilters` | SSD-9299, das aktuelle Ticket | leer — richtig |
+| C | `allFilters` | eine Nummer, die es nicht gibt | leer — richtig |
+| D | ohne `matchType`, wie heute live | SSD-9291 | **SSD-8227**, der TÜV-Aufzug |
+
+Fall D liefert exakt dasselbe falsche Ticket wie der echte Agentenlauf `114645`. Der Fehler ist damit reproduziert, nicht vermutet.
+
+Der Entwurf `23b634fd` unterscheidet sich von der aktiven Fassung `4654fda5` in genau einer Sache: `matchType` von nicht gesetzt auf `allFilters`. 81 Knoten in beiden, Verbindungen identisch, Filterbedingungen byte-identisch. Rückfallpunkt ist `4654fda5`.
 
 ### 1b. Die Wissenssuche schickt zu jedem Treffer den kompletten Metadatenblock mit
 
@@ -282,7 +295,7 @@ Am 04.09. neu geordnet, nachdem zwei Befunde dazugekommen sind, die nicht warten
 
 **Zuerst, weil es Fehler sind und keine Sparmaßnahmen:**
 
-1. **Punkt 1a** — `matchType` in `Jira-Altfall lesen`. Das Werkzeug liefert ein zufälliges fremdes Ticket, auf das der Agent seine Analyse stützt. Ein Parameter, eine halbe Stunde mit Gegenprobe.
+1. **Punkt 1a** — `matchType` in `Jira-Altfall lesen`. **Nachgewiesen, im Entwurf gesetzt, wartet auf das Publizieren.**
 2. **Punkt 6** — Lizenz für `rwg_automate@rwg-r.de`. Der Healthcheck meldet seit Tagen korrekt, dass sie fehlt.
 
 **Dann, weil sie die Reihenfolge des Restes bestimmen:**
