@@ -1,7 +1,7 @@
 # RWG_Jira-Feldpflege — OpenAI-Kosten senken, Abschluss
 
 **Workflow:** RWG_Jira-Feldpflege — `k4SmnNrz7ASMdFwk`
-**Link:** https://n8n.srv1307521.hstgr.cloud/workflow/k4SmnNrz7ASMdFwk
+**Link:** https://n8n.kapa-digital.de/workflow/k4SmnNrz7ASMdFwk
 **Stand:** 03.09.2026, spät abends — Bauphase abgeschlossen
 **Umfang:** ausschließlich dieser Flow.
 

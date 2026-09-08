@@ -38,7 +38,7 @@ Die Säule wird auf `handwerk`, `fertigung`, `engineering` oder `buero` normiert
 
 ## Verhältnis zum Content Studio
 
-Die Marketing-Idee wandert ins [KAPA Content Studio](https://n8n.srv1307521.hstgr.cloud/workflow/bBBybznNNCnU2nOJ) (`bBBybznNNCnU2nOJ`) — aber **nicht taggleich und nicht als Hauptquelle**:
+Die Marketing-Idee wandert ins [KAPA Content Studio](https://n8n.kapa-digital.de/workflow/bBBybznNNCnU2nOJ) (`bBBybznNNCnU2nOJ`) — aber **nicht taggleich und nicht als Hauptquelle**:
 
 - Das Content Studio hat einen eigenen Trigger, Di/Mi/Do 08:00 (`0 8 * * 2,3,4`).
 - Sein Node `Idee lesen` holt **alle** Einträge aus `marketing_ideas` mit `produced = false`, nach `idea_date` aufsteigend. Es ist eine Warteschlange, kein Tagesbezug.

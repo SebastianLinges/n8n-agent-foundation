@@ -1,7 +1,7 @@
 # Auftrag — Business Scout wieder mit Material versorgen
 
 **Flow:** KI Daily - Analyze & Deliver [WF-2] — `objM2PQrcTpEzik7`
-**Link:** https://n8n.srv1307521.hstgr.cloud/workflow/objM2PQrcTpEzik7
+**Link:** https://n8n.kapa-digital.de/workflow/objM2PQrcTpEzik7
 **Mitbetroffen:** Content Studio [WF-3] `bBBybznNNCnU2nOJ` (verbraucht die Use Cases), KI Daily - Collect [WF-1] `mzSLn4WzFQSv0cuX` (liefert die Meldungen)
 **Aufgenommen:** 04.09.2026.
 **Stand:** A1 und A2 sind am 04.09.2026 publiziert (`c12ddfb3`, Rueckfallpunkt `57e371ca`). Die sechs Handwerk-Use-Cases sind angelegt. A3 und A4 stehen aus. Der erste Lauf mit den Aenderungen ist **Montag, 07.09.2026, 06:20**.

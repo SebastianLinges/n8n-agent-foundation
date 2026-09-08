@@ -1,7 +1,7 @@
 # Auftrag — KAPA Content Studio: Themenwahl, Videostrang, Bildformate, Aufräumen
 
 **Flow:** KAPA Digital - Content Studio [WF-3] — `bBBybznNNCnU2nOJ`
-**Link:** https://n8n.srv1307521.hstgr.cloud/workflow/bBBybznNNCnU2nOJ
+**Link:** https://n8n.kapa-digital.de/workflow/bBBybznNNCnU2nOJ
 **Mitbetroffen (nur lesend):** KI Daily · Collect [WF-1] `mzSLn4WzFQSv0cuX`, Analyze & Deliver [WF-2] `objM2PQrcTpEzik7`
 **Stand der Vorarbeit:** 03.09.2026, abends
 **Supabase:** Marketing-Projekt `ouccmqkwgdxjnplblnzk` (Tabellen `use_cases`, `content_packages`, `content_schedule`, Blocklist)
