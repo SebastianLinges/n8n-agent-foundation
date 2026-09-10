@@ -144,15 +144,25 @@ Zwei Konstruktionsfehler machten daraus eine Dauerschleife:
 
 **Entschieden: aufnehmen als Steckbrief, nicht ausschliessen.** Zehntausende Datenzeilen ergeben in 1600-Zeichen-Chunks gesichtslose Schnipsel, die im HNSW-Index gegen die guten Prosa-Chunks konkurrieren, und die Frage, die zu so einer Datei tatsaechlich gestellt wird, ist eine Aggregationsfrage - die kann RAG nicht beantworten. Wertvoll ist die Auffindbarkeit: dass es die Datei gibt, mit welchen Spalten, welchem Umfang, unter welchem Link. Reines Ueberspringen waere ausserdem folgenlos geblieben - ohne Eintrag bleibt die Schleife.
 
-**Als Draft gebaut** (Stand 10.09., **nicht publiziert**): `Blaetter auffaechern` → `Blattmasse holen` → `Blattmasse pruefen` → `Blattwerte holen` → `Steckbrief bauen` → `Tabelle als CSV bauen`. Der neue Vorabruf holt nur `address`, `rowCount`, `columnCount` ohne Werte; `Blattmasse pruefen` entscheidet daraus die URL des naechsten Abrufs - `usedRange` mit Werten bei kleinen Blaettern, sonst ein fest begrenztes Fenster ab der linken oberen Ecke des Bereichs. Unbekannte Masse gilt als zu gross: ein fehlgeschlagener Vorabruf ist kein Freibrief. Neue Stellschrauben in `Vorgaben`: `maxZellenJeBlatt: 150000`, `steckbriefZeilen: 20`, `steckbriefSpalten: 40`. Die Zellgrenze ist geschaetzt - 5 MB bei grob 20 Byte je serialisierter Zelle; konservativer waere 100 000.
+**Als Draft gebaut** (Stand 10.09., **nicht publiziert**): `Blaetter auffaechern` → `Blattmasse holen` → `Blattmasse pruefen` → `Blattwerte holen` → `Steckbrief bauen` → `Tabelle als CSV bauen`. Der neue Vorabruf holt nur `address`, `rowCount`, `columnCount` ohne Werte; `Blattmasse pruefen` entscheidet daraus die URL des naechsten Abrufs - `usedRange` mit Werten bei kleinen Blaettern, sonst ein fest begrenztes Fenster ab der linken oberen Ecke des Bereichs. Unbekannte Masse gilt als zu gross: ein fehlgeschlagener Vorabruf ist kein Freibrief. Stellschrauben in `Vorgaben`: `maxZellenJeBlatt: 150000`, `steckbriefZeilen: 8`, `steckbriefSpalten: 40`.
+
+**Geprueft mit zwei Handlaeufen** (118962 und 118987, gepinnter Auftrag, echte Graph-Aufrufe):
+
+- **Die Massenabfrage ohne `values` geht durch** - 7,1 s fuer beide Blaetter. Der Fail-Closed-Pfad mit dem blinden Fenster bleibt damit die Ausnahme, nicht die Regel.
+- Die echten Masse weichen von den angenommenen ab: Tabelle1 5702 x 31 = 176 762 Zellen, Rohdaten 18 050 x 34 = 613 700. **Beide liegen ueber der Grenze**, beide werden als Steckbrief aufgenommen.
+- Die Datei steht in der Wissensbasis, Kopfsatz vorhanden. Der Abgleich liefert sie nicht erneut ein - **die Schleife ist gebrochen**.
+
+**Warum die Zellgrenze bei 150 000 bleibt.** Der erste Lauf legte offen, dass von 15 Chunks nur zwei den Steckbrief trugen; die uebrigen dreizehn waren Artikelzeilen der Form `| 6 | 66 | 11 | false | ##Dillspitzen gerebelt | ...`. Der Steckbrief reproduzierte im Kleinen genau das Problem, gegen das er gebaut wurde. Eine hoehere Grenze haette Tabelle1 mit bis zu 5000 solchen Zeilen in den Index geholt - Tabelle1 ist Artikeldatenbestand wie Rohdaten, nur kuerzer. Dass die Grenze es gefangen hat, war richtig und kein Rueckschritt.
+
+**Nachgebessert** (zweiter Lauf): `steckbriefZeilen` von 20 auf 8, und `Steckbrief bauen` sucht die Kopfzeile jetzt in den ersten Zeilen statt nur in der ersten - dieselbe Guetebewertung, die `Tabelle als CSV bauen` fuer echte Tabellen ohnehin fuehrt. Bei Tabelle1 steht in Zeile 1 eine Statusangabe und die Kopfzeile in Zeile 2; vorher fehlte dort die Spaltenzeile vollstaendig, also ausgerechnet die Zeile, fuer die der Steckbrief gebaut wird. Ergebnis: **7 Chunks und 1306 Woerter statt 15 und 2878**, beide Spaltenzeilen und die Vorbemerkung in Supabase nachgewiesen.
+
+**Das Verhaeltnis zum SQL-Weg.** Die Frage, ob solche Dateien ueberhaupt in die Wissensbasis gehoeren, ist dieselbe wie in [Tabellendaten abfragbar machen](#tabellendaten-abfragbar-machen---plan): Vektorsuche findet aehnliche Texte, sie rechnet nicht. Ein zweites RAG fuer Reporting wuerde daran nichts aendern - es haette dieselbe Schwaeche. Der Steckbrief ist kein Umweg dorthin, sondern die billige Vorstufe des dort geplanten `tabellen_katalog`: er haelt fest, welche Mappe welches Blatt mit welchen Spalten und wie vielen Zeilen fuehrt. Er bleibt auch dann richtig, wenn der rechnende Pfad einmal steht - dann sagt die Wissensbasis, dass es die Datei gibt, und die Zahlen kommen aus SQL.
 
 **Offen:**
 
-- **Publizieren.** Solange das aussteht, faellt der Lauf jede Nacht erneut aus.
-- **Kein echter Lauf.** Geprueft sind nur Byte-Diffs und eine lokale Simulation der Kette mit den echten Kennzahlen. Nach hiesigem Massstab damit nicht verifiziert.
-- **Empirisch offen:** ob die Massenabfrage ohne `values` selbst durchgeht. Falls Graph die Matrix intern doch materialisiert, greift der Fail-Closed-Pfad - der Lauf haelt, nur die Umfangsangabe im Steckbrief fehlt.
+- **Publizieren.** Solange das aussteht, faellt der Nachtlauf weiter aus.
 - **Kostenseite:** ein zusaetzlicher Graph-Aufruf je Blatt. Bei vielen Arbeitsmappen in einem Lauf auf 429-Throttling achten.
-- **Nach dem ersten Nachtlauf pruefen**, ob die Datei in Supabase landet und der Abgleich sie am Folgeabend nicht erneut einliefert.
+- **Nach dem ersten Nachtlauf pruefen**, ob der Abgleich die Datei am Folgeabend nicht erneut einliefert.
 - **Restposten:** `Blattmasse pruefen` schreibt `blatt_masse_grund`, aber kein Knoten liest das Feld. Der Grund geht nicht verloren - er steht im Steckbrief-Text - aber in `_hinweise` taucht er nicht auf.
 
 **Nicht Teil davon:** eine harte Byte-Grenze in der Steuerung. Eigener, breiterer Hebel, der auch die OCR-Strecke gegen sehr grosse PDFs schuetzen wuerde.
