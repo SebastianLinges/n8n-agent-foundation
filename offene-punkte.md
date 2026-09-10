@@ -131,6 +131,32 @@ Rund 370 Zeilen ohne `page_id` stehen in `prozesshub_spiegel` (`4akduDBG2tJrtKw4
 
 ## SharePoint Schulungen
 
+### Zu grosse Arbeitsmappen-Blaetter - gebaut, wartet aufs Publizieren
+
+**Der Ingest scheitert jede Nacht an derselben Datei.** Seit dem 06.09. bricht `RAG - SharePoint Ingest` (`coDhu7pIaI2bpmGZ`) im Knoten `Blattwerte holen` ab - Laeufe 116244, 116718, 117425, 118120 und zuletzt **118808 am 10.09. um 01:30**. Immer `1. Soll Ist Vergleich 12 2023.xlsx` (7,94 MB), Blatt `Rohdaten`, rund 41 000 Zeilen.
+
+Die n8n-Meldung `400 - Bad request` fuehrt in die Irre: n8n mappt jeden Graph-400 auf diesen Text. Graph selbst sagt `ResponsePayloadSizeLimitExceeded`. Der Request war richtig, die **Antwort** war zu gross - die Workbook-API deckelt sie bei etwa 5 MB.
+
+Zwei Konstruktionsfehler machten daraus eine Dauerschleife:
+
+- `maxZeilenJeBlatt: 5000` griff erst **nach** dem Abruf, in `Tabelle als CSV bauen`. Der Abruf selbst holte ueber `usedRange` immer das ganze Blatt - die Bremse sass auf der falschen Seite der API-Grenze.
+- `Blattwerte holen` hatte kein `onError`. Ein Blatt riss die gesamte Sub-Execution mit, samt aller Schreib-Knoten. Ohne Eintrag in Supabase meldete der Abgleich die Datei am naechsten Abend erneut als fehlend.
+
+**Entschieden: aufnehmen als Steckbrief, nicht ausschliessen.** Zehntausende Datenzeilen ergeben in 1600-Zeichen-Chunks gesichtslose Schnipsel, die im HNSW-Index gegen die guten Prosa-Chunks konkurrieren, und die Frage, die zu so einer Datei tatsaechlich gestellt wird, ist eine Aggregationsfrage - die kann RAG nicht beantworten. Wertvoll ist die Auffindbarkeit: dass es die Datei gibt, mit welchen Spalten, welchem Umfang, unter welchem Link. Reines Ueberspringen waere ausserdem folgenlos geblieben - ohne Eintrag bleibt die Schleife.
+
+**Als Draft gebaut** (Stand 10.09., **nicht publiziert**): `Blaetter auffaechern` → `Blattmasse holen` → `Blattmasse pruefen` → `Blattwerte holen` → `Steckbrief bauen` → `Tabelle als CSV bauen`. Der neue Vorabruf holt nur `address`, `rowCount`, `columnCount` ohne Werte; `Blattmasse pruefen` entscheidet daraus die URL des naechsten Abrufs - `usedRange` mit Werten bei kleinen Blaettern, sonst ein fest begrenztes Fenster ab der linken oberen Ecke des Bereichs. Unbekannte Masse gilt als zu gross: ein fehlgeschlagener Vorabruf ist kein Freibrief. Neue Stellschrauben in `Vorgaben`: `maxZellenJeBlatt: 150000`, `steckbriefZeilen: 20`, `steckbriefSpalten: 40`. Die Zellgrenze ist geschaetzt - 5 MB bei grob 20 Byte je serialisierter Zelle; konservativer waere 100 000.
+
+**Offen:**
+
+- **Publizieren.** Solange das aussteht, faellt der Lauf jede Nacht erneut aus.
+- **Kein echter Lauf.** Geprueft sind nur Byte-Diffs und eine lokale Simulation der Kette mit den echten Kennzahlen. Nach hiesigem Massstab damit nicht verifiziert.
+- **Empirisch offen:** ob die Massenabfrage ohne `values` selbst durchgeht. Falls Graph die Matrix intern doch materialisiert, greift der Fail-Closed-Pfad - der Lauf haelt, nur die Umfangsangabe im Steckbrief fehlt.
+- **Kostenseite:** ein zusaetzlicher Graph-Aufruf je Blatt. Bei vielen Arbeitsmappen in einem Lauf auf 429-Throttling achten.
+- **Nach dem ersten Nachtlauf pruefen**, ob die Datei in Supabase landet und der Abgleich sie am Folgeabend nicht erneut einliefert.
+- **Restposten:** `Blattmasse pruefen` schreibt `blatt_masse_grund`, aber kein Knoten liest das Feld. Der Grund geht nicht verloren - er steht im Steckbrief-Text - aber in `_hinweise` taucht er nicht auf.
+
+**Nicht Teil davon:** eine harte Byte-Grenze in der Steuerung. Eigener, breiterer Hebel, der auch die OCR-Strecke gegen sehr grosse PDFs schuetzen wuerde.
+
 ### OCR schonen — drei Hebel liegen noch
 
 Aus dem Konzept [konzept-ocr-schonen.md](konzept-ocr-schonen.md):
