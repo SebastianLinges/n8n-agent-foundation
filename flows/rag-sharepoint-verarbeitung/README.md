@@ -39,7 +39,10 @@ doc_id, filename, aktion, grund, chunks, bilder, woerter, lauf_id, roh_status, f
 ```
 Auftrag → Vorgaben → Auftrag pruefen → Was tun ─┬ datei        → Datei holen ──────────────┐
                                                 ├ arbeitsmappe → Blattnamen → Blaetter     │
-                                                │                → Blattwerte → CSV bauen  │
+                                                │                → Blattmasse holen        │
+                                                │                → Blattmasse pruefen      │
+                                                │                → Blattwerte → Steckbrief │
+                                                │                → CSV bauen               │
                                                 │                → CSV nach Datei ─────────┤
                                                 └ loeschen     → [Löschzweig] ─────────┐   │
                                                                                        │   ↓
@@ -78,6 +81,25 @@ werden zu einer CSV mit dem Blattnamen als erster Spalte.
 Dabei wird jedes Blatt eingeschätzt: Echte Tabellen kommen mit ihren Spalten, Notizen und Formulare
 als Text unter `Blatt / Zeile / Inhalt`. **Die Kopfzeile wird gesucht, nicht angenommen** — sie steht
 selten in Zeile 1, darüber liegen Titel und Leerzeilen.
+
+**Zu grosse Blätter werden zum Steckbrief.** Die Workbook-API deckelt ihre Antwortgröße bei etwa
+5 MB. Ein Blatt mit zehntausenden Zeilen sprengt sie, und der Fehler kam als irreführendes
+`400 - Bad request` zurück. Deshalb wird vor dem Wertabruf nur die Größe geholt — `rowCount`,
+`columnCount` und Bereich, ohne Werte. Liegt das Blatt über `maxZellenJeBlatt`, holt der nächste
+Abruf statt des ganzen Blattes ein fest begrenztes Fenster ab der linken oberen Ecke des Bereichs,
+und `Steckbrief bauen` schreibt daraus beschreibenden Text: Umfang, Bereich, Spaltennamen, ein paar
+Beispielzeilen und der Hinweis, dass die vollständigen Daten nur im Original stehen.
+
+Das ist Absicht und kein Notbehelf. Zehntausende Datenzeilen ergeben in 1600-Zeichen-Chunks
+gesichtslose Schnipsel, die im Index gegen die guten Prosa-Chunks konkurrieren, und die Frage, die
+zu so einer Datei tatsächlich gestellt wird, ist eine Aggregationsfrage — die kann Vektorsuche nicht
+beantworten. Wertvoll ist, **dass** es die Datei gibt: Titel, Spalten, Umfang, Link. Ein reines
+Überspringen wäre außerdem folgenlos geblieben — ohne Eintrag meldet der Abgleich die Datei jeden
+Abend erneut als fehlend.
+
+Unbekannte Maße gelten als zu groß: ein fehlgeschlagener Vorabruf ist kein Freibrief für den großen
+Abruf. Beide HTTP-Knoten tragen `onError` — ein Problemblatt reißt den Lauf nicht mehr mit, sein
+Fehler landet in den Hinweisen.
 
 Ab `Tabelle als CSV bauen` ist das Dokument eine CSV: Name, Endung und Weg werden umgestellt
 (`Datei.xlsx` → `Datei (xlsx, Tabellen und Text).csv`). `Normalize SharePoint Input` erkennt das am
@@ -172,6 +194,9 @@ ohne etwas zu verbessern.
 | `112951` | `Shortcuts.xlsx`, Arbeitsmappe | 34 Zeilen, 8 Chunks, Name auf `(xlsx, Tabellen und Text).csv` umgestellt |
 | `112958` | `.docx` über PDF-Wandlung | `file_extension: pdf`, `document_ai`, 3 Chunks |
 | `112957` | Löschzweig, Logik echt / HTTP simuliert | `DONE_DELETED`, zwei Speicherpfade erkannt |
+| `118962` | `1. Soll Ist Vergleich 12 2023.xlsx`, 7,9 MB — das Dokument, das fünf Nachtläufe riss | Massenabfrage ohne `values` geht durch. Beide Blätter über der Grenze (176 762 und 613 700 Zellen), beide als Steckbrief. 15 Chunks |
+| `118987` | derselbe Auftrag nach dem Eindampfen des Steckbriefs | 7 Chunks statt 15, 1306 statt 2878 Wörter. Beide Spaltenzeilen und die Vorbemerkung nachgewiesen |
+| `119013` | derselbe Auftrag noch einmal, nach dem Publizieren | `unveraendert` / `DONE_NO_CHANGE`, 0 Chunks neu gebaut, Weg über `Touch Unchanged Source`. Der Abgleich liefert die Datei nicht erneut ein |
 
 ## Noch nicht belegt
 

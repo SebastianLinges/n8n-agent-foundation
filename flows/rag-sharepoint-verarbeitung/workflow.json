@@ -93,28 +93,6 @@
         ]
       ]
     },
-    "Blaetter auffaechern": {
-      "main": [
-        [
-          {
-            "node": "Blattwerte holen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Blattwerte holen": {
-      "main": [
-        [
-          {
-            "node": "Tabelle als CSV bauen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Tabelle als CSV bauen": {
       "main": [
         [
@@ -1036,6 +1014,61 @@
           }
         ]
       ]
+    },
+    "Blaetter auffaechern": {
+      "main": [
+        [
+          {
+            "node": "Blattmasse holen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blattmasse holen": {
+      "main": [
+        [
+          {
+            "node": "Blattmasse pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blattmasse pruefen": {
+      "main": [
+        [
+          {
+            "node": "Blattwerte holen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blattwerte holen": {
+      "main": [
+        [
+          {
+            "node": "Steckbrief bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Steckbrief bauen": {
+      "main": [
+        [
+          {
+            "node": "Tabelle als CSV bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "nodes": [
@@ -1067,7 +1100,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// ============================================================\n// VORGABEN DER VERARBEITUNG\n// Alles, was nicht vom einzelnen Auftrag abhaengt: Chunkgroesse,\n// Modelle, Speicherort - und das Formatwissen, welche Endung ueber\n// die PDF-Wandlung und welche ueber die Workbook-API laeuft.\n// Frueher hiess dieser Knoten Config.\n// ============================================================\nconst config = {\n  flowVersion: 'sharepoint-verarbeitung-v1',\n  embeddingModel: 'text-embedding-3-small',\n  embeddingDimensions: 1536,\n  chunkSize: 1600,\n  chunkOverlap: 200,\n  embeddingBatchSize: 50,\n  mistralModel: 'mistral-ocr-latest',\n  storageBucket: 'rag',\n  storagePublicBase: 'https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/public/rag/',\n  defaultAudience: 'public',\n  minBodyLength: 20,\n  sharePointSiteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet',\n\n  // Word und PowerPoint laesst Graph selbst nach PDF wandeln - sie\n  // laufen dann durch dieselbe OCR-Strecke wie die PDFs.\n  ueberPdf: ['docx', 'doc', 'pptx', 'ppt'],\n\n  // Arbeitsmappen ueber die Workbook-API, weil der Extract-Node nur\n  // ein Blatt kennt und die uebrigen lautlos weglaesst.\n  ueberWorkbook: ['xlsx', 'xlsm'],\n\n  maxZeilenJeBlatt: 5000\n};\n\nreturn $input.all().map(item => ({\n  json: { ...item.json, _config: config },\n  binary: item.binary\n}));"
+        "jsCode": "// ============================================================\n// VORGABEN DER VERARBEITUNG\n// Alles, was nicht vom einzelnen Auftrag abhaengt: Chunkgroesse,\n// Modelle, Speicherort - und das Formatwissen, welche Endung ueber\n// die PDF-Wandlung und welche ueber die Workbook-API laeuft.\n// Frueher hiess dieser Knoten Config.\n// ============================================================\nconst config = {\n  flowVersion: 'sharepoint-verarbeitung-v1',\n  embeddingModel: 'text-embedding-3-small',\n  embeddingDimensions: 1536,\n  chunkSize: 1600,\n  chunkOverlap: 200,\n  embeddingBatchSize: 50,\n  mistralModel: 'mistral-ocr-latest',\n  storageBucket: 'rag',\n  storagePublicBase: 'https://zckaxkpycyyxaymmkmvu.supabase.co/storage/v1/object/public/rag/',\n  defaultAudience: 'public',\n  minBodyLength: 20,\n  sharePointSiteUrl: 'https://rwgrheinland.sharepoint.com/sites/rwgintranet',\n\n  // Word und PowerPoint laesst Graph selbst nach PDF wandeln - sie\n  // laufen dann durch dieselbe OCR-Strecke wie die PDFs.\n  ueberPdf: ['docx', 'doc', 'pptx', 'ppt'],\n\n  // Arbeitsmappen ueber die Workbook-API, weil der Extract-Node nur\n  // ein Blatt kennt und die uebrigen lautlos weglaesst.\n  ueberWorkbook: ['xlsx', 'xlsm'],\n\n  maxZeilenJeBlatt: 5000,\n\n  // Vor dem Abruf gilt zusaetzlich eine Zellgrenze: Die Workbook-API\n  // deckelt die Antwortgroesse. Ein Blatt oberhalb dieser Zahl wird\n  // gar nicht erst geholt, sonst endet der Abruf in einem 400.\n  maxZellenJeBlatt: 150000,\n\n  // Was oberhalb dieser Grenze liegt, wird nicht uebersprungen,\n  // sondern als Steckbrief aufgenommen: ein Ausschnitt dieser\n  // Groesse wird in beschreibenden Text umgeschrieben.\n  //\n  // Wenige Zeilen genuegen. Der Wert des Steckbriefs steckt in den\n  // Spaltennamen und im Umfang, nicht in den Beispielen - jede\n  // weitere Datenzeile erzeugt nur einen weiteren gesichtslosen\n  // Chunk, der im Index gegen die guten Prosa-Chunks konkurriert.\n  steckbriefZeilen: 8,\n  steckbriefSpalten: 40\n};\n\nreturn $input.all().map(item => ({\n  json: { ...item.json, _config: config },\n  binary: item.binary\n}));"
       },
       "id": "b078a46b-20a5-4974-a2a9-17043d8974c4",
       "name": "Vorgaben",
@@ -1241,13 +1274,13 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        224,
+        176,
         64
       ]
     },
     {
       "parameters": {
-        "url": "={{ $json.blatt ? (\"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"/items/\" + $json.item_id + \"/workbook/worksheets/\" + encodeURIComponent($json.blatt) + \"/usedRange(valuesOnly=true)?$select=values,address,rowCount,columnCount\") : (\"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"?$select=id\") }}",
+        "url": "={{ $json.blatt_url }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "oAuth2Api",
         "options": {}
@@ -1257,23 +1290,24 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        448,
+        704,
         64
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "jsCode": "// ============================================================\n// ARBEITSMAPPE AUFBEREITEN\n//\n// Nicht jedes Blatt einer Arbeitsmappe ist eine Tabelle. Es gibt\n// Deckblaetter, Notizen, ausgefuellte Formulare und Layouts. Wer\n// dort blind die erste Zeile als Kopfzeile nimmt, erzeugt Unsinn.\n//\n// Und selbst echte Tabellen fangen selten in Zeile 1 an. Ueber der\n// Kopfzeile stehen Titel, Stand-Angaben oder Leerzeilen. Deshalb\n// wird die Kopfzeile in den ersten Zeilen gesucht statt angenommen.\n//\n// Tabellenblaetter kommen mit ihren echten Spalten, alles andere als\n// Text unter Blatt, Zeile und Inhalt. Beides landet in derselben\n// CSV, damit eine Datei ein Dokument bleibt.\n// ============================================================\nconst a = $('Auftrag pruefen').first().json;\nconst cfg = a._config || {};\nconst maxZeilen = Number(cfg.maxZeilenJeBlatt || 5000);\nconst SUCHTIEFE = 8;\n\nfunction text(v) { return v === null || v === undefined ? '' : String(v).trim(); }\nfunction istZahl(v) {\n  const s = text(v);\n  return s !== '' && !isNaN(Number(s.replace(/\\./g, '').replace(',', '.')));\n}\n\nfunction kopfGuete(werte, i) {\n  const zeile = werte[i] || [];\n  const gefuellt = zeile.filter(c => text(c) !== '');\n  if (gefuellt.length < 2) return 0;\n  const zahlanteil = gefuellt.filter(istZahl).length / gefuellt.length;\n  if (zahlanteil > 0.5) return 0;\n  const eindeutig = new Set(gefuellt.map(c => text(c).toLowerCase())).size;\n  if (eindeutig < gefuellt.length * 0.8) return 0;\n  if (gefuellt.filter(c => text(c).length > 120).length) return 0;\n  const probe = werte.slice(i + 1, i + 21);\n  if (probe.length < 2) return 0;\n  const schnitt = probe.reduce((s, z) => s + z.filter(c => text(c) !== '').length, 0) / probe.length;\n  if (schnitt / gefuellt.length < 0.3) return 0;\n  return gefuellt.length * Math.min(schnitt / gefuellt.length, 1) * 100 - i;\n}\n\nconst eingang = $input.all();\nconst tabellen = [];\nconst notizen = [];\nconst hinweise = [];\n\nfor (let i = 0; i < eingang.length; i++) {\n  const j = eingang[i].json || {};\n  const meta = $('Blaetter auffaechern').all()[i];\n  const name = (meta && meta.json.blatt) || j.blatt || ('Blatt ' + (i + 1));\n\n  if (meta && meta.json.blatt_fehler) { hinweise.push(name + ': ' + meta.json.blatt_fehler); continue; }\n  if (j.error) { hinweise.push(name + ': ' + String(j.error.message || j.error).slice(0, 120)); continue; }\n\n  const alle = Array.isArray(j.values) ? j.values : [];\n  const werte = alle.filter(z => z.some(c => text(c) !== ''));\n  if (!werte.length) { hinweise.push(name + ': leer'); continue; }\n  if (werte.length > maxZeilen + 1) hinweise.push(name + ': auf ' + maxZeilen + ' von ' + (werte.length - 1) + ' Zeilen begrenzt');\n\n  let besteZeile = -1;\n  let besteGuete = 0;\n  for (let k = 0; k < Math.min(SUCHTIEFE, werte.length - 2); k++) {\n    const g = kopfGuete(werte, k);\n    if (g > besteGuete) { besteGuete = g; besteZeile = k; }\n  }\n\n  if (besteZeile >= 0) {\n    const kopf = werte[besteZeile].map((c, k) => text(c) || ('Spalte ' + (k + 1)));\n    const davor = werte.slice(0, besteZeile)\n      .map((z, k) => ({ nr: k + 1, inhalt: z.map(text).filter(Boolean).join('  |  ') }))\n      .filter(z => z.inhalt);\n    if (davor.length) notizen.push({ name: name + ' (Kopfbereich)', zeilen: davor });\n    if (besteZeile > 0) hinweise.push(name + ': Kopfzeile in Zeile ' + (besteZeile + 1) + ' gefunden');\n    tabellen.push({ name, kopf, zeilen: werte.slice(besteZeile + 1, besteZeile + 1 + maxZeilen) });\n  } else {\n    const zeilen = werte.slice(0, maxZeilen).map((z, k) => ({\n      nr: k + 1,\n      inhalt: z.map(text).filter(Boolean).join('  |  ')\n    })).filter(z => z.inhalt);\n    if (zeilen.length) {\n      notizen.push({ name, zeilen });\n      hinweise.push(name + ': als Text uebernommen, keine Tabellenstruktur erkannt');\n    }\n  }\n}\n\nif (!tabellen.length && !notizen.length) {\n  return [{ json: Object.assign({}, a, { _uebersprungen: 'KEINE_BLATTDATEN', _hinweise: hinweise }) }];\n}\n\nconst spalten = [];\nconst bekannt = new Set();\nfor (const b of tabellen) {\n  for (const s of b.kopf) { if (!bekannt.has(s)) { bekannt.add(s); spalten.push(s); } }\n}\nif (notizen.length) {\n  for (const s of ['Zeile', 'Inhalt']) { if (!bekannt.has(s)) { bekannt.add(s); spalten.push(s); } }\n}\n\nfunction feld(v) {\n  const t = v === null || v === undefined ? '' : String(v);\n  return /[\",\\n\\r]/.test(t) ? '\"' + t.replace(/\"/g, '\"\"') + '\"' : t;\n}\n\nconst ausgabe = [['Blatt'].concat(spalten).map(feld).join(',')];\nlet zeilenTabelle = 0;\nlet zeilenText = 0;\n\nfor (const b of tabellen) {\n  const nachSpalte = {};\n  b.kopf.forEach((s, k) => { if (nachSpalte[s] === undefined) nachSpalte[s] = k; });\n  for (const z of b.zeilen) {\n    if (!z.some(c => text(c) !== '')) continue;\n    const reihe = [b.name].concat(spalten.map(s => {\n      const k = nachSpalte[s];\n      return k === undefined ? '' : z[k];\n    }));\n    ausgabe.push(reihe.map(feld).join(','));\n    zeilenTabelle++;\n  }\n}\n\nfor (const b of notizen) {\n  for (const z of b.zeilen) {\n    const reihe = [b.name].concat(spalten.map(s => {\n      if (s === 'Zeile') return z.nr;\n      if (s === 'Inhalt') return z.inhalt;\n      return '';\n    }));\n    ausgabe.push(reihe.map(feld).join(','));\n    zeilenText++;\n  }\n}\n\nconst csv = ausgabe.join('\\n');\nconst art = tabellen.length && notizen.length ? 'Tabellen und Text'\n          : tabellen.length ? 'alle Blaetter'\n          : 'als Text';\nconst basis = String(a.filename || '').replace(/\\.[^/.]+$/, '');\nconst csvName = basis + ' (' + a.endung + ', ' + art + ').csv';\n\n// Ab hier ist das Dokument eine CSV - Name, Endung und Weg werden\n// umgestellt, damit die Extraktionsstrecke sie richtig behandelt.\nreturn [{ json: Object.assign({}, a, {\n  _mappe: true,\n  csv_base64: Buffer.from(csv, 'utf8').toString('base64'),\n  filename: csvName,\n  title: csvName.replace(/\\.[^/.]+$/, ''),\n  ext: 'csv',\n  fileType: 'csv',\n  mime_type: 'text/csv',\n  mimeType: 'text/csv',\n  route_group: 'spreadsheet',\n  ueber_pdf_gewandelt: false,\n  _blaetter_tabelle: tabellen.map(b => b.name),\n  _blaetter_text: notizen.map(b => b.name),\n  _zeilen_tabelle: zeilenTabelle,\n  _zeilen_text: zeilenText,\n  _hinweise: hinweise\n}) }];"
+        "jsCode": "// ============================================================\n// ARBEITSMAPPE AUFBEREITEN\n//\n// Nicht jedes Blatt einer Arbeitsmappe ist eine Tabelle. Es gibt\n// Deckblaetter, Notizen, ausgefuellte Formulare und Layouts. Wer\n// dort blind die erste Zeile als Kopfzeile nimmt, erzeugt Unsinn.\n//\n// Und selbst echte Tabellen fangen selten in Zeile 1 an. Ueber der\n// Kopfzeile stehen Titel, Stand-Angaben oder Leerzeilen. Deshalb\n// wird die Kopfzeile in den ersten Zeilen gesucht statt angenommen.\n//\n// Tabellenblaetter kommen mit ihren echten Spalten, alles andere als\n// Text unter Blatt, Zeile und Inhalt. Beides landet in derselben\n// CSV, damit eine Datei ein Dokument bleibt.\n// ============================================================\nconst a = $('Auftrag pruefen').first().json;\nconst cfg = a._config || {};\nconst maxZeilen = Number(cfg.maxZeilenJeBlatt || 5000);\nconst SUCHTIEFE = 8;\n\nfunction text(v) { return v === null || v === undefined ? '' : String(v).trim(); }\nfunction istZahl(v) {\n  const s = text(v);\n  return s !== '' && !isNaN(Number(s.replace(/\\./g, '').replace(',', '.')));\n}\n\nfunction kopfGuete(werte, i) {\n  const zeile = werte[i] || [];\n  const gefuellt = zeile.filter(c => text(c) !== '');\n  if (gefuellt.length < 2) return 0;\n  const zahlanteil = gefuellt.filter(istZahl).length / gefuellt.length;\n  if (zahlanteil > 0.5) return 0;\n  const eindeutig = new Set(gefuellt.map(c => text(c).toLowerCase())).size;\n  if (eindeutig < gefuellt.length * 0.8) return 0;\n  if (gefuellt.filter(c => text(c).length > 120).length) return 0;\n  const probe = werte.slice(i + 1, i + 21);\n  if (probe.length < 2) return 0;\n  const schnitt = probe.reduce((s, z) => s + z.filter(c => text(c) !== '').length, 0) / probe.length;\n  if (schnitt / gefuellt.length < 0.3) return 0;\n  return gefuellt.length * Math.min(schnitt / gefuellt.length, 1) * 100 - i;\n}\n\nconst eingang = $input.all();\nconst tabellen = [];\nconst notizen = [];\nconst hinweise = [];\n\nfor (let i = 0; i < eingang.length; i++) {\n  const j = eingang[i].json || {};\n  const meta = $('Blattmasse pruefen').all()[i];\n  const name = (meta && meta.json.blatt) || j.blatt || ('Blatt ' + (i + 1));\n\n  if (meta && meta.json.blatt_fehler) { hinweise.push(name + ': ' + meta.json.blatt_fehler); continue; }\n  if (j.error) { hinweise.push(name + ': ' + String(j.error.message || j.error).slice(0, 120)); continue; }\n\n  const alle = Array.isArray(j.values) ? j.values : [];\n  const werte = alle.filter(z => z.some(c => text(c) !== ''));\n  if (!werte.length) { hinweise.push(name + ': leer'); continue; }\n  if (werte.length > maxZeilen + 1) hinweise.push(name + ': auf ' + maxZeilen + ' von ' + (werte.length - 1) + ' Zeilen begrenzt');\n\n  let besteZeile = -1;\n  let besteGuete = 0;\n  for (let k = 0; k < Math.min(SUCHTIEFE, werte.length - 2); k++) {\n    const g = kopfGuete(werte, k);\n    if (g > besteGuete) { besteGuete = g; besteZeile = k; }\n  }\n\n  if (besteZeile >= 0) {\n    const kopf = werte[besteZeile].map((c, k) => text(c) || ('Spalte ' + (k + 1)));\n    const davor = werte.slice(0, besteZeile)\n      .map((z, k) => ({ nr: k + 1, inhalt: z.map(text).filter(Boolean).join('  |  ') }))\n      .filter(z => z.inhalt);\n    if (davor.length) notizen.push({ name: name + ' (Kopfbereich)', zeilen: davor });\n    if (besteZeile > 0) hinweise.push(name + ': Kopfzeile in Zeile ' + (besteZeile + 1) + ' gefunden');\n    tabellen.push({ name, kopf, zeilen: werte.slice(besteZeile + 1, besteZeile + 1 + maxZeilen) });\n  } else {\n    const zeilen = werte.slice(0, maxZeilen).map((z, k) => ({\n      nr: k + 1,\n      inhalt: z.map(text).filter(Boolean).join('  |  ')\n    })).filter(z => z.inhalt);\n    if (zeilen.length) {\n      notizen.push({ name, zeilen });\n      hinweise.push(name + ': als Text uebernommen, keine Tabellenstruktur erkannt');\n    }\n  }\n}\n\nif (!tabellen.length && !notizen.length) {\n  return [{ json: Object.assign({}, a, { _uebersprungen: 'KEINE_BLATTDATEN', _hinweise: hinweise }) }];\n}\n\nconst spalten = [];\nconst bekannt = new Set();\nfor (const b of tabellen) {\n  for (const s of b.kopf) { if (!bekannt.has(s)) { bekannt.add(s); spalten.push(s); } }\n}\nif (notizen.length) {\n  for (const s of ['Zeile', 'Inhalt']) { if (!bekannt.has(s)) { bekannt.add(s); spalten.push(s); } }\n}\n\nfunction feld(v) {\n  const t = v === null || v === undefined ? '' : String(v);\n  return /[\",\\n\\r]/.test(t) ? '\"' + t.replace(/\"/g, '\"\"') + '\"' : t;\n}\n\nconst ausgabe = [['Blatt'].concat(spalten).map(feld).join(',')];\nlet zeilenTabelle = 0;\nlet zeilenText = 0;\n\nfor (const b of tabellen) {\n  const nachSpalte = {};\n  b.kopf.forEach((s, k) => { if (nachSpalte[s] === undefined) nachSpalte[s] = k; });\n  for (const z of b.zeilen) {\n    if (!z.some(c => text(c) !== '')) continue;\n    const reihe = [b.name].concat(spalten.map(s => {\n      const k = nachSpalte[s];\n      return k === undefined ? '' : z[k];\n    }));\n    ausgabe.push(reihe.map(feld).join(','));\n    zeilenTabelle++;\n  }\n}\n\nfor (const b of notizen) {\n  for (const z of b.zeilen) {\n    const reihe = [b.name].concat(spalten.map(s => {\n      if (s === 'Zeile') return z.nr;\n      if (s === 'Inhalt') return z.inhalt;\n      return '';\n    }));\n    ausgabe.push(reihe.map(feld).join(','));\n    zeilenText++;\n  }\n}\n\nconst csv = ausgabe.join('\\n');\nconst art = tabellen.length && notizen.length ? 'Tabellen und Text'\n          : tabellen.length ? 'alle Blaetter'\n          : 'als Text';\nconst basis = String(a.filename || '').replace(/\\.[^/.]+$/, '');\nconst csvName = basis + ' (' + a.endung + ', ' + art + ').csv';\n\n// Ab hier ist das Dokument eine CSV - Name, Endung und Weg werden\n// umgestellt, damit die Extraktionsstrecke sie richtig behandelt.\nreturn [{ json: Object.assign({}, a, {\n  _mappe: true,\n  csv_base64: Buffer.from(csv, 'utf8').toString('base64'),\n  filename: csvName,\n  title: csvName.replace(/\\.[^/.]+$/, ''),\n  ext: 'csv',\n  fileType: 'csv',\n  mime_type: 'text/csv',\n  mimeType: 'text/csv',\n  route_group: 'spreadsheet',\n  ueber_pdf_gewandelt: false,\n  _blaetter_tabelle: tabellen.map(b => b.name),\n  _blaetter_text: notizen.map(b => b.name),\n  _zeilen_tabelle: zeilenTabelle,\n  _zeilen_text: zeilenText,\n  _hinweise: hinweise\n}) }];"
       },
       "id": "c58bbb72-343a-4ef5-914e-f87859f3834c",
       "name": "Tabelle als CSV bauen",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        688,
+        1056,
         64
       ]
     },
@@ -1306,7 +1340,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        912,
+        1232,
         64
       ]
     },
@@ -1324,7 +1358,7 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        1232,
+        1392,
         -16
       ]
     },
@@ -1532,8 +1566,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        2208,
-        -112
+        2144,
+        -240
       ]
     },
     {
@@ -1614,7 +1648,7 @@
       "typeVersion": 2,
       "position": [
         3104,
-        -96
+        -128
       ]
     },
     {
@@ -1626,8 +1660,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2240,
-        432
+        2528,
+        528
       ]
     },
     {
@@ -1639,8 +1673,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2608,
-        704
+        2528,
+        304
       ]
     },
     {
@@ -1671,8 +1705,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        2112,
-        -688
+        2128,
+        -720
       ],
       "retryOnFail": true,
       "maxTries": 3,
@@ -1810,7 +1844,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3232,
+        3136,
         -704
       ]
     },
@@ -2640,8 +2674,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        0,
-        704
+        736,
+        1136
       ]
     },
     {
@@ -2870,6 +2904,57 @@
         2784,
         1136
       ]
+    },
+    {
+      "id": "4fbc6dd1-1e50-4f02-acff-037975036761",
+      "name": "Blattmasse holen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        352,
+        64
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "method": "GET",
+        "options": {},
+        "sendBody": false,
+        "sendHeaders": false,
+        "sendQuery": false,
+        "url": "={{ $json.blatt ? (\"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"/items/\" + $json.item_id + \"/workbook/worksheets/\" + encodeURIComponent($json.blatt) + \"/usedRange(valuesOnly=true)?$select=address,rowCount,columnCount\") : (\"https://graph.microsoft.com/v1.0/drives/\" + $json.drive_id + \"?$select=id\") }}"
+      },
+      "notes": "Nur Groesse, keine Werte: rowCount, columnCount, address.",
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "bfeb1a4d-b220-40df-ae55-fbe0247aed58",
+      "name": "Blattmasse pruefen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        64
+      ],
+      "parameters": {
+        "jsCode": "// ============================================================\n// BLATTMASSE PRUEFEN\n//\n// Die Workbook-API deckelt die Groesse ihrer Antwort. Ein Blatt mit\n// zehntausenden Zeilen sprengt sie, der Abruf endet in einem 400\n// (ResponsePayloadSizeLimitExceeded) und riss bisher den ganzen Lauf\n// mit - auch die Blaetter, die schon gelesen waren.\n//\n// Deshalb wird vorher nur die Groesse geholt: rowCount, columnCount\n// und Bereich, ohne Werte. Dieser Knoten entscheidet daraus, welche\n// URL der naechste Abruf bekommt:\n//\n//   klein                  -> usedRange mit Werten, wie bisher\n//   zu gross / unbekannt   -> ein fest begrenztes Fenster ab der\n//                             linken oberen Ecke des Bereichs\n//   kein Blatt             -> billiger Leeraufruf\n//\n// Warum bei grossen Blaettern ein Ausschnitt statt Ueberspringen:\n// Zehntausende Datenzeilen ergeben in der Wissensbasis ohnehin nur\n// gesichtslose Chunks, die gegen die guten Prosa-Chunks konkurrieren,\n// und die Frage, die jemand zu so einer Datei tatsaechlich stellt,\n// ist eine Aggregationsfrage - die kann RAG nicht beantworten.\n// Wertvoll ist, DASS es die Datei gibt: Titel, Spalten, Umfang, Link.\n// Daraus baut der naechste Knoten einen Steckbrief.\n//\n// Ein reines Ueberspringen waere ausserdem folgenlos geblieben: ohne\n// Eintrag in der Wissensbasis meldet der Abgleich die Datei am\n// naechsten Abend erneut als fehlend - genau die Schleife, die hier\n// gebrochen werden soll.\n//\n// Das Fenster kann die Antwortgrenze nicht reissen, weil seine\n// Zellzahl feststeht. Unbekannte Masse wird deshalb wie zu gross\n// behandelt: ein fehlgeschlagener Vorabruf ist kein Freibrief fuer\n// den grossen Abruf.\n// ============================================================\nconst a = $('Auftrag pruefen').first().json;\nconst cfg = a._config || {};\nconst maxZellen = Number(cfg.maxZellenJeBlatt || 150000);\nconst auszugZeilen = Number(cfg.steckbriefZeilen || 20);\nconst auszugSpalten = Number(cfg.steckbriefSpalten || 40);\n\n// Der benutzte Bereich faengt nicht zwingend bei A1 an. Damit das\n// Fenster dort sitzt, wo die Daten stehen, wird die linke obere Ecke\n// aus der Adresse gelesen statt angenommen.\nfunction ecke(adr) {\n  const roh = String(adr || '');\n  const ohneBlatt = roh.indexOf('!') >= 0 ? roh.slice(roh.indexOf('!') + 1) : roh;\n  const start = ohneBlatt.split(':')[0];\n  const m = /^\\$?([A-Za-z]+)\\$?(\\d+)$/.exec(start);\n  if (!m) return { spalte: 'A', zeile: 1 };\n  return { spalte: m[1].toUpperCase(), zeile: Number(m[2]) };\n}\nfunction spalteZuNummer(s) {\n  let n = 0;\n  for (const z of s) n = n * 26 + (z.charCodeAt(0) - 64);\n  return n;\n}\nfunction nummerZuSpalte(n) {\n  let s = '';\n  let r = n;\n  while (r > 0) {\n    const rest = (r - 1) % 26;\n    s = String.fromCharCode(65 + rest) + s;\n    r = Math.floor((r - 1) / 26);\n  }\n  return s || 'A';\n}\n\nconst blaetter = $('Blaetter auffaechern').all();\nconst masse = $input.all();\n\nreturn blaetter.map((eintrag, i) => {\n  const meta = Object.assign({}, eintrag.json);\n  const leeraufruf = 'https://graph.microsoft.com/v1.0/drives/' + meta.drive_id + '?$select=id';\n\n  // Kein Blatt oder schon vorher vermerkt: unveraendert durchreichen.\n  if (!meta.blatt || meta.blatt_fehler) {\n    meta.blatt_url = leeraufruf;\n    meta.blatt_steckbrief = false;\n    return { json: meta };\n  }\n\n  const pfad = 'https://graph.microsoft.com/v1.0/drives/' + meta.drive_id\n    + '/items/' + meta.item_id + '/workbook/worksheets/'\n    + encodeURIComponent(meta.blatt) + '/';\n\n  const p = (masse[i] && masse[i].json) || null;\n  const zeilen = p ? Number(p.rowCount) : NaN;\n  const spalten = p ? Number(p.columnCount) : NaN;\n  const bekannt = !!p && !p.error && zeilen > 0 && spalten > 0;\n\n  meta.blatt_zeilen_gesamt = bekannt ? zeilen : null;\n  meta.blatt_spalten_gesamt = bekannt ? spalten : null;\n  meta.blatt_zellen = bekannt ? zeilen * spalten : null;\n  meta.blatt_bereich = (p && p.address) || null;\n  meta.blatt_masse_unbekannt = !bekannt;\n  if (!bekannt) {\n    meta.blatt_masse_grund = p && p.error\n      ? String(p.error.message || p.error).slice(0, 160)\n      : 'KEINE_MASSE';\n  }\n\n  if (bekannt && zeilen * spalten <= maxZellen) {\n    meta.blatt_steckbrief = false;\n    meta.blatt_url = pfad + 'usedRange(valuesOnly=true)?$select=values,address,rowCount,columnCount';\n    return { json: meta };\n  }\n\n  const start = ecke(meta.blatt_bereich);\n  const breite = bekannt ? Math.min(spalten, auszugSpalten) : auszugSpalten;\n  const bisSpalte = nummerZuSpalte(spalteZuNummer(start.spalte) + breite - 1);\n  const fenster = start.spalte + start.zeile + ':' + bisSpalte + (start.zeile + auszugZeilen - 1);\n\n  meta.blatt_steckbrief = true;\n  meta.blatt_auszug_bereich = fenster;\n  meta.blatt_auszug_zeilen = auszugZeilen;\n  meta.blatt_url = pfad + \"range(address='\" + fenster + \"')?$select=values,address,rowCount,columnCount\";\n  return { json: meta };\n});"
+      }
+    },
+    {
+      "id": "4adbca50-8a03-4e55-a498-9a8f28836fbf",
+      "name": "Steckbrief bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        64
+      ],
+      "parameters": {
+        "jsCode": "// ============================================================\n// STECKBRIEF BAUEN\n//\n// Fuer Blaetter oberhalb der Zellgrenze steht im Eingang nur ein\n// Ausschnitt der ersten Zeilen. Roh in die Wissensbasis gelegt waere\n// das irrefuehrend: ein paar Datenzeilen sehen aus wie die ganze\n// Tabelle, und niemand sieht der Datei an, dass sie zehntausende\n// weitere hat.\n//\n// Deshalb wird der Ausschnitt hier in beschreibenden Text\n// umgeschrieben - Umfang, Bereich, Spalten, Beispielzeilen und der\n// Hinweis auf das Original. Das beantwortet die Frage, die zu so\n// einer Datei ueberhaupt sinnvoll gestellt werden kann: dass es sie\n// gibt und was in ihr steht.\n//\n// Technisch ersetzt der Knoten dazu die Wertematrix des Blattes\n// durch eine einspaltige Textmatrix. Der folgende Knoten erkennt\n// darin keine Tabellenstruktur und uebernimmt sie als Text - genau\n// wie bei Deckblaettern und Notizzetteln. Alle anderen Blaetter\n// laufen unveraendert durch, ebenso Blaetter, deren Abruf\n// fehlgeschlagen ist: deren Fehler gehoert in die Hinweise, nicht\n// in den Text.\n// ============================================================\nconst a = $('Auftrag pruefen').first().json;\nconst meta = $('Blattmasse pruefen').all();\n\nfunction zahl(n) {\n  try { return new Intl.NumberFormat('de-DE').format(Number(n)); }\n  catch (e) { return String(n); }\n}\nfunction text(v) { return v === null || v === undefined ? '' : String(v).trim(); }\nfunction istZahl(v) {\n  const s = text(v);\n  return s !== '' && !isNaN(Number(s.replace(/\\./g, '').replace(',', '.')));\n}\n\n// Die Kopfzeile steht nicht zwingend in der ersten Zeile - darueber\n// stehen Titel, Stand-Angaben oder ausgefuellte Hinweise. Sie wird\n// deshalb in den ersten Zeilen gesucht statt angenommen, so wie es\n// der folgende Knoten fuer echte Tabellen ohnehin tut. Ohne diese\n// Suche fehlt dem Steckbrief ausgerechnet seine wertvollste Zeile:\n// die Spaltennamen, an denen ein Suchender die Datei erkennt.\nconst SUCHTIEFE = 8;\nfunction kopfGuete(werte, i) {\n  const zeile = (werte[i] || []).map(text).filter(Boolean);\n  if (zeile.length < 2) return 0;\n  if (zeile.filter(istZahl).length > zeile.length / 2) return 0;\n  if (new Set(zeile.map(c => c.toLowerCase())).size < zeile.length * 0.8) return 0;\n  if (zeile.filter(c => c.length > 120).length) return 0;\n  return zeile.length * 100 - i;\n}\n\nreturn $input.all().map((eintrag, i) => {\n  const j = eintrag.json || {};\n  const m = (meta[i] && meta[i].json) || {};\n\n  if (!m.blatt_steckbrief || j.error) return eintrag;\n\n  const werte = Array.isArray(j.values) ? j.values : [];\n  const gefuellt = werte.filter(z => z.some(c => text(c) !== ''));\n\n  const zeilen = [];\n  zeilen.push('Blatt \"' + m.blatt + '\" der Datei \"' + (a.filename || '') + '\".');\n\n  if (m.blatt_zeilen_gesamt) {\n    zeilen.push('Umfang: ' + zahl(m.blatt_zeilen_gesamt) + ' Zeilen und '\n      + zahl(m.blatt_spalten_gesamt) + ' Spalten'\n      + (m.blatt_bereich ? ' im Bereich ' + m.blatt_bereich : '') + '.');\n    zeilen.push('Das Blatt ist zu umfangreich fuer die vollstaendige Uebernahme. Aufgenommen sind nur die ersten '\n      + zahl(m.blatt_auszug_zeilen) + ' Zeilen als Beispiel; die vollstaendigen Daten stehen ausschliesslich in der Originaldatei.');\n  } else {\n    zeilen.push('Der Umfang des Blattes liess sich nicht ermitteln. Aufgenommen sind nur die ersten '\n      + zahl(m.blatt_auszug_zeilen) + ' Zeilen als Beispiel; die vollstaendigen Daten stehen ausschliesslich in der Originaldatei.');\n  }\n\n  if (gefuellt.length) {\n    let besteZeile = -1;\n    let besteGuete = 0;\n    for (let k = 0; k < Math.min(SUCHTIEFE, gefuellt.length - 1); k++) {\n      const g = kopfGuete(gefuellt, k);\n      if (g > besteGuete) { besteGuete = g; besteZeile = k; }\n    }\n\n    // Was ueber der Kopfzeile steht, ist oft der Hinweis, worum es\n    // in dem Blatt geht - er gehoert in den Steckbrief.\n    const davor = (besteZeile > 0 ? gefuellt.slice(0, besteZeile) : [])\n      .map(z => z.map(text).filter(Boolean).join('  |  '))\n      .filter(Boolean);\n    for (const v of davor) zeilen.push('Vorbemerkung: ' + v);\n\n    if (besteZeile >= 0) {\n      zeilen.push('Spalten: ' + gefuellt[besteZeile].map(text).filter(Boolean).join('  |  '));\n    }\n\n    const rest = besteZeile >= 0 ? gefuellt.slice(besteZeile + 1) : gefuellt;\n    let nr = 0;\n    for (const z of rest) {\n      const inhalt = z.map(text).filter(Boolean).join('  |  ');\n      if (!inhalt) continue;\n      nr++;\n      zeilen.push('Beispielzeile ' + nr + ': ' + inhalt);\n    }\n  } else {\n    zeilen.push('Aus dem Blatt liess sich kein Auszug lesen.');\n  }\n\n  return { json: Object.assign({}, j, { values: zeilen.map(z => [z]) }) };\n});"
+      }
     }
   ],
   "nodeGroups": [],
