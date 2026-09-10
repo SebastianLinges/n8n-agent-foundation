@@ -33,3 +33,25 @@ Aufgekommen am 04.09.2026. Zielt auf die Ursache der Handwerk-Luecke, nicht auf 
 **Was ausdruecklich NICHT automatisiert werden sollte:** das Kommentieren unter fremden Beitraegen. Ein Firmenkonto, das automatisch unter Kammerbeitraegen kommentiert, ist ein Reputationsrisiko und widerspricht der eigenen Redaktionslogik - der ganze Aufwand mit Ankern, Belegpflicht und Mengenwoertern existiert, weil eine Maschine unter dem Firmennamen leicht Unsinn schreibt. Unter einem fremden Beitrag faellt das direkt auf den Absender zurueck.
 
 **Sinnvoll dagegen:** Kammerinhalte als Eingang fuer eigene Beitraege, mit Quellenangabe. Und eine gepflegte Liste relevanter Kammer- und Zentrenkonten, unter denen sich das Mitreden lohnt - das bleibt Handarbeit und Beziehungsarbeit.
+
+## E-Rechnung vor der Buchung prüfen
+
+Aufgekommen am 10.09.2026.
+
+**Die Idee:** Rechnung aus dem Posteingang holen, gegen die Regeln prüfen, Ergebnis an die Buchhaltung, bei Fehlern Rückmeldung an den Absender. Der Nutzen ist beim Eingang größer als beim Ausgang: Seit 2025 müssen Unternehmen E-Rechnungen empfangen können, und ein fehlerhafter Beleg kostet dort eine Rückfrage. Alternativ beim Ausgang vor dem Versand.
+
+**Möglicher Anbieter:** [ZUGFeRD-Validator](https://zugferd-validator.de/). Laut Anbieterseite, abgerufen am 10.09.2026, nicht selbst geprüft:
+
+| Punkt | Angabe |
+| --- | --- |
+| Formate | ZUGFeRD 2.x (alle Profile), Factur-X, XRechnung (UBL und CII) |
+| Regeln | EN 16931 und die deutschen Geschäftsregeln BR-DE |
+| API | REST, Schlüssel im Header `X-Api-Key`; Endpunkte u. a. `validate_invoice`, `extract_xml`, `check_consistency` (sichtbares PDF gegen XML), `create_invoice`, `validation_report` |
+| Antwort | JSON mit Regel-ID, betroffenem Feld, Zeile und Korrekturvorschlag; rund 2 s je Prüfung |
+| Kosten | kostenlos 20 Prüfungen/Woche; 19 €/Monat für 500/Woche mit API (60 Aufrufe/Std.); 69 €/Monat unbegrenzt (300 Aufrufe/Std.); jährliche Abrechnung |
+| Datenschutz | Server in Nürnberg; Dateien bleiben laut Anbieter nur im Arbeitsspeicher und werden nicht gespeichert |
+| Prüfkern | Mustang und KoSIT-Validator; dazu eine MCP-Anbindung für KI-Agenten |
+
+**Es geht auch ohne Dritten.** Beide Prüfwerkzeuge sind Open Source: Der KoSIT-Validator ist das amtliche Prüfwerkzeug für die XRechnung, Mustang prüft und liest ZUGFeRD. Selbst betrieben macht das mehr Aufwand beim Einrichten, dafür bleiben die Rechnungen im Haus und es gibt kein Kontingent.
+
+**Zu klären vor einem Start:** Rechnungen enthalten Namen, Adressen, Beträge und Bankdaten. Beim Anbieter verlassen sie das Haus - dafür braucht es eine Freigabe von Datenschutz und IT und einen Auftragsverarbeitungsvertrag, auch wenn der Anbieter nichts speichert. Außerdem offen: ob das Vorhaben RWG oder KAPA Digital betrifft, und damit welcher Posteingang und welche Buchhaltung gemeint sind.
