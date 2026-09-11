@@ -109,6 +109,12 @@ Belegt an beiden echten Nutzlasten: Lauf `113871` (Abo-Ereignis) endet bei `Kein
 
 In `agent_requests` stehen **3 Alteinträge** mit einer Abo-ID statt einer Nachrichten-ID (unter 808 Zeilen, seit dem 15.07.). Sie sind wirkungslos: Zu ihnen gehört keine Nachricht, und der Duplikatschutz greift nur auf die eigene ID.
 
+## Das Graph-Abo lebt nur 72 Stunden
+
+Der Trigger empfängt über ein Graph-Abo auf `/me/chats/getAllMessages`. n8n legt es beim Aktivieren an und **verlängert es nie**; nach knapp 72 Stunden kommt nichts mehr an. Es gibt dann weder eine Ausführung noch einen Fehler, der Agent schweigt einfach. So geschehen vom 05.09. bis 08.09. und am 11.09. mittags, zweimal zufällig behoben durch eine Neuaktivierung.
+
+**Am Leben hält es seit dem 11.09. der Monitor** (`flows/rwg-monitor-graph-teams/`): Er verlängert das Abo einmal am Tag und schlägt Alarm, wenn es fehlt. Fehlt es, hilft nur, diesen Flow **neu zu publizieren**; anlegen kann das Abo nur der Trigger selbst. Wird der Trigger-Node ersetzt statt nur neu publiziert, ändert sich seine webhookId, und `agentWebhookId` in der `Config` des Monitors muss nachgezogen werden.
+
 ## Offene Punkte
 
 **Begrüßungsantwort läuft auf `gpt-4o-mini`.** Der Node `Greeting Reply` nutzt ein eigenes, altes Modell mit `temperature 0.6`. Das ist kein Fehler — gpt-4o-mini akzeptiert den Parameter — aber eine Modellgeneration hinter dem Agenten. Ein Wechsel wäre eine Verhaltensänderung und keine Bereinigung; deshalb offen.
