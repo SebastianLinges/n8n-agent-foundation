@@ -49,7 +49,8 @@ Nicht aufwerfen, das ist geklärt:
 - **Ein HTTP-Node ohne `onError` beendet den ganzen Lauf.** In einer Schleife über viele Dokumente reißt ein einzelner Netzabbruch alles Übrige mit.
 - **n8n legt bei HTTP-Fehlern das komplette Request-Objekt in den Ausführungsdaten ab**, samt `apikey` und `Authorization` im Klartext.
 - **Ein Fehlerausgang liefert weder `httpCode` noch den Knotennamen mit.** Bei `onError: continueErrorOutput` trägt das Item nur die Meldung. Wer wissen will, an welchem Knoten es klemmte, muss `$prevNode.name` lesen; die Fehlerart lässt sich nur am Meldungstext erkennen. Gemessen in Lauf 111419.
-- **Telegram liest jede Nachricht als Markup.** Ein einzelner Unterstrich ohne Gegenstück — etwa in `KONTINGENT_ERSCHOEPFT` — lässt den Versand mit `can't parse entities` scheitern, und zwar lautlos, wenn der Node `onError` trägt. Gegenmittel ist `parse_mode: HTML` und das Maskieren von `&`, `<` und `>` im eingesetzten Text. Belegt in Lauf 111467 gegen 111469.
+- **Telegram liest jede Nachricht als Markup.** Ohne `parse_mode` sendet der Node als Markdown. Ein einzelner Unterstrich ohne Gegenstück — etwa in `KONTINGENT_ERSCHOEPFT`, `rwg_automate` oder `RWG_Jira-Agent` — lässt den Versand mit `can't parse entities` scheitern, und zwar lautlos, wenn der Node `onError` trägt. Gegenmittel ist `parse_mode: HTML` und das Maskieren von `&`, `<` und `>` im eingesetzten Text. Belegt in Lauf 111467 gegen 111469. Der zentrale Fehlermelder `Telegram_Error_Info` hatte dieselbe Falle bis zum 11.09.; bis dahin ist kein einziger Alarm des Monitors angekommen.
+- **Das Graph-Abo des Teams-Triggers stirbt nach 72 Stunden, und das ohne jede Meldung.** n8n legt es nur beim Aktivieren an und verlängert es nie. Danach gibt es keine Ausführung und keinen Fehler, der Agent schweigt einfach (05.–08.09. und 11.09.). Seit dem 11.09. verlängert es der Monitor `1OcqfC4wTC9bj0wK`. Fehlt es trotzdem, hilft nur, den Teams-Agenten neu zu publizieren: Anlegen kann es nur der Trigger selbst, weil nur er das `clientState` kennt. Details in `flows/rwg-monitor-graph-teams/README.md`.
 - **Der Supabase-MCP-Zugang liest nur.** `execute_sql` scheitert bei jedem Schreibversuch mit `cannot execute DROP TABLE in a read-only transaction`. DDL geht ausschliesslich ueber `apply_migration`.
 - **Der Postgres-Node durchsucht den gesamten Abfragetext nach Dollar-Platzhaltern** — auch in Zeichenketten und **in Kommentaren**. Ein `$1` in einem Kommentar bricht die Abfrage mit `out of range`; ein `$` ohne Ziffer wird still verschluckt (ein Zeilenende-Anker in einem regulären Ausdruck verschwand samt Anführungszeichen). Platzhalter zur Laufzeit aus `chr(36)` bauen, Daten immer über `queryReplacement` binden.
 - **Ein Node ohne Ausgabeitems stoppt seinen Zweig.** Ein PostgREST-`DELETE` oder `PATCH` ohne Treffer liefert mit `Prefer: return=representation` ein leeres Array — n8n macht daraus null Items, und alles Nachfolgende läuft nicht mehr. In einer Schleife bleibt der Rest der Aufgaben liegen, und der Lauf gilt trotzdem als erfolgreich. Gegenmittel ist `alwaysOutputData` am betroffenen Node — aber nur, wenn die nachgelagerten Nodes aus **benannten Vorgängern** lesen. Hängt dahinter ein Aggregate-Node oder etwas, das Items zählt, verfälscht das eingefügte Leer-Item die Zahl.
@@ -99,7 +100,7 @@ Dazu 319 Zeilen in `sharepoint_documents` und der Bucket `rag`. Gelesen wird üb
 
 **Vor größeren Eingriffen** die Gesundheitsprüfung laufen lassen.
 
-**Nur nachsehen, nicht anfassen** — vier Dinge laufen seit dem 02.09. und brauchen einen Blick, keine Arbeit:
+**Nur nachsehen, nicht anfassen** — diese Dinge brauchen einen Blick, keine Arbeit:
 
 | Was | Worauf |
 |---|---|
@@ -107,6 +108,7 @@ Dazu 319 Zeilen in `sharepoint_documents` und der Bucket `rag`. Gelesen wird üb
 | Contract Loader, stündlich | der erste Lauf mit einer **echten neuen Datei** unter `mistral-medium-latest` |
 | Content Studio, 04.09. | die Mengenangaben-Regel ist publiziert, aber im Flow nie gelaufen |
 | SharePoint-Abgleich, 03:30 | 15 Einlesungen, Rückstand danach rund 356 Dateien |
+| Monitor Graph & Teams, Sa 12.09. 13:30 | die erste Verlängerung des Agenten-Abos im Echtbetrieb. Beleg: Der Teams-Agent antwortet am Montag nach 13:23 noch |
 
 Der SharePoint-Ingest läuft seit dem 01.09. im Neuschnitt: `RAG - SharePoint Steuerung` (`PAqphQur0CTQRypM`) trägt beide Zeitpläne und ruft je Datei `RAG - SharePoint Ingest` (`coDhu7pIaI2bpmGZ`). Der abgelöste Flow heißt in n8n `… OLD` (`BBhGCRsQ8pdNSxTi`) und ist deaktiviert. **Die Namen sind vertauscht — immer über die ID gehen, nie über den Namen.** Der Rückweg bleibt billig: alten Flow aktivieren, Steuerung abschalten, **nie beide gleichzeitig** (gleiche Cron-Zeiten, gleicher Delta-Anker).
 
@@ -123,13 +125,15 @@ Die vollständige Liste steht in [offene-punkte.md](offene-punkte.md), nach Drin
 - **Ein Werkzeug für Data-Table-Zeilen.** Über MCP lassen sich Zeilen weder lesen noch löschen. Betrifft die rund 370 Null-Zeilen im `prozesshub_spiegel`.
 - **Redaction ist nicht verfügbar.** In den Workflow-Einstellungen ausgegraut mit `Upgrade`-Abzeichen. Der bekannte Klartext-Effekt bei HTTP-Fehlern bleibt. Gemessen: der **lebende** Zugang ist in keiner Ausführung gelandet.
 
-**Der Stand der Flows nach dem 02.09.:**
+**Der Stand der zuletzt publizierten Flows:**
 
 | Flow | Version | Zustand |
 |---|---|---|
 | `RWG Contract Loader` | `98c19d61` | alle 12 Zeilen in `vertraege` auf `abgelegt`, `FEHLER` leer |
 | `RWG_Jira-Agent` | `4654fda5` | Nachzügler-Zeitplan aktiv, **`probelauf` steht auf `true`** |
-| `RWG Teams Agent` | `432ee008` | Abo-Ereignisse fallen vor dem Claim heraus |
+| `RWG Teams Agent` | `3a19f7ed` | Abo-Ereignisse fallen vor dem Claim heraus; neu publiziert am 11.09., damit neues Graph-Abo `b6e14054` |
+| `RWG Monitor - Microsoft Graph & Teams` | `786d2eb7` | verlängert das Graph-Abo des Teams-Agenten, grün im Echtbetrieb (120436) |
+| `Telegram_Error_Info` | `03bb8a59` | sendet als HTML, Unterstriche brechen den Versand nicht mehr |
 | `KAPA Digital - Lead Intake` | `206a930b` | `spam_verdacht` ist im Prompt definiert |
 
 **Technisch offen**, alles kleinteilig und ohne Termin: Embeddings von 4 091 Bildchunks nach der Adressänderung (rund vier Cent), Dokumenteintrag vor den Chunks, der Retry als Netz im Content Studio, drei Alteinträge in `agent_requests`, das 404-Ausweichen im Jira-Agent.

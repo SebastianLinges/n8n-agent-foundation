@@ -59,6 +59,8 @@ Graph kündigt das Ende mit einer Lebenszyklus-Meldung an denselben Webhook an. 
 | 120387 | dasselbe mit Ziel 71,9 Stunden | Ablauf von 11:04:27 auf 11:23:23 UTC am 14.09. verlängert |
 | 120388 | gepinnte leere Abo-Liste | rot, „Kein Graph-Abo für den Teams-Agenten“ |
 | 120390 | gepinnte Verlängerung mit 403 | rot, „Abo-Verlängerung fehlgeschlagen: HTTP 403“ |
+| 120401 | Handlauf auf der aktiven Fassung `786d2eb7` | grün |
+| 120436 | geplanter Produktionslauf 12:00 UTC, dafür kurz mit Erfolgsspeicherung | grün, Abo gefunden, rund 71 Stunden Rest |
 
 ## Offen
 

@@ -596,6 +596,7 @@
           "value": "gpt-5.4",
           "cachedResultName": "gpt-5.4"
         },
+        "builtInTools": {},
         "options": {
           "maxTokens": 2500,
           "reasoningEffort": "low"
@@ -1530,7 +1531,8 @@
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       },
       "notes": "Graph schickt ueber denselben Webhook auch Lebenszyklus-Meldungen des Abos - dann steht in @odata.type '#microsoft.graph.subscription' statt '#Microsoft.Graph.chatMessage', und es gibt weder Chat- noch Nachrichten-ID. Geprueft wird positiv auf chatMessage, nicht negativ auf subscription: Graph kennt weitere Lifecycle-Typen. Die Schreibweise unterscheidet sich zwischen beiden Faellen, deshalb toLowerCase."
     },
